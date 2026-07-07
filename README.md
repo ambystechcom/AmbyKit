@@ -70,6 +70,7 @@ Antigravity (IDE + CLI). See [`docs/tool-compatibility.md`](./docs/tool-compatib
 | `ambykit add <tool…>` | Add/refresh one tool's integration |
 | `ambykit sync` | Re-emit all configured tools from the neutral source |
 | `ambykit dashboard [story-id]` | Progress view over the story/task graph |
+| `ambykit analyze` | Validate the dependency graph (cycles, blockers, orphans) |
 | `ambykit check` | Doctor: verify integrations |
 | `ambykit upgrade` | Update AmbyKit and re-sync |
 
@@ -82,7 +83,7 @@ See [`docs/cli-reference.md`](./docs/cli-reference.md).
 - **M2** ✅ GitHub Copilot (VS Code + CLI) emitters.
 - **M3** ✅ OpenCode, Cursor (+ CLI), Antigravity (IDE + CLI) emitters — all 9 targets shipping.
 - **M4** ✅ Template installation into `.amby/` + deepened UI-design artifact.
-- **M5** — `analyze` dependency-graph validation, npm publish, CI sync check. ← *next*
+- **M5** ✅ `analyze` dependency-graph validation, CI self-host gate, npm publish prep.
 
 ## Contributing
 

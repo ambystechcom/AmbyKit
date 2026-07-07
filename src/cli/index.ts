@@ -4,6 +4,7 @@ import { InitCommand } from "./init.js";
 import { SyncCommand } from "./sync.js";
 import { AddCommand } from "./add.js";
 import { DashboardCommand } from "./dashboard.js";
+import { AnalyzeCommand } from "./analyze.js";
 import { CheckCommand } from "./check.js";
 import { UpgradeCommand } from "./upgrade.js";
 
@@ -14,6 +15,7 @@ const COMMANDS: BaseCommand[] = [
   new AddCommand(),
   new SyncCommand(),
   new DashboardCommand(),
+  new AnalyzeCommand(),
   new CheckCommand(),
   new UpgradeCommand(),
 ];

@@ -56,6 +56,18 @@ ambykit dashboard --feature 001-password-reset
 ambykit dashboard --json
 ```
 
+## `ambykit analyze`
+
+Validate the story dependency graph, computed locally from `specs/` (no model tokens): detects
+**cycles** and **dangling references** (structural errors), and reports **blocked** vs **buildable**
+stories and **orphans** (stories with no tasks). Exits non-zero on structural errors, so it can gate
+CI. Complements the generative `/amby.analyze` phase.
+
+```bash
+ambykit analyze
+ambykit analyze --json
+```
+
 ## `ambykit check`
 
 Doctor: verify integrations are present and well-formed and that expected assistant CLIs are
