@@ -18,7 +18,7 @@ export class ClaudeEmitter extends BaseEmitter {
   readonly commandSurface: CommandSurface = "commands";
   readonly commandDir = ".claude/commands";
 
-  protected readonly toolNameMap: Record<AbstractTool, string> = {
+  protected override readonly toolNameMap: Record<AbstractTool, string> = {
     read: "Read",
     write: "Write",
     edit: "Edit",

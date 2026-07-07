@@ -1,11 +1,5 @@
 import { join } from "node:path";
-import type {
-  AbstractTool,
-  CommandSpec,
-  CommandSurface,
-  EmittedFile,
-  RulesContext,
-} from "../core/types.js";
+import type { CommandSpec, CommandSurface, EmittedFile, RulesContext } from "../core/types.js";
 import { BaseEmitter } from "./base-emitter.js";
 
 /**
@@ -19,14 +13,6 @@ export class CopilotEmitter extends BaseEmitter {
   readonly displayName: string = "GitHub Copilot (VS Code)";
   readonly commandSurface: CommandSurface = "commands";
   readonly commandDir: string = join(".github", "prompts");
-
-  // Reserved for a future `tools:` frontmatter; we currently run in agent mode which grants tools.
-  protected readonly toolNameMap: Record<AbstractTool, string> = {
-    read: "codebase",
-    write: "editFiles",
-    edit: "editFiles",
-    bash: "runCommands",
-  };
 
   protected override commandFileName(spec: CommandSpec): string {
     return `${spec.name}.prompt.md`;

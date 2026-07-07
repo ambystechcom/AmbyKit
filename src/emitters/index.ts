@@ -2,11 +2,21 @@ import type { BaseEmitter } from "./base-emitter.js";
 import { ClaudeEmitter } from "./claude.js";
 import { CopilotEmitter } from "./copilot.js";
 import { CopilotCliEmitter } from "./copilot-cli.js";
+import { OpenCodeEmitter } from "./opencode.js";
+import { CursorEmitter } from "./cursor.js";
+import { CursorCliEmitter } from "./cursor-cli.js";
+import { AntigravityEmitter } from "./antigravity.js";
+import { AntigravityCliEmitter } from "./antigravity-cli.js";
 
 export { BaseEmitter } from "./base-emitter.js";
 export { ClaudeEmitter } from "./claude.js";
 export { CopilotEmitter } from "./copilot.js";
 export { CopilotCliEmitter } from "./copilot-cli.js";
+export { OpenCodeEmitter } from "./opencode.js";
+export { CursorEmitter } from "./cursor.js";
+export { CursorCliEmitter } from "./cursor-cli.js";
+export { AntigravityEmitter } from "./antigravity.js";
+export { AntigravityCliEmitter } from "./antigravity-cli.js";
 
 /** A user-selectable target and the emitter it resolves to. */
 export interface TargetDef {
@@ -22,6 +32,11 @@ export interface TargetDef {
 const claude = new ClaudeEmitter();
 const copilot = new CopilotEmitter();
 const copilotCli = new CopilotCliEmitter();
+const opencode = new OpenCodeEmitter();
+const cursor = new CursorEmitter();
+const cursorCli = new CursorCliEmitter();
+const antigravity = new AntigravityEmitter();
+const antigravityCli = new AntigravityCliEmitter();
 
 /**
  * Registry of selectable targets → emitters. Several targets can share one emitter (VS Code
@@ -32,6 +47,11 @@ export const TARGETS: TargetDef[] = [
   { id: "claude-vscode", displayName: "Claude Code (VS Code)", emitter: claude, alias: true },
   { id: "copilot", displayName: "GitHub Copilot (VS Code)", emitter: copilot },
   { id: "copilot-cli", displayName: "GitHub Copilot CLI", emitter: copilotCli },
+  { id: "opencode", displayName: "OpenCode", emitter: opencode },
+  { id: "cursor", displayName: "Cursor", emitter: cursor },
+  { id: "cursor-cli", displayName: "Cursor CLI", emitter: cursorCli },
+  { id: "antigravity", displayName: "Antigravity (IDE)", emitter: antigravity },
+  { id: "antigravity-cli", displayName: "Antigravity CLI", emitter: antigravityCli },
 ];
 
 export function getTarget(id: string): TargetDef | undefined {

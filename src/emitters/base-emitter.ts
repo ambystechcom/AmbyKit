@@ -21,8 +21,13 @@ export abstract class BaseEmitter {
   abstract readonly commandSurface: CommandSurface;
   /** Directory (relative to project root) that holds command/skill/workflow files. */
   abstract readonly commandDir: string;
-  /** Map from abstract capability to this tool's concrete tool name. */
-  protected abstract readonly toolNameMap: Record<AbstractTool, string>;
+  /** Map from abstract capability to this tool's concrete tool name. Override when emitting tools. */
+  protected readonly toolNameMap: Record<AbstractTool, string> = {
+    read: "read",
+    write: "write",
+    edit: "edit",
+    bash: "bash",
+  };
 
   /** Template method: orchestrates a full emit. Subclasses do not override this. */
   emit(specs: CommandSpec[], ctx: RulesContext): EmittedFile[] {
@@ -55,9 +60,12 @@ export abstract class BaseEmitter {
   protected abstract commandFrontmatter(spec: CommandSpec): Array<[string, string]>;
 
   protected commandFile(spec: CommandSpec): EmittedFile {
-    const front = this.renderFrontmatter(this.commandFrontmatter(spec));
+    const pairs = this.commandFrontmatter(spec);
     const notice = this.generatedNotice(spec);
-    const contents = `${front}\n${notice}\n\n${this.transformBody(spec)}\n`;
+    const body = this.transformBody(spec);
+    // Tools with no command frontmatter (e.g. Cursor plain commands) get no `---` block.
+    const head = pairs.length > 0 ? `${this.renderFrontmatter(pairs)}\n` : "";
+    const contents = `${head}${notice}\n\n${body}\n`;
     return { path: this.commandFilePath(spec), contents, scope: "project" };
   }
 
