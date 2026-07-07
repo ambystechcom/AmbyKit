@@ -7,7 +7,21 @@ use `ambykit <command>`.
 
 - `--verbose` — detailed logging.
 - `--dry-run` — show what would change without writing files.
-- `--yes` — assume yes for prompts (non-interactive).
+- `--yes` — assume yes for prompts (non-interactive); skips interactive tool selection.
+
+## Terminal output
+
+The CLI adapts its output to your terminal. It colorizes and uses box-drawing glyphs on an
+interactive terminal, and **degrades cleanly** everywhere else so logs and pipes stay readable:
+
+- Piped / redirected / non-interactive (CI): plain text, no color, no control sequences.
+- `NO_COLOR` set: color is dropped (glyphs and words remain).
+- Terminals without extended glyphs: an ASCII fallback (`[ok]`/`x`, `#`/`-` bars) is used.
+- Narrow terminals: the dashboard drops lower-priority columns rather than wrapping.
+- `--json` output is always unstyled and byte-stable — safe to parse.
+
+Multi-step commands (`init`, `add`, `sync`, `upgrade`) show a spinner while working and a
+created/updated/unchanged/skipped summary when done.
 
 ## `ambykit init [dir]`
 
@@ -23,10 +37,13 @@ npx @ambystech/ambykit init . --yes
 ## `ambykit add <tool…>`
 
 Add or refresh integration for one or more targets (see [tool compatibility](./tool-compatibility.md)
-for target names).
+for target names). On an interactive terminal, running it with **no target** opens a multi-select
+prompt (`space` toggle, `enter` confirm, `esc` cancel); non-interactively it errors with the list of
+available targets instead of blocking. `init` behaves the same when `--tools` is omitted.
 
 ```bash
 ambykit add cursor claude
+ambykit add                       # interactive tool picker (TTY only)
 ```
 
 ## `ambykit sync`
@@ -48,9 +65,13 @@ model tokens).
 - **`story-id`** — detail for one story. Story ids **restart per feature**, so a bare `US-3` may
   match several; qualify it with the feature ref as `NNN:US-3` (also accepts `NNN/US-3`). A bare id
   that matches more than one feature prints the matches so you can pick.
+- **`--interactive`** — opt-in full-screen navigable view (TTY only): `↑`/`↓` move, `enter` opens a
+  story's tasks, `←`/`esc` goes back, `q` quits. On a non-interactive terminal it falls back to the
+  one-shot table.
 
 ```bash
 ambykit dashboard
+ambykit dashboard --interactive   # full-screen navigable view (TTY only)
 ambykit dashboard 001:US-3        # feature-qualified (recommended)
 ambykit dashboard --status blocked
 ambykit dashboard --feature 001-password-reset

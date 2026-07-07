@@ -1,0 +1,104 @@
+{
+  "$schema": "https://ambystech.dev/schemas/design-tokens.json",
+  "$note": "Terminal UI tokens. 'color' primitives are ANSI SGR parameters (not hex); 'glyph' primitives carry a unicode value and an ASCII fallback {u,a} selected by Capabilities.unicode; 'space' is measured in character columns.",
+  "primitive": {
+    "sgr": {
+      "reset": "0",
+      "bold": "1",
+      "dim": "2",
+      "fg-default": "39",
+      "fg-cyan": "36",
+      "fg-green": "32",
+      "fg-yellow": "33",
+      "fg-red": "31",
+      "fg-magenta": "35",
+      "fg-gray": "90"
+    },
+    "glyph": {
+      "tick": { "u": "✓", "a": "[ok]" },
+      "bang": { "u": "!", "a": "!" },
+      "cross": { "u": "✗", "a": "x" },
+      "bar-fill": { "u": "█", "a": "#" },
+      "bar-empty": { "u": "░", "a": "-" },
+      "cursor": { "u": "▸", "a": ">" },
+      "checked": { "u": "◉", "a": "(*)" },
+      "unchecked": { "u": "◯", "a": "( )" },
+      "arrow": { "u": "→", "a": "->" },
+      "spinner": { "u": ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"], "a": ["-","\\","|","/"] }
+    },
+    "space": { "col-1": 1, "col-2": 2, "pad": 1, "bar-width": 10, "box-pad": 1 }
+  },
+  "semantic": {
+    "color": {
+      "accent": "{primitive.sgr.fg-cyan}",
+      "success": "{primitive.sgr.fg-green}",
+      "warn": "{primitive.sgr.fg-yellow}",
+      "danger": "{primitive.sgr.fg-red}",
+      "muted": "{primitive.sgr.dim}",
+      "text": "{primitive.sgr.fg-default}"
+    },
+    "symbol": {
+      "success": "{primitive.glyph.tick}",
+      "warn": "{primitive.glyph.bang}",
+      "error": "{primitive.glyph.cross}",
+      "bar-fill": "{primitive.glyph.bar-fill}",
+      "bar-empty": "{primitive.glyph.bar-empty}",
+      "cursor": "{primitive.glyph.cursor}",
+      "checked": "{primitive.glyph.checked}",
+      "unchecked": "{primitive.glyph.unchecked}",
+      "next-step": "{primitive.glyph.arrow}"
+    },
+    "space": { "gutter": "{primitive.space.col-2}", "indent": "{primitive.space.col-2}" }
+  },
+  "component": {
+    "banner": { "fg": "{semantic.color.accent}", "tagline-fg": "{semantic.color.muted}" },
+    "message": {
+      "info": { "fg": "{semantic.color.text}" },
+      "success": { "fg": "{semantic.color.success}", "symbol": "{semantic.symbol.success}" },
+      "warn": { "fg": "{semantic.color.warn}", "symbol": "{semantic.symbol.warn}" },
+      "error": { "fg": "{semantic.color.danger}", "symbol": "{semantic.symbol.error}" },
+      "heading": { "fg": "{semantic.color.accent}", "weight": "{primitive.sgr.bold}" },
+      "next-step": { "fg": "{semantic.color.muted}", "symbol": "{semantic.symbol.next-step}", "indent": "{semantic.space.indent}" }
+    },
+    "spinner": { "fg": "{semantic.color.accent}", "frames": "{primitive.glyph.spinner}" },
+    "progress-bar": {
+      "fill": "{semantic.symbol.bar-fill}",
+      "empty": "{semantic.symbol.bar-empty}",
+      "width": "{primitive.space.bar-width}",
+      "fg-complete": "{semantic.color.success}",
+      "fg-partial": "{semantic.color.accent}",
+      "fg-empty": "{semantic.color.muted}"
+    },
+    "status-badge": {
+      "draft": { "fg": "{semantic.color.muted}" },
+      "ready": { "fg": "{semantic.color.accent}" },
+      "in-progress": { "fg": "{semantic.color.warn}" },
+      "blocked": { "fg": "{semantic.color.danger}" },
+      "done": { "fg": "{semantic.color.success}" }
+    },
+    "table": {
+      "header-fg": "{semantic.color.muted}",
+      "rule-fg": "{semantic.color.muted}",
+      "gutter": "{semantic.space.gutter}"
+    },
+    "summary": {
+      "created-fg": "{semantic.color.success}",
+      "updated-fg": "{semantic.color.accent}",
+      "unchanged-fg": "{semantic.color.muted}",
+      "skipped-fg": "{semantic.color.warn}"
+    },
+    "menu": {
+      "cursor": "{semantic.symbol.cursor}",
+      "cursor-fg": "{semantic.color.accent}",
+      "hint-fg": "{semantic.color.muted}",
+      "box-fg": "{semantic.color.muted}"
+    },
+    "prompt": {
+      "message-fg": "{semantic.color.accent}",
+      "hint-fg": "{semantic.color.muted}",
+      "checked": "{semantic.symbol.checked}",
+      "unchecked": "{semantic.symbol.unchecked}",
+      "cursor": "{semantic.symbol.cursor}"
+    }
+  }
+}

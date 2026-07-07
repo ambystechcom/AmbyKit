@@ -1,4 +1,9 @@
 import { findProjectRoot } from "../core/paths.js";
+import { detectCapabilities } from "./ui/capabilities.js";
+import * as render from "./ui/render.js";
+import { spinner, summarize, type Spinner } from "./ui/progress.js";
+import { toChangeSummary, type WriteResult } from "./fsops.js";
+import type { Capabilities } from "./ui/types.js";
 
 /** Parsed CLI invocation for one command. */
 export interface CliOptions {
@@ -24,13 +29,16 @@ export abstract class BaseCommand {
   protected dryRun = false;
   protected assumeYes = false;
 
+  /** Terminal capabilities driving all styled output. Detected once from the real stdout. */
+  protected caps: Capabilities = detectCapabilities();
+
   async run(opts: CliOptions): Promise<number> {
     this.verbose = flag(opts, "verbose");
     this.dryRun = flag(opts, "dry-run");
     this.assumeYes = flag(opts, "yes") || flag(opts, "y");
 
     if (this.requiresProject && findProjectRoot(opts.cwd) === null) {
-      this.error("Not inside an AmbyKit project (no .amby/ found). Run `ambykit init` first.");
+      this.error("Not inside an AmbyKit project (no .amby/ found).", "Run `ambykit init` first.");
       return 1;
     }
     try {
@@ -51,21 +59,36 @@ export abstract class BaseCommand {
     return root;
   }
 
-  // --- logging ---
+  // --- logging (all styling routes through src/cli/ui/render.ts — Principle 2) ---
   protected info(msg: string): void {
-    console.log(msg);
+    console.log(render.info(msg));
+  }
+  protected heading(msg: string): void {
+    console.log(render.heading(this.caps, msg));
   }
   protected success(msg: string): void {
-    console.log(`✓ ${msg}`);
+    console.log(render.success(this.caps, msg));
   }
   protected warn(msg: string): void {
-    console.warn(`! ${msg}`);
+    console.warn(render.warn(this.caps, msg));
   }
-  protected error(msg: string): void {
-    console.error(`✗ ${msg}`);
+  /** Error line, optionally with an actionable next-step hint (`→ …`). */
+  protected error(msg: string, next?: string): void {
+    console.error(render.error(this.caps, msg, next));
   }
   protected debug(msg: string): void {
-    if (this.verbose) console.log(`  ${msg}`);
+    if (this.verbose) console.log(render.info(`  ${msg}`));
+  }
+
+  /** A spinner for live feedback during multi-step work (no-op on a non-TTY). */
+  protected spinner(): Spinner {
+    return spinner(this.caps);
+  }
+
+  /** Print the created/updated/unchanged/skipped block for a write result (US-3). */
+  protected printSummary(result: WriteResult): void {
+    const block = summarize(this.caps, toChangeSummary(result, this.dryRun));
+    if (block) console.log(block);
   }
 }
 

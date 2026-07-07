@@ -14,10 +14,14 @@ export class UpgradeCommand extends BaseCommand {
     // @ambystech/ambykit@latest`) then run this to refresh generated files.
     const root = this.projectRoot(opts.cwd);
     const config = loadConfig(root);
+    const spin = this.spinner();
+    spin.start(this.dryRun ? "Checking what would change…" : "Re-syncing generated files…");
     const files = buildEmittedFiles(root, config);
     const result = applyFiles(root, files, { dryRun: this.dryRun, includeUser: false });
+    spin.stop();
     const changed = this.dryRun ? result.wouldChange : result.written;
-    this.success(`${this.dryRun ? "Would refresh" : "Refreshed"} ${changed.length} file(s); ${result.unchanged.length} unchanged.`);
+    this.success(`${this.dryRun ? "Would refresh" : "Refreshed"} ${changed.length} file(s).`);
+    this.printSummary(result);
     this.info("To update the AmbyKit version itself, run `npm i -g @ambystech/ambykit@latest`.");
     return 0;
   }
