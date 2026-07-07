@@ -7,6 +7,7 @@ import { saveConfig } from "../core/config.js";
 import { templatesDir } from "../core/paths.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
 import { getTarget, TARGETS } from "../emitters/index.js";
+import { banner } from "./banner.js";
 import type { AmbyConfig } from "../core/types.js";
 
 const PKG_VERSION = "0.0.0";
@@ -25,6 +26,7 @@ export class InitCommand extends BaseCommand {
   protected override requiresProject = false;
 
   protected async execute(opts: CliOptions): Promise<number> {
+    this.info(banner());
     const target = resolve(opts.cwd, opts.positionals[0] ?? ".");
 
     const toolsFlag = stringFlag(opts, "tools");
