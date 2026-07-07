@@ -1,0 +1,26 @@
+---
+id: analyze
+name: amby.analyze
+description: Cross-check spec, plan, and tasks for coverage, consistency, and dependency-graph health.
+argument-hint: "[feature id, defaults to current]"
+phase: analyze
+reads: [specs/NNN-slug/spec.md, specs/NNN-slug/plan.md, specs/NNN-slug/tasks.md]
+writes: []
+allowedTools: [read]
+---
+
+Analyze feature `$ARGUMENTS` (default: the current feature) for consistency. Read-only — report, don't edit.
+
+Check and report:
+
+1. **Coverage:** every `FR-###`/`US-#` in the spec is addressed by the plan and has at least one
+   task; every task maps to a real `US-#`. List orphans and gaps.
+2. **Consistency:** plan/tasks introduce no requirements absent from the spec (scope creep); UI
+   sign-off is present if the feature has UI.
+3. **Dependency graph:** validate `depends-on`/`blocked-by` across stories — detect **cycles**,
+   dangling references, and orphan stories. Report which stories are currently **blocked** vs
+   **buildable now**.
+4. **Clarity:** any remaining `[NEEDS CLARIFICATION]` markers.
+
+Output a short, structured report (tables/bullets). Prefer machine-checkable facts over prose. Do not
+modify any file.
