@@ -1,8 +1,12 @@
 import type { BaseEmitter } from "./base-emitter.js";
 import { ClaudeEmitter } from "./claude.js";
+import { CopilotEmitter } from "./copilot.js";
+import { CopilotCliEmitter } from "./copilot-cli.js";
 
 export { BaseEmitter } from "./base-emitter.js";
 export { ClaudeEmitter } from "./claude.js";
+export { CopilotEmitter } from "./copilot.js";
+export { CopilotCliEmitter } from "./copilot-cli.js";
 
 /** A user-selectable target and the emitter it resolves to. */
 export interface TargetDef {
@@ -16,15 +20,18 @@ export interface TargetDef {
 }
 
 const claude = new ClaudeEmitter();
+const copilot = new CopilotEmitter();
+const copilotCli = new CopilotCliEmitter();
 
 /**
  * Registry of selectable targets → emitters. Several targets can share one emitter (VS Code
- * extensions, CLIs that reuse a sibling's output). M1 ships Claude Code; later milestones add the
- * rest without touching this shape.
+ * extensions, CLIs that reuse a sibling's output). Adding a tool is a new emitter + entries here.
  */
 export const TARGETS: TargetDef[] = [
   { id: "claude", displayName: "Claude Code (CLI)", emitter: claude },
   { id: "claude-vscode", displayName: "Claude Code (VS Code)", emitter: claude, alias: true },
+  { id: "copilot", displayName: "GitHub Copilot (VS Code)", emitter: copilot },
+  { id: "copilot-cli", displayName: "GitHub Copilot CLI", emitter: copilotCli },
 ];
 
 export function getTarget(id: string): TargetDef | undefined {

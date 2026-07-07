@@ -57,8 +57,16 @@ export abstract class BaseEmitter {
   protected commandFile(spec: CommandSpec): EmittedFile {
     const front = this.renderFrontmatter(this.commandFrontmatter(spec));
     const notice = this.generatedNotice(spec);
-    const contents = `${front}\n${notice}\n\n${spec.body}\n`;
+    const contents = `${front}\n${notice}\n\n${this.transformBody(spec)}\n`;
     return { path: this.commandFilePath(spec), contents, scope: "project" };
+  }
+
+  /**
+   * Transform the neutral prompt body for this tool. Default: verbatim. Tools with a different
+   * argument-placeholder convention override this (e.g. Copilot swaps `$ARGUMENTS` for `${input:…}`).
+   */
+  protected transformBody(spec: CommandSpec): string {
+    return spec.body;
   }
 
   protected generatedNotice(spec: CommandSpec): string {

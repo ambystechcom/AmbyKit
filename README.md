@@ -77,10 +77,10 @@ See [`docs/cli-reference.md`](./docs/cli-reference.md).
 
 ## Roadmap
 
-- **M0** — Bootstrap: repo scaffold, docs, neutral templates + prompts, own constitution. ← *here*
-- **M1** — Core model + Claude Code emitter + `ambykit init`.
-- **M2** — GitHub Copilot (VS Code + CLI) emitters.
-- **M3** — OpenCode, Cursor (+ CLI), Antigravity (IDE + CLI) emitters.
+- **M0** ✅ Bootstrap: repo scaffold, docs, neutral templates + prompts, own constitution.
+- **M1** ✅ Core model + Claude Code emitter + `ambykit init`/`sync`/`dashboard`.
+- **M2** ✅ GitHub Copilot (VS Code + CLI) emitters.
+- **M3** — OpenCode, Cursor (+ CLI), Antigravity (IDE + CLI) emitters. ← *next*
 - **M4** — Finalize phase prompts + UI-design depth.
 - **M5** — `analyze`/`upgrade`/`check`, tests, npm publish.
 
