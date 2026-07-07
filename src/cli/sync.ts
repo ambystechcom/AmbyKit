@@ -26,15 +26,21 @@ export class SyncCommand extends BaseCommand {
       this.info(`${this.dryRun ? "Would install" : "Installed"} ${templates.created.length} new template/reference file(s).`);
     }
 
+    const spin = this.spinner();
+    spin.start(this.dryRun || checkOnly ? "Checking what would change…" : "Emitting tool files…");
     const files = buildEmittedFiles(root, config);
     const result = applyFiles(root, files, {
       dryRun: this.dryRun || checkOnly,
       includeUser,
     });
+    spin.stop();
 
     if (checkOnly) {
       if (result.wouldChange.length > 0) {
-        this.error(`Out of sync: ${result.wouldChange.length} file(s) would change.`);
+        this.error(
+          `Out of sync: ${result.wouldChange.length} file(s) would change.`,
+          "Run `ambykit sync` to regenerate them.",
+        );
         for (const p of result.wouldChange) this.info(`  ~ ${p}`);
         return 1;
       }
@@ -43,11 +49,8 @@ export class SyncCommand extends BaseCommand {
     }
 
     const changed = this.dryRun ? result.wouldChange : result.written;
-    this.success(`${this.dryRun ? "Would sync" : "Synced"} ${changed.length} file(s); ${result.unchanged.length} unchanged.`);
-    for (const p of changed) this.debug(p);
-    if (result.skipped.length > 0) {
-      this.warn(`${result.skipped.length} user-level file(s) skipped (use --include-user).`);
-    }
+    this.success(`${this.dryRun ? "Would sync" : "Synced"} ${changed.length} file(s).`);
+    this.printSummary(result);
     return 0;
   }
 }

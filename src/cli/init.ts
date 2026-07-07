@@ -8,6 +8,8 @@ import { templatesDir } from "../core/paths.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
 import { getTarget, TARGETS } from "../emitters/index.js";
 import { banner } from "./banner.js";
+import { multiSelect } from "./ui/interactive/prompt.js";
+import { toolOptions } from "./tool-options.js";
 import type { AmbyConfig } from "../core/types.js";
 
 const PKG_VERSION = "0.0.0";
@@ -30,14 +32,32 @@ export class InitCommand extends BaseCommand {
     const target = resolve(opts.cwd, opts.positionals[0] ?? ".");
 
     const toolsFlag = stringFlag(opts, "tools");
-    const tools = toolsFlag
-      ? toolsFlag.split(",").map((t) => t.trim()).filter(Boolean)
-      : detectTools(target);
+    let tools: string[];
+    if (toolsFlag) {
+      tools = toolsFlag.split(",").map((t) => t.trim()).filter(Boolean);
+    } else if (this.caps.isTTY && !this.assumeYes) {
+      // No --tools on an interactive terminal → prompt, preselecting detected tools (US-7, FR-015).
+      const picked = await multiSelect(this.caps, {
+        message: "Select tools to configure",
+        options: toolOptions(),
+        preselected: detectTools(target),
+      });
+      if (picked === null) {
+        this.warn("Cancelled.");
+        return 1;
+      }
+      tools = picked.length > 0 ? picked : detectTools(target);
+    } else {
+      // Non-TTY (or --yes): fall back to detection rather than blocking on a prompt (FR-016).
+      tools = detectTools(target);
+    }
 
     const unknown = tools.filter((t) => !getTarget(t));
     if (unknown.length > 0) {
-      this.error(`Unknown target(s): ${unknown.join(", ")}`);
-      this.info(`Available: ${TARGETS.map((t) => t.id).join(", ")}`);
+      this.error(
+        `Unknown target(s): ${unknown.join(", ")}`,
+        `Available: ${TARGETS.map((t) => t.id).join(", ")}`,
+      );
       return 1;
     }
 
@@ -60,14 +80,14 @@ export class InitCommand extends BaseCommand {
       this.debug(`${this.dryRun ? "Would install" : "Installed"} ${templates.created.length} template/reference file(s).`);
     }
 
+    const spin = this.spinner();
+    spin.start(this.dryRun ? "Checking what would change…" : "Emitting tool files…");
     const files = buildEmittedFiles(target, config);
     const result = applyFiles(target, files, { dryRun: this.dryRun, includeUser: false });
+    spin.stop();
 
-    const verb = this.dryRun ? "Would emit" : "Emitted";
-    const changed = this.dryRun ? result.wouldChange.length : result.written.length;
     this.success(`${this.dryRun ? "Planned" : "Initialized"} AmbyKit in ${basename(target)} for: ${tools.join(", ")}`);
-    this.info(`${verb} ${changed} file(s); ${result.unchanged.length} unchanged.`);
-    for (const p of this.dryRun ? result.wouldChange : result.written) this.debug(p);
+    this.printSummary(result);
     if (!this.dryRun) {
       this.info("Next: run /amby.constitution then /amby.specify in your assistant.");
     }

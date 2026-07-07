@@ -2,9 +2,12 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
 import type { EmittedFile } from "../core/types.js";
+import type { ChangeSummary } from "./ui/types.js";
 
 export interface WriteResult {
-  written: string[];
+  written: string[]; // created ∪ updated (kept for existing callers)
+  created: string[]; // written and did not previously exist
+  updated: string[]; // written over an existing, differing file
   unchanged: string[];
   wouldChange: string[];
   skipped: string[]; // user-scope files skipped without consent
@@ -22,7 +25,14 @@ export function applyFiles(
   files: EmittedFile[],
   opts: ApplyOptions,
 ): WriteResult {
-  const result: WriteResult = { written: [], unchanged: [], wouldChange: [], skipped: [] };
+  const result: WriteResult = {
+    written: [],
+    created: [],
+    updated: [],
+    unchanged: [],
+    wouldChange: [],
+    skipped: [],
+  };
   for (const file of files) {
     if (file.scope === "user" && !opts.includeUser) {
       result.skipped.push(file.path);
@@ -30,7 +40,8 @@ export function applyFiles(
     }
     const base = file.scope === "user" ? homedir() : projectRoot;
     const abs = join(base, file.path);
-    const current = existsSync(abs) ? readFileSync(abs, "utf8") : null;
+    const existed = existsSync(abs);
+    const current = existed ? readFileSync(abs, "utf8") : null;
     if (current === file.contents) {
       result.unchanged.push(file.path);
       continue;
@@ -42,8 +53,21 @@ export function applyFiles(
     mkdirSync(dirname(abs), { recursive: true });
     writeFileSync(abs, file.contents, "utf8");
     result.written.push(file.path);
+    (existed ? result.updated : result.created).push(file.path);
   }
   return result;
+}
+
+/** Project a write result into the change-summary shape the UI layer renders (US-3). */
+export function toChangeSummary(r: WriteResult, dryRun: boolean): ChangeSummary {
+  return {
+    created: r.created,
+    updated: r.updated,
+    unchanged: r.unchanged,
+    skipped: r.skipped,
+    wouldChange: r.wouldChange,
+    dryRun,
+  };
 }
 
 /** Copy a template file into the project if it does not already exist. Returns true if written. */

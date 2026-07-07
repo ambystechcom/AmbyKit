@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import type { BaseCommand, CliOptions } from "./base-command.js";
 import { banner } from "./banner.js";
+import { detectCapabilities } from "./ui/capabilities.js";
+import * as render from "./ui/render.js";
 import { InitCommand } from "./init.js";
 import { SyncCommand } from "./sync.js";
 import { AddCommand } from "./add.js";
@@ -62,7 +64,7 @@ export async function main(argv: string[]): Promise<number> {
   }
   const command = COMMANDS.find((c) => c.name === name);
   if (!command) {
-    console.error(`✗ Unknown command: ${name}`);
+    console.error(render.error(detectCapabilities(), `Unknown command: ${name}`));
     printHelp();
     return 1;
   }

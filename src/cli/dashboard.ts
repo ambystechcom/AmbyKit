@@ -10,11 +10,20 @@ import {
   type StoryProgress,
   type TaskLine,
 } from "../core/dashboard.js";
+import { progressCell, renderTable, statusCell } from "./ui/table.js";
+import type { Cell } from "./ui/types.js";
+import { runFullscreen } from "./ui/interactive/fullscreen.js";
+import {
+  initDashboardTui,
+  isDashboardDone,
+  reduceDashboard,
+  renderDashboardTui,
+} from "./ui/interactive/dashboard.js";
 
 export class DashboardCommand extends BaseCommand {
   readonly name = "dashboard";
   readonly summary = "Progress view over the story/task graph.";
-  readonly usage = "ambykit dashboard [story-id] [--json] [--status=X] [--feature=X]";
+  readonly usage = "ambykit dashboard [story-id] [--interactive] [--json] [--status=X] [--feature=X]";
 
   protected async execute(opts: CliOptions): Promise<number> {
     const root = this.projectRoot(opts.cwd);
@@ -36,30 +45,53 @@ export class DashboardCommand extends BaseCommand {
       this.info("No user stories found. Run /amby.specify to create one.");
       return 0;
     }
+    // Opt-in interactive view — only on a real terminal; otherwise fall back to one-shot (FR-014).
+    if (flag(opts, "interactive") && this.caps.isTTY) {
+      return this.interactive(root, stories);
+    }
     this.renderTable(stories);
     return 0;
   }
 
   private renderTable(stories: StoryProgress[]): void {
-    this.info(banner());
-    const rows = stories.map((s) => [
+    this.info(banner(this.caps));
+    // Higher priority = kept longer when the terminal is narrow; drops Blocked-by → Prio → Feat first.
+    const columns = [
+      { header: "Feat", min: 3, priority: 50 },
+      { header: "Story", min: 5, priority: 100 },
+      { header: "Description", min: 8, priority: 80 },
+      { header: "Progress", min: 15, priority: 90 },
+      { header: "Status", min: 6, priority: 70 },
+      { header: "Prio", min: 4, priority: 40 },
+      { header: "Blocked-by", min: 6, priority: 30 },
+    ];
+    const rows: Cell[][] = stories.map((s) => [
       s.featureRef,
       s.displayId,
       truncate(s.title, 30),
-      `${s.tasksDone}/${s.tasksTotal}`,
-      `${s.percent}%`,
-      s.status || "-",
+      progressCell(s.tasksDone, s.tasksTotal),
+      statusCell(s.status || "-"),
       s.priority || "-",
       s.blockedBy.length ? s.blockedBy.join(",") : "-",
     ]);
-    const header = ["Feat", "Story", "Description", "Tasks", "%", "Status", "Prio", "Blocked-by"];
-    this.info(formatTable(header, rows));
+    this.info(renderTable(this.caps, { columns, rows, width: this.caps.columns }));
 
     const totalTasks = stories.reduce((n, s) => n + s.tasksTotal, 0);
     const doneTasks = stories.reduce((n, s) => n + s.tasksDone, 0);
     const pct = totalTasks === 0 ? 0 : Math.round((doneTasks / totalTasks) * 100);
     this.info("");
     this.info(`Overall: ${stories.length} stories · ${doneTasks}/${totalTasks} tasks · ${pct}%`);
+  }
+
+  /** Launch the opt-in full-screen navigable view (US-6). Assumes a TTY (checked by the caller). */
+  private async interactive(root: string, stories: StoryProgress[]): Promise<number> {
+    await runFullscreen({
+      initial: initDashboardTui(stories),
+      render: (s) => renderDashboardTui(this.caps, s, (story) => tasksForStory(root, story)),
+      reduce: reduceDashboard,
+      isDone: isDashboardDone,
+    });
+    return 0;
   }
 
   private detail(
@@ -123,14 +155,4 @@ function tasksForStory(root: string, story: StoryProgress): TaskLine[] {
 
 function truncate(s: string, n: number): string {
   return s.length <= n ? s : s.slice(0, n - 1) + "…";
-}
-
-function formatTable(header: string[], rows: string[][]): string {
-  const widths = header.map((h, i) =>
-    Math.max(h.length, ...rows.map((r) => (r[i] ?? "").length)),
-  );
-  const line = (cells: string[]) =>
-    cells.map((c, i) => c.padEnd(widths[i] ?? 0)).join("  ").trimEnd();
-  const sep = widths.map((w) => "-".repeat(w)).join("  ");
-  return [line(header), sep, ...rows.map(line)].join("\n");
 }

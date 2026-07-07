@@ -3,6 +3,8 @@ import { applyFiles } from "./fsops.js";
 import { buildEmittedFiles } from "./emit.js";
 import { loadConfig, saveConfig } from "../core/config.js";
 import { getTarget, TARGETS } from "../emitters/index.js";
+import { multiSelect } from "./ui/interactive/prompt.js";
+import { toolOptions } from "./tool-options.js";
 
 export class AddCommand extends BaseCommand {
   readonly name = "add";
@@ -11,29 +13,43 @@ export class AddCommand extends BaseCommand {
 
   protected async execute(opts: CliOptions): Promise<number> {
     const root = this.projectRoot(opts.cwd);
-    if (opts.positionals.length === 0) {
-      this.error("Specify at least one target.");
-      this.info(`Available: ${TARGETS.map((t) => t.id).join(", ")}`);
-      return 1;
+    const available = `Available: ${TARGETS.map((t) => t.id).join(", ")}`;
+    let targets = opts.positionals;
+    if (targets.length === 0) {
+      if (!this.caps.isTTY) {
+        // Non-TTY + no target → error with guidance instead of blocking on a prompt (US-7, FR-016).
+        this.error("Specify at least one target.", available);
+        return 1;
+      }
+      const picked = await multiSelect(this.caps, {
+        message: "Select tools to add",
+        options: toolOptions(),
+      });
+      if (picked === null || picked.length === 0) {
+        this.warn("Nothing selected.");
+        return 1;
+      }
+      targets = picked;
     }
-    const unknown = opts.positionals.filter((t) => !getTarget(t));
+    const unknown = targets.filter((t) => !getTarget(t));
     if (unknown.length > 0) {
-      this.error(`Unknown target(s): ${unknown.join(", ")}`);
-      this.info(`Available: ${TARGETS.map((t) => t.id).join(", ")}`);
+      this.error(`Unknown target(s): ${unknown.join(", ")}`, available);
       return 1;
     }
 
     const config = loadConfig(root);
-    const merged = Array.from(new Set([...config.tools, ...opts.positionals]));
+    const merged = Array.from(new Set([...config.tools, ...targets]));
     config.tools = merged;
     if (!this.dryRun) saveConfig(root, config);
 
+    const spin = this.spinner();
+    spin.start(this.dryRun ? "Checking what would change…" : "Emitting tool files…");
     const files = buildEmittedFiles(root, config);
     const result = applyFiles(root, files, { dryRun: this.dryRun, includeUser: false });
-    const changed = this.dryRun ? result.wouldChange : result.written;
-    this.success(`${this.dryRun ? "Would add" : "Added"}: ${opts.positionals.join(", ")}`);
-    this.info(`${this.dryRun ? "Would emit" : "Emitted"} ${changed.length} file(s); ${result.unchanged.length} unchanged.`);
-    for (const p of changed) this.debug(p);
+    spin.stop();
+
+    this.success(`${this.dryRun ? "Would add" : "Added"}: ${targets.join(", ")}`);
+    this.printSummary(result);
     return 0;
   }
 }
