@@ -1,5 +1,5 @@
 ---
-description: Create or amend the project constitution — durable, cross-feature principles.
+description: "Create or amend the project constitution — durable, cross-feature principles."
 argument-hint: "[area to add or change, optional]"
 allowed-tools: Read, Write, Edit
 ---
@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit
 Establish or update the project **constitution** at `.amby/constitution.md`.
 
 1. If the file is missing, copy the constitution template and fill it in. If it exists, amend only
-   the section relevant to $ARGUMENTS (or, with no argument, review all principles briefly).
+   the section relevant to `$ARGUMENTS` (or, with no argument, review all principles briefly).
 2. Interview the user only where a principle is unclear — ask one focused question at a time.
 3. Keep each principle short, imperative, and **numbered** so later phases can cite it.
 4. Cover: code quality, testing standards, UX consistency, performance/reliability, security. Add

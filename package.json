@@ -48,9 +48,10 @@
     "@types/node": "^20.14.0"
   },
   "dependencies": {
-    "clipanion": "^4.0.0-rc.4",
     "gray-matter": "^4.0.3",
-    "zod": "^3.23.0",
-    "@clack/prompts": "^0.7.0"
+    "zod": "^3.23.0"
+  },
+  "allowScripts": {
+    "esbuild@0.21.5": true
   }
 }

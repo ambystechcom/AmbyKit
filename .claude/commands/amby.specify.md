@@ -1,5 +1,5 @@
 ---
-description: Turn a feature idea into a spec — user stories, EARS requirements, acceptance criteria.
+description: "Turn a feature idea into a spec — user stories, EARS requirements, acceptance criteria."
 argument-hint: "<feature description>"
 allowed-tools: Read, Write, Edit
 ---
