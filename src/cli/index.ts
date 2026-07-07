@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import type { BaseCommand, CliOptions } from "./base-command.js";
+import { banner } from "./banner.js";
 import { InitCommand } from "./init.js";
 import { SyncCommand } from "./sync.js";
 import { AddCommand } from "./add.js";
@@ -40,7 +41,7 @@ export function parseArgs(argv: string[]): { positionals: string[]; flags: Recor
 }
 
 function printHelp(): void {
-  console.log("ambykit — Spec-Driven Development for AI coding assistants\n");
+  console.log(banner());
   console.log("Usage: ambykit <command> [options]\n");
   console.log("Commands:");
   const width = Math.max(...COMMANDS.map((c) => c.name.length));
