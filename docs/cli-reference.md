@@ -44,13 +44,14 @@ ambykit sync --dry-run
 Progress view over the story/task graph, computed locally from `specs/*/spec.md` + `tasks.md` (no
 model tokens).
 
-- **No arg** — a table of all user stories: `ID | description | X of Y tasks | % | status | priority | blocked-by`, with per-feature and overall roll-ups.
-- **`story-id`** — detail for one story: narrative, EARS requirements, acceptance criteria, the
-  dependency/blocked-by graph, and its task checklist.
+- **No arg** — a table of all user stories: `Feat | Story | description | X of Y tasks | % | status | priority | blocked-by`, with an overall roll-up.
+- **`story-id`** — detail for one story. Story ids **restart per feature**, so a bare `US-3` may
+  match several; qualify it with the feature ref as `NNN:US-3` (also accepts `NNN/US-3`). A bare id
+  that matches more than one feature prints the matches so you can pick.
 
 ```bash
 ambykit dashboard
-ambykit dashboard US-3
+ambykit dashboard 001:US-3        # feature-qualified (recommended)
 ambykit dashboard --status blocked
 ambykit dashboard --feature 001-password-reset
 ambykit dashboard --json

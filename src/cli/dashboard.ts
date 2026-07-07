@@ -5,6 +5,7 @@ import { banner } from "./banner.js";
 import {
   canonicalStoryId,
   computeDashboard,
+  displayKey,
   parseTasks,
   type StoryProgress,
   type TaskLine,
@@ -42,15 +43,16 @@ export class DashboardCommand extends BaseCommand {
   private renderTable(stories: StoryProgress[]): void {
     this.info(banner());
     const rows = stories.map((s) => [
+      s.featureRef,
       s.displayId,
-      truncate(s.title, 32),
+      truncate(s.title, 30),
       `${s.tasksDone}/${s.tasksTotal}`,
       `${s.percent}%`,
       s.status || "-",
       s.priority || "-",
       s.blockedBy.length ? s.blockedBy.join(",") : "-",
     ]);
-    const header = ["Story", "Description", "Tasks", "%", "Status", "Prio", "Blocked-by"];
+    const header = ["Feat", "Story", "Description", "Tasks", "%", "Status", "Prio", "Blocked-by"];
     this.info(formatTable(header, rows));
 
     const totalTasks = stories.reduce((n, s) => n + s.tasksTotal, 0);
@@ -66,18 +68,25 @@ export class DashboardCommand extends BaseCommand {
     storyArg: string,
     asJson: boolean,
   ): number {
-    const key = canonicalStoryId(storyArg);
-    const story = stories.find((s) => s.id === key);
-    if (!story) {
+    const matches = resolveStories(stories, storyArg);
+    if (matches.length === 0) {
       this.error(`Story ${storyArg} not found.`);
       return 1;
     }
+    if (matches.length > 1) {
+      // Story ids restart per feature, so a bare id can match several. Ask the user to qualify.
+      this.error(`Ambiguous story '${storyArg}' — it exists in ${matches.length} features:`);
+      for (const m of matches) this.info(`  ${displayKey(m)}  (${m.feature})`);
+      this.info(`Qualify it, e.g. \`ambykit dashboard ${displayKey(matches[0]!)}\`.`);
+      return 1;
+    }
+    const story = matches[0]!;
     const tasks = tasksForStory(root, story);
     if (asJson) {
       this.info(JSON.stringify({ ...story, tasks }, null, 2));
       return 0;
     }
-    this.info(`${story.displayId} — ${story.title}`);
+    this.info(`${displayKey(story)} — ${story.title}`);
     this.info(`  feature:    ${story.feature}`);
     this.info(`  status:     ${story.status || "-"}   priority: ${story.priority || "-"}`);
     this.info(`  progress:   ${story.tasksDone}/${story.tasksTotal} tasks (${story.percent}%)`);
@@ -89,6 +98,21 @@ export class DashboardCommand extends BaseCommand {
     }
     return 0;
   }
+}
+
+/**
+ * Resolve a dashboard story argument to matching stories. Accepts a bare local id (`US-1`, which may
+ * match several features) or a feature-qualified id (`001:US-1`, `001/US-1`, `001 US-1`).
+ */
+function resolveStories(stories: StoryProgress[], arg: string): StoryProgress[] {
+  const qualified = /^(\w+?)[\s:/-]+(US-?\d+)$/i.exec(arg.trim());
+  if (qualified) {
+    const feat = qualified[1] ?? "";
+    const local = canonicalStoryId(qualified[2] ?? "");
+    return stories.filter((s) => s.id === local && (s.featureRef === feat || s.feature === feat));
+  }
+  const local = canonicalStoryId(arg);
+  return stories.filter((s) => s.id === local);
 }
 
 function tasksForStory(root: string, story: StoryProgress): TaskLine[] {

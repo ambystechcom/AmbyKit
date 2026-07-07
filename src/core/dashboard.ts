@@ -2,8 +2,10 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 export interface StoryProgress {
-  id: string; // canonical, e.g. "US1"
+  id: string; // feature-local canonical, e.g. "US1" (NOT globally unique — restarts per feature)
   displayId: string; // as written, e.g. "US-1"
+  featureRef: string; // short, unique feature ref, e.g. "001"
+  key: string; // globally-unique: `${featureRef}:${id}`, e.g. "001:US1"
   title: string;
   priority: string; // "P1" | ""
   status: string; // draft|ready|in-progress|blocked|done|""
@@ -13,6 +15,22 @@ export interface StoryProgress {
   tasksTotal: number;
   tasksDone: number;
   percent: number;
+}
+
+/** Short, unique reference for a feature dir: its leading number (e.g. "001"), else the full name. */
+export function featureRefOf(feature: string): string {
+  const m = /^(\d+)/.exec(feature);
+  return m ? (m[1] ?? feature) : feature;
+}
+
+/** Globally-unique story key from a feature ref and a local canonical id. */
+export function storyKey(featureRef: string, localId: string): string {
+  return `${featureRef}:${localId}`;
+}
+
+/** Human-facing qualified id, e.g. "001:US-1". */
+export function displayKey(s: StoryProgress): string {
+  return `${s.featureRef}:${s.displayId}`;
 }
 
 export interface TaskLine {
@@ -40,6 +58,7 @@ export function parseStories(content: string, feature: string): StoryProgress[] 
   const lines = content.split(/\r?\n/);
   const stories: StoryProgress[] = [];
   let current: StoryProgress | null = null;
+  const ref = featureRefOf(feature);
 
   const headingRe = /^#{2,4}\s+(US-?\d+)\s*[—–-]\s*(.+?)\s*$/;
 
@@ -55,9 +74,12 @@ export function parseStories(content: string, feature: string): StoryProgress[] 
         priority = (pri[1] ?? "").toUpperCase();
         title = title.replace(/\s*\(priority:\s*P\d\)\s*/i, "").trim();
       }
+      const localId = canonicalStoryId(displayId);
       current = {
-        id: canonicalStoryId(displayId),
+        id: localId,
         displayId,
+        featureRef: ref,
+        key: storyKey(ref, localId),
         title,
         priority,
         status: "",

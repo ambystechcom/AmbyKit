@@ -37,7 +37,7 @@ npx @ambystech/ambykit init
 
 # track progress from the terminal
 npx ambykit dashboard
-npx ambykit dashboard US-3
+npx ambykit dashboard 001:US-3   # story ids restart per feature — qualify with the feature ref
 ```
 
 ## The workflow

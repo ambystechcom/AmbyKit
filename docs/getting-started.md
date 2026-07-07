@@ -63,7 +63,7 @@ From the terminal, watch progress across the story/task graph:
 
 ```bash
 npx ambykit dashboard          # table of all stories with % complete
-npx ambykit dashboard US-3     # detail for one story
+npx ambykit dashboard 001:US-3 # detail for one story (qualify id with the feature ref)
 ```
 
 ## Where things live
