@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ambystech.dev/schemas/design-tokens.json",
+  "primitive": {
+    "color": {
+      "blue-600": "#2563eb",
+      "gray-900": "#111827",
+      "gray-500": "#6b7280",
+      "gray-100": "#f3f4f6",
+      "red-600": "#dc2626",
+      "white": "#ffffff"
+    },
+    "space": { "1": "4px", "2": "8px", "3": "12px", "4": "16px", "6": "24px", "8": "32px" },
+    "radius": { "sm": "4px", "md": "8px", "lg": "16px" },
+    "font": { "sans": "system-ui, sans-serif", "size-md": "16px", "size-lg": "20px" }
+  },
+  "semantic": {
+    "color": {
+      "action": "{primitive.color.blue-600}",
+      "text": "{primitive.color.gray-900}",
+      "text-muted": "{primitive.color.gray-500}",
+      "surface": "{primitive.color.white}",
+      "danger": "{primitive.color.red-600}"
+    },
+    "space": { "sm": "{primitive.space.2}", "md": "{primitive.space.4}", "lg": "{primitive.space.6}" }
+  },
+  "component": {
+    "button": {
+      "primary": {
+        "bg": "{semantic.color.action}",
+        "fg": "{primitive.color.white}",
+        "radius": "{primitive.radius.sm}",
+        "padding": "{semantic.space.sm} {semantic.space.md}"
+      }
+    },
+    "input": {
+      "border": "{semantic.color.text-muted}",
+      "radius": "{primitive.radius.sm}",
+      "padding": "{semantic.space.sm}"
+    }
+  }
+}

@@ -2,6 +2,7 @@ import { BaseCommand, flag, type CliOptions } from "./base-command.js";
 import { applyFiles } from "./fsops.js";
 import { buildEmittedFiles } from "./emit.js";
 import { loadConfig } from "../core/config.js";
+import { installArtifactTemplates } from "../core/scaffold.js";
 
 export class SyncCommand extends BaseCommand {
   readonly name = "sync";
@@ -18,6 +19,13 @@ export class SyncCommand extends BaseCommand {
 
     const checkOnly = flag(opts, "check");
     const includeUser = flag(opts, "include-user");
+
+    // Add any newly-introduced templates/reference docs without clobbering user customizations.
+    const templates = installArtifactTemplates(root, this.dryRun || checkOnly);
+    if (templates.created.length > 0 && !checkOnly) {
+      this.info(`${this.dryRun ? "Would install" : "Installed"} ${templates.created.length} new template/reference file(s).`);
+    }
+
     const files = buildEmittedFiles(root, config);
     const result = applyFiles(root, files, {
       dryRun: this.dryRun || checkOnly,

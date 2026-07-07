@@ -13,7 +13,7 @@ Generate `tasks.md` for feature `$ARGUMENTS` (default: the current feature).
 
 Context: read that feature's `plan.md` (and `spec.md` for story IDs/priorities/dependencies).
 
-1. Write tasks from the tasks template as checkbox lines:
+1. Write tasks following `@.amby/templates/tasks.md` as checkbox lines:
    `- [ ] [T###] [P?] [US#] description (file/path)`.
 2. Group into phases: **Setup → Foundational → User stories (by priority) → Polish**. Enforce the
    gate: no user-story task before Foundational completes.

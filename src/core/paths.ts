@@ -29,6 +29,11 @@ export function templatesDir(): string {
   return join(packageRoot(), "src", "templates");
 }
 
+/** Directory containing on-demand reference docs (loaded by phases when needed). */
+export function referenceDir(): string {
+  return join(packageRoot(), "src", "reference");
+}
+
 /** Find the project root by walking up from `start` looking for an `.amby` dir. */
 export function findProjectRoot(start: string = process.cwd()): string | null {
   let dir = resolve(start);

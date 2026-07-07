@@ -5,6 +5,7 @@ import { applyFiles, writeIfAbsent } from "./fsops.js";
 import { buildEmittedFiles } from "./emit.js";
 import { saveConfig } from "../core/config.js";
 import { templatesDir } from "../core/paths.js";
+import { installArtifactTemplates } from "../core/scaffold.js";
 import { getTarget, TARGETS } from "../emitters/index.js";
 import type { AmbyConfig } from "../core/types.js";
 
@@ -49,6 +50,12 @@ export class InitCommand extends BaseCommand {
     if (!this.dryRun) {
       writeIfAbsent(target, join(".amby", "constitution.md"), constitution);
       saveConfig(target, config);
+    }
+
+    // Install artifact templates + reference docs into .amby/ (write-if-absent; project owns them).
+    const templates = installArtifactTemplates(target, this.dryRun);
+    if (templates.created.length > 0) {
+      this.debug(`${this.dryRun ? "Would install" : "Installed"} ${templates.created.length} template/reference file(s).`);
     }
 
     const files = buildEmittedFiles(target, config);

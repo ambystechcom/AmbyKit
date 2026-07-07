@@ -11,13 +11,15 @@ allowedTools: [read, write, edit]
 
 Design the UI for feature `$ARGUMENTS` (default: the current feature).
 
-Context: read only that `spec.md`. Design for its user stories.
+Context: read that feature's `spec.md`, the templates `@.amby/templates/ui.md` +
+`@.amby/templates/design-tokens.json`, and — for detailed rules — `@.amby/reference/design-conventions.md`.
+Design for the spec's user stories.
 
-1. Write `ui.md` from the UI template: per story, a layout/wireframe (ASCII or SVG), a component
-   inventory (props + states), interaction criteria in Given/When/Then tied to the `US-#`, and
-   content/accessibility notes (WCAG AA).
-2. Write/extend `design-tokens.json` in three tiers — primitive → semantic → component. Reference
-   tokens by name from `ui.md`; don't inline raw values there.
+1. Write `ui.md` following the template: per story, a layout/wireframe (ASCII or embedded SVG), a
+   component inventory (props + full state set + token names), interaction criteria in
+   Given/When/Then tied to the `US-#`, and content/accessibility notes (WCAG AA).
+2. Write/extend `design-tokens.json` in three tiers — primitive → semantic → component. In `ui.md`
+   cite semantic/component token **names**, never raw values.
 3. Keep the UI consistent with any constitution UX principle (cite by number).
 4. **Sign-off gate:** present the design and ask the user to approve. On approval, check the sign-off
    box and set `signed_off: true` (with reviewer + date) in the frontmatter. Until then it's a draft.

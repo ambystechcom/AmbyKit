@@ -11,10 +11,11 @@ allowedTools: [read, write, edit]
 
 Write a specification for: **$ARGUMENTS**
 
-Context: read `@.amby/constitution.md` only. Do not read other specs.
+Context: read `@.amby/constitution.md` and the structure of `@.amby/templates/spec.md` only. Do not
+read other specs.
 
 1. Create the feature dir `specs/NNN-slug/` (next number, kebab-slug from the title) and write
-   `spec.md` from the spec template.
+   `spec.md` following `@.amby/templates/spec.md`.
 2. Define **user stories** (`US-#`): role / capability / benefit, a priority (P1/P2/P3), why that
    priority, an independent-test statement, and `depends-on`/`blocked-by` if any. Set `status: draft`.
 3. Write **acceptance criteria** in Given/When/Then per story.

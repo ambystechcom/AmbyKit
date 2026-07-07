@@ -9,8 +9,8 @@ Write the implementation plan for feature `$ARGUMENTS` (default: the current fea
 
 Context: read that feature's `spec.md` and `ui.md`, plus `@.amby/constitution.md`.
 
-1. Write `plan.md` from the plan template: technical context (stack, libraries, constraints),
-   architecture, and a phased approach (Phase 0 research → Phase 1 foundation → feature phases).
+1. Write `plan.md` following `@.amby/templates/plan.md`: technical context (stack, libraries,
+   constraints), architecture, and a phased approach (Phase 0 research → Phase 1 foundation → feature phases).
 2. This is the **first artifact with technology decisions.** Ensure every choice honors the
    constitution (cite principle numbers).
 3. Map each `FR-###`/`US-#` to how the design satisfies it. **Reference by ID — do not restate the

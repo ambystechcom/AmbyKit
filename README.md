@@ -81,8 +81,8 @@ See [`docs/cli-reference.md`](./docs/cli-reference.md).
 - **M1** ✅ Core model + Claude Code emitter + `ambykit init`/`sync`/`dashboard`.
 - **M2** ✅ GitHub Copilot (VS Code + CLI) emitters.
 - **M3** ✅ OpenCode, Cursor (+ CLI), Antigravity (IDE + CLI) emitters — all 9 targets shipping.
-- **M4** — Finalize phase prompts + UI-design depth. ← *next*
-- **M5** — `analyze`/`upgrade`/`check`, tests, npm publish.
+- **M4** ✅ Template installation into `.amby/` + deepened UI-design artifact.
+- **M5** — `analyze` dependency-graph validation, npm publish, CI sync check. ← *next*
 
 ## Contributing
 
