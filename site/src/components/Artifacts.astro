@@ -1,0 +1,75 @@
+---
+// Renders a phase's reads/writes (US-2). The frontmatter carries the machine-checkable facts that
+// scripts/check-docs-sync.mjs validates against src/prompts (FR-014); this shows them to readers.
+interface Props {
+  reads: string[];
+  writes: string[];
+}
+const { reads, writes } = Astro.props;
+---
+
+<div class="ak-artifacts">
+  <div class="ak-art-col">
+    <h4>Reads</h4>
+    {
+      reads.length > 0 ? (
+        <ul>{reads.map((r) => (<li><code>{r}</code></li>))}</ul>
+      ) : (
+        <p class="ak-none">nothing</p>
+      )
+    }
+  </div>
+  <div class="ak-art-col">
+    <h4>Writes</h4>
+    {
+      writes.length > 0 ? (
+        <ul>{writes.map((w) => (<li><code>{w}</code></li>))}</ul>
+      ) : (
+        <p class="ak-none">nothing</p>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .ak-artifacts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start; /* both columns pin to the top */
+    column-gap: 1.75rem;
+    margin-block: 1.25rem;
+    border: 1px solid var(--ak-border);
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    background: var(--ak-surface-elevated);
+  }
+  /* Starlight adds `margin-top` between adjacent content siblings, which drops the 2nd column
+     ("Writes") and the lists. These two-class selectors (0,2,0) out-specify that rule (0,1,2). */
+  .ak-artifacts .ak-art-col,
+  .ak-artifacts .ak-art-col > * {
+    margin-top: 0;
+  }
+  .ak-art-col h4 {
+    margin: 0 0 0.4rem;
+    color: var(--ak-brand);
+  }
+  .ak-art-col ul {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+  .ak-none {
+    margin: 0;
+    color: var(--ak-text-muted);
+    font-style: italic;
+  }
+
+  /* Stack on very narrow screens only; restore a gap between the stacked columns. */
+  @media (max-width: 30rem) {
+    .ak-artifacts {
+      grid-template-columns: 1fr;
+    }
+    .ak-artifacts .ak-art-col + .ak-art-col {
+      margin-top: 1rem;
+    }
+  }
+</style>

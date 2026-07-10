@@ -1,0 +1,36 @@
+---
+title: Tasks
+description: Break the plan into an ordered, dependency-aware task checklist.
+sidebar:
+  order: 6
+phase: tasks
+order: 6
+command: amby.tasks
+reads: [specs/NNN-slug/plan.md, specs/NNN-slug/spec.md]
+writes: [specs/NNN-slug/tasks.md]
+---
+
+import PhaseBadge from "../../../components/PhaseBadge.astro";
+import Artifacts from "../../../components/Artifacts.astro";
+
+<PhaseBadge n={6} name="Tasks" />
+
+**Tasks** breaks the plan into an ordered checklist grouped **Setup → Foundational → user stories →
+Polish**, gated so no story task starts before Foundational completes. Tasks are ordered by the story
+dependency graph, tagged with their `US-#`, marked `[P]` when parallelizable, and each carries a
+stable `T###` id and a concrete file path.
+
+## Command
+
+```bash
+/amby.tasks
+```
+
+## Artifacts read & written
+
+<Artifacts
+  reads={["specs/NNN-slug/plan.md", "specs/NNN-slug/spec.md"]}
+  writes={["specs/NNN-slug/tasks.md"]}
+/>
+
+Checked boxes (`- [x]`) are the source of truth for `ambykit dashboard`.

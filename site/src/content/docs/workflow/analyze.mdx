@@ -1,0 +1,49 @@
+---
+title: Analyze
+description: Cross-check spec, plan, and tasks for coverage, consistency, and dependency-graph health.
+sidebar:
+  order: 7
+phase: analyze
+order: 7
+command: amby.analyze
+reads: [specs/NNN-slug/spec.md, specs/NNN-slug/plan.md, specs/NNN-slug/tasks.md]
+writes: []
+---
+
+import PhaseBadge from "../../../components/PhaseBadge.astro";
+import Artifacts from "../../../components/Artifacts.astro";
+import Diagram from "../../../components/Diagram.astro";
+
+<PhaseBadge n={7} name="Analyze" />
+
+**Analyze** is a read-only consistency check across the spec, plan, and tasks. It reports coverage
+(every `FR-###`/`US-#` has a task, no orphans), scope creep, and dependency-graph health — detecting
+cycles, dangling references, and which stories are **blocked** vs **buildable now**. It runs locally
+at zero model tokens.
+
+Analyze validates the **story dependency graph** — the `depends-on`/`blocked-by` edges that decide
+what is buildable now versus gated:
+
+<Diagram
+  caption="A story dependency graph: US-6 is gated until US-2 completes."
+  summary="Example: US-1 unblocks US-2 and US-3; US-2 in turn unblocks US-6, which stays gated until US-2 is done."
+  code={`flowchart TD
+  US1[US-1] --> US2[US-2]
+  US1 --> US3[US-3]
+  US2 --> US6[US-6 gated]`}
+/>
+
+## Command
+
+```bash
+/amby.analyze
+```
+
+## Artifacts read & written
+
+<Artifacts
+  reads={["specs/NNN-slug/spec.md", "specs/NNN-slug/plan.md", "specs/NNN-slug/tasks.md"]}
+  writes={[]}
+/>
+
+Analyze never modifies files — it only reports. Fix findings before you implement.

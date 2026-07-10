@@ -1,0 +1,38 @@
+---
+title: Tool compatibility
+description: The assistants AmbyKit supports and the native files it emits for each.
+sidebar:
+  order: 2
+---
+
+AmbyKit's **author-once, emit-per-tool** design means one neutral source becomes each assistant's
+native format. These are the selectable targets and their command surface. Several targets share one
+emitter (VS Code extensions, sibling CLIs).
+
+## Selectable targets
+
+| Target id | Assistant | Command surface |
+|---|---|---|
+| `claude` | Claude Code (CLI) | `commands` |
+| `claude-vscode` | Claude Code (VS Code) | `commands` (alias of `claude`) |
+| `copilot` | GitHub Copilot (VS Code) | `commands` |
+| `copilot-cli` | GitHub Copilot CLI | `skills` |
+| `opencode` | OpenCode | `commands` |
+| `cursor` | Cursor | `commands` |
+| `cursor-cli` | Cursor CLI | `none` (rules-only) |
+| `antigravity` | Antigravity (IDE) | `workflows` |
+| `antigravity-cli` | Antigravity CLI | `workflows` (reuses Antigravity) |
+
+## Where files land
+
+| Concern | Claude Code | OpenCode | Copilot (VS Code) | Copilot CLI | Cursor | Cursor CLI | Antigravity |
+|---|---|---|---|---|---|---|---|
+| Rules file | `CLAUDE.md` (+`@AGENTS.md` bridge) | `AGENTS.md` | `.github/copilot-instructions.md` + `AGENTS.md` | same as Copilot | `.cursor/rules/*.mdc` + `AGENTS.md` | Cursor config + `AGENTS.md` | `AGENTS.md` + `.agents/rules/*.md` |
+| Commands | `.claude/commands/amby/*.md` | `.opencode/commands/*.md` | `.github/prompts/*.prompt.md` | **skills** | `.cursor/commands/*.md` | none | `.agents/workflows/*.md` |
+| MCP file | `.mcp.json` | `opencode.json` → `mcp` | `.vscode/mcp.json` (`servers`) | `~/.copilot/mcp-config.json` (`mcpServers`, user) | `.cursor/mcp.json` (`mcpServers`) | reads `.cursor/mcp.json` | `mcp_config.json` (`mcpServers`, user) |
+
+:::note
+Claude Code does not read `AGENTS.md` natively — AmbyKit emits a `CLAUDE.md` whose first line is
+`@AGENTS.md` so there is a single shared rules source. User-level MCP files (Copilot CLI, Antigravity)
+are written only with explicit consent.
+:::

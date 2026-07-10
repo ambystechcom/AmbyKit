@@ -1,0 +1,9 @@
+# Astro / build
+node_modules/
+dist/
+.astro/
+
+# env / logs
+.env
+.env.production
+npm-debug.log*

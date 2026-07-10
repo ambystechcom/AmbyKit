@@ -1,0 +1,33 @@
+---
+title: Specify
+description: Turn a feature idea into a spec — user stories, EARS requirements, acceptance criteria.
+sidebar:
+  order: 2
+phase: specify
+order: 2
+command: amby.specify
+reads: [.amby/constitution.md]
+writes: [specs/NNN-slug/spec.md]
+---
+
+import PhaseBadge from "../../../components/PhaseBadge.astro";
+import Artifacts from "../../../components/Artifacts.astro";
+
+<PhaseBadge n={2} name="Specify" />
+
+**Specify** turns a feature idea into a spec that captures **WHAT** and **WHY** — never technology.
+It produces prioritized user stories (`US-#`), testable requirements in EARS notation (`FR-###`),
+Given/When/Then acceptance criteria, and measurable success criteria (`SC-###`). Unknowns are flagged
+inline as `[NEEDS CLARIFICATION: …]` rather than guessed.
+
+## Command
+
+```bash
+/amby.specify <feature description>
+```
+
+## Artifacts read & written
+
+<Artifacts reads={[".amby/constitution.md"]} writes={["specs/NNN-slug/spec.md"]} />
+
+The spec is created under a numbered feature directory, `specs/NNN-slug/`.

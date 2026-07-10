@@ -1,0 +1,28 @@
+---
+title: Author once, emit per tool
+description: How one neutral source becomes every assistant's native commands.
+sidebar:
+  order: 1
+---
+
+import Diagram from "../../../components/Diagram.astro";
+
+AmbyKit's core design is **author-once, emit-per-tool**. There is exactly one neutral source of truth
+for the workflow — the templates and phase prompts. Per-tool **emitters** translate that source into
+each assistant's native command/rules format. You never hand-maintain per-tool files; you edit the
+neutral source and run `ambykit sync`.
+
+<Diagram
+  caption="One neutral source; per-tool emitters produce native files."
+  summary="A single neutral source (src/templates + src/prompts) is translated by emitters into native files for Claude Code, GitHub Copilot (+ CLI), Cursor (+ CLI), OpenCode, and Antigravity (+ CLI)."
+  code={`flowchart TD
+  SRC["neutral source<br/>src/templates + src/prompts"] --> E{emitters}
+  E --> CLD[Claude Code]
+  E --> COP[Copilot / CLI]
+  E --> CUR[Cursor / CLI]
+  E --> OC[OpenCode]
+  E --> ANT[Antigravity / CLI]`}
+/>
+
+This keeps the workflow consistent across every assistant a team uses, and makes adding a new tool a
+thin emitter rather than a fork of the whole workflow.

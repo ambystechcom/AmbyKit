@@ -1,0 +1,64 @@
+name: Docs site
+
+# Build the AmbyKit docs site and deploy it to GitHub Pages (feature 007, FR-014/FR-015).
+# The docs-sync check runs before the build, so drift from src/prompts blocks the deploy.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "src/prompts/**"
+      - "src/emitters/index.ts"
+      - "scripts/check-docs-sync.mjs"
+      - ".github/workflows/site.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never run two Pages deploys at once; let an in-progress one finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Root deps provide gray-matter for the docs-sync check.
+      - name: Install root deps
+        run: npm ci
+
+      - name: Docs-sync check (FR-014)
+        run: node scripts/check-docs-sync.mjs
+
+      - name: Install site deps
+        working-directory: site
+        run: npm ci
+
+      - name: Build site
+        working-directory: site
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

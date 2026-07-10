@@ -1,0 +1,63 @@
+/* ambystech design tokens → CSS custom properties.
+   Transcribed from specs/007-documentation-site/design-tokens.json (the binding source).
+   Primitives are mode-independent; semantic tokens swap by [data-theme]. */
+
+:root {
+  /* -- primitive palette -- */
+  --ak-magenta-400: #f65fbb;
+  --ak-magenta-500: #ee1199;
+  --ak-magenta-700: #b10c72;
+  --ak-blue-500: #3c69e7;
+  --ak-orchid-400: #b45fdd;
+  --ak-orchid-500: #9932cc;
+  --ak-sky-500: #00ccff;
+  --ak-sky-700: #0785a6;
+  --ak-deep-900: #040d14;
+  --ak-deep-800: #0b1620;
+  --ak-deep-700: #16232f;
+  --ak-white: #ffffff;
+  --ak-slate-50: #f7f9fb;
+  --ak-slate-100: #e9eef2;
+  --ak-slate-300: #c3cdd6;
+  --ak-slate-500: #6b7b88;
+  --ak-slate-700: #33414d;
+  --ak-slate-900: #101820;
+
+  /* -- signature gradient -- */
+  --ak-gradient-signature: linear-gradient(90deg, #ee1199 0%, #9932cc 50%, #00ccff 100%);
+  --ak-gradient-signature-diagonal: linear-gradient(135deg, #ee1199 0%, #9932cc 50%, #00ccff 100%);
+
+  /* -- semantic brand constants (mode-independent) -- */
+  --ak-brand: var(--ak-magenta-500);
+  --ak-accent-blue: var(--ak-blue-500);
+  --ak-accent-orchid: var(--ak-orchid-500);
+  --ak-accent-sky: var(--ak-sky-500);
+  --ak-focus-ring: var(--ak-sky-500);
+}
+
+/* -- semantic: dark (default; brand lives on Deep) -- */
+:root,
+:root[data-theme="dark"] {
+  --ak-surface: var(--ak-deep-900);
+  --ak-surface-elevated: var(--ak-deep-800);
+  --ak-border: var(--ak-deep-700);
+  --ak-text: var(--ak-slate-100);
+  --ak-text-muted: var(--ak-slate-300);
+  --ak-link: var(--ak-magenta-400);
+  --ak-link-hover: var(--ak-sky-500);
+  --ak-code-bg: var(--ak-deep-800);
+  --ak-mermaid-cluster-bg: var(--ak-deep-800);
+}
+
+/* -- semantic: light -- */
+:root[data-theme="light"] {
+  --ak-surface: var(--ak-white);
+  --ak-surface-elevated: var(--ak-slate-50);
+  --ak-border: var(--ak-slate-100);
+  --ak-text: var(--ak-slate-900);
+  --ak-text-muted: var(--ak-slate-500);
+  --ak-link: var(--ak-magenta-700);
+  --ak-link-hover: var(--ak-orchid-500);
+  --ak-code-bg: var(--ak-slate-50);
+  --ak-mermaid-cluster-bg: var(--ak-slate-50);
+}

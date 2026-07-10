@@ -1,0 +1,90 @@
+---
+// Supported-assistant cards for the home page, using the official brand logos in src/assets/tools/.
+// The marks are white / near-white / color, so each sits on a consistent dark tile (works in both
+// themes). Logos loaded as hashed URLs via a glob import.
+const href = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/cli/compatibility/`;
+
+const files = import.meta.glob("../assets/tools/*.{svg,png}", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+const logo = (name: string): string => {
+  const hit = Object.entries(files).find(([path]) => path.endsWith(`/${name}`));
+  return (hit?.[1] as string) ?? "";
+};
+
+const tools = [
+  { name: "Claude Code", file: "claudecode-color.svg" },
+  { name: "GitHub Copilot", file: "github-copilot-light.svg" },
+  { name: "Cursor", file: "cursor-dark.png" },
+  { name: "OpenCode", file: "opencode-dark.svg" },
+  { name: "Antigravity", file: "antigravity-color.svg" },
+];
+---
+
+<ul class="ak-tools not-content">
+  {
+    tools.map((t) => (
+      <li>
+        <a class="ak-toolcard" href={href}>
+          <span class="ak-toolmark">
+            <img src={logo(t.file)} alt="" loading="lazy" width="40" height="40" />
+          </span>
+          <span class="ak-toolname">{t.name}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .ak-tools {
+    list-style: none;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+    gap: 1rem;
+  }
+  .ak-tools li {
+    margin: 0;
+  }
+  .ak-toolcard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.25rem 1rem;
+    border: 1px solid var(--ak-border);
+    border-radius: 14px;
+    background: var(--ak-surface-elevated);
+    text-decoration: none;
+    color: var(--ak-text);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .ak-toolcard:hover {
+    border-color: var(--ak-brand);
+    transform: translateY(-2px);
+  }
+  /* Consistent dark tile so white / color logos all read the same in either theme. */
+  .ak-toolmark {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 12px;
+    background: #0a0f16;
+    border: 1px solid var(--ak-deep-700);
+    padding: 0.6rem;
+  }
+  .ak-toolmark img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .ak-toolname {
+    font-weight: 600;
+    text-align: center;
+  }
+</style>

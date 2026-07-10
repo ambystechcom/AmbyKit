@@ -1,0 +1,33 @@
+---
+title: Constitution
+description: Create or amend the project constitution — durable, cross-feature principles.
+sidebar:
+  order: 1
+phase: constitution
+order: 1
+command: amby.constitution
+reads: []
+writes: [.amby/constitution.md]
+---
+
+import PhaseBadge from "../../../components/PhaseBadge.astro";
+import Artifacts from "../../../components/Artifacts.astro";
+
+<PhaseBadge n={1} name="Constitution" />
+
+The **constitution** captures durable, cross-feature principles every later phase must honor — the
+project's non-negotiables. It is written once and amended rarely; phases cite it by principle number
+instead of restating it.
+
+## Command
+
+```bash
+/amby.constitution
+```
+
+## Artifacts read & written
+
+<Artifacts reads={[]} writes={[".amby/constitution.md"]} />
+
+Run this first, before any feature work. Later phases (specify, plan) reference these principles to
+keep every decision consistent.

@@ -5,6 +5,9 @@ plans and tasks **once** — AmbyKit emits native commands and rules for every a
 uses, so the AI builds from clear, testable requirements instead of guessing.
 
 > Status: early development (M0 bootstrap). See [`docs/`](./docs) and the roadmap below.
+>
+> 📖 **Documentation site:** the user-facing docs live in [`site/`](./site) (Astro Starlight) and
+> deploy to GitHub Pages. Run it locally with `cd site && npm install && npm run dev`.
 
 ## Why
 
