@@ -1,0 +1,42 @@
+---
+// "Made with ♥ in Ambystech" — the heart carries an accessible label so it reads as the word "love",
+// and Ambystech links to the company site. The copyright year is stamped at build time.
+const year = new Date().getFullYear();
+---
+
+<p class="ak-madewith">
+  Made with 
+  <svg class="ak-heart" viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="love">
+    <path
+      d="M12 20.3l-1.45-1.32C5.4 14.24 2 11.16 2 7.5 2 4.42 4.42 2 7.5 2c1.74 0 3.41.81 4.5 2.09C13.09 2.81 14.76 2 16.5 2 19.58 2 22 4.42 22 7.5c0 3.66-3.4 6.74-8.55 11.49L12 20.3z"
+    ></path>
+  </svg>
+   in <a href="https://www.ambystech.com" rel="noopener">Ambystech</a>
+</p>
+<p class="ak-copyright">© {year}, Ambystech</p>
+
+<style>
+  .ak-madewith {
+    margin-top: 1.5rem;
+    text-align: center;
+    color: var(--ak-text-muted);
+    font-size: var(--sl-text-sm, 0.875rem);
+  }
+  .ak-heart {
+    width: 1em;
+    height: 1em;
+    margin-inline: 0.35em;
+    vertical-align: -0.15em;
+    color: var(--ak-magenta-500);
+  }
+  .ak-madewith a {
+    color: var(--ak-link);
+    font-weight: 600;
+  }
+  .ak-copyright {
+    margin-top: 0.35rem;
+    text-align: center;
+    color: var(--ak-text-muted);
+    font-size: var(--sl-text-xs, 0.8125rem);
+  }
+</style>

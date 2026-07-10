@@ -21,6 +21,9 @@ export default defineConfig({
         alt: "AmbyKit",
         replacesTitle: true,
       },
+      components: {
+        Footer: "./src/components/Footer.astro",
+      },
       customCss: [
         "./src/styles/global.css",
         "./src/styles/tokens.css",

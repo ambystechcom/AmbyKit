@@ -6,11 +6,13 @@ interface Props {
   code: string;
   caption: string;
   summary: string;
+  /** "wide" renders at natural (un-shrunk) size and scrolls horizontally — good for long LR flows. */
+  size?: "fit" | "wide";
 }
-const { code, caption, summary } = Astro.props;
+const { code, caption, summary, size = "fit" } = Astro.props;
 ---
 
-<figure class="ak-diagram">
+<figure class="ak-diagram" data-size={size}>
   <div class="ak-diagram-render" data-mermaid={code}>
     <p class="ak-diagram-fallback">{summary}</p>
   </div>
@@ -72,6 +74,15 @@ const { code, caption, summary } = Astro.props;
   .ak-diagram-render :global(svg) {
     max-width: 100%;
     height: auto;
+  }
+  /* "wide": render at natural size (bigger) and scroll horizontally instead of shrinking to fit. */
+  .ak-diagram[data-size="wide"] .ak-diagram-render {
+    justify-content: flex-start;
+  }
+  .ak-diagram[data-size="wide"] .ak-diagram-render :global(svg) {
+    width: auto !important;
+    max-width: none !important;
+    min-height: 5.5rem;
   }
   .ak-diagram-fallback {
     color: var(--ak-text-muted);

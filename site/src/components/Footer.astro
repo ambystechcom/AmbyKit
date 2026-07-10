@@ -1,0 +1,9 @@
+---
+// Starlight Footer override: keep the built-in footer (pagination, last-updated) and append the
+// "Made with ♥ in Ambystech" line.
+import Default from "@astrojs/starlight/components/Footer.astro";
+import MadeWithLove from "./MadeWithLove.astro";
+---
+
+<Default><slot /></Default>
+<MadeWithLove />
