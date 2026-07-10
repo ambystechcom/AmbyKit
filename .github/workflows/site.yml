@@ -31,7 +31,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       # Root deps provide gray-matter for the docs-sync check.
       - name: Install root deps
