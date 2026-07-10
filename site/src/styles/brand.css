@@ -1,0 +1,60 @@
+/* ambystech brand applied across the site (US-4). Cites design-tokens by their CSS-var names. */
+
+/* --- Splash hero: signature gradient panel (FR-006) ---
+   A diagonal Deep scrim (45% → 75%) sits over the gradient so white text clears WCAG AA (≥4.5:1)
+   across the bright sky-blue end while the brand hues still glow through (SC-004 / FR-010). */
+.hero {
+  padding: clamp(1.5rem, 5vw, 3rem);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(4, 13, 20, 0.45), rgba(4, 13, 20, 0.75)),
+    var(--ak-gradient-signature-diagonal);
+  color: #fff;
+}
+.hero h1,
+.hero .tagline {
+  color: #fff;
+}
+.hero .tagline {
+  color: rgba(255, 255, 255, 0.92);
+}
+/* Minimal action ("View on GitHub") reads as light on the dark hero. */
+.hero .actions a[class*="minimal"] {
+  color: #fff;
+}
+/* Solid fallback if gradients are unsupported. */
+@supports not (background: linear-gradient(135deg, #000, #000)) {
+  .hero {
+    background: var(--ak-brand);
+  }
+}
+
+/* --- Header logo --- */
+/* Source PNG is cropped of its dark padding, so the artwork fills the frame and reads large at a
+   height that still fits the default nav bar (no header growth). */
+.site-title img {
+  height: 2.75rem;
+  width: auto;
+  border-radius: 6px;
+}
+
+/* --- Active nav link --- */
+/* Starlight's default active link is white-on-accent; our accent maps to a light pink, so the text
+   looked pink. Use a deeper brand pink (magenta-700) so white text is legible at WCAG AA. */
+a[aria-current="page"],
+a[aria-current="page"]:hover,
+a[aria-current="page"]:focus {
+  background-color: var(--ak-magenta-700);
+  color: #fff;
+}
+
+/* --- Palette accents --- */
+/* Footer hairline in the signature gradient. */
+footer.sl-flex {
+  border-top: 2px solid transparent;
+  border-image: var(--ak-gradient-signature) 1;
+}
+/* Markdown link hover picks up the brand hover token. */
+.sl-markdown-content a:hover {
+  color: var(--ak-link-hover);
+}

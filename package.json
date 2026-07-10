@@ -16,13 +16,14 @@
   ],
   "license": "MIT",
   "author": "ambystech",
+  "publisher": "Ambystech",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ambystech/AmbyKit.git"
+    "url": "git+https://github.com/ambystechcom/AmbyKit.git"
   },
-  "homepage": "https://github.com/ambystech/AmbyKit#readme",
+  "homepage": "https://github.com/ambystechcom/AmbyKit#readme",
   "bugs": {
-    "url": "https://github.com/ambystech/AmbyKit/issues"
+    "url": "https://github.com/ambystechcom/AmbyKit/issues"
   },
   "type": "module",
   "bin": {

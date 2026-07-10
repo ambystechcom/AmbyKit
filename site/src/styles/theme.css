@@ -1,0 +1,41 @@
+/* Map ambystech tokens onto Starlight's design variables so the whole theme is branded.
+   (Starlight drives links, active nav, and surfaces from these --sl-* variables.) */
+
+:root {
+  --sl-color-accent: var(--ak-brand);
+  --sl-color-accent-high: var(--ak-magenta-400);
+  --sl-color-accent-low: color-mix(in srgb, var(--ak-brand) 22%, transparent);
+  --sl-color-text-accent: var(--ak-link);
+}
+
+:root,
+:root[data-theme="dark"] {
+  --sl-color-bg: var(--ak-deep-900);
+  --sl-color-bg-nav: var(--ak-deep-900);
+  --sl-color-bg-sidebar: var(--ak-deep-800);
+  --sl-color-bg-inline-code: var(--ak-deep-800);
+  --sl-color-hairline: var(--ak-deep-700);
+  --sl-color-hairline-light: var(--ak-deep-700);
+  --sl-color-text: var(--ak-slate-100);
+  --sl-color-gray-1: var(--ak-slate-100);
+  --sl-color-gray-2: var(--ak-slate-300);
+}
+
+:root[data-theme="light"] {
+  --sl-color-bg: var(--ak-white);
+  --sl-color-bg-nav: var(--ak-white);
+  --sl-color-bg-sidebar: var(--ak-slate-50);
+  --sl-color-bg-inline-code: var(--ak-slate-50);
+  --sl-color-hairline: var(--ak-slate-100);
+  --sl-color-hairline-light: var(--ak-slate-100);
+  --sl-color-text: var(--ak-slate-900);
+  --sl-color-gray-1: var(--ak-slate-900);
+  --sl-color-gray-2: var(--ak-slate-700);
+}
+
+/* Visible focus ring for keyboard users (US-6 a11y). */
+:where(a, button, input, summary):focus-visible {
+  outline: 2px solid var(--ak-focus-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}

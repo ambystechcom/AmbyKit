@@ -1,0 +1,43 @@
+---
+// Numbered phase badge for workflow pages (US-2). Uses the signature gradient.
+interface Props {
+  n: number;
+  name: string;
+}
+const { n, name } = Astro.props;
+---
+
+<div class="ak-phase-badge">
+  <span class="ak-phase-num">{n}</span>
+  <span class="ak-phase-name">{name}</span>
+</div>
+
+<style>
+  .ak-phase-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem 0.25rem 0.3rem;
+    border: 1px solid var(--ak-border);
+    border-radius: 9999px;
+    background: var(--ak-surface-elevated);
+    font-size: 0.8rem;
+    margin-block-end: 1rem;
+  }
+  .ak-phase-num {
+    display: inline-grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    background: var(--ak-gradient-signature-diagonal);
+    color: #fff;
+    font-weight: 700;
+  }
+  .ak-phase-name {
+    color: var(--ak-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+</style>

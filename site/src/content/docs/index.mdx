@@ -1,0 +1,44 @@
+---
+title: AmbyKit
+description: Spec-Driven Development for AI coding assistants.
+template: splash
+hero:
+  tagline: Author once. Emit per tool. Ship better software with AI coding assistants.
+  image:
+    alt: AmbyKit axolotl mascot
+    file: ../../assets/ambystech-axolotl.png
+  actions:
+    - text: Get started
+      link: start/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/ambystechcom/AmbyKit
+      icon: external
+      variant: minimal
+---
+
+import ToolCards from "../../components/ToolCards.astro";
+
+AmbyKit is a **Spec-Driven Development** framework: it helps AI coding assistants build better
+software by producing structured artifacts — a project constitution, user stories, testable
+requirements, UI design, an implementation plan, and an ordered task list — before code is written.
+
+## Getting started
+
+Install the CLI and scaffold your project:
+
+```bash
+npm install -g @ambystech/ambykit
+ambykit init
+```
+
+Then run `/amby.constitution` in your assistant to write your first artifact.
+[Read the full walkthrough →](/start/getting-started/)
+
+## Works with your assistant
+
+One neutral source of truth is translated by per-tool emitters into each assistant's native commands
+and rules — the same workflow runs everywhere.
+
+<ToolCards />

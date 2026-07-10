@@ -1,0 +1,48 @@
+---
+title: Getting started
+description: Install AmbyKit and produce your first artifact.
+sidebar:
+  order: 1
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+AmbyKit runs as a CLI (`ambykit`) and as slash commands inside your AI coding assistant. This gets
+you from zero to your first artifact — a project **constitution** — in a few minutes.
+
+<Steps>
+
+1. **Install the CLI.**
+
+   ```bash
+   npm install -g @ambystech/ambykit
+   # or run without installing:
+   npx @ambystech/ambykit init
+   ```
+
+2. **Initialize your project.** Pick the assistants you use; AmbyKit emits their native command
+   files and a shared `AGENTS.md`.
+
+   ```bash
+   ambykit init --tools=claude,cursor
+   ```
+
+3. **Create the constitution.** In your assistant, run the first phase — durable principles every
+   later phase honors.
+
+   ```bash
+   /amby.constitution
+   ```
+
+   That writes `.amby/constitution.md` — your first artifact. 🎉
+
+4. **Start a feature.** Turn an idea into a spec, then walk the workflow:
+
+   ```bash
+   /amby.specify Add a password reset flow
+   ```
+
+</Steps>
+
+From here, follow the [workflow](/workflow/) — specify → clarify → design → plan → tasks → analyze →
+implement — each phase producing a reviewable artifact before the next.

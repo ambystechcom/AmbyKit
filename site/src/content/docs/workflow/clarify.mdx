@@ -1,0 +1,32 @@
+---
+title: Clarify
+description: Resolve the open [NEEDS CLARIFICATION] markers in a feature spec.
+sidebar:
+  order: 3
+phase: clarify
+order: 3
+command: amby.clarify
+reads: [specs/NNN-slug/spec.md]
+writes: [specs/NNN-slug/spec.md]
+---
+
+import PhaseBadge from "../../../components/PhaseBadge.astro";
+import Artifacts from "../../../components/Artifacts.astro";
+
+<PhaseBadge n={3} name="Clarify" />
+
+**Clarify** resolves every open `[NEEDS CLARIFICATION: …]` marker the spec left behind. It asks one
+focused question per marker, then patches only the affected lines in place — token-frugal and
+non-destructive. When no markers remain, the spec is marked `ready`.
+
+## Command
+
+```bash
+/amby.clarify
+```
+
+## Artifacts read & written
+
+<Artifacts reads={["specs/NNN-slug/spec.md"]} writes={["specs/NNN-slug/spec.md"]} />
+
+Clarify edits the spec in place — it never rewrites untouched sections.

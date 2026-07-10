@@ -1,0 +1,87 @@
+---
+// Mermaid diagram (US-3). Renders client-side, themed from the ambystech CSS vars, and re-renders on
+// the light/dark toggle (FR-007). The text `summary` stays in the DOM as the caption and as the
+// render container's initial content, so it survives no-JS and render failures (edge cases).
+interface Props {
+  code: string;
+  caption: string;
+  summary: string;
+}
+const { code, caption, summary } = Astro.props;
+---
+
+<figure class="ak-diagram">
+  <div class="ak-diagram-render" data-mermaid={code}>
+    <p class="ak-diagram-fallback">{summary}</p>
+  </div>
+  <figcaption>{caption}</figcaption>
+</figure>
+
+<script>
+  import mermaid from "mermaid";
+  import { mermaidThemeVariables } from "../styles/mermaid";
+
+  function initMermaid(): void {
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: mermaidThemeVariables(),
+    });
+  }
+
+  async function renderAll(): Promise<void> {
+    initMermaid();
+    const nodes = document.querySelectorAll<HTMLElement>(".ak-diagram-render");
+    let i = 0;
+    for (const el of nodes) {
+      const code = el.dataset.mermaid;
+      if (!code) continue;
+      try {
+        const { svg } = await mermaid.render(`ak-mmd-${i}-${Date.now()}`, code);
+        el.innerHTML = svg;
+      } catch {
+        /* leave the text fallback in place */
+      }
+      i += 1;
+    }
+  }
+
+  void renderAll();
+
+  // Re-render when Starlight toggles the theme so diagrams track light/dark.
+  const observer = new MutationObserver((mutations) => {
+    if (mutations.some((m) => m.attributeName === "data-theme")) void renderAll();
+  });
+  observer.observe(document.documentElement, { attributes: true });
+</script>
+
+<style>
+  .ak-diagram {
+    margin-block: 1.5rem;
+  }
+  .ak-diagram-render {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    padding: 1rem;
+    border: 1px solid var(--ak-border);
+    border-radius: 12px;
+    background: var(--ak-surface-elevated);
+  }
+  .ak-diagram-render :global(svg) {
+    max-width: 100%;
+    height: auto;
+  }
+  .ak-diagram-fallback {
+    color: var(--ak-text-muted);
+    font-style: italic;
+    margin: 0;
+  }
+  figcaption {
+    text-align: center;
+    color: var(--ak-text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+</style>

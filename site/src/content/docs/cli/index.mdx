@@ -1,0 +1,79 @@
+---
+title: CLI reference
+description: Every ambykit command, its flags, and examples.
+sidebar:
+  order: 1
+  label: Commands
+---
+
+Run via `npx @ambystech/ambykit <command>` or install globally and use `ambykit <command>`.
+
+## Global flags
+
+- `--verbose` — detailed logging.
+- `--dry-run` — show what would change without writing files.
+- `--yes` — assume yes for prompts; skips interactive tool selection.
+
+Output adapts to your terminal — color + glyphs when interactive, plain text when piped or under
+`NO_COLOR`, ASCII fallback where glyphs are unsupported, and byte-stable `--json`.
+
+## `ambykit init [dir]`
+
+```text
+ambykit init [dir] [--tools=claude,…] [--yes] [--dry-run]
+```
+
+Scaffold AmbyKit into a project: creates `.amby/` (constitution + `config.json`), detects installed
+assistants, emits their native files, and writes the shared `AGENTS.md` (+ `CLAUDE.md` bridge for
+Claude). With no `--tools` on an interactive terminal it opens a tool picker.
+
+## `ambykit add <tool…>`
+
+```text
+ambykit add <tool…> [--dry-run]
+```
+
+Add or refresh one or more targets (see [tool compatibility](/cli/compatibility/)). With no target on
+a TTY it opens a multi-select picker; non-interactively it errors with the available targets.
+
+## `ambykit sync`
+
+```text
+ambykit sync [--check] [--include-user] [--dry-run]
+```
+
+Re-emit all configured tools from the neutral source. `--check` exits non-zero if anything is out of
+date (used in CI). User-level MCP files are opt-in via `--include-user`.
+
+## `ambykit dashboard [story-id]`
+
+```text
+ambykit dashboard [story-id] [--interactive] [--json] [--status=X] [--feature=X]
+```
+
+Progress view over the story/task graph, computed locally from `specs/*/spec.md` + `tasks.md` (zero
+model tokens). `--interactive` opens a full-screen navigable view on a TTY.
+
+## `ambykit analyze`
+
+```text
+ambykit analyze [--json]
+```
+
+Cross-check spec ↔ plan ↔ tasks for coverage, consistency, and dependency-graph health. Read-only.
+
+## `ambykit check`
+
+```text
+ambykit check
+```
+
+Validate the project's AmbyKit setup and configuration.
+
+## `ambykit upgrade`
+
+```text
+ambykit upgrade [--dry-run]
+```
+
+Refresh generated files after updating the AmbyKit package.

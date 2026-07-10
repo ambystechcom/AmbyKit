@@ -1,0 +1,122 @@
+{
+  "$schema": "https://ambystech.dev/schemas/design-tokens.json",
+  "$note": "ambystech brand system for the AmbyKit docs site. Web tokens (hex/px/gradient). Mode-aware semantic tokens carry {light,dark} pairs; components cite semantic/component names, never raw values. Bright brand hues are for headings / large text / UI affordances (AA 3:1), NOT small body copy — body uses the neutral text tokens.",
+  "primitive": {
+    "color": {
+      "magenta-400": "#F65FBB",
+      "magenta-500": "#EE1199",
+      "magenta-700": "#B10C72",
+      "blue-500": "#3C69E7",
+      "orchid-400": "#B45FDD",
+      "orchid-500": "#9932CC",
+      "sky-500": "#00CCFF",
+      "sky-700": "#0785A6",
+      "deep-900": "#040D14",
+      "deep-800": "#0B1620",
+      "deep-700": "#16232F",
+      "white": "#FFFFFF",
+      "slate-50": "#F7F9FB",
+      "slate-100": "#E9EEF2",
+      "slate-300": "#C3CDD6",
+      "slate-500": "#6B7B88",
+      "slate-700": "#33414D",
+      "slate-900": "#101820"
+    },
+    "gradient": {
+      "signature": "linear-gradient(90deg, #EE1199 0%, #9932CC 50%, #00CCFF 100%)",
+      "signature-diagonal": "linear-gradient(135deg, #EE1199 0%, #9932CC 50%, #00CCFF 100%)"
+    },
+    "space": { "1": "4px", "2": "8px", "3": "12px", "4": "16px", "6": "24px", "8": "32px", "12": "48px", "16": "64px" },
+    "radius": { "sm": "4px", "md": "8px", "lg": "16px", "full": "9999px" },
+    "font": {
+      "sans": "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+      "mono": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "size-sm": "14px",
+      "size-md": "16px",
+      "size-lg": "20px",
+      "size-xl": "28px",
+      "size-2xl": "40px"
+    },
+    "logo": { "header-height": "32px", "favicon": "32px", "source-min": "512px" }
+  },
+  "semantic": {
+    "color": {
+      "brand": "{primitive.color.magenta-500}",
+      "accent-blue": "{primitive.color.blue-500}",
+      "accent-orchid": "{primitive.color.orchid-500}",
+      "accent-sky": "{primitive.color.sky-500}",
+      "surface": { "light": "{primitive.color.white}", "dark": "{primitive.color.deep-900}" },
+      "surface-elevated": { "light": "{primitive.color.slate-50}", "dark": "{primitive.color.deep-800}" },
+      "border": { "light": "{primitive.color.slate-100}", "dark": "{primitive.color.deep-700}" },
+      "text": { "light": "{primitive.color.slate-900}", "dark": "{primitive.color.slate-100}" },
+      "text-muted": { "light": "{primitive.color.slate-500}", "dark": "{primitive.color.slate-300}" },
+      "link": { "light": "{primitive.color.magenta-700}", "dark": "{primitive.color.magenta-400}" },
+      "link-hover": { "light": "{primitive.color.orchid-500}", "dark": "{primitive.color.sky-500}" },
+      "focus-ring": "{primitive.color.sky-500}",
+      "code-bg": { "light": "{primitive.color.slate-50}", "dark": "{primitive.color.deep-800}" }
+    },
+    "gradient": { "brand": "{primitive.gradient.signature}", "brand-diagonal": "{primitive.gradient.signature-diagonal}" },
+    "space": { "xs": "{primitive.space.2}", "sm": "{primitive.space.4}", "md": "{primitive.space.6}", "lg": "{primitive.space.12}" }
+  },
+  "component": {
+    "header": {
+      "bg": "{semantic.color.surface}",
+      "border": "{semantic.color.border}",
+      "logo-height": "{primitive.logo.header-height}"
+    },
+    "hero": {
+      "gradient": "{semantic.gradient.brand-diagonal}",
+      "title-fg": "{primitive.color.white}",
+      "subtitle-fg": "{primitive.color.slate-100}",
+      "fallback-fg": "{semantic.color.brand}"
+    },
+    "sidebar": {
+      "bg": "{semantic.color.surface-elevated}",
+      "link-fg": "{semantic.color.text-muted}",
+      "link-active-fg": "{semantic.color.brand}",
+      "link-active-indicator": "{semantic.color.brand}"
+    },
+    "link": { "fg": "{semantic.color.link}", "fg-hover": "{semantic.color.link-hover}" },
+    "button-primary": {
+      "bg": "{semantic.color.brand}",
+      "fg": "{primitive.color.white}",
+      "bg-hover": "{semantic.color.accent-orchid}",
+      "radius": "{primitive.radius.md}"
+    },
+    "button-gradient": {
+      "bg": "{semantic.gradient.brand}",
+      "fg": "{primitive.color.white}",
+      "radius": "{primitive.radius.md}"
+    },
+    "phase-badge": {
+      "bg": "{semantic.color.surface-elevated}",
+      "number-fg": "{semantic.color.brand}",
+      "border": "{semantic.color.border}"
+    },
+    "phase-card": {
+      "bg": "{semantic.color.surface-elevated}",
+      "border": "{semantic.color.border}",
+      "title-fg": "{semantic.color.text}",
+      "accent": "{semantic.color.brand}",
+      "radius": "{primitive.radius.lg}"
+    },
+    "aside": {
+      "note": { "accent": "{semantic.color.accent-blue}" },
+      "tip": { "accent": "{semantic.color.brand}" },
+      "caution": { "accent": "{semantic.color.accent-orchid}" },
+      "danger": { "accent": "{primitive.color.magenta-700}" }
+    },
+    "code-block": { "bg": "{semantic.color.code-bg}", "border": "{semantic.color.border}", "font": "{primitive.font.mono}" },
+    "table": { "header-bg": "{semantic.color.surface-elevated}", "border": "{semantic.color.border}", "stripe": "{semantic.color.surface-elevated}" },
+    "mermaid": {
+      "node-fill": "{semantic.color.surface-elevated}",
+      "node-stroke": "{semantic.color.brand}",
+      "node-text": "{semantic.color.text}",
+      "line": "{semantic.color.accent-orchid}",
+      "cluster-bg": { "light": "{primitive.color.slate-50}", "dark": "{primitive.color.deep-800}" },
+      "cluster-border": "{semantic.color.border}",
+      "active-fill": "{semantic.color.accent-sky}",
+      "active-text": "{primitive.color.deep-900}"
+    }
+  }
+}
