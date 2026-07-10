@@ -1,0 +1,52 @@
+name: Publish to npm
+
+# Publishes @ambystech/ambykit to npm when a GitHub Release is published (or run manually).
+# Requires an NPM_TOKEN repo secret (npm automation token with publish rights to the ambystech org).
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # npm provenance attestation
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # Fail fast if a release tag (vX.Y.Z) doesn't match package.json — avoids publishing a stale version.
+      - name: Verify tag matches package version
+        if: github.event_name == 'release'
+        run: |
+          PKG=$(node -p "require('./package.json').version")
+          TAG=${GITHUB_REF_NAME#v}
+          if [ "$PKG" != "$TAG" ]; then
+            echo "::error::Release tag '$TAG' does not match package.json version '$PKG'"
+            exit 1
+          fi
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
