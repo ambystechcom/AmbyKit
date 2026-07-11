@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./public/ambykit_logo.png" alt="AmbyKit" width="480">
+  <img src="./public/ambykit_logo.png" alt="AmbyKit" />
 </p>
 
 <p align="center">
@@ -22,12 +22,27 @@ Install from npm and scaffold AmbyKit into your project:
 ```bash
 npm install -g @ambystech/ambykit
 ambykit init            # scaffold .amby/ and pick your assistants
+# — or run it without installing —
+npx @ambystech/ambykit init
 ```
 
-Or run it without installing:
+Then, inside your AI assistant, walk the workflow:
 
 ```bash
-npx @ambystech/ambykit init
+/amby.constitution   # one-time: set your project's guiding principles
+/amby.specify        # describe a feature → spec.md (user stories + EARS requirements)
+/amby.clarify        # resolve open questions
+/amby.design         # UI spec + design-tokens.json
+/amby.plan           # technical plan
+/amby.tasks          # ordered, dependency-aware task list
+/amby.implement      # build it
+```
+
+Track progress from the terminal:
+
+```bash
+ambykit dashboard
+ambykit dashboard 001:US-3   # story ids restart per feature — qualify with the feature ref
 ```
 
 📖 Full documentation: **[ambystech.io/AmbyKit](https://ambystech.io/AmbyKit/)**
@@ -45,26 +60,6 @@ truth that compiles to each tool's native format.
   most spec tools skip.
 - **Author once, emit per tool.** One neutral source → Claude Code, OpenCode, GitHub Copilot
   (VS Code + CLI), Cursor (+ CLI), Antigravity (IDE + CLI).
-
-## Install & quickstart
-
-```bash
-# scaffold AmbyKit into your project and pick your tools
-npx @ambystech/ambykit init
-
-# then, inside your assistant:
-/amby.constitution   # one-time: set your project's guiding principles
-/amby.specify        # describe a feature → spec.md (user stories + EARS requirements)
-/amby.clarify        # resolve open questions
-/amby.design         # UI spec + design-tokens.json
-/amby.plan           # technical plan
-/amby.tasks          # ordered, dependency-aware task list
-/amby.implement      # build it
-
-# track progress from the terminal
-npx ambykit dashboard
-npx ambykit dashboard 001:US-3   # story ids restart per feature — qualify with the feature ref
-```
 
 ## The workflow
 
