@@ -1,6 +1,6 @@
 {
   "name": "@ambystech/ambykit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Spec-Driven Development framework that helps AI coding assistants build better software — author your specs, user stories, UI design, plans and tasks once, and emit native config for Claude Code, OpenCode, GitHub Copilot, Cursor, Antigravity and more.",
   "keywords": [
     "spec-driven-development",
