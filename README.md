@@ -1,13 +1,36 @@
+<p align="center">
+  <img src="./public/ambykit_logo.png" alt="AmbyKit" width="480">
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@ambystech/ambykit"><img src="https://img.shields.io/npm/v/@ambystech/ambykit" alt="npm version"></a>
+  <a href="https://github.com/ambystechcom/AmbyKit/actions/workflows/ci.yml"><img src="https://github.com/ambystechcom/AmbyKit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://ambystech.io/AmbyKit/"><img src="https://img.shields.io/badge/docs-live-EE1199" alt="Docs"></a>
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license">
+</p>
+
 # AmbyKit
 
 **Spec-Driven Development for AI coding assistants.** Author your specs, user stories, UI design,
 plans and tasks **once** — AmbyKit emits native commands and rules for every assistant your team
 uses, so the AI builds from clear, testable requirements instead of guessing.
 
-> Status: early development (M0 bootstrap). See [`docs/`](./docs) and the roadmap below.
->
-> 📖 **Documentation site:** the user-facing docs live in [`site/`](./site) (Astro Starlight) and
-> deploy to GitHub Pages. Run it locally with `cd site && npm install && npm run dev`.
+## Quick start
+
+Install from npm and scaffold AmbyKit into your project:
+
+```bash
+npm install -g @ambystech/ambykit
+ambykit init            # scaffold .amby/ and pick your assistants
+```
+
+Or run it without installing:
+
+```bash
+npx @ambystech/ambykit init
+```
+
+📖 Full documentation: **[ambystech.io/AmbyKit](https://ambystech.io/AmbyKit/)**
 
 ## Why
 
@@ -78,15 +101,6 @@ Antigravity (IDE + CLI). See [`docs/tool-compatibility.md`](./docs/tool-compatib
 | `ambykit upgrade` | Update AmbyKit and re-sync |
 
 See [`docs/cli-reference.md`](./docs/cli-reference.md).
-
-## Roadmap
-
-- **M0** ✅ Bootstrap: repo scaffold, docs, neutral templates + prompts, own constitution.
-- **M1** ✅ Core model + Claude Code emitter + `ambykit init`/`sync`/`dashboard`.
-- **M2** ✅ GitHub Copilot (VS Code + CLI) emitters.
-- **M3** ✅ OpenCode, Cursor (+ CLI), Antigravity (IDE + CLI) emitters — all 9 targets shipping.
-- **M4** ✅ Template installation into `.amby/` + deepened UI-design artifact.
-- **M5** ✅ `analyze` dependency-graph validation, CI self-host gate, npm publish prep.
 
 ## Contributing
 
