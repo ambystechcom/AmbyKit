@@ -16,6 +16,8 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Must match the "Environment" set on the npm trusted publisher (case-sensitive).
+    environment: Prod
     steps:
       - uses: actions/checkout@v7
 
