@@ -4,7 +4,8 @@ import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
 
 // GitHub Pages project site → served under /AmbyKit/. Override AMBYKIT_BASE for a custom domain ('/').
-const base = process.env.AMBYKIT_BASE ?? "/AmbyKit";
+//const base = process.env.AMBYKIT_BASE ?? "/AmbyKit";
+const base = "/";
 
 // https://astro.build/config
 export default defineConfig({
