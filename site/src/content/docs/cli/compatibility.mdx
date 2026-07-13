@@ -22,17 +22,19 @@ emitter (VS Code extensions, sibling CLIs).
 | `cursor-cli` | Cursor CLI | `none` (rules-only) |
 | `antigravity` | Antigravity (IDE) | `workflows` |
 | `antigravity-cli` | Antigravity CLI | `workflows` (reuses Antigravity) |
+| `codex` | Codex CLI | `skills` |
 
 ## Where files land
 
-| Concern | Claude Code | OpenCode | Copilot (VS Code) | Copilot CLI | Cursor | Cursor CLI | Antigravity |
-|---|---|---|---|---|---|---|---|
-| Rules file | `CLAUDE.md` (+`@AGENTS.md` bridge) | `AGENTS.md` | `.github/copilot-instructions.md` + `AGENTS.md` | same as Copilot | `.cursor/rules/*.mdc` + `AGENTS.md` | Cursor config + `AGENTS.md` | `AGENTS.md` + `.agents/rules/*.md` |
-| Commands | `.claude/commands/amby/*.md` | `.opencode/commands/*.md` | `.github/prompts/*.prompt.md` | **skills** | `.cursor/commands/*.md` | none | `.agents/workflows/*.md` |
-| MCP file | `.mcp.json` | `opencode.json` → `mcp` | `.vscode/mcp.json` (`servers`) | `~/.copilot/mcp-config.json` (`mcpServers`, user) | `.cursor/mcp.json` (`mcpServers`) | reads `.cursor/mcp.json` | `mcp_config.json` (`mcpServers`, user) |
+| Concern | Claude Code | OpenCode | Copilot (VS Code) | Copilot CLI | Cursor | Cursor CLI | Antigravity | Codex CLI |
+|---|---|---|---|---|---|---|---|---|
+| Rules file | `CLAUDE.md` (+`@AGENTS.md` bridge) | `AGENTS.md` | `.github/copilot-instructions.md` + `AGENTS.md` | same as Copilot | `.cursor/rules/*.mdc` + `AGENTS.md` | Cursor config + `AGENTS.md` | `AGENTS.md` + `.agents/rules/*.md` | `AGENTS.md` |
+| Commands | `.claude/commands/amby/*.md` | `.opencode/commands/*.md` | `.github/prompts/*.prompt.md` | **skills** | `.cursor/commands/*.md` | none | `.agents/workflows/*.md` | **skills** — `.agents/skills/*/SKILL.md` |
+| MCP file | `.mcp.json` | `opencode.json` → `mcp` | `.vscode/mcp.json` (`servers`) | `~/.copilot/mcp-config.json` (`mcpServers`, user) | `.cursor/mcp.json` (`mcpServers`) | reads `.cursor/mcp.json` | `mcp_config.json` (`mcpServers`, user) | `.codex/config.toml` — not written (out of scope) |
 
 :::note
 Claude Code does not read `AGENTS.md` natively — AmbyKit emits a `CLAUDE.md` whose first line is
 `@AGENTS.md` so there is a single shared rules source. User-level MCP files (Copilot CLI, Antigravity)
-are written only with explicit consent.
+are written only with explicit consent. Codex's skills have no argument-placeholder convention, so
+AmbyKit rewrites `$ARGUMENTS` into instruction prose instead of leaving a literal token.
 :::

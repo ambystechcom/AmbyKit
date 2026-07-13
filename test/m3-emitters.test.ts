@@ -4,6 +4,7 @@ import { CursorEmitter } from "../src/emitters/cursor.js";
 import { CursorCliEmitter } from "../src/emitters/cursor-cli.js";
 import { AntigravityEmitter } from "../src/emitters/antigravity.js";
 import { AntigravityCliEmitter } from "../src/emitters/antigravity-cli.js";
+import { CodexEmitter } from "../src/emitters/codex.js";
 import type { CommandSpec, RulesContext } from "../src/core/types.js";
 
 const spec: CommandSpec = {
@@ -68,5 +69,33 @@ describe("AntigravityCliEmitter", () => {
     const cli = new AntigravityCliEmitter().emit([spec], ctx(false))[0]!;
     expect(cli.path).toBe(ide.path);
     expect(cli.contents).toBe(ide.contents);
+  });
+});
+
+describe("CodexEmitter (surface: skills)", () => {
+  it("emits a skill at .agents/skills/<name>/SKILL.md with name + description frontmatter", () => {
+    const file = new CodexEmitter().emit([spec], ctx(false))[0]!;
+    expect(file.path).toBe(".agents/skills/amby-specify/SKILL.md");
+    expect(file.contents).toContain("name: amby-specify");
+    expect(file.contents).toContain('description: "Turn a feature idea into a spec."');
+  });
+
+  it("emits no Codex-specific rules file (AGENTS.md-native, US-2)", () => {
+    const files = new CodexEmitter().emit([spec], ctx(true));
+    expect(files).toHaveLength(1);
+    expect(files.every((f) => f.path.endsWith("SKILL.md"))).toBe(true);
+  });
+
+  it("is idempotent: two consecutive emit() calls produce identical output (FR-005)", () => {
+    const emitter = new CodexEmitter();
+    const first = emitter.emit([spec], ctx(false));
+    const second = emitter.emit([spec], ctx(false));
+    expect(second).toEqual(first);
+  });
+
+  it("rewrites $ARGUMENTS to prose instead of leaving a literal placeholder (US-3/FR-003)", () => {
+    const file = new CodexEmitter().emit([spec], ctx(false))[0]!;
+    expect(file.contents).not.toContain("$ARGUMENTS");
+    expect(file.contents).toContain("the user's request that followed this skill invocation");
   });
 });
