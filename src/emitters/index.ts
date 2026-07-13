@@ -7,6 +7,7 @@ import { CursorEmitter } from "./cursor.js";
 import { CursorCliEmitter } from "./cursor-cli.js";
 import { AntigravityEmitter } from "./antigravity.js";
 import { AntigravityCliEmitter } from "./antigravity-cli.js";
+import { CodexEmitter } from "./codex.js";
 
 export { BaseEmitter } from "./base-emitter.js";
 export { ClaudeEmitter } from "./claude.js";
@@ -17,6 +18,7 @@ export { CursorEmitter } from "./cursor.js";
 export { CursorCliEmitter } from "./cursor-cli.js";
 export { AntigravityEmitter } from "./antigravity.js";
 export { AntigravityCliEmitter } from "./antigravity-cli.js";
+export { CodexEmitter } from "./codex.js";
 
 /** A user-selectable target and the emitter it resolves to. */
 export interface TargetDef {
@@ -37,6 +39,7 @@ const cursor = new CursorEmitter();
 const cursorCli = new CursorCliEmitter();
 const antigravity = new AntigravityEmitter();
 const antigravityCli = new AntigravityCliEmitter();
+const codex = new CodexEmitter();
 
 /**
  * Registry of selectable targets → emitters. Several targets can share one emitter (VS Code
@@ -52,6 +55,7 @@ export const TARGETS: TargetDef[] = [
   { id: "cursor-cli", displayName: "Cursor CLI", emitter: cursorCli },
   { id: "antigravity", displayName: "Antigravity (IDE)", emitter: antigravity },
   { id: "antigravity-cli", displayName: "Antigravity CLI", emitter: antigravityCli },
+  { id: "codex", displayName: "Codex CLI", emitter: codex },
 ];
 
 export function getTarget(id: string): TargetDef | undefined {
