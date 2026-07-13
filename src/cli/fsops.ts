@@ -19,6 +19,14 @@ export interface ApplyOptions {
   includeUser: boolean;
 }
 
+/**
+ * Compare contents ignoring CRLF/LF differences: git `core.autocrlf` may check generated files out
+ * with CRLF on Windows, and that alone must not count as drift (it would make `check`/`sync` churn).
+ */
+function sameContents(a: string, b: string): boolean {
+  return a.replaceAll("\r\n", "\n") === b.replaceAll("\r\n", "\n");
+}
+
 /** Write a set of emitted files, reporting what changed. Idempotent: unchanged files are untouched. */
 export function applyFiles(
   projectRoot: string,
@@ -42,7 +50,7 @@ export function applyFiles(
     const abs = join(base, file.path);
     const existed = existsSync(abs);
     const current = existed ? readFileSync(abs, "utf8") : null;
-    if (current === file.contents) {
+    if (current !== null && sameContents(current, file.contents)) {
       result.unchanged.push(file.path);
       continue;
     }

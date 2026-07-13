@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 /**
  * Resolve the installed package root (where src/prompts and src/templates live).
@@ -17,6 +17,18 @@ export function packageRoot(): string {
   }
   // fallback: two levels up from core/
   return resolve(here, "..", "..");
+}
+
+/** The installed package version, read from package.json. */
+export function packageVersion(): string {
+  try {
+    const pkg = JSON.parse(readFileSync(join(packageRoot(), "package.json"), "utf8")) as {
+      version?: string;
+    };
+    return pkg.version ?? "0.0.0";
+  } catch {
+    return "0.0.0";
+  }
 }
 
 /** Directory containing the neutral phase prompts. */

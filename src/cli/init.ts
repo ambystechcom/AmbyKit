@@ -4,15 +4,13 @@ import { BaseCommand, stringFlag, type CliOptions } from "./base-command.js";
 import { applyFiles, writeIfAbsent } from "./fsops.js";
 import { buildEmittedFiles } from "./emit.js";
 import { saveConfig } from "../core/config.js";
-import { templatesDir } from "../core/paths.js";
+import { packageVersion, templatesDir } from "../core/paths.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
 import { getTarget, TARGETS } from "../emitters/index.js";
 import { banner } from "./banner.js";
 import { multiSelect } from "./ui/interactive/prompt.js";
 import { toolOptions } from "./tool-options.js";
 import type { AmbyConfig } from "../core/types.js";
-
-const PKG_VERSION = "0.0.0";
 
 /** Detect likely targets from existing tool directories; fall back to Claude Code. */
 function detectTools(projectRoot: string): string[] {
@@ -61,7 +59,7 @@ export class InitCommand extends BaseCommand {
       return 1;
     }
 
-    const config: AmbyConfig = { version: PKG_VERSION, tools };
+    const config: AmbyConfig = { version: packageVersion(), tools };
 
     // Scaffold .amby/ (constitution + config) unless present.
     const constitution = readFileSync(join(templatesDir(), "constitution.md"), "utf8")

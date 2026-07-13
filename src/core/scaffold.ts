@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, posix } from "node:path";
 import { referenceDir, templatesDir } from "./paths.js";
 
 /** Artifact templates installed into a consumer's `.amby/templates/` (referenced by the prompts). */
@@ -43,10 +43,10 @@ export function installArtifactTemplates(projectRoot: string, dryRun = false): I
   };
 
   for (const name of ARTIFACT_TEMPLATES) {
-    copy(join(templatesDir(), name), join(".amby", "templates", name));
+    copy(join(templatesDir(), name), posix.join(".amby", "templates", name));
   }
   for (const name of REFERENCE_DOCS) {
-    copy(join(referenceDir(), name), join(".amby", "reference", name));
+    copy(join(referenceDir(), name), posix.join(".amby", "reference", name));
   }
   return result;
 }
