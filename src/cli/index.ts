@@ -10,8 +10,7 @@ import { DashboardCommand } from "./dashboard.js";
 import { AnalyzeCommand } from "./analyze.js";
 import { CheckCommand } from "./check.js";
 import { UpgradeCommand } from "./upgrade.js";
-
-const VERSION = "0.0.0";
+import { packageVersion } from "../core/paths.js";
 
 const COMMANDS: BaseCommand[] = [
   new InitCommand(),
@@ -59,7 +58,7 @@ export async function main(argv: string[]): Promise<number> {
     return 0;
   }
   if (name === "--version" || name === "-v") {
-    console.log(VERSION);
+    console.log(packageVersion());
     return 0;
   }
   const command = COMMANDS.find((c) => c.name === name);

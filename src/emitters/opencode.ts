@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import { join } from "node:path/posix";
 import type { CommandSpec, CommandSurface } from "../core/types.js";
 import { BaseEmitter } from "./base-emitter.js";
 
