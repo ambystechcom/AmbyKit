@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-  compareVersions,
-  installedVersion,
-  isDevPlaceholder,
-  isOutdated,
-} from "../../src/core/version.js";
+import { compareVersions, isDevPlaceholder, isOutdated } from "../../src/core/version.js";
+import { packageVersion } from "../../src/core/paths.js";
 
 describe("compareVersions (feature 010)", () => {
   it("orders by numeric x.y.z", () => {
@@ -41,8 +37,8 @@ describe("isOutdated (FR-013)", () => {
   });
 });
 
-describe("installedVersion", () => {
+describe("packageVersion", () => {
   it("reads a non-empty version from the package", () => {
-    expect(installedVersion()).toMatch(/^\d+\.\d+\.\d+/);
+    expect(packageVersion()).toMatch(/^\d+\.\d+\.\d+/);
   });
 });

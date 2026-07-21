@@ -1,23 +1,7 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import { packageRoot } from "./paths.js";
-
 /**
- * Version helpers for the outdated-warning + `update` feature (010). Comparison and classification are
- * pure; `installedVersion` reads the package's own `package.json` (same edge as `paths.ts`).
+ * Pure version helpers for the outdated-warning + `update` feature (010). The running version itself
+ * is read via `packageVersion()` in `core/paths.js` (single source — Principle 2).
  */
-
-/** The running CLI version, read from `packageRoot()/package.json`; "0.0.0" if unreadable. */
-export function installedVersion(): string {
-  try {
-    const pkg = JSON.parse(readFileSync(join(packageRoot(), "package.json"), "utf8")) as {
-      version?: unknown;
-    };
-    return typeof pkg.version === "string" ? pkg.version : "0.0.0";
-  } catch {
-    return "0.0.0";
-  }
-}
 
 /** "0.0.0" and other unpublished placeholders → true (never warn/downgrade, FR-013). */
 export function isDevPlaceholder(version: string): boolean {

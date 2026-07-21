@@ -11,7 +11,6 @@ import { getTarget, TARGETS } from "../emitters/index.js";
 import { banner } from "./banner.js";
 import { multiSelect } from "./ui/interactive/prompt.js";
 import { toolOptions } from "./tool-options.js";
-import { installedVersion } from "../core/version.js";
 import type { AmbyConfig } from "../core/types.js";
 
 /** Detect likely targets from existing tool directories; fall back to Claude Code. */
@@ -75,7 +74,7 @@ export class InitCommand extends BaseCommand {
       return 1;
     }
 
-    const config: AmbyConfig = { version: installedVersion(), tools };
+    const config: AmbyConfig = { version: packageVersion(), tools };
 
     // Scaffold .amby/ (constitution + config) unless present.
     const constitution = readFileSync(join(templatesDir(), "constitution.md"), "utf8")

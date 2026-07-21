@@ -14,9 +14,7 @@ import { CheckCommand } from "./check.js";
 import { RestoreCommand } from "./restore.js";
 import { UpdateCommand } from "./update.js";
 import { outdatedWarning } from "./ui/callout.js";
-import { installedVersion } from "../core/version.js";
-
-const VERSION = installedVersion();
+import { packageVersion } from "../core/paths.js";
 
 const COMMANDS: BaseCommand[] = [
   new InitCommand(),

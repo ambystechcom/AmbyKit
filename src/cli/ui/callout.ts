@@ -1,4 +1,5 @@
-import { installedVersion, isOutdated } from "../../core/version.js";
+import { packageVersion } from "../../core/paths.js";
+import { isOutdated } from "../../core/version.js";
 import { cacheIsStale, latestFromCache, refreshLatest } from "../version-check.js";
 import { boxGlyphs, paint, symbols } from "./theme.js";
 import type { Capabilities } from "./types.js";
@@ -51,5 +52,5 @@ export function versionWarning(
 export async function outdatedWarning(caps: Capabilities): Promise<string> {
   let latest = latestFromCache();
   if (cacheIsStale()) latest = (await refreshLatest()) ?? latest;
-  return versionWarning(caps, installedVersion(), latest);
+  return versionWarning(caps, packageVersion(), latest);
 }

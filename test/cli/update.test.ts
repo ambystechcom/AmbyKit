@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { UpdateCommand } from "../../src/cli/update.js";
-import { installedVersion } from "../../src/core/version.js";
+import { packageVersion } from "../../src/core/paths.js";
 import type { CliOptions } from "../../src/cli/base-command.js";
 
 /** Drives the CLI-update seams without spawning npm or hitting the network. */
@@ -48,7 +48,7 @@ function project(tools: string[]): string {
 }
 
 /** `update` on a CLI that is already current → goes straight to the project prompt refresh. */
-const currentUpdate = () => new TestUpdate(installedVersion(), false);
+const currentUpdate = () => new TestUpdate(packageVersion(), false);
 
 afterEach(() => {
   delete process.env["AMBYKIT_CACHE_DIR"];
@@ -70,7 +70,7 @@ describe("ambykit update — CLI self-update (feature 010 / US-2)", () => {
 
   it("does not attempt an install when already current", async () => {
     // latest == installed → not outdated → no update path, no re-run message.
-    const { code, out } = await run(new TestUpdate(installedVersion(), false));
+    const { code, out } = await run(new TestUpdate(packageVersion(), false));
     expect(code).toBe(0);
     expect(out).not.toMatch(/Re-run .*ambykit update/);
   });

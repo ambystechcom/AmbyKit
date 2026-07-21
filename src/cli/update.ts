@@ -3,8 +3,8 @@ import { BaseCommand, type CliOptions } from "./base-command.js";
 import { applyFiles } from "./fsops.js";
 import { buildEmittedFiles } from "./emit.js";
 import { loadConfig } from "../core/config.js";
-import { installedVersion, isOutdated } from "../core/version.js";
-import { projectAtCwd } from "../core/paths.js";
+import { isOutdated } from "../core/version.js";
+import { packageVersion, projectAtCwd } from "../core/paths.js";
 import { refreshLatest } from "./version-check.js";
 
 const PACKAGE = "@ambystech/ambykit";
@@ -22,7 +22,7 @@ export class UpdateCommand extends BaseCommand {
   protected override requiresProject = false;
 
   protected async execute(opts: CliOptions): Promise<number> {
-    const installed = installedVersion();
+    const installed = packageVersion();
     const latest = await this.latestVersion();
 
     if (latest !== null && isOutdated(installed, latest)) {
