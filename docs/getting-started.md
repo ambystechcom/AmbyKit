@@ -22,6 +22,16 @@ npx @ambystech/ambykit init
 
 Re-run any time to add a tool (`ambykit add cursor`) or refresh generated files (`ambykit sync`).
 
+### Already have a project (and a `CLAUDE.md` / `AGENTS.md`)?
+
+`init` is **non-destructive**. If a rules file already exists, AmbyKit does **not** overwrite it — it
+detects the existing project (an existing rules file, source files, or git history) and adds only its
+own `### AmbyKit usage` section, leaving everything you wrote intact. Re-running is idempotent: the
+section is updated in place, never duplicated. Before modifying an existing file it writes a
+timestamped backup under `.amby/backups/`, and if you hand-edit AmbyKit's section it is left untouched
+and reported as skipped. Preview any run with `--dry-run`; recover a file with
+[`ambykit restore`](./cli-reference.md). Add `.amby/backups/` to your `.gitignore`.
+
 ## 2. Set your constitution (once)
 
 Inside your assistant:

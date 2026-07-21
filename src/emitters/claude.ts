@@ -5,6 +5,7 @@ import type {
   EmittedFile,
   RulesContext,
 } from "../core/types.js";
+import { buildPointerRegion } from "../core/rules.js";
 import { BaseEmitter } from "./base-emitter.js";
 
 /**
@@ -34,17 +35,13 @@ export class ClaudeEmitter extends BaseEmitter {
   }
 
   protected override rulesFiles(_ctx: RulesContext): EmittedFile[] {
-    const contents = `@AGENTS.md
-
-# Claude Code
-
-The shared, tool-neutral guidance is in \`@AGENTS.md\` above (imported). Claude Code does not read
-\`AGENTS.md\` natively — the import on the first line is the bridge, so keep it there.
-
-The AmbyKit workflow is available as \`/amby.*\` slash commands in \`.claude/commands/\`.
-
-<!-- Managed by AmbyKit. Regenerate with \`ambykit sync\`. -->
-`;
-    return [{ path: "CLAUDE.md", contents, scope: "project" }];
+    // The `@AGENTS.md` import must stay on line 1 (Claude does not read AGENTS.md natively). It is
+    // the `requiredPrefix` so a brownfield merge re-adds it if missing (FR-011); the AmbyKit body is
+    // a pointer region spliced non-destructively into any existing CLAUDE.md (FR-001).
+    const region = buildPointerRegion(
+      "The `/amby.*` slash commands live in `.claude/commands/` (Claude reads `AGENTS.md` via the import above).",
+    );
+    const contents = `@AGENTS.md\n\n${region}`;
+    return [{ path: "CLAUDE.md", contents, scope: "project", merge: "region", requiredPrefix: "@AGENTS.md" }];
   }
 }

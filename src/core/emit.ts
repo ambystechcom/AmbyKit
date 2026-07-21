@@ -1,7 +1,7 @@
 import { basename } from "node:path";
-import type { AmbyConfig, EmittedFile } from "../core/types.js";
-import { loadCommandSpecs } from "../core/command-spec.js";
-import { buildAgentsMd } from "../core/rules.js";
+import type { AmbyConfig, EmittedFile } from "./types.js";
+import { loadCommandSpecs } from "./command-spec.js";
+import { buildAgentsMd } from "./rules.js";
 import { emittersForTargets } from "../emitters/index.js";
 
 /**
@@ -17,7 +17,12 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
 
   const files: EmittedFile[] = [];
   if (manageRules) {
-    files.push({ path: "AGENTS.md", contents: buildAgentsMd(projectName, specs), scope: "project" });
+    files.push({
+      path: "AGENTS.md",
+      contents: buildAgentsMd(projectName, specs),
+      scope: "project",
+      merge: "region", // preserve any user-authored AGENTS.md content (feature 008 / FR-001)
+    });
   }
   for (const emitter of emittersForTargets(config.tools)) {
     files.push(...emitter.emit(specs, ctx));

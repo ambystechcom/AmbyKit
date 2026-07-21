@@ -34,8 +34,10 @@ const verbs = new Set();
 for (const f of readdirSync(join(root, "src/cli"))) {
   if (!f.endsWith(".ts")) continue;
   const src = readFileSync(join(root, "src/cli", f), "utf8");
-  const m = src.match(/readonly name = "([a-z-]+)"/);
-  if (m && /extends BaseCommand/.test(src)) verbs.add(m[1]);
+  // Match `[override] readonly name[: string] = "verb"` and any *Command base (e.g. a deprecated alias
+  // that extends another command, not BaseCommand directly).
+  const m = src.match(/(?:override\s+)?readonly name(?:\s*:\s*string)?\s*=\s*"([a-z-]+)"/);
+  if (m && /\bextends \w*Command\b/.test(src)) verbs.add(m[1]);
 }
 
 // --- source of truth: emitter/target registry ---

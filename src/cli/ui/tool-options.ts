@@ -1,5 +1,5 @@
-import { TARGETS } from "../emitters/index.js";
-import type { PromptOption } from "./ui/interactive/prompt.js";
+import { TARGETS } from "../../emitters/index.js";
+import type { PromptOption } from "./interactive/prompt.js";
 
 /** The selectable tool targets for interactive prompts (aliases hidden). */
 export function toolOptions(): PromptOption[] {

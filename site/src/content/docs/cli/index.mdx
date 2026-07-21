@@ -27,6 +27,11 @@ Scaffold AmbyKit into a project: creates `.amby/` (constitution + `config.json`)
 assistants, emits their native files, and writes the shared `AGENTS.md` (+ `CLAUDE.md` bridge for
 Claude). With no `--tools` on an interactive terminal it opens a tool picker.
 
+**Brownfield-safe.** `init` detects an existing project (a rules file, source files, or git history)
+and merges rather than overwrites: existing `CLAUDE.md`/`AGENTS.md` content is preserved and only
+AmbyKit's `### AmbyKit usage` section is added/updated. The file is backed up to `.amby/backups/`
+first, a section you hand-edited is left untouched, and `--dry-run` previews the change.
+
 ## `ambykit add <tool…>`
 
 ```text
@@ -43,7 +48,9 @@ ambykit sync [--check] [--include-user] [--dry-run]
 ```
 
 Re-emit all configured tools from the neutral source. `--check` exits non-zero if anything is out of
-date (used in CI). User-level MCP files are opt-in via `--include-user`.
+date (used in CI). User-level MCP files are opt-in via `--include-user`. `sync` is also the
+**update path** for existing docs — it merges AmbyKit's section into each tool's rules file
+non-destructively (preserve, back up, skip hand-edits), keeping your agent docs current.
 
 ## `ambykit dashboard [story-id]`
 
@@ -70,10 +77,22 @@ ambykit check
 
 Validate the project's AmbyKit setup and configuration.
 
-## `ambykit upgrade`
+## `ambykit restore [file]`
 
 ```text
-ambykit upgrade [--dry-run]
+ambykit restore [file]   # no file → list available backups
 ```
 
-Refresh generated files after updating the AmbyKit package.
+Recover an agent-doc file (`AGENTS.md`, `CLAUDE.md`, …) from the timestamped backup AmbyKit writes to
+`.amby/backups/` before it modifies an existing file. With no argument it lists what can be restored.
+
+## `ambykit update`
+
+```text
+ambykit update
+```
+
+Update the AmbyKit CLI to the latest published version when it's behind, then — on a re-run once
+current — refresh this project's tool prompts. When outdated it upgrades the CLI and asks you to
+**re-run** `ambykit update` to refresh prompts under the new version; if it can't self-update (e.g. an
+`npx` run or a permissions error) it prints the exact `npm install -g` command.

@@ -1,5 +1,6 @@
 import { join } from "node:path/posix";
 import type { CommandSpec, CommandSurface, EmittedFile, RulesContext } from "../core/types.js";
+import { buildPointerRegion } from "../core/rules.js";
 import { BaseEmitter } from "./base-emitter.js";
 
 /**
@@ -32,13 +33,10 @@ export class CopilotEmitter extends BaseEmitter {
   }
 
   protected override rulesFiles(_ctx: RulesContext): EmittedFile[] {
-    const contents = `# GitHub Copilot instructions
-
-This project uses **AmbyKit** for Spec-Driven Development. Follow the workflow and rules in
-\`AGENTS.md\` (repository root). The \`/amby.*\` prompts under \`.github/prompts/\` drive the phases.
-
-<!-- Managed by AmbyKit. Regenerate with \`ambykit sync\`. -->
-`;
-    return [{ path: join(".github", "copilot-instructions.md"), contents, scope: "project" }];
+    const region = buildPointerRegion("The `/amby.*` prompts under `.github/prompts/` drive the phases.");
+    const contents = `# GitHub Copilot instructions\n\n${region}`;
+    return [
+      { path: join(".github", "copilot-instructions.md"), contents, scope: "project", merge: "region" },
+    ];
   }
 }

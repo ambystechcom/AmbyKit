@@ -26,6 +26,10 @@ ambykit init            # scaffold .amby/ and pick your assistants
 npx @ambystech/ambykit init
 ```
 
+Already have a project? `init` is **non-destructive** — an existing `CLAUDE.md`/`AGENTS.md` is
+preserved (and backed up); AmbyKit only adds/updates its own `### AmbyKit usage` section. Re-run
+`ambykit sync` any time to keep it current, or `ambykit restore` to roll a file back.
+
 Then, inside your AI assistant, walk the workflow:
 
 ```bash
@@ -93,7 +97,8 @@ Antigravity (IDE + CLI). See [`docs/tool-compatibility.md`](./docs/tool-compatib
 | `ambykit dashboard [story-id]` | Progress view over the story/task graph |
 | `ambykit analyze` | Validate the dependency graph (cycles, blockers, orphans) |
 | `ambykit check` | Doctor: verify integrations |
-| `ambykit upgrade` | Update AmbyKit and re-sync |
+| `ambykit restore [file]` | Restore an agent-doc file from its `.amby/backups/` backup |
+| `ambykit update` | Update the CLI to the latest, then refresh this project's prompts |
 
 See [`docs/cli-reference.md`](./docs/cli-reference.md).
 

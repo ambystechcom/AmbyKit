@@ -38,7 +38,11 @@ Several targets share one emitter's output (why `BaseEmitter` + thin subclasses 
 ## Gotchas the emitters encode
 
 - **Claude Code does not read `AGENTS.md`.** Emit a `CLAUDE.md` whose first line is `@AGENTS.md` (or a
-  symlink) so there's a single shared rules source.
+  symlink) so there's a single shared rules source. This bridge line is preserved (re-added if missing)
+  when merging into an existing `CLAUDE.md`.
+- **Rules files are merged, not overwritten.** Every rules file wraps AmbyKit's content in a
+  `### AmbyKit usage` section so it can be spliced into a file the user already authored; only that
+  section is AmbyKit's. (Command/prompt/skill/workflow files remain fully generated and overwritten.)
 - **MCP top-level key differs**: `servers` (Copilot VS Code) vs `mcpServers` (Cursor, Copilot CLI,
   Antigravity) vs `mcp` (OpenCode) vs per-server `type` blocks (Claude `.mcp.json`).
 - **MCP scope differs**: Copilot CLI and Antigravity use **user-level** files outside the repo — AmbyKit

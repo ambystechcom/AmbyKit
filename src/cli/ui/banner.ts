@@ -1,6 +1,6 @@
-import { detectCapabilities } from "./ui/capabilities.js";
-import { paint } from "./ui/theme.js";
-import type { Capabilities } from "./ui/types.js";
+import { detectCapabilities } from "./capabilities.js";
+import { paint } from "./theme.js";
+import type { Capabilities } from "./types.js";
 
 const ART = [
   "  ▄▀█ █▀▄▀█ █▄▄ █▄█ █▄▀ █ ▀█▀",

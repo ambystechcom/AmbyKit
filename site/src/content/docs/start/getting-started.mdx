@@ -27,6 +27,11 @@ you from zero to your first artifact — a project **constitution** — in a few
    ambykit init --tools=claude,cursor
    ```
 
+   Already have a project? `init` is **non-destructive** — an existing `CLAUDE.md`/`AGENTS.md` is
+   preserved and backed up to `.amby/backups/`; AmbyKit adds/updates only its own `### AmbyKit usage`
+   section. Re-run `ambykit sync` to keep it current, `ambykit restore` to roll a file back, and add
+   `.amby/backups/` to your `.gitignore`.
+
 3. **Create the constitution.** In your assistant, run the first phase — durable principles every
    later phase honors.
 

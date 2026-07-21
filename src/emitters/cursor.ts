@@ -1,5 +1,6 @@
 import { join } from "node:path/posix";
 import type { CommandSpec, CommandSurface, EmittedFile, RulesContext } from "../core/types.js";
+import { buildPointerRegion } from "../core/rules.js";
 import { BaseEmitter } from "./base-emitter.js";
 
 /**
@@ -19,15 +20,15 @@ export class CursorEmitter extends BaseEmitter {
   }
 
   protected override rulesFiles(_ctx: RulesContext): EmittedFile[] {
+    // The `.mdc` frontmatter is the greenfield preamble; the AmbyKit body is a pointer region spliced
+    // non-destructively (merge lives in the body — the frontmatter has no headings to confuse it).
+    const region = buildPointerRegion("Use the `/amby.*` commands in `.cursor/commands/` to run each phase.");
     const contents = `---
 description: AmbyKit Spec-Driven Development workflow
 alwaysApply: true
 ---
-This project uses **AmbyKit** for Spec-Driven Development. Follow the workflow and rules in
-\`AGENTS.md\` (repository root). Use the \`/amby.*\` commands in \`.cursor/commands/\` to run each phase.
 
-<!-- Managed by AmbyKit. Regenerate with \`ambykit sync\`. -->
-`;
-    return [{ path: join(".cursor", "rules", "ambykit.mdc"), contents, scope: "project" }];
+${region}`;
+    return [{ path: join(".cursor", "rules", "ambykit.mdc"), contents, scope: "project", merge: "region" }];
   }
 }

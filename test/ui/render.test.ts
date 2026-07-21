@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as render from "../../src/cli/ui/render.js";
-import { banner } from "../../src/cli/banner.js";
+import { banner } from "../../src/cli/ui/banner.js";
 import { fakeCapabilities, hasAnsi, stripAnsi } from "./helpers.js";
 
 describe("render.info — machine-output fidelity (FR-009/010)", () => {

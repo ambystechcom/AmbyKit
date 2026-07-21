@@ -1,0 +1,40 @@
+---
+title: Revise
+description: Continue an existing feature's spec (or design) — add and refine in place, with a done-guard.
+sidebar:
+  order: 4
+phase: revise
+order: 4
+command: amby.revise
+reads: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md]
+writes: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md]
+---
+
+import PhaseBadge from "../../../components/PhaseBadge.astro";
+import Artifacts from "../../../components/Artifacts.astro";
+
+<PhaseBadge n={4} name="Revise" />
+
+**Revise** continues an existing feature: it adds new user stories, requirements, and success criteria
+and refines existing ones **in place** — preserving every stable id — rather than starting over. It is
+distinct from `specify` (which creates a new feature) and `clarify` (which only resolves
+`[NEEDS CLARIFICATION]` markers).
+
+If the feature's spec is already `done`, revise makes no edits and points you to `/amby.specify` for a
+new feature. Otherwise it sets the spec `in-progress` and leaves any completed stories untouched. When
+continuing design, it extends an existing `ui.md`, or directs you to `/amby.design` if there is none.
+
+## Command
+
+```bash
+/amby.revise
+```
+
+## Artifacts read & written
+
+<Artifacts
+  reads={["specs/NNN-slug/spec.md", "specs/NNN-slug/ui.md"]}
+  writes={["specs/NNN-slug/spec.md", "specs/NNN-slug/ui.md"]}
+/>
+
+Revise patches in place — it never rewrites untouched sections or renumbers existing ids.

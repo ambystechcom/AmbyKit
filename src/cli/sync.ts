@@ -1,6 +1,6 @@
 import { BaseCommand, flag, type CliOptions } from "./base-command.js";
-import { applyFiles } from "./fsops.js";
-import { buildEmittedFiles } from "./emit.js";
+import { applyFiles } from "./io/fsops.js";
+import { buildEmittedFiles } from "../core/emit.js";
 import { loadConfig } from "../core/config.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
 
