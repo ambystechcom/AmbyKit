@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import type { BaseCommand, CliOptions } from "./base-command.js";
 import { banner } from "./banner.js";
 import { detectCapabilities } from "./ui/capabilities.js";
@@ -9,8 +11,12 @@ import { AddCommand } from "./add.js";
 import { DashboardCommand } from "./dashboard.js";
 import { AnalyzeCommand } from "./analyze.js";
 import { CheckCommand } from "./check.js";
-import { UpgradeCommand } from "./upgrade.js";
-import { packageVersion } from "../core/paths.js";
+import { RestoreCommand } from "./restore.js";
+import { UpdateCommand } from "./update.js";
+import { outdatedWarning } from "./ui/callout.js";
+import { installedVersion } from "../core/version.js";
+
+const VERSION = installedVersion();
 
 const COMMANDS: BaseCommand[] = [
   new InitCommand(),
@@ -19,7 +25,8 @@ const COMMANDS: BaseCommand[] = [
   new DashboardCommand(),
   new AnalyzeCommand(),
   new CheckCommand(),
-  new UpgradeCommand(),
+  new RestoreCommand(),
+  new UpdateCommand(),
 ];
 
 /** Parse argv (after the command name) into positionals + flags. */
@@ -41,8 +48,15 @@ export function parseArgs(argv: string[]): { positionals: string[]; flags: Recor
   return { positionals, flags };
 }
 
-function printHelp(): void {
-  console.log(banner());
+async function printHelp(): Promise<void> {
+  const caps = detectCapabilities();
+  console.log(banner(caps));
+  // The outdated-version callout sits between the banner and the usage/commands, like every command
+  // shows it between the banner and its content (feature 010, US-1).
+  if (caps.isTTY) {
+    const warning = await outdatedWarning(caps);
+    if (warning) console.log(warning);
+  }
   console.log("Usage: ambykit <command> [options]\n");
   console.log("Commands:");
   const width = Math.max(...COMMANDS.map((c) => c.name.length));
@@ -54,7 +68,7 @@ function printHelp(): void {
 export async function main(argv: string[]): Promise<number> {
   const [name, ...rest] = argv;
   if (!name || name === "--help" || name === "-h" || name === "help") {
-    printHelp();
+    await printHelp();
     return 0;
   }
   if (name === "--version" || name === "-v") {
@@ -64,7 +78,7 @@ export async function main(argv: string[]): Promise<number> {
   const command = COMMANDS.find((c) => c.name === name);
   if (!command) {
     console.error(render.error(detectCapabilities(), `Unknown command: ${name}`));
-    printHelp();
+    await printHelp();
     return 1;
   }
   const { positionals, flags } = parseArgs(rest);
@@ -76,11 +90,25 @@ export async function main(argv: string[]): Promise<number> {
   return command.run(opts);
 }
 
-main(process.argv.slice(2))
-  .then((code) => {
-    process.exitCode = code;
-  })
-  .catch((err) => {
-    console.error(err);
-    process.exitCode = 1;
-  });
+// Run only when invoked as the CLI entry point — importing this module (e.g. in tests) must not
+// execute the CLI. Resolve real paths so a symlinked/global bin still matches.
+function isEntryPoint(): boolean {
+  const invoked = process.argv[1];
+  if (!invoked) return false;
+  try {
+    return realpathSync(fileURLToPath(import.meta.url)) === realpathSync(invoked);
+  } catch {
+    return false;
+  }
+}
+
+if (isEntryPoint()) {
+  main(process.argv.slice(2))
+    .then((code) => {
+      process.exitCode = code;
+    })
+    .catch((err) => {
+      console.error(err);
+      process.exitCode = 1;
+    });
+}

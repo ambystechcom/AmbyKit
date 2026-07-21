@@ -33,3 +33,4 @@ Thumbs.db
 CLAUDE.local.md
 .claude/settings.local.json
 .amby/config.local.json
+.amby/backups/

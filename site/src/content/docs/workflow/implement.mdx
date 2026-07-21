@@ -2,9 +2,9 @@
 title: Implement
 description: Execute the task list, checking off tasks and updating story status as you go.
 sidebar:
-  order: 8
+  order: 9
 phase: implement
-order: 8
+order: 9
 command: amby.implement
 reads: [specs/NNN-slug/tasks.md, specs/NNN-slug/plan.md]
 writes: [specs/NNN-slug/tasks.md, specs/NNN-slug/spec.md]
@@ -13,7 +13,7 @@ writes: [specs/NNN-slug/tasks.md, specs/NNN-slug/spec.md]
 import PhaseBadge from "../../../components/PhaseBadge.astro";
 import Artifacts from "../../../components/Artifacts.astro";
 
-<PhaseBadge n={8} name="Implement" />
+<PhaseBadge n={9} name="Implement" />
 
 **Implement** executes the task list. It respects the Foundational-before-features gate and the
 dependency graph, loads only the slice each task needs (token frugality), and satisfies the mapped

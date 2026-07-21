@@ -46,6 +46,14 @@ export function referenceDir(): string {
   return join(packageRoot(), "src", "reference");
 }
 
+/**
+ * Whether `cwd` is itself an AmbyKit project root: a `.amby/` AND a `specs/` directory directly at the
+ * invocation dir (feature 010 / FR-007). Deliberately NOT a walk-up like `findProjectRoot`.
+ */
+export function projectAtCwd(cwd: string): boolean {
+  return existsSync(join(cwd, ".amby")) && existsSync(join(cwd, "specs"));
+}
+
 /** Find the project root by walking up from `start` looking for an `.amby` dir. */
 export function findProjectRoot(start: string = process.cwd()): string | null {
   let dir = resolve(start);

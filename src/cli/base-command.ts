@@ -1,5 +1,6 @@
 import { findProjectRoot } from "../core/paths.js";
 import { detectCapabilities } from "./ui/capabilities.js";
+import { outdatedWarning } from "./ui/callout.js";
 import * as render from "./ui/render.js";
 import { spinner, summarize, type Spinner } from "./ui/progress.js";
 import { toChangeSummary, type WriteResult } from "./fsops.js";
@@ -37,6 +38,10 @@ export abstract class BaseCommand {
     this.dryRun = flag(opts, "dry-run");
     this.assumeYes = flag(opts, "yes") || flag(opts, "y");
 
+    const pre = this.preamble();
+    if (pre) console.log(pre);
+    await this.printVersionWarning(flag(opts, "json"));
+
     if (this.requiresProject && findProjectRoot(opts.cwd) === null) {
       this.error("Not inside an AmbyKit project (no .amby/ found).", "Run `ambykit init` first.");
       return 1;
@@ -51,6 +56,22 @@ export abstract class BaseCommand {
   }
 
   protected abstract execute(opts: CliOptions): Promise<number>;
+
+  /** Text printed before the version warning (e.g. init's banner). Default: none. */
+  protected preamble(): string | null {
+    return null;
+  }
+
+  /**
+   * Show the outdated-version callout between the preamble and the command output (feature 010, US-1).
+   * Suppressed on non-TTY and `--json` (FR-004). The hot path reads only the cache; a stale cache
+   * triggers one bounded, best-effort refresh used this run (FR-005/005a) — never blocks on failure.
+   */
+  private async printVersionWarning(json: boolean): Promise<void> {
+    if (!this.caps.isTTY || json) return;
+    const warning = await outdatedWarning(this.caps);
+    if (warning) console.log(warning);
+  }
 
   /** The project root, throwing a clear error if absent. */
   protected projectRoot(cwd: string): string {
@@ -89,6 +110,27 @@ export abstract class BaseCommand {
   protected printSummary(result: WriteResult): void {
     const block = summarize(this.caps, toChangeSummary(result, this.dryRun));
     if (block) console.log(block);
+    this.printRegionOutcomes(result);
+  }
+
+  /**
+   * Report the brownfield-merge outcomes that the generic summary does not cover (feature 008):
+   * pre-modification backups, hand-edited regions left untouched, and files that could not be
+   * merged safely. Silent when none apply.
+   */
+  protected printRegionOutcomes(result: WriteResult): void {
+    if (result.backedUp.length > 0) {
+      this.info(`  backed up ${result.backedUp.length} file(s) before updating → .amby/backups/`);
+    }
+    if (result.skippedRegions.length > 0) {
+      this.warn(`Left ${result.skippedRegions.length} hand-edited AmbyKit region(s) untouched:`);
+      for (const p of result.skippedRegions) this.info(`  ~ ${p}`);
+      this.info("  Revert your edits (or remove the region) and re-run to let AmbyKit refresh it.");
+    }
+    if (result.aborted.length > 0) {
+      this.warn(`Could not safely update ${result.aborted.length} file(s):`);
+      for (const p of result.aborted) this.info(`  ! ${p}`);
+    }
   }
 }
 

@@ -17,7 +17,12 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
 
   const files: EmittedFile[] = [];
   if (manageRules) {
-    files.push({ path: "AGENTS.md", contents: buildAgentsMd(projectName, specs), scope: "project" });
+    files.push({
+      path: "AGENTS.md",
+      contents: buildAgentsMd(projectName, specs),
+      scope: "project",
+      merge: "region", // preserve any user-authored AGENTS.md content (feature 008 / FR-001)
+    });
   }
   for (const emitter of emittersForTargets(config.tools)) {
     files.push(...emitter.emit(specs, ctx));

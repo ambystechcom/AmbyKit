@@ -26,3 +26,13 @@ neutral source and run `ambykit sync`.
 
 This keeps the workflow consistent across every assistant a team uses, and makes adding a new tool a
 thin emitter rather than a fork of the whole workflow.
+
+## Non-destructive rules merge
+
+Command files are AmbyKit's alone and are overwritten. **Rules files** (`AGENTS.md`, the `CLAUDE.md`
+bridge, `copilot-instructions.md`, Cursor's `.mdc`) may already contain your own instructions, so
+AmbyKit never overwrites them. It owns a single Markdown section that opens with `### AmbyKit usage`
+and merges just that section into whatever file exists — preserving everything around it. The section
+carries a fingerprint so a hand-edited copy is detected and left untouched, an existing file is backed
+up to `.amby/backups/` before any change (recover with `ambykit restore`), and re-running is
+idempotent. This is what makes AmbyKit safe to adopt in an existing (brownfield) project.

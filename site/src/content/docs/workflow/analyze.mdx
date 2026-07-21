@@ -2,9 +2,9 @@
 title: Analyze
 description: Cross-check spec, plan, and tasks for coverage, consistency, and dependency-graph health.
 sidebar:
-  order: 7
+  order: 8
 phase: analyze
-order: 7
+order: 8
 command: amby.analyze
 reads: [specs/NNN-slug/spec.md, specs/NNN-slug/plan.md, specs/NNN-slug/tasks.md]
 writes: []
@@ -14,7 +14,7 @@ import PhaseBadge from "../../../components/PhaseBadge.astro";
 import Artifacts from "../../../components/Artifacts.astro";
 import Diagram from "../../../components/Diagram.astro";
 
-<PhaseBadge n={7} name="Analyze" />
+<PhaseBadge n={8} name="Analyze" />
 
 **Analyze** is a read-only consistency check across the spec, plan, and tasks. It reports coverage
 (every `FR-###`/`US-#` has a task, no orphans), scope creep, and dependency-graph health — detecting

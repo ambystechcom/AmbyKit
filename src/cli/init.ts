@@ -3,6 +3,7 @@ import { basename, join, resolve } from "node:path";
 import { BaseCommand, stringFlag, type CliOptions } from "./base-command.js";
 import { applyFiles, writeIfAbsent } from "./fsops.js";
 import { buildEmittedFiles } from "./emit.js";
+import { classifyProject, describeSignals } from "../core/classify.js";
 import { saveConfig } from "../core/config.js";
 import { packageVersion, templatesDir } from "../core/paths.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
@@ -10,6 +11,7 @@ import { getTarget, TARGETS } from "../emitters/index.js";
 import { banner } from "./banner.js";
 import { multiSelect } from "./ui/interactive/prompt.js";
 import { toolOptions } from "./tool-options.js";
+import { installedVersion } from "../core/version.js";
 import type { AmbyConfig } from "../core/types.js";
 
 /** Detect likely targets from existing tool directories; fall back to Claude Code. */
@@ -25,9 +27,23 @@ export class InitCommand extends BaseCommand {
   readonly usage = "ambykit init [dir] [--tools=claude,...] [--yes] [--dry-run]";
   protected override requiresProject = false;
 
+  /** Banner prints before the version warning, via the shared run() preamble hook (feature 010). */
+  protected override preamble(): string | null {
+    return banner();
+  }
+
   protected async execute(opts: CliOptions): Promise<number> {
-    this.info(banner());
     const target = resolve(opts.cwd, opts.positionals[0] ?? ".");
+
+    // Detect and report brownfield vs greenfield (US-3). The write path is non-destructive either
+    // way, so this is informational; on an existing project it reassures that docs are preserved.
+    const { mode, signals } = classifyProject(target);
+    if (mode === "brownfield") {
+      this.info(`Detected an existing (brownfield) project — ${describeSignals(signals)}.`);
+      this.info("Existing agent docs will be preserved; AmbyKit updates only its own section.");
+    } else {
+      this.debug("Detected a greenfield project.");
+    }
 
     const toolsFlag = stringFlag(opts, "tools");
     let tools: string[];
@@ -59,7 +75,7 @@ export class InitCommand extends BaseCommand {
       return 1;
     }
 
-    const config: AmbyConfig = { version: packageVersion(), tools };
+    const config: AmbyConfig = { version: installedVersion(), tools };
 
     // Scaffold .amby/ (constitution + config) unless present.
     const constitution = readFileSync(join(templatesDir(), "constitution.md"), "utf8")

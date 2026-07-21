@@ -51,8 +51,26 @@ Adding a tool = one subclass + a compatibility-matrix row + a snapshot test.
 The CLI verbs mirror the same pattern. An abstract `BaseCommand` holds project/`.amby/` discovery,
 config load/save, emitter resolution, tool detection, logging, error handling, and `--dry-run`/
 `--yes`. Its template method `run()` validates context then calls each subclass's `execute()`.
-Subclasses: `InitCommand`, `AddCommand`, `SyncCommand`, `CheckCommand`, `UpgradeCommand`,
-`DashboardCommand`.
+Subclasses: `InitCommand`, `AddCommand`, `SyncCommand`, `CheckCommand`, `RestoreCommand`,
+`UpgradeCommand`, `DashboardCommand`.
+
+## Non-destructive rules merge (brownfield)
+
+Generated **command** files are AmbyKit's alone and are overwritten. **Rules files** (`AGENTS.md`,
+the `CLAUDE.md` bridge, `copilot-instructions.md`, Cursor's `.mdc`) are different: a user may have
+authored them. Each such `EmittedFile` is tagged `merge: "region"`, and the writer (`applyFiles`)
+reconciles it through a pure core (`src/core/merge.ts`) instead of overwriting:
+
+- The AmbyKit-owned span is a Markdown section that opens with `### AmbyKit usage` and ends at the
+  next same-or-higher heading (or EOF). On a fresh file the whole emitted file is written; on an
+  existing file only that region is spliced in, preserving every other byte.
+- A short **fingerprint** is embedded in the region footer. On re-run, a region whose body no longer
+  matches its fingerprint was hand-edited, so it is left untouched and reported as *skipped*.
+- Before modifying an existing file, the writer copies it to `.amby/backups/<name>.<ts>.bak`
+  (`ambykit restore` reverses this). Backups are outside the emitted set, so `check` stays green.
+- `classifyProject` (`src/core/classify.ts`) labels a project greenfield/brownfield from three
+  signals — an existing rules file, non-AmbyKit source files, or a git history — defaulting to the
+  safe (non-destructive) path when uncertain.
 
 ## Token efficiency
 

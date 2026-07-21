@@ -47,6 +47,12 @@ const GLYPHS = {
   checked: { u: "◉", a: "(*)" },
   unchecked: { u: "◯", a: "( )" },
   arrow: { u: "→", a: "->" },
+  "box-tl": { u: "┌", a: "+" },
+  "box-tr": { u: "┐", a: "+" },
+  "box-bl": { u: "└", a: "+" },
+  "box-br": { u: "┘", a: "+" },
+  "box-h": { u: "─", a: "-" },
+  "box-v": { u: "│", a: "|" },
 } as const satisfies Record<string, Glyph>;
 
 /** Spinner frame sets (primitive.glyph.spinner). */
@@ -81,4 +87,26 @@ export function symbols(caps: Capabilities): Symbols {
 /** The spinner frame set for the current capabilities. */
 export function spinnerFrames(caps: Capabilities): readonly string[] {
   return caps.unicode ? SPINNER.u : SPINNER.a;
+}
+
+/** Box-drawing characters (unicode or ASCII fallback), for the version-warning callout (feature 010). */
+export interface BoxGlyphs {
+  tl: string;
+  tr: string;
+  bl: string;
+  br: string;
+  h: string;
+  v: string;
+}
+
+export function boxGlyphs(caps: Capabilities): BoxGlyphs {
+  const pick = (g: Glyph): string => (caps.unicode ? g.u : g.a);
+  return {
+    tl: pick(GLYPHS["box-tl"]),
+    tr: pick(GLYPHS["box-tr"]),
+    bl: pick(GLYPHS["box-bl"]),
+    br: pick(GLYPHS["box-br"]),
+    h: pick(GLYPHS["box-h"]),
+    v: pick(GLYPHS["box-v"]),
+  };
 }
