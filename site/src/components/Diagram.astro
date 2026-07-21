@@ -2,6 +2,10 @@
 // Mermaid diagram (US-3). Renders client-side, themed from the ambystech CSS vars, and re-renders on
 // the light/dark toggle (FR-007). The text `summary` stays in the DOM as the caption and as the
 // render container's initial content, so it survives no-JS and render failures (edge cases).
+//
+// Diagrams render at their natural size (see `useMaxWidth: false` below) and scroll horizontally
+// when they overflow. "Expand" opens the same diagram in a full-screen dialog with zoom, because a
+// wide left-to-right flow is hard to read inside a documentation column.
 interface Props {
   code: string;
   caption: string;
@@ -13,15 +17,38 @@ const { code, caption, summary, size = "fit" } = Astro.props;
 ---
 
 <figure class="ak-diagram" data-size={size}>
-  <div class="ak-diagram-render" data-mermaid={code}>
-    <p class="ak-diagram-fallback">{summary}</p>
+  <div class="ak-diagram-frame">
+    <div class="ak-diagram-render" data-mermaid={code}>
+      <p class="ak-diagram-fallback">{summary}</p>
+    </div>
+    <button type="button" class="ak-diagram-expand" data-expand hidden>
+      Expand
+    </button>
   </div>
   <figcaption>{caption}</figcaption>
+
+  <dialog class="ak-diagram-dialog" data-dialog aria-label={caption}>
+    <div class="ak-diagram-toolbar">
+      <div class="ak-diagram-zoom" role="group" aria-label="Zoom">
+        <button type="button" data-zoom="out" aria-label="Zoom out">&minus;</button>
+        <output data-zoom-level>100%</output>
+        <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
+        <button type="button" data-zoom="fit">Fit</button>
+      </div>
+      <button type="button" class="ak-diagram-close" data-close>Close</button>
+    </div>
+    <div class="ak-diagram-canvas" data-canvas>
+      <div class="ak-diagram-stage" data-stage></div>
+    </div>
+  </dialog>
 </figure>
 
 <script>
   import mermaid from "mermaid";
-  import { mermaidThemeVariables } from "../styles/mermaid";
+  import { mermaidThemeCSS, mermaidThemeVariables } from "../styles/mermaid";
+
+  const MIN_ZOOM = 0.4;
+  const MAX_ZOOM = 4;
 
   function initMermaid(): void {
     mermaid.initialize({
@@ -29,7 +56,91 @@ const { code, caption, summary, size = "fit" } = Astro.props;
       securityLevel: "strict",
       theme: "base",
       themeVariables: mermaidThemeVariables(),
+      themeCSS: mermaidThemeCSS(),
+      // Emit real width/height attributes instead of `width="100%"`. Without this the SVG carries
+      // only a viewBox, so any CSS `width: auto` collapses it to the 300x150 default replaced-element
+      // size — which is what made these diagrams render illegibly small.
+      flowchart: { useMaxWidth: false },
     });
+  }
+
+  /** Natural CSS pixel size mermaid rendered the SVG at (attribute first, then viewBox). */
+  function naturalSize(svg: SVGElement): { w: number; h: number } {
+    const attr = (name: string): number => Number.parseFloat(svg.getAttribute(name) ?? "");
+    const box = svg.getAttribute("viewBox")?.split(/[\s,]+/) ?? [];
+    const fromBox = (i: number): number =>
+      box.length === 4 ? Number.parseFloat(box[i]!) || 0 : 0;
+    const w = Number.isFinite(attr("width")) && attr("width") > 0 ? attr("width") : fromBox(2);
+    const h = Number.isFinite(attr("height")) && attr("height") > 0 ? attr("height") : fromBox(3);
+    return { w, h };
+  }
+
+  let modalSeq = 0;
+
+  function wireDialog(figure: HTMLElement): void {
+    const dialog = figure.querySelector<HTMLDialogElement>("[data-dialog]");
+    const canvas = figure.querySelector<HTMLElement>("[data-canvas]");
+    const stage = figure.querySelector<HTMLElement>("[data-stage]");
+    const expand = figure.querySelector<HTMLButtonElement>("[data-expand]");
+    const level = figure.querySelector<HTMLElement>("[data-zoom-level]");
+    if (!dialog || !canvas || !stage || !expand || dialog.dataset.wired) return;
+    dialog.dataset.wired = "true";
+
+    let zoom = 1;
+    let natural = { w: 0, h: 0 };
+
+    function apply(): void {
+      const svg = stage!.querySelector("svg");
+      if (!svg || !natural.w) return;
+      svg.style.width = `${natural.w * zoom}px`;
+      svg.style.height = "auto";
+      svg.style.maxWidth = "none";
+      if (level) level.textContent = `${Math.round(zoom * 100)}%`;
+    }
+
+    function fit(): void {
+      if (!natural.w) return;
+      // Fit both axes, with breathing room, so a tall diagram doesn't overflow when width alone fits.
+      const byWidth = (canvas!.clientWidth - 48) / natural.w;
+      const byHeight = natural.h ? (canvas!.clientHeight - 48) / natural.h : byWidth;
+      zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Math.min(byWidth, byHeight)));
+      apply();
+    }
+
+    expand.addEventListener("click", async () => {
+      const code = figure.querySelector<HTMLElement>(".ak-diagram-render")?.dataset.mermaid;
+      if (!code) return;
+      dialog.showModal();
+      try {
+        // Render fresh with its own id rather than cloning. Mermaid scopes the SVG's entire
+        // stylesheet to `#<id>`, so a clone with a stripped (or duplicated) id loses every rule
+        // and renders unstyled.
+        const { svg } = await mermaid.render(`ak-mmd-modal-${modalSeq++}`, code);
+        stage.innerHTML = svg;
+        const el = stage.querySelector("svg");
+        if (!el) throw new Error("no svg");
+        natural = naturalSize(el);
+        fit();
+      } catch {
+        dialog.close();
+      }
+    });
+
+    dialog.addEventListener("close", () => stage.replaceChildren());
+    figure.querySelector("[data-close]")?.addEventListener("click", () => dialog.close());
+    // Clicking the backdrop (the dialog element itself, outside the toolbar/canvas) closes.
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+
+    for (const btn of figure.querySelectorAll<HTMLButtonElement>("[data-zoom]")) {
+      btn.addEventListener("click", () => {
+        const mode = btn.dataset.zoom;
+        if (mode === "fit") return fit();
+        zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * (mode === "in" ? 1.25 : 0.8)));
+        apply();
+      });
+    }
   }
 
   async function renderAll(): Promise<void> {
@@ -42,6 +153,12 @@ const { code, caption, summary, size = "fit" } = Astro.props;
       try {
         const { svg } = await mermaid.render(`ak-mmd-${i}-${Date.now()}`, code);
         el.innerHTML = svg;
+        const figure = el.closest<HTMLElement>(".ak-diagram");
+        if (figure) {
+          // Only offer "Expand" once there is something to expand.
+          figure.querySelector<HTMLButtonElement>("[data-expand]")?.removeAttribute("hidden");
+          wireDialog(figure);
+        }
       } catch {
         /* leave the text fallback in place */
       }
@@ -62,37 +179,153 @@ const { code, caption, summary, size = "fit" } = Astro.props;
   .ak-diagram {
     margin-block: 1.5rem;
   }
+
+  /* The frame positions "Expand" over the scroll container without joining its scroll area. */
+  .ak-diagram-frame {
+    position: relative;
+  }
+
   .ak-diagram-render {
     display: flex;
     justify-content: center;
     overflow-x: auto;
-    padding: 1rem;
+    padding: 1.25rem;
     border: 1px solid var(--ak-border);
     border-radius: 12px;
     background: var(--ak-surface-elevated);
   }
   .ak-diagram-render :global(svg) {
-    max-width: 100%;
     height: auto;
+    max-width: 100%;
   }
-  /* "wide": render at natural size (bigger) and scroll horizontally instead of shrinking to fit. */
+  /* "wide": keep the natural size mermaid rendered and scroll instead of shrinking to fit. The SVG
+     carries explicit width/height attributes (useMaxWidth: false), so no width override is needed —
+     setting `width: auto` here would collapse it to the default replaced-element size. */
   .ak-diagram[data-size="wide"] .ak-diagram-render {
     justify-content: flex-start;
   }
   .ak-diagram[data-size="wide"] .ak-diagram-render :global(svg) {
-    width: auto !important;
-    max-width: none !important;
-    min-height: 5.5rem;
+    max-width: none;
   }
+
   .ak-diagram-fallback {
     color: var(--ak-text-muted);
     font-style: italic;
     margin: 0;
   }
+
   figcaption {
     text-align: center;
     color: var(--ak-text-muted);
     font-size: 0.85rem;
     margin-top: 0.5rem;
+  }
+
+  /* --- Expand affordance --- */
+  .ak-diagram-expand {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.3rem 0.7rem;
+    font: inherit;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    color: var(--ak-text-muted);
+    background: var(--ak-surface);
+    border: 1px solid var(--ak-border);
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .ak-diagram-expand:hover {
+    color: var(--ak-text);
+    border-color: var(--ak-brand);
+  }
+  .ak-diagram-expand:focus-visible {
+    outline: 2px solid var(--ak-focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* --- Full-screen dialog --- */
+  .ak-diagram-dialog {
+    width: min(96vw, 1600px);
+    height: min(92vh, 1200px);
+    max-width: none;
+    max-height: none;
+    padding: 0;
+    border: 1px solid var(--ak-border);
+    border-radius: 14px;
+    background: var(--ak-surface-elevated);
+    color: var(--ak-text);
+    overflow: hidden;
+  }
+  /* Column layout: the toolbar takes its natural height and the canvas gets the rest. Sizing the
+     canvas off a hardcoded toolbar height instead would clip the diagram's bottom edge. */
+  .ak-diagram-dialog[open] {
+    display: flex;
+    flex-direction: column;
+  }
+  .ak-diagram-dialog::backdrop {
+    background: rgb(4 13 20 / 0.72);
+  }
+
+  .ak-diagram-toolbar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--ak-border);
+    background: var(--ak-surface);
+  }
+  .ak-diagram-zoom {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .ak-diagram-zoom output {
+    min-width: 4ch;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--ak-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .ak-diagram-toolbar button {
+    min-width: 2rem;
+    padding: 0.25rem 0.6rem;
+    font: inherit;
+    font-size: 0.8rem;
+    color: var(--ak-text);
+    background: var(--ak-surface-elevated);
+    border: 1px solid var(--ak-border);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .ak-diagram-toolbar button:hover {
+    border-color: var(--ak-brand);
+  }
+  .ak-diagram-toolbar button:focus-visible {
+    outline: 2px solid var(--ak-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .ak-diagram-canvas {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding: 1.5rem;
+    display: flex;
+  }
+  /* `margin: auto` centres the diagram when it is smaller than the canvas and still scrolls
+     correctly when it is larger — which `place-items: center` would clip at the top-left. */
+  .ak-diagram-stage {
+    margin: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ak-diagram-expand,
+    .ak-diagram-toolbar button {
+      transition: none;
+    }
   }
 </style>
