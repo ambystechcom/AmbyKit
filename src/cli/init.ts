@@ -1,16 +1,16 @@
 import { existsSync, readFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { BaseCommand, stringFlag, type CliOptions } from "./base-command.js";
-import { applyFiles, writeIfAbsent } from "./fsops.js";
-import { buildEmittedFiles } from "./emit.js";
+import { applyFiles, writeIfAbsent } from "./io/fsops.js";
+import { buildEmittedFiles } from "../core/emit.js";
 import { classifyProject, describeSignals } from "../core/classify.js";
 import { saveConfig } from "../core/config.js";
 import { packageVersion, templatesDir } from "../core/paths.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
 import { getTarget, TARGETS } from "../emitters/index.js";
-import { banner } from "./banner.js";
+import { banner } from "./ui/banner.js";
 import { multiSelect } from "./ui/interactive/prompt.js";
-import { toolOptions } from "./tool-options.js";
+import { toolOptions } from "./ui/tool-options.js";
 import type { AmbyConfig } from "../core/types.js";
 
 /** Detect likely targets from existing tool directories; fall back to Claude Code. */

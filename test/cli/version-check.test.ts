@@ -7,7 +7,7 @@ import {
   isStale,
   latestFromCache,
   refreshLatest,
-} from "../../src/cli/version-check.js";
+} from "../../src/cli/io/version-check.js";
 
 function useTempCache(): string {
   const dir = mkdtempSync(join(tmpdir(), "ambykit-vc-"));

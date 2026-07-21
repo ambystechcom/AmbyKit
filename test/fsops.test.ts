@@ -2,7 +2,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { applyFiles } from "../src/cli/fsops.js";
+import { applyFiles } from "../src/cli/io/fsops.js";
 import type { EmittedFile } from "../src/core/types.js";
 
 const OPTS = { dryRun: false, includeUser: false } as const;

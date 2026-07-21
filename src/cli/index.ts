@@ -2,7 +2,7 @@
 import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { BaseCommand, CliOptions } from "./base-command.js";
-import { banner } from "./banner.js";
+import { banner } from "./ui/banner.js";
 import { detectCapabilities } from "./ui/capabilities.js";
 import * as render from "./ui/render.js";
 import { InitCommand } from "./init.js";

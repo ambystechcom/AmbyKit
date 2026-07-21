@@ -1,5 +1,5 @@
 import { BaseCommand, type CliOptions } from "./base-command.js";
-import { listBackups, restoreLatestBackup } from "./fsops.js";
+import { listBackups, restoreLatestBackup } from "./io/fsops.js";
 
 /**
  * Recover an agent-doc file that a brownfield init/update modified, from the timestamped backups

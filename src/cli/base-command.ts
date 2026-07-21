@@ -3,7 +3,7 @@ import { detectCapabilities } from "./ui/capabilities.js";
 import { outdatedWarning } from "./ui/callout.js";
 import * as render from "./ui/render.js";
 import { spinner, summarize, type Spinner } from "./ui/progress.js";
-import { toChangeSummary, type WriteResult } from "./fsops.js";
+import { toChangeSummary, type WriteResult } from "./io/fsops.js";
 import type { Capabilities } from "./ui/types.js";
 
 /** Parsed CLI invocation for one command. */

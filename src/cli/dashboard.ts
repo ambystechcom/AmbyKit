@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BaseCommand, flag, stringFlag, type CliOptions } from "./base-command.js";
-import { banner } from "./banner.js";
+import { banner } from "./ui/banner.js";
 import {
   canonicalStoryId,
   computeDashboard,

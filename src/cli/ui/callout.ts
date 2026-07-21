@@ -1,6 +1,6 @@
 import { packageVersion } from "../../core/paths.js";
 import { isOutdated } from "../../core/version.js";
-import { cacheIsStale, latestFromCache, refreshLatest } from "../version-check.js";
+import { cacheIsStale, latestFromCache, refreshLatest } from "../io/version-check.js";
 import { boxGlyphs, paint, symbols } from "./theme.js";
 import type { Capabilities } from "./types.js";
 

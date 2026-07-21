@@ -2,8 +2,8 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } fro
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { applyFiles } from "../../src/cli/fsops.js";
-import { buildEmittedFiles } from "../../src/cli/emit.js";
+import { applyFiles } from "../../src/cli/io/fsops.js";
+import { buildEmittedFiles } from "../../src/core/emit.js";
 import { REGION_HEADING, findRegion } from "../../src/core/merge.js";
 import type { AmbyConfig, EmittedFile } from "../../src/core/types.js";
 

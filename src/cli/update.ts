@@ -1,11 +1,11 @@
 import { spawnSync } from "node:child_process";
 import { BaseCommand, type CliOptions } from "./base-command.js";
-import { applyFiles } from "./fsops.js";
-import { buildEmittedFiles } from "./emit.js";
+import { applyFiles } from "./io/fsops.js";
+import { buildEmittedFiles } from "../core/emit.js";
 import { loadConfig } from "../core/config.js";
 import { isOutdated } from "../core/version.js";
 import { packageVersion, projectAtCwd } from "../core/paths.js";
-import { refreshLatest } from "./version-check.js";
+import { refreshLatest } from "./io/version-check.js";
 
 const PACKAGE = "@ambystech/ambykit";
 

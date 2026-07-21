@@ -1,10 +1,10 @@
 import { BaseCommand, type CliOptions } from "./base-command.js";
-import { applyFiles } from "./fsops.js";
-import { buildEmittedFiles } from "./emit.js";
+import { applyFiles } from "./io/fsops.js";
+import { buildEmittedFiles } from "../core/emit.js";
 import { loadConfig, saveConfig } from "../core/config.js";
 import { getTarget, TARGETS } from "../emitters/index.js";
 import { multiSelect } from "./ui/interactive/prompt.js";
-import { toolOptions } from "./tool-options.js";
+import { toolOptions } from "./ui/tool-options.js";
 
 export class AddCommand extends BaseCommand {
   readonly name = "add";

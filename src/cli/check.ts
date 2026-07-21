@@ -1,8 +1,8 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { BaseCommand, type CliOptions } from "./base-command.js";
-import { applyFiles } from "./fsops.js";
-import { buildEmittedFiles } from "./emit.js";
+import { applyFiles } from "./io/fsops.js";
+import { buildEmittedFiles } from "../core/emit.js";
 import { loadConfig } from "../core/config.js";
 import { getTarget } from "../emitters/index.js";
 

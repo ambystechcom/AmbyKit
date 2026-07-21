@@ -1,7 +1,7 @@
 import { basename } from "node:path";
-import type { AmbyConfig, EmittedFile } from "../core/types.js";
-import { loadCommandSpecs } from "../core/command-spec.js";
-import { buildAgentsMd } from "../core/rules.js";
+import type { AmbyConfig, EmittedFile } from "./types.js";
+import { loadCommandSpecs } from "./command-spec.js";
+import { buildAgentsMd } from "./rules.js";
 import { emittersForTargets } from "../emitters/index.js";
 
 /**

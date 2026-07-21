@@ -1,9 +1,9 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
-import { mergeRegion } from "../core/merge.js";
-import type { EmittedFile } from "../core/types.js";
-import type { ChangeSummary } from "./ui/types.js";
+import { mergeRegion } from "../../core/merge.js";
+import type { EmittedFile } from "../../core/types.js";
+import type { ChangeSummary } from "../ui/types.js";
 
 /** Directory (project-relative) that holds pre-modification backups of merged rules files (FR-008c). */
 export const BACKUP_DIR = join(".amby", "backups");
