@@ -36,6 +36,7 @@ Then, inside your AI assistant, walk the workflow:
 /amby.constitution   # one-time: set your project's guiding principles
 /amby.specify        # describe a feature → spec.md (user stories + EARS requirements)
 /amby.clarify        # resolve open questions
+/amby.revise         # continue an existing spec — add and refine in place
 /amby.design         # UI spec + design-tokens.json
 /amby.plan           # technical plan
 /amby.tasks          # ordered, dependency-aware task list
@@ -72,6 +73,7 @@ truth that compiles to each tool's native format.
 | Governance (once) | `/amby.constitution` | `.amby/constitution.md` |
 | Specify (WHAT/WHY) | `/amby.specify` | `specs/NNN-feature/spec.md` |
 | Clarify | `/amby.clarify` | resolves `[NEEDS CLARIFICATION]` markers |
+| Revise | `/amby.revise` | continues `spec.md` / `ui.md` in place |
 | **Design (UI)** | `/amby.design` | `ui.md` + `design-tokens.json` |
 | Plan (HOW) | `/amby.plan` | `plan.md` (+ `data-model.md`, `contracts/`) |
 | Tasks | `/amby.tasks` | `tasks.md` |

@@ -61,7 +61,12 @@ as `[NEEDS CLARIFICATION: …]`.
 /amby.design       # ui.md + design-tokens.json (with a sign-off gate)
 /amby.plan         # plan.md — the technical HOW
 /amby.tasks        # tasks.md — ordered, dependency-aware checklist
+/amby.analyze      # cross-check spec ↔ plan ↔ tasks before you build
 ```
+
+Need to grow a feature that's already specced? `/amby.revise` continues the spec (or `ui.md`) **in
+place** — adding stories and requirements and refining existing ones while preserving every stable
+ID. Use it instead of `/amby.specify`, which starts a new feature.
 
 ## 5. Implement and track
 
@@ -74,6 +79,13 @@ From the terminal, watch progress across the story/task graph:
 ```bash
 npx ambykit dashboard          # table of all stories with % complete
 npx ambykit dashboard 001:US-3 # detail for one story (qualify id with the feature ref)
+```
+
+## 6. Keep it current
+
+```bash
+ambykit check    # doctor: verify your integrations and report drift
+ambykit update   # update the CLI, then refresh this project's generated prompts
 ```
 
 ## Where things live

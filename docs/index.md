@@ -25,7 +25,7 @@ native format — Claude Code, OpenCode, GitHub Copilot (VS Code + CLI), Cursor 
 ## Read next
 
 - [Getting started](./getting-started.md) — install and run your first feature.
-- [The workflow](./workflow.md) — the eight phases in order.
+- [The workflow](./workflow.md) — the nine phases in order.
 - Concepts: [Spec-Driven Development](./concepts/spec-driven-development.md) ·
   [The constitution](./concepts/constitution.md)
 - Artifacts: [spec](./artifacts/spec.md) · [UI design](./artifacts/ui-design.md) ·
