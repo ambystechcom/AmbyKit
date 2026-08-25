@@ -69,6 +69,6 @@ created: 2026-08-25
 
 ## Phase 8 — Polish
 
-- [ ] [T090] [P] Workflow guide "Roles" section; CLI reference notes on `sync`/`check` role validation (docs/workflow.md, docs/cli-reference.md, site/src/content/docs/cli/index.mdx)
-- [ ] [T091] [P] Tick 012's T091 now that this feature was developed in a worktree (specs/012-worktree-isolation/tasks.md)
-- [ ] [T092] `node scripts/check-docs-sync.mjs`, site build, `npm run typecheck && npm test` all green (scripts/check-docs-sync.mjs)
+- [x] [T090] [P] Workflow guide "Roles" section; CLI reference notes on `sync`/`check` role validation (docs/workflow.md, docs/cli-reference.md, site/src/content/docs/cli/index.mdx)
+- [x] [T091] [P] Tick 012's T091 now that this feature was developed in a worktree (specs/012-worktree-isolation/tasks.md)
+- [x] [T092] `node scripts/check-docs-sync.mjs`, site build, `npm run typecheck && npm test` all green (scripts/check-docs-sync.mjs)

@@ -67,4 +67,4 @@ created: 2026-08-25
 ## Phase 8 — Polish
 
 - [x] [T090] Final `npm run typecheck && npm test`; open PR `012-worktree-isolation` → `main` (git)
-- [ ] [T091] Follow-up (SC-005, non-blocking): develop the next feature inside `.worktrees/` and note it in that feature's spec (specs/)
+- [x] [T091] Follow-up (SC-005, non-blocking): develop the next feature inside `.worktrees/` and note it in that feature's spec (specs/) — done: 013 built in `.worktrees/013-multi-agent-roles/`

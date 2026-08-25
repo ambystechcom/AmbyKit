@@ -2,7 +2,7 @@
 feature: 013-multi-agent-roles
 title: Multi-agent roles — PM, Architect, QA perspectives in the workflow
 branch: 013-multi-agent-roles
-status: in-progress
+status: done
 created: 2026-08-25
 ---
 
@@ -183,6 +183,10 @@ that tool's native form, so that I can address a role directly outside the phase
 - Existing artifacts already carry sign-off blocks (design) or status fields (spec) that a review
   record can extend without changing their structure.
 - The default role set is a starting point; teams edit it, so the defaults need not be exhaustive.
+
+## Notes
+
+- Developed inside `.worktrees/013-multi-agent-roles/` via `ambykit worktree` (closes 012 T091 / SC-005).
 
 ## Reviews
 

@@ -72,6 +72,11 @@ ambykit sync
 ambykit sync --dry-run
 ```
 
+Also installs any newly shipped templates, reference docs, and **roles** into `.amby/` (write-if-absent —
+your edits are kept), warns when a role in `.amby/roles/` exceeds 150 words, and refuses to emit
+when two roles share an id. Projects with roles get one native sub-agent per role for Claude Code,
+OpenCode, and Copilot.
+
 ## `ambykit restore [file]`
 
 Recover an agent-doc file (`AGENTS.md`, `CLAUDE.md`, a tool's rules file) from the timestamped backup
@@ -140,7 +145,9 @@ ambykit analyze --json
 ## `ambykit check`
 
 Doctor: verify integrations are present and well-formed and that expected assistant CLIs are
-installed. Reports drift between the neutral source and emitted files.
+installed. Reports drift between the neutral source and emitted files, worktrees whose branch is
+already merged, and role problems in `.amby/roles/` (oversized roles, duplicate ids, shipped
+defaults that were deleted — `ambykit sync` reinstalls those).
 
 ## `ambykit update`
 
