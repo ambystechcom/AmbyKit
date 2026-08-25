@@ -12,13 +12,13 @@ import Diagram from "../../../components/Diagram.astro";
 AmbyKit moves a feature idea through structured **Spec-Driven Development** phases. Each phase reads
 the artifacts before it and writes the next, so every decision is reviewable before code is written,
 and later phases reference earlier ones by stable ID rather than restating them. Five phases run for
-every feature; the constitution is written once per project, and clarify, revise, analyze, and
-converge run only when you need them.
+every feature; the constitution is written once per project, and clarify, revise, analyze,
+converge, and review run only when you need them.
 
 <Diagram
   size="wide"
   caption="Solid arrows carry an artifact forward and always run. Dotted arrows run only when you need them."
-  summary="The constitution is written once per project and its principles feed every feature. Each feature then runs five phases in sequence, each handing an artifact to the next: specify writes spec.md, design writes ui.md, plan writes plan.md, tasks writes tasks.md, and implement builds against them. Four more phases run only as needed: clarify resolves open questions in the spec, revise grows the spec in place, analyze cross-checks spec, plan, and tasks before you build, and converge checks the code against spec, plan, and tasks after implement, appending gap tasks until the feature converges."
+  summary="The constitution is written once per project and its principles feed every feature. Each feature then runs five phases in sequence, each handing an artifact to the next: specify writes spec.md, design writes ui.md, plan writes plan.md, tasks writes tasks.md, and implement builds against them. Four more phases run only as needed: clarify resolves open questions in the spec, revise grows the spec in place, analyze cross-checks spec, plan, and tasks before you build, and converge checks the code against spec, plan, and tasks after implement, appending gap tasks until the feature converges. and review asks a different role to critique any artifact, returning findings by stable ID."
   code={`flowchart LR
   subgraph FEATURE ["every feature"]
     SPEC(["specify"]) -->|spec.md| DES(["design"])
@@ -33,6 +33,7 @@ converge run only when you need them.
   ANA{{"analyze"}} -.->|cross-check| TASK
   IMPL -.->|verify code| CONV{{"converge"}}
   CONV -.->|gap tasks| TASK
+  REVW{{"review"}} -.->|findings by ID| SPEC
 
   classDef spine stroke-width:2.5px
   classDef gov stroke-width:2px
@@ -40,7 +41,7 @@ converge run only when you need them.
 
   class SPEC,DES,PLAN,TASK,IMPL spine
   class CON gov
-  class CLAR,REV,ANA,CONV opt`}
+  class CLAR,REV,ANA,CONV,REVW opt`}
 />
 
 <CardGrid>
@@ -54,4 +55,5 @@ converge run only when you need them.
   <LinkCard title="8 · Analyze" href="/workflow/analyze/" description="Coverage + consistency check." />
   <LinkCard title="9 · Implement" href="/workflow/implement/" description="Execute the tasks, track status." />
   <LinkCard title="10 · Converge" href="/workflow/converge/" description="Verify code against spec; append gap tasks." />
+  <LinkCard title="11 · Review" href="/workflow/review/" description="Another role critiques an artifact, by ID." />
 </CardGrid>

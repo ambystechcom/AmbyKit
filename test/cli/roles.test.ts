@@ -91,6 +91,6 @@ describe("roles in init / sync / check (feature 013, US-2)", () => {
     // Emit again without roles: commands must not reference them.
     const { buildEmittedFiles } = await import("../../src/core/emit.js");
     const files = buildEmittedFiles(root, { version: "0.0.0", tools: ["claude"] });
-    for (const f of files) expect(f.contents).not.toContain(".amby/roles/");
+    for (const f of files) expect(f.contents).not.toContain("say so in your first line");
   });
 });

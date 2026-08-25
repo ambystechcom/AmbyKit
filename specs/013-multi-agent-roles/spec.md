@@ -77,7 +77,7 @@ before the next phase consumes the artifact.
   nothing to the artifact unless asked.
 - **depends-on:** [US-1, US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given an artifact and a reviewing role, When the review runs, Then it produces findings each
@@ -98,7 +98,7 @@ get an alternative perspective without changing project defaults.
   risk section reflects QA concerns.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a role override, When the phase runs, Then it uses that role instead of the default and says so.
@@ -149,8 +149,8 @@ that tool's native form, so that I can address a role directly outside the phase
   a project role exceeds 150 words, without refusing it (Principle 3).
 - FR-011  THE SYSTEM SHALL include role material in `ambykit check` drift detection and in the docs
   (workflow guide, CLI reference), passing the docs-sync checker.
-- FR-012  THE SYSTEM SHALL NOT require multiple concurrent assistants; roles are perspectives a
-  single assistant adopts, and SHALL also work when different assistants take different roles.
+- FR-012  THE SYSTEM SHALL NOT require multiple concurrent assistants: a single assistant SHALL be
+  able to run every phase, including any `--as` override, with no process or session beyond its own.
 
 ## Success criteria
 
@@ -162,8 +162,8 @@ that tool's native form, so that I can address a role directly outside the phase
   hand edits; `ambykit check` is clean.
 - SC-004  Every shipped default role is ≤ 150 words; a 151-word fixture role produces exactly one
   sync warning.
-- SC-005  Every functional requirement maps to an automated test where mechanical, or a documented
-  manual fixture where model-executed; `npm test` passes.
+- SC-005  FR-001–005 and FR-009–012 each map to an automated test; FR-006–008 (model-executed) map
+  to a documented manual fixture; `npm test` passes.
 - SC-006  Dogfood: this feature's own spec receives a QA role review before `plan` (and is developed
   in a worktree per feature 012, closing its T091).
 
@@ -183,3 +183,8 @@ that tool's native form, so that I can address a role directly outside the phase
 - Existing artifacts already carry sign-off blocks (design) or status fields (spec) that a review
   record can extend without changing their structure.
 - The default role set is a starting point; teams edit it, so the defaults need not be exhaustive.
+
+## Reviews
+
+- 2026-08-25 · QA Engineer · 2 findings applied (FR-012 reworded to be testable; SC-005 boundary
+  between automated and manual coverage made explicit)

@@ -44,7 +44,7 @@ describe("role binding on emitted commands (feature 013, US-1)", () => {
     const files = buildEmittedFiles(root, { version: "0.0.0", tools: ["claude"], manageRules: false });
     const direct = new ClaudeEmitter().emit(specs, noRoles);
     expect(files.map((f) => f.contents)).toEqual(direct.map((f) => f.contents));
-    for (const f of files) expect(f.contents).not.toContain(".amby/roles/");
+    for (const f of files) expect(f.contents).not.toContain("say so in your first line");
   });
 
   it("prepends the role line on every roled command for every command-surface emitter (FR-003)", () => {
@@ -73,7 +73,7 @@ describe("role binding on emitted commands (feature 013, US-1)", () => {
           const tail = spec.body.trim().split("\n").at(-1)!.slice(0, 20);
           expect(file!.contents.indexOf("@.amby/roles/")).toBeLessThan(file!.contents.indexOf(tail));
         } else {
-          expect(file!.contents).not.toContain(".amby/roles/");
+          expect(file!.contents).not.toContain("say so in your first line");
         }
       }
     }

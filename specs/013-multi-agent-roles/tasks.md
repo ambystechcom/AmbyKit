@@ -44,19 +44,19 @@ created: 2026-08-25
 
 ## Phase 5 — User story US-4  (priority: P2, depends-on US-1)
 
-- [ ] [T040] [US4] Finalize the `--as <id>` clause wording: use `@.amby/roles/<id>.md`; if missing, stop and list `.amby/roles/` (FR-005) (src/emitters/base-emitter.ts)
-- [ ] [T041] [US4] Manual fixture: `/amby.plan --as qa` states "acting as QA"; `/amby.plan --as nope` refuses and lists roles (manual, scratchpad project)
+- [x] [T040] [US4] Finalize the `--as <id>` clause wording: use `@.amby/roles/<id>.md`; if missing, stop and list `.amby/roles/` (FR-005) (src/emitters/base-emitter.ts)
+- [x] [T041] [US4] Manual fixture: `/amby.plan --as qa` states "acting as QA"; `/amby.plan --as nope` refuses and lists roles (manual, scratchpad project)
 - **Checkpoint:** US-4 is demoable — one-run override works and unknown roles are refused.
 
 ## Phase 6 — User story US-3  (priority: P2, depends-on US-1, US-2)
 
-- [ ] [T050] [US3] Write the review phase: `/amby.review <artifact> [--as <role>] [--apply]` — findings `ID · severity · finding · fix`; read-only by default; `--apply` patches in place preserving IDs and appends a `## Reviews` record; zero findings → approval line (FR-006/007/008) (src/prompts/review.md)
-- [ ] [T051] [P] [US3] Append `"review"` to `PHASE_SEQUENCE` after `converge` (src/core/rules.ts)
-- [ ] [T052] [P] [US3] Emit test: loads as `amby.review`, `allowedTools: [read, edit]`, emitted by every command-surface emitter; update the phase-id list test (test/review-emit.test.ts, test/command-spec.test.ts)
-- [ ] [T053] [P] [US3] Site page `order: 11` + LinkCard/Mermaid node/summary in the workflow overview (site/src/content/docs/workflow/review.mdx, index.mdx)
-- [ ] [T054] [P] [US3] `/amby.review` in the README command list/table and `docs/workflow.md` phase table + section (README.md, docs/workflow.md)
-- [ ] [T055] [US3] Manual fixture: flawed spec (untestable FR, missing negative case, unmeasurable SC) → QA review reports all three IDs; `--apply` preserves IDs and appends the record (SC-002) (manual, scratchpad project)
-- [ ] [T056] [US3] Dogfood: run a QA review of this feature's spec and record it (SC-006) (specs/013-multi-agent-roles/spec.md)
+- [x] [T050] [US3] Write the review phase: `/amby.review <artifact> [--as <role>] [--apply]` — findings `ID · severity · finding · fix`; read-only by default; `--apply` patches in place preserving IDs and appends a `## Reviews` record; zero findings → approval line (FR-006/007/008) (src/prompts/review.md)
+- [x] [T051] [P] [US3] Append `"review"` to `PHASE_SEQUENCE` after `converge` (src/core/rules.ts)
+- [x] [T052] [P] [US3] Emit test: loads as `amby.review`, `allowedTools: [read, edit]`, emitted by every command-surface emitter; update the phase-id list test (test/review-emit.test.ts, test/command-spec.test.ts)
+- [x] [T053] [P] [US3] Site page `order: 11` + LinkCard/Mermaid node/summary in the workflow overview (site/src/content/docs/workflow/review.mdx, index.mdx)
+- [x] [T054] [P] [US3] `/amby.review` in the README command list/table and `docs/workflow.md` phase table + section (README.md, docs/workflow.md)
+- [x] [T055] [US3] Manual fixture: flawed spec (untestable FR, missing negative case, unmeasurable SC) → QA review reports all three IDs; `--apply` preserves IDs and appends the record (SC-002) (manual, scratchpad project)
+- [x] [T056] [US3] Dogfood: run a QA review of this feature's spec and record it (SC-006) (specs/013-multi-agent-roles/spec.md)
 - **Checkpoint:** US-3 is demoable — QA review of a spec yields ID-keyed findings; `--apply` records it.
 
 ## Phase 7 — User story US-5  (priority: P3, depends-on US-2)
