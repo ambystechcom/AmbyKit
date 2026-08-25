@@ -71,6 +71,7 @@ const PHASE_SEQUENCE = [
   "tasks",
   "analyze",
   "implement",
+  "converge",
 ];
 
 function phaseOrder(phase: string): number {

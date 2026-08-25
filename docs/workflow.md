@@ -1,8 +1,8 @@
 # The AmbyKit workflow
 
-Nine phases, each a slash command in your assistant, each producing or updating one artifact. The
+Ten phases, each a slash command in your assistant, each producing or updating one artifact. The
 happy path is **specify → design → plan → tasks → implement**, with `constitution` once up front and
-`clarify`/`revise`/`analyze` when you need them.
+`clarify`/`revise`/`analyze`/`converge` when you need them.
 
 | Phase | Command | Reads | Writes |
 |---|---|---|---|
@@ -15,6 +15,7 @@ happy path is **specify → design → plan → tasks → implement**, with `con
 | Tasks | `/amby.tasks` | plan | `tasks.md` |
 | Analyze | `/amby.analyze` | all | consistency report |
 | Implement | `/amby.implement` | tasks (one slice) | code + task/status updates |
+| Converge | `/amby.converge` | spec, plan, tasks + code | `tasks.md` (appends gap tasks), story status |
 
 ## 1. Constitution
 
@@ -68,6 +69,13 @@ Cross-checks spec ↔ plan ↔ tasks for coverage gaps and inconsistencies, and 
 
 Executes tasks one slice at a time, checking off `tasks.md` checkboxes and updating each story's
 `status:` as it goes — which is what `ambykit dashboard` reports on.
+
+## 10. Converge
+
+Closes the loop after implementation: checks the code against every `FR-###`/`SC-###`, plan
+decision, and checked task; appends one unchecked task per gap under `## Convergence` in `tasks.md`
+(`[VERIFY]` for inconclusive items); marks fully covered stories `done`. Append-only and idempotent —
+it never edits source. Loop `implement → converge` until it reports **converged**.
 
 ## Dependencies & prioritization
 

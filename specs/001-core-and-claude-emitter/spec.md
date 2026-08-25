@@ -2,7 +2,7 @@
 feature: 001-core-and-claude-emitter
 title: Core model + Claude Code emitter + CLI
 branch: main
-status: in-progress
+status: done
 created: 2026-07-07
 ---
 

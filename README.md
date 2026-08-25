@@ -41,6 +41,7 @@ Then, inside your AI assistant, walk the workflow:
 /amby.plan           # technical plan
 /amby.tasks          # ordered, dependency-aware task list
 /amby.implement      # build it
+/amby.converge       # verify the code against the spec; append gap tasks, repeat until converged
 ```
 
 Track progress from the terminal:
@@ -79,6 +80,7 @@ truth that compiles to each tool's native format.
 | Tasks | `/amby.tasks` | `tasks.md` |
 | Analyze | `/amby.analyze` | cross-artifact consistency report |
 | Implement | `/amby.implement` | executes `tasks.md` |
+| Converge | `/amby.converge` | checks code vs spec/plan/tasks; appends gap tasks to `tasks.md` |
 
 Requirements use **user stories** (`US-#`) + **EARS** functional requirements (`FR-###`) +
 **Given/When/Then** acceptance criteria. Stories carry `priority` and `depends-on`/`blocked-by` so
