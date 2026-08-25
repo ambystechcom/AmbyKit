@@ -104,6 +104,8 @@ export interface AmbyConfig {
   tools: string[];
   /** When false, `sync` regenerates commands only, not AGENTS.md/CLAUDE.md. Default true. */
   manageRules?: boolean;
+  /** When true, `/amby.specify` creates a `.worktrees/<feature>` worktree for each new feature (feature 012). */
+  worktrees?: boolean;
 }
 
 /** How a tool materializes phase prompts. */

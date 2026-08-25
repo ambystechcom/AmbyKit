@@ -7,6 +7,7 @@ const configSchema = z.object({
   version: z.string().default("0.0.0"),
   tools: z.array(z.string()).default([]),
   manageRules: z.boolean().optional(),
+  worktrees: z.boolean().optional(),
 });
 
 /** Path to a project's config file. */

@@ -32,7 +32,10 @@ ${rows}
 - Specs (\`specs/NNN-*/spec.md\`) capture WHAT/WHY with **no technology choices**; plans capture HOW.
 - Requirements use EARS (WHEN/WHILE/IF…THE SYSTEM SHALL…) with Given/When/Then acceptance criteria.
 - Reference artifacts by stable id (US-#, FR-###, SC-###); don't restate them. Patch in place.
-- Task checkboxes in \`tasks.md\` are the source of truth for progress (\`ambykit dashboard\`).`;
+- Task checkboxes in \`tasks.md\` are the source of truth for progress (\`ambykit dashboard\`).
+- **Current feature** (when a phase gets no id): the enclosing \`.worktrees/NNN-slug/\` directory if
+  the project root is one; else the git branch, if it names a \`specs/\` dir; else the highest-numbered
+  \`specs/\` dir — say which you chose. \`ambykit worktree <id>\` gives a feature its own working copy.`;
 
   return buildRegion(core);
 }

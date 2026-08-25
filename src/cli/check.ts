@@ -5,6 +5,8 @@ import { applyFiles } from "./io/fsops.js";
 import { buildEmittedFiles } from "../core/emit.js";
 import { loadConfig } from "../core/config.js";
 import { getTarget } from "../emitters/index.js";
+import { defaultBranch, isMerged, isRepo, worktreeList } from "../core/git.js";
+import { featureWorktrees } from "../core/worktree.js";
 
 export class CheckCommand extends BaseCommand {
   readonly name = "check";
@@ -40,10 +42,29 @@ export class CheckCommand extends BaseCommand {
       ok = false;
     }
 
+    // Stale feature worktrees (feature 012, FR-013): branch already merged into the default branch.
+    for (const id of staleWorktrees(root)) {
+      this.warn(`Worktree .worktrees/${id} is merged — run \`ambykit worktree remove ${id}\`.`);
+    }
+
     if (ok) {
       this.success(`Healthy: ${config.tools.join(", ")} · ${result.unchanged.length} file(s) in sync.`);
       return 0;
     }
     return 1;
+  }
+}
+
+/** Feature worktrees whose branch is already merged into the default branch (never fails `check`). */
+export function staleWorktrees(root: string): string[] {
+  if (!isRepo(root)) return [];
+  try {
+    const base = defaultBranch(root);
+    if (!base) return [];
+    return featureWorktrees(root, worktreeList(root))
+      .filter(({ worktree: w }) => w.branch && w.branch !== base && isMerged(root, w.branch, base))
+      .map((x) => x.feature);
+  } catch {
+    return [];
   }
 }

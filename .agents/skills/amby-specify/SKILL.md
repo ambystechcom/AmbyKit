@@ -19,5 +19,8 @@ read other specs.
 5. Write measurable, tech-agnostic **success criteria** (`SC-###`).
 6. **Capture WHAT/WHY only — no technology choices.** Flag every unknown inline as
    `[NEEDS CLARIFICATION: …]` instead of guessing.
+7. If `.amby/config.json` has `"worktrees": true` and this is a git repo, run
+   `ambykit worktree NNN-slug` (the only command to run) and tell the user to continue in
+   `.worktrees/NNN-slug/`. Otherwise skip this step (say why if isolation was enabled but git is absent).
 
 Keep it tight. Reference the constitution by principle number where relevant; don't restate it.

@@ -119,6 +119,45 @@ export function multiSelect(
   });
 }
 
+/**
+ * Single-key yes/no question (feature 012, FR-011a). Resolves to the answer, or `defaultValue` on
+ * enter; `null` on esc / ctrl-c. Precondition: `caps.isTTY` (callers gate on it).
+ */
+export function confirm(
+  caps: Capabilities,
+  args: { message: string; defaultValue?: boolean },
+  io: { input: NodeJS.ReadStream; output: OutputLike } = { input: process.stdin, output: process.stdout },
+): Promise<boolean | null> {
+  const { input, output } = io;
+  const def = args.defaultValue ?? false;
+  const hint = def ? "Y/n" : "y/N";
+  output.write(`${paint(caps, "accent", "?")} ${args.message} ${paint(caps, "muted", `(${hint})`)} `);
+
+  emitKeypressEvents(input);
+  const wasRaw = Boolean(input.isRaw);
+  input.setRawMode?.(true);
+  input.resume();
+
+  return new Promise((resolve) => {
+    const finish = (value: boolean | null): void => {
+      input.off("keypress", onKey);
+      input.setRawMode?.(wasRaw);
+      input.pause();
+      output.write(`${value === null ? "" : value ? "yes" : "no"}\n`);
+      resolve(value);
+    };
+    const onKey = (str: string, key: { name?: string; ctrl?: boolean } = {}): void => {
+      if (key.ctrl && key.name === "c") return finish(null);
+      if (key.name === "escape") return finish(null);
+      if (key.name === "return" || key.name === "enter") return finish(def);
+      const ch = (str ?? "").toLowerCase();
+      if (ch === "y") return finish(true);
+      if (ch === "n") return finish(false);
+    };
+    input.on("keypress", onKey);
+  });
+}
+
 function mapKey(key: { name?: string; ctrl?: boolean }): PromptKey | null {
   if (key.ctrl && key.name === "c") return "escape";
   switch (key.name) {

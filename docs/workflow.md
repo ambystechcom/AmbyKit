@@ -77,6 +77,15 @@ decision, and checked task; appends one unchecked task per gap under `## Converg
 (`[VERIFY]` for inconclusive items); marks fully covered stories `done`. Append-only and idempotent —
 it never edits source. Loop `implement → converge` until it reports **converged**.
 
+## Parallel features (worktrees)
+
+Every feature has its own branch; `ambykit worktree <feature>` gives it its own **working copy** at
+`.worktrees/<feature>/` so two features — or two assistants — can progress side by side with no
+checkout switching. Inside a worktree, every phase resolves "the current feature" from the directory
+name. Opt in at `ambykit init` (or `"worktrees": true` in `.amby/config.json`) and `/amby.specify`
+creates the worktree for each new feature; `ambykit worktree list|remove` and `ambykit check` keep
+them tidy.
+
 ## Dependencies & prioritization
 
 Stories and features carry `priority` (P1/P2/P3) and `depends-on`/`blocked-by` references by stable
