@@ -103,6 +103,7 @@ Antigravity (IDE + CLI). See [`docs/tool-compatibility.md`](./docs/tool-compatib
 | `ambykit check` | Doctor: verify integrations |
 | `ambykit restore [file]` | Restore an agent-doc file from its `.amby/backups/` backup |
 | `ambykit update` | Update the CLI to the latest, then refresh this project's prompts |
+| `ambykit worktree <feature>` | Isolated working copy per feature (`list`, `remove`) for parallel work |
 
 See [`docs/cli-reference.md`](./docs/cli-reference.md).
 

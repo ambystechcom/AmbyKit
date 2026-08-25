@@ -9,7 +9,7 @@ import { packageVersion, templatesDir } from "../core/paths.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
 import { getTarget, TARGETS } from "../emitters/index.js";
 import { banner } from "./ui/banner.js";
-import { multiSelect } from "./ui/interactive/prompt.js";
+import { confirm, multiSelect } from "./ui/interactive/prompt.js";
 import { toolOptions } from "./ui/tool-options.js";
 import type { AmbyConfig } from "../core/types.js";
 
@@ -74,7 +74,22 @@ export class InitCommand extends BaseCommand {
       return 1;
     }
 
-    const config: AmbyConfig = { version: packageVersion(), tools };
+    // Worktree isolation opt-in (feature 012, FR-011a): asked only on an interactive terminal without
+    // --yes; otherwise the default (disabled) is kept silently.
+    let worktrees = false;
+    if (!toolsFlag && this.caps.isTTY && !this.assumeYes) {
+      const answer = await confirm(this.caps, {
+        message: "Enable worktree isolation? (/amby.specify puts each new feature in .worktrees/<id>)",
+        defaultValue: false,
+      });
+      if (answer === null) {
+        this.warn("Cancelled.");
+        return 1;
+      }
+      worktrees = answer;
+    }
+
+    const config: AmbyConfig = { version: packageVersion(), tools, ...(worktrees ? { worktrees } : {}) };
 
     // Scaffold .amby/ (constitution + config) unless present.
     const constitution = readFileSync(join(templatesDir(), "constitution.md"), "utf8")

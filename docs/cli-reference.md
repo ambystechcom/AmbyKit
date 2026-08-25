@@ -84,6 +84,25 @@ ambykit restore CLAUDE.md       # restore the most recent backup of CLAUDE.md
 ambykit restore CLAUDE.md --dry-run
 ```
 
+## `ambykit worktree <feature> | list | remove <feature>`
+
+Per-feature **git worktrees** so several features can be worked on in parallel — by you or by
+several assistants — without checkout switching. Each feature gets its own working copy at
+`.worktrees/<feature>/` (gitignored) on branch `<feature>`, created from the repository's default
+branch when the branch does not exist yet. Zero model tokens.
+
+```bash
+ambykit worktree 004-slug            # create .worktrees/004-slug on branch 004-slug
+ambykit worktree list                # feature, branch, clean/dirty/merged, path
+ambykit worktree remove 004-slug     # delete the working copy (branch is kept); --force if dirty
+ambykit worktree 004-slug --dry-run  # show the git command without running it
+```
+
+Creating twice is a no-op; removing a missing one exits 0. `ambykit check` flags worktrees whose
+branch is already merged. Opt in to automatic creation from `/amby.specify` by answering yes at
+`ambykit init`, or set `"worktrees": true` in `.amby/config.json`. Inside a worktree, phases resolve
+"the current feature" from the directory name.
+
 ## `ambykit dashboard [story-id]`
 
 Progress view over the story/task graph, computed locally from `specs/*/spec.md` + `tasks.md` (no
