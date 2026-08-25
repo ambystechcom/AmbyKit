@@ -122,3 +122,16 @@ describe("project-root discovery inside a worktree (FR-010 edge case)", () => {
     expect(findProjectRoot(join(wtRoot, "src", "deep"))).toBe(wtRoot);
   });
 });
+
+describe("samePath canonicalization (CI regression: symlinked / 8.3 tmp dirs)", () => {
+  it("matches a path against its realpath and a planned child of a real parent", async () => {
+    const { realpathSync, mkdtempSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const { samePath } = await import("../../src/core/worktree.js");
+    const dir = mkdtempSync(join(tmpdir(), "ambykit-canon-"));
+    const real = realpathSync.native(dir);
+    expect(samePath(dir, real)).toBe(true);
+    expect(samePath(join(dir, "missing-child"), join(real, "missing-child"))).toBe(true);
+    expect(samePath(join(dir, "a"), join(dir, "b"))).toBe(false);
+  });
+});

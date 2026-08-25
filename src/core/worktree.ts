@@ -1,5 +1,5 @@
-import { existsSync, readdirSync, statSync } from "node:fs";
-import { join, resolve, sep } from "node:path";
+import { existsSync, readdirSync, realpathSync, statSync } from "node:fs";
+import { basename, dirname, join, resolve, sep } from "node:path";
 import type { GitWorktree } from "./git.js";
 
 /** Directory (relative to the project root) that holds per-feature worktrees (FR-002). */
@@ -33,10 +33,32 @@ export function ensureGitignore(text: string): { text: string; changed: boolean 
   return { text: `${text}${sep}# AmbyKit per-feature worktrees\n${rule}\n`, changed: true };
 }
 
-/** Normalize a path for comparison against git's forward-slash output. */
+/**
+ * Normalize a path for comparison against git's output. Git reports **canonical** paths — symlinks
+ * resolved (macOS `/var` → `/private/var`) and Windows 8.3 names expanded (`RUNNER~1`) — so both
+ * sides go through `realpath` when they exist, falling back to a plain `resolve` otherwise.
+ */
 export function samePath(a: string, b: string): boolean {
-  const norm = (p: string) => resolve(p).replace(/[\\/]+/g, "/").replace(/\/$/, "").toLowerCase();
-  return norm(a) === norm(b);
+  return canonical(a) === canonical(b);
+}
+
+function canonical(p: string): string {
+  let full = resolve(p);
+  try {
+    full = realpathSync.native(full);
+  } catch {
+    // Not on disk (e.g. a planned path): canonicalize the nearest existing ancestor so a
+    // symlinked or short-named parent still matches.
+    const parent = dirname(full);
+    if (parent !== full) {
+      try {
+        full = join(realpathSync.native(parent), basename(full));
+      } catch {
+        /* keep the resolved form */
+      }
+    }
+  }
+  return full.replace(/[\\/]+/g, "/").replace(/\/$/, "").toLowerCase();
 }
 
 /** The registered worktree whose path is `.worktrees/<featureId>`, if any. */
