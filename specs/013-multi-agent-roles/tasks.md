@@ -61,10 +61,10 @@ created: 2026-08-25
 
 ## Phase 7 — User story US-5  (priority: P3, depends-on US-2)
 
-- [ ] [T060] [US5] `BaseEmitter.roleFiles(roles, ctx)` default `[]`; called from `emit()` when `ctx.manageRules` (src/emitters/base-emitter.ts)
-- [ ] [T061] [P] [US5] Override `roleFiles` for each target verified in T002 only (e.g. `.claude/agents/amby-<id>.md`), body = role body + pointer to `AGENTS.md` (src/emitters/claude.ts, opencode.ts, copilot.ts as verified)
-- [ ] [T062] [P] [US5] Snapshot tests: one persona file per role for verified targets; none for cursor/antigravity/codex (FR-009) (test/roles-emit.test.ts)
-- [ ] [T063] [US5] `ambykit sync` + `ambykit check` on this repo cover the persona files (.claude/agents/)
+- [x] [T060] [US5] `BaseEmitter.roleFiles(roles, ctx)` default `[]`; called from `emit()` when `ctx.manageRules` (src/emitters/base-emitter.ts)
+- [x] [T061] [P] [US5] Override `roleFiles` for each target verified in T002 only (e.g. `.claude/agents/amby-<id>.md`), body = role body + pointer to `AGENTS.md` (src/emitters/claude.ts, opencode.ts, copilot.ts as verified)
+- [x] [T062] [P] [US5] Snapshot tests: one persona file per role for verified targets; none for cursor/antigravity/codex (FR-009) (test/roles-emit.test.ts)
+- [x] [T063] [US5] `ambykit sync` + `ambykit check` on this repo cover the persona files (.claude/agents/)
 - **Checkpoint:** US-5 is demoable — verified targets get one native persona per role.
 
 ## Phase 8 — Polish

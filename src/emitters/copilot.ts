@@ -1,5 +1,5 @@
 import { join } from "node:path/posix";
-import type { CommandSpec, CommandSurface, EmittedFile, RulesContext } from "../core/types.js";
+import type { CommandSpec, CommandSurface, EmittedFile, Role, RulesContext } from "../core/types.js";
 import { buildPointerRegion } from "../core/rules.js";
 import { BaseEmitter } from "./base-emitter.js";
 
@@ -30,6 +30,19 @@ export class CopilotEmitter extends BaseEmitter {
   /** Copilot substitutes `${input:name}`; map our single `$ARGUMENTS` token to it. */
   protected override transformBody(spec: CommandSpec): string {
     return spec.body.replaceAll("$ARGUMENTS", "${input:args}");
+  }
+
+  /** Custom agents at `.github/agents/<name>.agent.md` — `description` required; all environments incl. CLI (verified, feature 013). */
+  protected override roleFiles(roles: Role[], _ctx: RulesContext): EmittedFile[] {
+    return roles.map((role) => ({
+      path: join(".github", "agents", `${this.personaName(role)}.agent.md`),
+      contents:
+        `${this.renderFrontmatter([
+          ["name", this.personaName(role)],
+          ["description", this.yamlQuote(this.personaDescription(role))],
+        ])}\n${this.personaBody(role)}\n`,
+      scope: "project",
+    }));
   }
 
   protected override rulesFiles(_ctx: RulesContext): EmittedFile[] {

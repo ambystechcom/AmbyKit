@@ -3,6 +3,7 @@ import type {
   CommandSpec,
   CommandSurface,
   EmittedFile,
+  Role,
   RulesContext,
 } from "../core/types.js";
 import { buildPointerRegion } from "../core/rules.js";
@@ -32,6 +33,20 @@ export class ClaudeEmitter extends BaseEmitter {
       ["argument-hint", this.yamlQuote(spec.argumentHint)],
       ["allowed-tools", this.mappedTools(spec)],
     ];
+  }
+
+  /** Sub-agents at `.claude/agents/<name>.md` — `name` + `description` required (verified, feature 013). */
+  protected override roleFiles(roles: Role[], _ctx: RulesContext): EmittedFile[] {
+    return roles.map((role) => ({
+      path: `.claude/agents/${this.personaName(role)}.md`,
+      contents:
+        `${this.renderFrontmatter([
+          ["name", this.personaName(role)],
+          ["description", this.yamlQuote(this.personaDescription(role))],
+          ["tools", "Read, Grep, Glob"],
+        ])}\n${this.personaBody(role)}\n`,
+      scope: "project",
+    }));
   }
 
   protected override rulesFiles(_ctx: RulesContext): EmittedFile[] {

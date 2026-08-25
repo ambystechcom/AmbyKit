@@ -90,3 +90,44 @@ describe("role binding on emitted commands (feature 013, US-1)", () => {
     expect(copilot.contents).not.toMatch(/\$ARGUMENTS/);
   });
 });
+
+describe("native persona files (feature 013, US-5, FR-009)", () => {
+  const specs = loadCommandSpecs();
+  const root = mkdtempSync(join(tmpdir(), "ambykit-personas-"));
+  mkdirSync(join(root, ".amby"), { recursive: true });
+  installArtifactTemplates(root);
+  const ctx: RulesContext = { projectName: "demo", specs, manageRules: false, roles: loadRoles(root) };
+
+  it("emits one persona per role for the verified targets only", () => {
+    const expectPersonas = (files: { path: string }[], prefix: string, suffix: string) => {
+      const personas = files.filter((f) => f.path.startsWith(prefix)).map((f) => f.path).sort();
+      expect(personas).toEqual(
+        ["architect", "developer", "pm", "qa", "tech-lead", "ux"].map((id) => `${prefix}amby-${id}${suffix}`),
+      );
+    };
+    expectPersonas(new ClaudeEmitter().emit(specs, ctx), ".claude/agents/", ".md");
+    expectPersonas(new OpenCodeEmitter().emit(specs, ctx), ".opencode/agents/", ".md");
+    expectPersonas(new CopilotEmitter().emit(specs, ctx), ".github/agents/", ".agent.md");
+    expectPersonas(new CopilotCliEmitter().emit(specs, ctx), ".github/agents/", ".agent.md");
+    for (const emitter of [new CursorEmitter(), new AntigravityEmitter(), new CodexEmitter()]) {
+      expect(emitter.emit(specs, ctx).some((f) => /agents\/amby-/.test(f.path)), emitter.constructor.name).toBe(false);
+    }
+  });
+
+  it("uses the verified frontmatter per target and the role body as the system prompt", () => {
+    const claude = new ClaudeEmitter().emit(specs, ctx).find((f) => f.path.endsWith("amby-qa.md"))!;
+    expect(claude.contents).toMatch(/^---\nname: amby-qa\ndescription: "QA Engineer/);
+    expect(claude.contents).toContain("tools: Read, Grep, Glob");
+    expect(claude.contents).toContain("Own verification.");
+    expect(claude.contents).toContain("`AGENTS.md`");
+    const opencode = new OpenCodeEmitter().emit(specs, ctx).find((f) => f.path.endsWith("amby-qa.md"))!;
+    expect(opencode.contents).toMatch(/^---\ndescription: "QA Engineer[^\n]*\nmode: subagent\n---/);
+    const copilot = new CopilotEmitter().emit(specs, ctx).find((f) => f.path.endsWith("amby-qa.agent.md"))!;
+    expect(copilot.contents).toMatch(/^---\nname: amby-qa\ndescription: "QA Engineer/);
+  });
+
+  it("emits no persona files when roles are not installed (FR-004)", () => {
+    const none: RulesContext = { projectName: "demo", specs, manageRules: true };
+    expect(new ClaudeEmitter().emit(specs, none).some((f) => f.path.startsWith(".claude/agents/"))).toBe(false);
+  });
+});

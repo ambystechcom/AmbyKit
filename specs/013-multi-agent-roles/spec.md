@@ -115,7 +115,7 @@ that tool's native form, so that I can address a role directly outside the phase
   extra and lose no functionality.
 - **depends-on:** [US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a target with a verified persona/sub-agent format, When `ambykit sync` runs, Then one native
