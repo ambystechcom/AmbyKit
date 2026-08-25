@@ -1,0 +1,40 @@
+---
+title: Converge
+description: Check the codebase against spec, plan, and tasks after implementing; append gap tasks, never edit code.
+sidebar:
+  order: 10
+phase: converge
+order: 10
+command: amby.converge
+reads: [specs/NNN-slug/spec.md, specs/NNN-slug/plan.md, specs/NNN-slug/tasks.md]
+writes: [specs/NNN-slug/tasks.md, specs/NNN-slug/spec.md]
+---
+
+import PhaseBadge from "../../../components/PhaseBadge.astro";
+import Artifacts from "../../../components/Artifacts.astro";
+
+<PhaseBadge n={10} name="Converge" />
+
+**Converge** closes the loop after implementation. It checks the codebase against every `FR-###`,
+`SC-###`, plan decision, and checked-off task, classifying each as covered, gap, or unverified. Gaps
+become new unchecked tasks under a `## Convergence` section in `tasks.md` (unverified items get a
+`[VERIFY]` prefix); stories whose requirements are all covered are marked `done`. It never edits
+source code and never rewrites existing tasks — run `/amby.implement` on the new tasks, then converge
+again until it reports **converged**.
+
+## Command
+
+```bash
+/amby.converge            # current feature
+/amby.converge 004-slug   # a specific feature
+```
+
+## Artifacts read & written
+
+<Artifacts
+  reads={["specs/NNN-slug/spec.md", "specs/NNN-slug/plan.md", "specs/NNN-slug/tasks.md"]}
+  writes={["specs/NNN-slug/tasks.md", "specs/NNN-slug/spec.md"]}
+/>
+
+Converge is append-only and idempotent: with nothing to add, `tasks.md` is left byte-for-byte
+unchanged, and running it twice never duplicates a task.

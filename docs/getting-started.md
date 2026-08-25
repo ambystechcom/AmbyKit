@@ -72,7 +72,11 @@ ID. Use it instead of `/amby.specify`, which starts a new feature.
 
 ```
 /amby.implement    # work through tasks.md, checking off tasks as it goes
+/amby.converge     # check the code against spec/plan/tasks; gaps become new tasks
 ```
+
+Repeat `implement → converge` until converge reports **converged** — it never edits code, only
+appends tasks and updates story status.
 
 From the terminal, watch progress across the story/task graph:
 
