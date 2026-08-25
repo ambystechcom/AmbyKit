@@ -35,11 +35,11 @@ created: 2026-08-25
 
 ## Phase 4 — User story US-2  (priority: P1)
 
-- [ ] [T030] [US2] `sync`: run `validateRoles` — print warnings, refuse (exit 1) on duplicate ids (src/cli/sync.ts)
-- [ ] [T031] [US2] `check`: report role warnings/errors and any shipped default missing from `.amby/roles/` (src/cli/check.ts)
-- [ ] [T032] [US2] `init`: roles installed with templates (via T014); confirm in the init summary line (src/cli/init.ts)
-- [ ] [T033] [US2] E2E tests: edited role needs no command re-sync (`@path` load); duplicate → sync exit 1; 151-word role → exactly one warning; missing default reported by check (SC-003, SC-004) (test/cli/roles.test.ts)
-- [ ] [T034] [US2] `ambykit sync` on this repo → `.amby/roles/` installed, commands regenerated; `ambykit check` clean (.amby/roles/, .claude/, .agents/)
+- [x] [T030] [US2] `sync`: run `validateRoles` — print warnings, refuse (exit 1) on duplicate ids (src/cli/sync.ts)
+- [x] [T031] [US2] `check`: report role warnings/errors and any shipped default missing from `.amby/roles/` (src/cli/check.ts)
+- [x] [T032] [US2] `init`: roles installed with templates (via T014); confirm in the init summary line (src/cli/init.ts)
+- [x] [T033] [US2] E2E tests: edited role needs no command re-sync (`@path` load); duplicate → sync exit 1; 151-word role → exactly one warning; missing default reported by check (SC-003, SC-004) (test/cli/roles.test.ts)
+- [x] [T034] [US2] `ambykit sync` on this repo → `.amby/roles/` installed, commands regenerated; `ambykit check` clean (.amby/roles/, .claude/, .agents/)
 - **Checkpoint:** US-2 is demoable — edit `.amby/roles/qa.md`, phases pick it up; sync/check validate.
 
 ## Phase 5 — User story US-4  (priority: P2, depends-on US-1)

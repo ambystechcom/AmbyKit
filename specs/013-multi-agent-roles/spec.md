@@ -55,7 +55,7 @@ they reach every supported assistant from one source.
   drift.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given `ambykit init` (or `ambykit sync` on an existing project), When it runs, Then the default

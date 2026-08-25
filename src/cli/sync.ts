@@ -3,6 +3,7 @@ import { applyFiles } from "./io/fsops.js";
 import { buildEmittedFiles } from "../core/emit.js";
 import { loadConfig } from "../core/config.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
+import { loadRoles, validateRoles } from "../core/roles.js";
 
 export class SyncCommand extends BaseCommand {
   readonly name = "sync";
@@ -24,6 +25,14 @@ export class SyncCommand extends BaseCommand {
     const templates = installArtifactTemplates(root, this.dryRun || checkOnly);
     if (templates.created.length > 0 && !checkOnly) {
       this.info(`${this.dryRun ? "Would install" : "Installed"} ${templates.created.length} new template/reference file(s).`);
+    }
+
+    // Roles (feature 013, FR-010): size is advisory, duplicate ids are not.
+    const roles = validateRoles(loadRoles(root));
+    for (const w of roles.warnings) this.warn(w);
+    if (roles.errors.length > 0) {
+      for (const e of roles.errors) this.error(e);
+      return 1;
     }
 
     const spin = this.spinner();
