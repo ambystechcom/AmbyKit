@@ -31,6 +31,7 @@ Several targets share one emitter's output (why `BaseEmitter` + thin subclasses 
 | Scoped instructions | `.claude/rules/*.md` (`paths:`) | `instructions[]` in `opencode.json` | `.github/instructions/*.instructions.md` (`applyTo`) | same (`applyTo`, `excludeAgent`) | `.mdc` `globs`/`alwaysApply` | via `.mdc` | `.agents/rules/*.md` | nested `AGENTS.md`/`AGENTS.override.md` per directory (no glob key) |
 | Args placeholder | `$ARGUMENTS`, `$N`, `$name` | `$ARGUMENTS`, `$1` | `${input:x}` | — | prompt text | — | steps in body | none — trailing free text only (AmbyKit reworks `$ARGUMENTS` into prose) |
 | Agents | `.claude/agents/*.md` | `.opencode/agents/*.md` | `.github/agents/*.agent.md` | `.github/agents/*.agent.md` | UI modes (no file) | — | none (SDK only) | none (skills only) |
+| Agent frontmatter | `name`*, `description`*, `tools`, `model` (body = system prompt) | `description`* (+`mode`, `permission`; filename = id) | `description`*, `name`, `tools` | same as Copilot VS Code | — | — | — | — |
 | MCP file | `.mcp.json` | `opencode.json` → `mcp` | `.vscode/mcp.json` | `~/.copilot/mcp-config.json` (user) | `.cursor/mcp.json` | reads `.cursor/mcp.json` | `mcp_config.json` (user) | `.codex/config.toml` (TOML) — **out of scope**, AmbyKit does not write it |
 | MCP top-level key | (per-server `type`) | `mcp` | `servers` | `mcpServers` | `mcpServers` | — | `mcpServers` | `mcp_servers.<id>` (not written) |
 | AGENTS.md native | No (bridge) | Yes | Yes (opt-in) | Yes | Yes | Yes | Yes | Yes |

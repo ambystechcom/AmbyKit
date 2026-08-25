@@ -11,26 +11,26 @@ created: 2026-08-25
 
 ## Phase 1 — Setup
 
-- [ ] [T001] After #7 merges: `ambykit worktree 013-multi-agent-roles` and work inside `.worktrees/013-multi-agent-roles/` (closes 012 T091 / SC-006) (.worktrees/)
-- [ ] [T002] [P] Phase 0 research: verify agent-file frontmatter for Claude Code, OpenCode, Copilot against official docs; record outcome per target (specs/013-multi-agent-roles/research.md)
-- [ ] [T003] [P] Add an "Agent frontmatter" row with the verified keys (or "unverified — not emitted") (docs/tool-compatibility.md)
+- [x] [T001] After #7 merges: `ambykit worktree 013-multi-agent-roles` and work inside `.worktrees/013-multi-agent-roles/` (closes 012 T091 / SC-006) (.worktrees/)
+- [x] [T002] [P] Phase 0 research: verify agent-file frontmatter for Claude Code, OpenCode, Copilot against official docs; record outcome per target (specs/013-multi-agent-roles/research.md)
+- [x] [T003] [P] Add an "Agent frontmatter" row with the verified keys (or "unverified — not emitted") (docs/tool-compatibility.md)
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T010] [P] Write six default roles ≤ 150 words each with `id`/`name`/`phases` frontmatter (src/roles/pm.md, ux.md, architect.md, tech-lead.md, developer.md, qa.md)
-- [ ] [T011] [P] `Role` type + `roles?: Role[]` on `RulesContext`; optional `role` on `CommandSpec` (src/core/types.ts)
-- [ ] [T012] [P] `loadRoles(root)`, `validateRoles(roles)` (duplicate ids case-insensitive → error; >150 words → warning), `wordCount` (src/core/roles.ts)
-- [ ] [T013] Accept optional `role: <id>` in prompt frontmatter schema (src/core/command-spec.ts)
-- [ ] [T014] Install `src/roles/*.md` into `.amby/roles/` write-if-absent alongside templates/reference; `rolesDir()` path helper (src/core/scaffold.ts, src/core/paths.ts)
-- [ ] [T015] Unit tests: loader parsing, duplicate refusal, word-count warning at 151, every shipped role ≤ 150 words (FR-010, SC-004) (test/core/roles.test.ts)
-- [ ] [T016] Export new module; `npm run typecheck && npm test` green (src/core/index.ts)
+- [x] [T010] [P] Write six default roles ≤ 150 words each with `id`/`name`/`phases` frontmatter (src/roles/pm.md, ux.md, architect.md, tech-lead.md, developer.md, qa.md)
+- [x] [T011] [P] `Role` type + `roles?: Role[]` on `RulesContext`; optional `role` on `CommandSpec` (src/core/types.ts)
+- [x] [T012] [P] `loadRoles(root)`, `validateRoles(roles)` (duplicate ids case-insensitive → error; >150 words → warning), `wordCount` (src/core/roles.ts)
+- [x] [T013] Accept optional `role: <id>` in prompt frontmatter schema (src/core/command-spec.ts)
+- [x] [T014] Install `src/roles/*.md` into `.amby/roles/` write-if-absent alongside templates/reference; `rolesDir()` path helper (src/core/scaffold.ts, src/core/paths.ts)
+- [x] [T015] Unit tests: loader parsing, duplicate refusal, word-count warning at 151, every shipped role ≤ 150 words (FR-010, SC-004) (test/core/roles.test.ts)
+- [x] [T016] Export new module; `npm run typecheck && npm test` green (src/core/index.ts)
 
 ## Phase 3 — User story US-1  (priority: P1)
 
-- [ ] [T020] [US1] Add `role:` to every phase prompt per the default mapping (pm/ux/architect/tech-lead/developer/qa) (src/prompts/*.md)
-- [ ] [T021] [US1] `BaseEmitter.transformBody`: when `ctx.roles` is non-empty and the spec has a role, prepend the role line (act-as + `--as` override + missing-file refusal) (src/emitters/base-emitter.ts)
-- [ ] [T022] [US1] `buildEmittedFiles`: load roles from the project root into `ctx.roles` (src/core/emit.ts)
-- [ ] [T023] [US1] Snapshot tests: with roles → line present on every command for every emitter; without `.amby/roles/` → output byte-identical to pre-feature (FR-003, FR-004, SC-001) (test/roles-emit.test.ts)
+- [x] [T020] [US1] Add `role:` to every phase prompt per the default mapping (pm/ux/architect/tech-lead/developer/qa) (src/prompts/*.md)
+- [x] [T021] [US1] `BaseEmitter.transformBody`: when `ctx.roles` is non-empty and the spec has a role, prepend the role line (act-as + `--as` override + missing-file refusal) (src/emitters/base-emitter.ts)
+- [x] [T022] [US1] `buildEmittedFiles`: load roles from the project root into `ctx.roles` (src/core/emit.ts)
+- [x] [T023] [US1] Snapshot tests: with roles → line present on every command for every emitter; without `.amby/roles/` → output byte-identical to pre-feature (FR-003, FR-004, SC-001) (test/roles-emit.test.ts)
 - **Checkpoint:** US-1 is demoable — emitted `/amby.specify` opens with "act as `@.amby/roles/pm.md`".
 
 ## Phase 4 — User story US-2  (priority: P1)

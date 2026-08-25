@@ -4,6 +4,7 @@ name: amby.analyze
 description: Cross-check spec, plan, and tasks for coverage, consistency, and dependency-graph health.
 argument-hint: "[feature id, defaults to current]"
 phase: analyze
+role: qa
 reads: [specs/NNN-slug/spec.md, specs/NNN-slug/plan.md, specs/NNN-slug/tasks.md]
 writes: []
 allowedTools: [read]

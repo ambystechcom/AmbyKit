@@ -4,6 +4,7 @@ name: amby.revise
 description: Continue an existing feature's spec (or design) — add and refine in place, with a done-guard.
 argument-hint: "[feature id, defaults to current] + what to add or refine"
 phase: revise
+role: pm
 reads: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md]
 writes: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md]
 allowedTools: [read, edit]

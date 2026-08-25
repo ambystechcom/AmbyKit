@@ -4,6 +4,7 @@ name: amby.plan
 description: Produce the technical implementation plan (the HOW) from an approved spec and UI.
 argument-hint: "[feature id, defaults to current]"
 phase: plan
+role: architect
 reads: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md, .amby/constitution.md]
 writes: [specs/NNN-slug/plan.md, specs/NNN-slug/data-model.md, specs/NNN-slug/contracts/]
 allowedTools: [read, write, edit]

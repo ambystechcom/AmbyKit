@@ -41,6 +41,11 @@ export function templatesDir(): string {
   return join(packageRoot(), "src", "templates");
 }
 
+/** Directory containing the shipped default role definitions (feature 013). */
+export function rolesDir(): string {
+  return join(packageRoot(), "src", "roles");
+}
+
 /** Directory containing on-demand reference docs (loaded by phases when needed). */
 export function referenceDir(): string {
   return join(packageRoot(), "src", "reference");

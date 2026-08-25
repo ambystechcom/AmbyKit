@@ -2,7 +2,7 @@
 feature: 013-multi-agent-roles
 title: Multi-agent roles — PM, Architect, QA perspectives in the workflow
 branch: 013-multi-agent-roles
-status: ready
+status: in-progress
 created: 2026-08-25
 ---
 
@@ -34,7 +34,7 @@ prompting for them.
   (e.g. user value, scope boundaries, success metrics).
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a project with role definitions, When a phase runs, Then it states which role it is acting

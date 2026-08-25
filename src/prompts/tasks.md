@@ -4,6 +4,7 @@ name: amby.tasks
 description: Break the plan into an ordered, dependency-aware task checklist.
 argument-hint: "[feature id, defaults to current]"
 phase: tasks
+role: tech-lead
 reads: [specs/NNN-slug/plan.md, specs/NNN-slug/spec.md]
 writes: [specs/NNN-slug/tasks.md]
 allowedTools: [read, write, edit]

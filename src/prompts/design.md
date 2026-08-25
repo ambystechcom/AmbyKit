@@ -4,6 +4,7 @@ name: amby.design
 description: Design the UI — wireframes, component specs, and design tokens — with a sign-off gate.
 argument-hint: "[feature id, defaults to current]"
 phase: design
+role: ux
 reads: [specs/NNN-slug/spec.md]
 writes: [specs/NNN-slug/ui.md, specs/NNN-slug/design-tokens.json]
 allowedTools: [read, write, edit]

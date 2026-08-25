@@ -1,4 +1,5 @@
 import { join } from "node:path/posix";
+import { roleForSpec } from "../core/roles.js";
 import type {
   AbstractTool,
   CommandSpec,
@@ -33,7 +34,7 @@ export abstract class BaseEmitter {
   emit(specs: CommandSpec[], ctx: RulesContext): EmittedFile[] {
     const files: EmittedFile[] = [];
     if (this.commandSurface !== "none") {
-      for (const spec of specs) files.push(this.commandFile(spec));
+      for (const spec of specs) files.push(this.commandFile(spec, ctx));
     }
     if (ctx.manageRules) files.push(...this.rulesFiles(ctx));
     return files;
@@ -59,10 +60,13 @@ export abstract class BaseEmitter {
   /** Native frontmatter as ordered [key, serializedValue] pairs. */
   protected abstract commandFrontmatter(spec: CommandSpec): Array<[string, string]>;
 
-  protected commandFile(spec: CommandSpec): EmittedFile {
+  protected commandFile(spec: CommandSpec, ctx?: RulesContext): EmittedFile {
     const pairs = this.commandFrontmatter(spec);
     const notice = this.generatedNotice(spec);
-    const body = this.transformBody(spec);
+    const roleLine = this.roleLine(spec, ctx);
+    // The role line is prepended *before* transformBody so tool-specific placeholder rewrites
+    // (e.g. Copilot's `$ARGUMENTS`) apply to its `--as` clause too.
+    const body = this.transformBody(roleLine ? { ...spec, body: `${roleLine}\n\n${spec.body}` } : spec);
     // Tools with no command frontmatter (e.g. Cursor plain commands) get no `---` block.
     const head = pairs.length > 0 ? `${this.renderFrontmatter(pairs)}\n` : "";
     const contents = `${head}${notice}\n\n${body}\n`;
@@ -75,6 +79,22 @@ export abstract class BaseEmitter {
    */
   protected transformBody(spec: CommandSpec): string {
     return spec.body;
+  }
+
+  /**
+   * One sentence binding the phase to its role (feature 013, FR-003/FR-005). Emitted only when the
+   * project has roles installed and the spec names one; otherwise nothing, so projects without
+   * `.amby/roles/` get byte-identical output (FR-004). The role is referenced by path, never
+   * inlined (Principle 3).
+   */
+  protected roleLine(spec: CommandSpec, ctx?: RulesContext): string | null {
+    const role = roleForSpec(ctx?.roles ?? [], spec.role);
+    if (!role) return null;
+    return (
+      `Act as the **${role.name}** in \`@.amby/roles/${role.id}.md\` and say so in your first line. ` +
+      "If `$ARGUMENTS` contains `--as <id>`, use `@.amby/roles/<id>.md` instead; if that file is " +
+      "missing, stop and list the files in `.amby/roles/`."
+    );
   }
 
   protected generatedNotice(spec: CommandSpec): string {
