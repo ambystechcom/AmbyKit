@@ -52,8 +52,14 @@ Type "export RPROMPT=''" Enter
 # Pre-warm the npx cache. Without this the visible `npx … init` spends ~10s downloading and the
 # GIF is mostly dead air. The command on camera is still the real one — this only skips the
 # first-run download, exactly as it would be skipped for anyone who has run it before.
-Type "npx --yes @ambystech/ambykit --version >/dev/null 2>&1" Enter
-Sleep 20s
+#
+# @latest is load-bearing: npx will happily reuse a stale cached copy for an unpinned spec, and a
+# take recorded that way looks fine while quietly showing an old release. That is how a previous
+# take ended up printing "created 37" with no .claude/agents — the role sub-agents landed in 1.1.0.
+# Pinning here refreshes the cache, so the unpinned command on camera resolves to the same current
+# version. Check the file count in the take: a full run of 1.1.0 reports 49.
+Type "npx --yes @ambystech/ambykit@latest --version >/dev/null 2>&1" Enter
+Sleep 25s
 Type "clear" Enter
 Sleep 1s
 Show
