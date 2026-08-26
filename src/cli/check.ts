@@ -7,6 +7,8 @@ import { loadConfig } from "../core/config.js";
 import { getTarget } from "../emitters/index.js";
 import { defaultBranch, isMerged, isRepo, worktreeList } from "../core/git.js";
 import { featureWorktrees } from "../core/worktree.js";
+import { ROLES_DIR, loadRoles, validateRoles } from "../core/roles.js";
+import { SHIPPED_ROLES } from "../core/scaffold.js";
 
 export class CheckCommand extends BaseCommand {
   readonly name = "check";
@@ -31,6 +33,21 @@ export class CheckCommand extends BaseCommand {
       if (!getTarget(t)) {
         this.warn(`Configured tool '${t}' is not a known target.`);
         ok = false;
+      }
+    }
+
+    // Roles (feature 013, FR-011): report validation problems and shipped defaults that were removed.
+    const roles = loadRoles(root);
+    if (roles.length > 0) {
+      const v = validateRoles(roles);
+      for (const w of v.warnings) this.warn(w);
+      for (const e of v.errors) {
+        this.warn(e);
+        ok = false;
+      }
+      const missing = SHIPPED_ROLES.filter((f) => !existsSync(join(root, ROLES_DIR, f)));
+      if (missing.length > 0) {
+        this.warn(`Default role(s) missing from ${ROLES_DIR}: ${missing.join(", ")} — run \`ambykit sync\` to reinstall.`);
       }
     }
 

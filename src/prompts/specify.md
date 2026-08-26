@@ -4,6 +4,7 @@ name: amby.specify
 description: Turn a feature idea into a spec — user stories, EARS requirements, acceptance criteria.
 argument-hint: "<feature description>"
 phase: specify
+role: pm
 reads: [.amby/constitution.md, .amby/config.json]
 writes: [specs/NNN-slug/spec.md]
 allowedTools: [read, write, edit, bash]

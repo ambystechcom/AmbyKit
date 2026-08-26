@@ -1,0 +1,39 @@
+---
+title: Review
+description: Review an artifact from another role's perspective — findings by stable ID, advisory only.
+sidebar:
+  order: 11
+phase: review
+order: 11
+command: amby.review
+reads: [.amby/roles/*.md]
+writes: []
+---
+
+import PhaseBadge from "../../../components/PhaseBadge.astro";
+import Artifacts from "../../../components/Artifacts.astro";
+
+<PhaseBadge n={11} name="Review" />
+
+**Review** asks a *different* role to look at an artifact before the next phase consumes it: QA
+reviews a spec or task list, the Architect reviews a plan, the PM reviews a UI design — or any role
+you name with `--as`. Findings come back one per line, each tied to a stable ID (`US-#`, `FR-###`,
+`SC-###`, `T###`) with a severity and a suggested fix, and nothing is modified. With `--apply` the
+artifact is patched in place (IDs are never renumbered) and a line is appended under `## Reviews`
+recording the role, date, and outcome — `approved` when there were no findings.
+
+Reviews are advisory, like `analyze`: no phase waits on one.
+
+## Command
+
+```bash
+/amby.review specs/004-slug/spec.md              # QA reviews the spec
+/amby.review specs/004-slug/plan.md --as qa      # any role you name
+/amby.review specs/004-slug/tasks.md --apply     # patch in place + record the review
+```
+
+## Artifacts read & written
+
+<Artifacts reads={[".amby/roles/*.md"]} writes={[]} />
+
+Roles live in `.amby/roles/`; edit them to tune what each reviewer looks for.

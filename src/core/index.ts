@@ -8,3 +8,4 @@ export * from "./scaffold.js";
 export * from "./analyze.js";
 export * from "./git.js";
 export * from "./worktree.js";
+export * from "./roles.js";

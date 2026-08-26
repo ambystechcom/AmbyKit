@@ -5,6 +5,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import {
   ARTIFACT_TEMPLATES,
   REFERENCE_DOCS,
+  SHIPPED_ROLES,
   installArtifactTemplates,
 } from "../src/core/scaffold.js";
 
@@ -25,7 +26,10 @@ describe("installArtifactTemplates", () => {
     for (const name of REFERENCE_DOCS) {
       expect(existsSync(join(root, ".amby", "reference", name))).toBe(true);
     }
-    expect(result.created.length).toBe(ARTIFACT_TEMPLATES.length + REFERENCE_DOCS.length);
+    for (const name of SHIPPED_ROLES) {
+      expect(existsSync(join(root, ".amby", "roles", name))).toBe(true);
+    }
+    expect(result.created.length).toBe(ARTIFACT_TEMPLATES.length + REFERENCE_DOCS.length + SHIPPED_ROLES.length);
     expect(result.present).toHaveLength(0);
   });
 

@@ -77,6 +77,10 @@ ambykit check
 
 Validate the project's AmbyKit setup and configuration.
 
+Also reports stale worktrees and role problems in `.amby/roles/` (oversized, duplicate ids, deleted
+defaults). `ambykit sync` validates roles the same way and emits one native sub-agent per role for
+Claude Code, OpenCode, and Copilot.
+
 ## `ambykit restore [file]`
 
 ```text

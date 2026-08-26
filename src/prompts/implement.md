@@ -4,6 +4,7 @@ name: amby.implement
 description: Execute the task list, checking off tasks and updating story status as you go.
 argument-hint: "[task id or story id, defaults to next unblocked]"
 phase: implement
+role: developer
 reads: [specs/NNN-slug/tasks.md, specs/NNN-slug/plan.md]
 writes: [specs/NNN-slug/tasks.md, specs/NNN-slug/spec.md]
 allowedTools: [read, write, edit, bash]

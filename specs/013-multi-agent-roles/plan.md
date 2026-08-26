@@ -1,6 +1,6 @@
 ---
 feature: 013-multi-agent-roles
-status: draft
+status: done
 created: 2026-08-25
 ---
 

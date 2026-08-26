@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, posix } from "node:path";
-import { referenceDir, templatesDir } from "./paths.js";
+import { referenceDir, rolesDir, templatesDir } from "./paths.js";
 
 /** Artifact templates installed into a consumer's `.amby/templates/` (referenced by the prompts). */
 export const ARTIFACT_TEMPLATES = [
@@ -14,6 +14,9 @@ export const ARTIFACT_TEMPLATES = [
 
 /** On-demand reference docs installed into a consumer's `.amby/reference/`. */
 export const REFERENCE_DOCS = ["design-conventions.md"] as const;
+
+/** Default role definitions installed into a consumer's `.amby/roles/` (feature 013, FR-001). */
+export const SHIPPED_ROLES = ["pm.md", "ux.md", "architect.md", "tech-lead.md", "developer.md", "qa.md"] as const;
 
 export interface InstallResult {
   created: string[];
@@ -47,6 +50,9 @@ export function installArtifactTemplates(projectRoot: string, dryRun = false): I
   }
   for (const name of REFERENCE_DOCS) {
     copy(join(referenceDir(), name), posix.join(".amby", "reference", name));
+  }
+  for (const name of SHIPPED_ROLES) {
+    copy(join(rolesDir(), name), posix.join(".amby", "roles", name));
   }
   return result;
 }

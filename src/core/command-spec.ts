@@ -17,6 +17,7 @@ const frontmatterSchema = z.object({
   reads: z.array(z.string()).default([]),
   writes: z.array(z.string()).default([]),
   allowedTools: z.array(abstractTool).default([]),
+  role: z.string().regex(/^[a-z][a-z0-9-]*$/).optional(),
 });
 
 /** Parse a single prompt file's raw contents into a CommandSpec. */
@@ -36,6 +37,7 @@ export function parseCommandSpec(raw: string, sourceName: string): CommandSpec {
     reads: data.reads,
     writes: data.writes,
     allowedTools: data.allowedTools,
+    ...(data.role ? { role: data.role } : {}),
     body: parsed.content.trim(),
   };
 }

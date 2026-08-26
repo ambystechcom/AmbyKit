@@ -4,6 +4,7 @@ name: amby.clarify
 description: Resolve the open [NEEDS CLARIFICATION] markers in a feature spec.
 argument-hint: "[feature id, defaults to current]"
 phase: clarify
+role: pm
 reads: [specs/NNN-slug/spec.md]
 writes: [specs/NNN-slug/spec.md]
 allowedTools: [read, edit]

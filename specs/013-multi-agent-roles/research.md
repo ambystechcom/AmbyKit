@@ -14,17 +14,18 @@ anything (constitution Principle 4: verify formats, never guess).
 | Review is advisory | Clarified 2026-08-25; consistent with `analyze` (report, never block). |
 | 150-word cap, warn not refuse | Clarified 2026-08-25; keeps overhead bounded while letting teams exceed it knowingly. |
 
-## To verify in Phase 0 (blocks US-5 only)
+## Phase 0 verification — done 2026-08-25 (T002)
 
-`docs/tool-compatibility.md` records agent **paths** but not agent-file **frontmatter**. Verify each
-against the official docs and add an "Agent frontmatter" row; drop any target that cannot be
-verified.
+Verified against official docs; recorded in `docs/tool-compatibility.md` ("Agent frontmatter" row).
+All three targets qualify for US-5.
 
-| Target | Path (matrix) | Keys to confirm | Source to check |
-|---|---|---|---|
-| Claude Code | `.claude/agents/*.md` | `name`, `description`, `tools`, `model` | Claude Code docs → Sub-agents |
-| OpenCode | `.opencode/agents/*.md` | `description`, `mode`, `model`, `tools` | opencode.ai docs → Agents |
-| Copilot | `.github/agents/*.agent.md` | `name`, `description`, `tools` | GitHub Docs → Custom agents |
+| Target | Path | Required keys | Optional keys we use | Source |
+|---|---|---|---|---|
+| Claude Code | `.claude/agents/<name>.md` | `name` (lowercase+hyphens), `description` | `tools` (comma list), `model` | code.claude.com/docs/en/sub-agents |
+| OpenCode | `.opencode/agents/<id>.md` (filename = agent id) | `description` | `mode: subagent`, `permission` | opencode.ai/docs/agents |
+| Copilot VS Code + CLI | `.github/agents/<name>.agent.md` | `description` | `name`, `tools` | docs.github.com → create-custom-agents (all environments) |
+
+Body = system prompt in all three. Filenames: `amby-<role-id>` (Copilot allows `. - _ a-z A-Z 0-9`).
 
 Out of scope for native emission (matrix lists no file format): Cursor (UI modes), Cursor CLI,
 Antigravity (SDK only), Codex (skills only).

@@ -105,7 +105,7 @@ export class InitCommand extends BaseCommand {
     // Install artifact templates + reference docs into .amby/ (write-if-absent; project owns them).
     const templates = installArtifactTemplates(target, this.dryRun);
     if (templates.created.length > 0) {
-      this.debug(`${this.dryRun ? "Would install" : "Installed"} ${templates.created.length} template/reference file(s).`);
+      this.debug(`${this.dryRun ? "Would install" : "Installed"} ${templates.created.length} template/reference/role file(s).`);
     }
 
     const spin = this.spinner();

@@ -1,8 +1,8 @@
 # The AmbyKit workflow
 
-Ten phases, each a slash command in your assistant, each producing or updating one artifact. The
+Eleven phases, each a slash command in your assistant, each producing or updating one artifact. The
 happy path is **specify → design → plan → tasks → implement**, with `constitution` once up front and
-`clarify`/`revise`/`analyze`/`converge` when you need them.
+`clarify`/`revise`/`analyze`/`converge`/`review` when you need them.
 
 | Phase | Command | Reads | Writes |
 |---|---|---|---|
@@ -16,6 +16,7 @@ happy path is **specify → design → plan → tasks → implement**, with `con
 | Analyze | `/amby.analyze` | all | consistency report |
 | Implement | `/amby.implement` | tasks (one slice) | code + task/status updates |
 | Converge | `/amby.converge` | spec, plan, tasks + code | `tasks.md` (appends gap tasks), story status |
+| Review | `/amby.review` | any artifact + a role | findings (advisory); the artifact only with `--apply` |
 
 ## 1. Constitution
 
@@ -76,6 +77,20 @@ Closes the loop after implementation: checks the code against every `FR-###`/`SC
 decision, and checked task; appends one unchecked task per gap under `## Convergence` in `tasks.md`
 (`[VERIFY]` for inconclusive items); marks fully covered stories `done`. Append-only and idempotent —
 it never edits source. Loop `implement → converge` until it reports **converged**.
+
+## 11. Review
+
+Asks a *different* role to critique an artifact — QA on a spec or task list, the Architect on a
+plan, the PM on a UI design, or any role via `--as <id>`. Findings are one per line, each tied to a
+stable ID with severity and a suggested fix; nothing is modified. `--apply` patches the artifact in
+place (IDs are never renumbered) and appends a `## Reviews` record. Advisory, like `analyze`.
+
+## Roles
+
+Every phase acts as a role defined in `.amby/roles/<id>.md` (PM, UX Designer, Architect, Tech
+Lead, Developer, QA by default — project-owned and editable, ≤ 150 words each). Phases load only
+their role, by path; pass `--as <id>` to any phase for a one-run alternative perspective. `sync`
+warns on oversized roles and refuses duplicate ids; `check` reports removed defaults.
 
 ## Parallel features (worktrees)
 

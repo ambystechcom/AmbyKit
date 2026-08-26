@@ -42,6 +42,7 @@ Then, inside your AI assistant, walk the workflow:
 /amby.tasks          # ordered, dependency-aware task list
 /amby.implement      # build it
 /amby.converge       # verify the code against the spec; append gap tasks, repeat until converged
+/amby.review         # have another role (QA, Architect, PM…) critique an artifact, findings by ID
 ```
 
 Track progress from the terminal:
@@ -81,6 +82,7 @@ truth that compiles to each tool's native format.
 | Analyze | `/amby.analyze` | cross-artifact consistency report |
 | Implement | `/amby.implement` | executes `tasks.md` |
 | Converge | `/amby.converge` | checks code vs spec/plan/tasks; appends gap tasks to `tasks.md` |
+| Review | `/amby.review` | cross-role critique of any artifact; `--apply` patches in place |
 
 Requirements use **user stories** (`US-#`) + **EARS** functional requirements (`FR-###`) +
 **Given/When/Then** acceptance criteria. Stories carry `priority` and `depends-on`/`blocked-by` so

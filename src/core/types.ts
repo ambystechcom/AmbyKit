@@ -18,6 +18,8 @@ export interface CommandSpec {
   writes: string[];
   /** Abstract tool capabilities the phase needs. */
   allowedTools: AbstractTool[];
+  /** Default role id this phase acts as, if any (feature 013). */
+  role?: string;
   /** The prompt body (Markdown), verbatim minus surrounding whitespace. */
   body: string;
 }
@@ -87,6 +89,19 @@ export interface MergePlan {
   reason?: string;
 }
 
+/** A role definition from `.amby/roles/<id>.md` (feature 013). */
+export interface Role {
+  id: string;
+  name: string;
+  /** Phases this role owns by default (informational; the binding lives on the CommandSpec). */
+  phases: string[];
+  /** Markdown body — mission, focus checklist, hand-off. */
+  body: string;
+  words: number;
+  /** Project-relative source path, for messages. */
+  source: string;
+}
+
 /** Context an emitter needs to render rules/config for a project. */
 export interface RulesContext {
   /** Human project name. */
@@ -95,6 +110,8 @@ export interface RulesContext {
   specs: CommandSpec[];
   /** Whether the emitter should also emit the shared rules file(s). */
   manageRules: boolean;
+  /** Roles installed in the project; empty/absent means phases run without a role (feature 013). */
+  roles?: Role[];
 }
 
 /** Persisted project configuration at .amby/config.json. */

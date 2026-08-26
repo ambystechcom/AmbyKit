@@ -4,6 +4,7 @@ name: amby.converge
 description: Check the codebase against spec, plan, and tasks after implementing; append gap tasks, never edit code.
 argument-hint: "[feature id, defaults to current]"
 phase: converge
+role: qa
 reads: [specs/NNN-slug/spec.md, specs/NNN-slug/plan.md, specs/NNN-slug/tasks.md]
 writes: [specs/NNN-slug/tasks.md, specs/NNN-slug/spec.md]
 allowedTools: [read, edit]
