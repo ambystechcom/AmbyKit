@@ -54,6 +54,22 @@ jobs:
       - name: Build
         run: npm run build
 
+      # The same version can reach this workflow twice — e.g. a manual dispatch publishes it, then
+      # the GitHub Release for that version fires `release: published`. npm rejects the second
+      # attempt (EPUBLISHCONFLICT), so detect it and skip rather than fail the release.
+      - name: Check whether this version is already on npm
+        id: published
+        run: |
+          PKG=$(node -p "require('./package.json').name")
+          VER=$(node -p "require('./package.json').version")
+          if [ -n "$(npm view "$PKG@$VER" version 2>/dev/null)" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::$PKG@$VER is already published — skipping the publish step."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       # Trusted Publishing: npm uses the id-token (OIDC) — no NODE_AUTH_TOKEN. Provenance is automatic.
       - name: Publish
+        if: steps.published.outputs.exists != 'true'
         run: npm publish --access public
