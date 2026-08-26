@@ -7,11 +7,12 @@
 #   brew install vhs tree
 #
 # Run from the repo root:
-#   node scripts/demo-reset.mjs     # start from a clean example/
+#   node scripts/demo-reset.mjs     # rebuild the gitignored .demo/ project
 #   vhs scripts/demo.tape           # writes public/demo.gif
 #
-# Records against example/ (the TaskFlow app) so AmbyKit lands in a project that already exists.
-# Everything it generates there is gitignored; demo-reset.mjs puts it back between takes.
+# Records against .demo/ (TaskFlow, written by scripts/demo-scaffold.mjs) so AmbyKit lands in a
+# project that already exists. .demo/ is gitignored and fully generated — the demo app is a
+# recording fixture, not part of AmbyKit, so it is not committed.
 #
 # ONE GIF SERVES EVERY READER.
 # GitHub markdown cannot detect the visitor's OS — no JS, no OS media query, and images are proxied
@@ -42,7 +43,7 @@ Set PlaybackSpeed 1.0
 
 # --- setup (hidden) -------------------------------------------------------
 Hide
-Type "cd example" Enter
+Type "cd .demo" Enter
 # A stylized prompt for visual punch: the project name in bold sky-blue, then a mauve→pink
 # gradient triple-chevron. Uses only zsh %F{…} color escapes and the ❯ glyph already proven to
 # render in VHS's font (no Nerd Font / powerline glyphs, which would tofu-box). RPROMPT is cleared
