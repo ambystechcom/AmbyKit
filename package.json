@@ -13,7 +13,15 @@
     "cursor",
     "antigravity",
     "agents.md",
-    "codex"
+    "codex",
+    "agents-md",
+    "spec-kit",
+    "ai-agents",
+    "slash-commands",
+    "requirements",
+    "ears",
+    "prd",
+    "design-tokens"
   ],
   "license": "MIT",
   "author": "ambystech",
@@ -38,7 +46,10 @@
     "src/templates",
     "src/prompts",
     "src/reference",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "docs"
   ],
   "engines": {
     "node": ">=20"

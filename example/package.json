@@ -1,0 +1,14 @@
+{
+  "name": "taskflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A small task board — the sample project used by AmbyKit's README demo recording.",
+  "type": "module",
+  "scripts": {
+    "start": "node --run serve",
+    "serve": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

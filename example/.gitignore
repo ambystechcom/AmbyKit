@@ -1,0 +1,13 @@
+# Everything AmbyKit emits when the demo is recorded here. Keeping these out of git means a take
+# can be run at any time without dirtying the repo. Reset with: node scripts/demo-reset.mjs
+.amby/
+.claude/
+.cursor/
+.github/
+.agents/
+.opencode/
+.gemini/
+specs/
+AGENTS.md
+CLAUDE.md
+.cursorrules
