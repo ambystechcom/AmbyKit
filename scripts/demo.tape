@@ -43,8 +43,11 @@ Set PlaybackSpeed 1.0
 # --- setup (hidden) -------------------------------------------------------
 Hide
 Type "cd example" Enter
-# A short, neutral prompt. RPROMPT is cleared so no right-hand git status drifts into frame.
-Type "export PROMPT='taskflow ❯ '" Enter
+# A stylized prompt for visual punch: the project name in bold sky-blue, then a mauve→pink
+# gradient triple-chevron. Uses only zsh %F{…} color escapes and the ❯ glyph already proven to
+# render in VHS's font (no Nerd Font / powerline glyphs, which would tofu-box). RPROMPT is cleared
+# so no right-hand git status drifts into frame.
+Type "export PROMPT='%F{117}%Btaskflow%b%f %F{141}❯%F{176}❯%F{212}❯%f '" Enter
 Type "export RPROMPT=''" Enter
 # Pre-warm the npx cache. Without this the visible `npx … init` spends ~10s downloading and the
 # GIF is mostly dead air. The command on camera is still the real one — this only skips the
