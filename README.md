@@ -17,12 +17,9 @@ straight to a technical plan and leave the interface to the model's imagination.
 first-class design phase — `ui.md` plus a real `design-tokens.json` — between the *what* and the
 *how*, then emits native commands and rules for every AI coding assistant your team uses.
 
-<!-- Demo GIF goes here once recorded on macOS: `brew install vhs tree` then
-     `node scripts/demo-reset.mjs && vhs scripts/demo.tape`. Restore with:
 <p align="center">
   <img src="https://raw.githubusercontent.com/ambystechcom/AmbyKit/main/public/demo.gif" alt="One ambykit init emits native commands for Claude Code, Cursor, and Copilot at once" />
 </p>
--->
 
 ## Quick start
 
