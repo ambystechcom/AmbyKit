@@ -13,8 +13,12 @@ const assetDirs = { promptsDir, templatesDir, rolesDir, referenceDir };
 // Paths the published tarball would contain. Tests run against the checkout, so without this a dir
 // missing from "files" passes every other test and only fails for real users (ENOENT on init).
 function packedPaths(): Set<string> {
+  type Pack = { files: { path: string }[] };
   const out = execSync("npm pack --dry-run --json --ignore-scripts", { cwd: root, encoding: "utf8" });
-  const [pack] = JSON.parse(out) as { files: { path: string }[] }[];
+  // npm <= 11 prints an array of packs; npm 12 prints an object keyed by package name. The publish
+  // workflow runs npm@latest, so accept both.
+  const json = JSON.parse(out) as Pack[] | Record<string, Pack>;
+  const [pack] = Array.isArray(json) ? json : Object.values(json);
   return new Set(pack.files.map((f) => f.path.replace(/\\/g, "/")));
 }
 
