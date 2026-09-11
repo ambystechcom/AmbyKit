@@ -10,6 +10,20 @@ Release notes with full detail live on the
 
 ## [Unreleased]
 
+## [1.1.1] — 2026-09-11
+
+Packaging fix.
+
+### Fixed
+
+- `ambykit init` failed with `ENOENT` on `src/roles/pm.md` when installed from npm: the default
+  role files were missing from the published package. A test now checks the packed tarball for
+  every runtime asset.
+
+### Changed
+
+- The npm package now also ships `LICENSE`, `CHANGELOG.md`, and `docs/`.
+
 ## [1.1.0] — 2026-08-26
 
 Converge, worktree isolation, and multi-agent roles.
@@ -80,7 +94,8 @@ Packaging fixes.
 
 Initial release: the enhanced terminal UI and the AmbyKit documentation site.
 
-[Unreleased]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ambystechcom/AmbyKit/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ambystechcom/AmbyKit/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/ambystechcom/AmbyKit/compare/v0.1.1...v0.2.0
