@@ -1,30 +1,36 @@
 <p align="center">
-  <img src="./public/ambykit_logo.png" alt="AmbyKit" />
+  <img src="https://raw.githubusercontent.com/ambystechcom/AmbyKit/main/public/ambykit_logo.png" alt="AmbyKit" />
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@ambystech/ambykit"><img src="https://img.shields.io/npm/v/@ambystech/ambykit" alt="npm version"></a>
   <a href="https://github.com/ambystechcom/AmbyKit/actions/workflows/ci.yml"><img src="https://github.com/ambystechcom/AmbyKit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://ambystech.io/AmbyKit/"><img src="https://img.shields.io/badge/docs-live-EE1199" alt="Docs"></a>
+  <a href="https://ambykit.ambystech.io/"><img src="https://img.shields.io/badge/docs-live-EE1199" alt="Docs"></a>
+  <img src="https://img.shields.io/badge/node-%E2%89%A520-5FA04E" alt="Node >= 20">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license">
 </p>
 
 # AmbyKit
 
-**Spec-Driven Development for AI coding assistants.** Author your specs, user stories, UI design,
-plans and tasks **once** — AmbyKit emits native commands and rules for every assistant your team
-uses, so the AI builds from clear, testable requirements instead of guessing.
+**Spec-Driven Development that specs your UI too.** Most SDD frameworks take you from user stories
+straight to a technical plan and leave the interface to the model's imagination. AmbyKit adds a
+first-class design phase — `ui.md` plus a real `design-tokens.json` — between the *what* and the
+*how*, then emits native commands and rules for every AI coding assistant your team uses.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/ambystechcom/AmbyKit/main/public/demo.gif" alt="One ambykit init emits native commands for Claude Code, Cursor, and Copilot at once" />
+</p>
 
 ## Quick start
 
-Install from npm and scaffold AmbyKit into your project:
-
 ```bash
+npx @ambystech/ambykit init     # scaffold .amby/ and pick your assistants
+# — or install it —
 npm install -g @ambystech/ambykit
-ambykit init            # scaffold .amby/ and pick your assistants
-# — or run it without installing —
-npx @ambystech/ambykit init
+ambykit init
 ```
+
+Node ≥ 20. No Python toolchain, no separate installer — it's an npm package.
 
 Already have a project? `init` is **non-destructive** — an existing `CLAUDE.md`/`AGENTS.md` is
 preserved (and backed up); AmbyKit only adds/updates its own `### AmbyKit usage` section. Re-run
@@ -52,21 +58,50 @@ ambykit dashboard
 ambykit dashboard 001:US-3   # story ids restart per feature — qualify with the feature ref
 ```
 
-📖 Full documentation: **[ambystech.io/AmbyKit](https://ambystech.io/AmbyKit/)**
+📖 Full documentation: **[ambykit.ambystech.io](https://ambykit.ambystech.io/)**
 
 ## Why
 
-AI coding assistants build better software when they start from good requirements. But every
-assistant reads a *different* config format, and specs written for one don't carry to another.
-AmbyKit fixes both: it gives you a rigorous, tech-agnostic SDD workflow **and** a single source of
-truth that compiles to each tool's native format.
+AI coding assistants build better software when they start from good requirements. AmbyKit gives you
+a rigorous, tech-agnostic SDD workflow **and** a single source of truth that compiles to each tool's
+native format.
 
+- **UI is a first-class artifact.** `/amby.design` produces a UI spec plus design tokens — the part
+  every other spec framework skips. Your assistant builds the interface you described, not the one
+  it guessed.
 - **WHAT before HOW.** `spec.md` captures user stories + testable requirements with no tech
   decisions; `plan.md` captures the technical approach separately.
-- **UI is a first-class artifact.** `/amby.design` produces a UI spec + design tokens — the part
-  most spec tools skip.
+- **Parallel work is built in.** `ambykit worktree` gives each feature its own git worktree, so
+  several features — or several assistants — run side by side without checkout switching.
 - **Author once, emit per tool.** One neutral source → Claude Code, OpenCode, GitHub Copilot
-  (VS Code + CLI), Cursor (+ CLI), Antigravity (IDE + CLI).
+  (VS Code + CLI), Cursor (+ CLI), Antigravity (IDE + CLI), Codex CLI.
+
+## How AmbyKit compares
+
+The honest version. [GitHub Spec-Kit](https://github.com/github/spec-kit) is the big one in this
+category and it is genuinely good — if you want the widest assistant coverage and the largest
+community, use it. AmbyKit is the choice when the UI matters and you live in the Node ecosystem.
+
+| | AmbyKit | GitHub Spec-Kit | Kiro |
+|---|---|---|---|
+| UI design phase + design tokens | ✅ `ui.md` + `design-tokens.json` | ❌ | ❌ (`design.md` is architecture) |
+| Native git worktree isolation | ✅ `ambykit worktree` | ❌ [open issue](https://github.com/github/spec-kit/issues/1476); third-party forks | ❌ |
+| Cross-role artifact review | ✅ `/amby.review`, findings by ID, `--apply` patches in place | Role "bundles" for setup, no review phase | ❌ |
+| Dependency-graph dashboard | ✅ `ambykit dashboard` / `analyze` | ❌ | ❌ |
+| Code-vs-spec drift check | ✅ `/amby.converge` | ✅ `/speckit.converge` | ❌ |
+| Brownfield / revise in place | ✅ `/amby.revise` | ✅ evolving-specs guide | ✅ |
+| EARS requirements | ✅ | ✅ | ✅ |
+| **Assistants supported** | **6 families / 10 targets** | **37 integrations** | self-contained |
+| Runtime | Node ≥ 20, `npx` | Python 3.11+, `uv`/`pipx` | proprietary IDE + CLI |
+| License | MIT | MIT | proprietary (Crew is Apache 2.0) |
+| Maturity | young, v1.1 | very large community | AWS-backed, paid tiers |
+
+**Why not just Spec-Kit?** If breadth of assistant support is your constraint, use Spec-Kit — it
+covers far more tools. Pick AmbyKit if you want the design phase, per-feature worktrees, and an
+install that's one `npx` away instead of a Python toolchain.
+
+*Comparison current as of AmbyKit v1.1.0; competitors move fast — corrections welcome via
+[issue](https://github.com/ambystechcom/AmbyKit/issues) or PR.*
 
 ## The workflow
 
@@ -91,7 +126,10 @@ work can be ordered and blocked; `ambykit dashboard` reports progress across the
 ## Supported tools
 
 Claude Code (CLI + VS Code), GitHub Copilot (VS Code + CLI), OpenCode, Cursor (+ CLI),
-Antigravity (IDE + CLI). See [`docs/tool-compatibility.md`](./docs/tool-compatibility.md).
+Antigravity (IDE + CLI), Codex CLI. See [`docs/tool-compatibility.md`](./docs/tool-compatibility.md).
+
+Missing yours? [Open a request](https://github.com/ambystechcom/AmbyKit/issues/new/choose) — a new
+target is a thin `BaseEmitter` subclass.
 
 ## CLI
 
@@ -111,5 +149,6 @@ See [`docs/cli-reference.md`](./docs/cli-reference.md).
 
 ## Contributing
 
-AmbyKit is built with AmbyKit — see [`AGENTS.md`](./AGENTS.md) and
-[`docs/contributing.md`](./docs/contributing.md). MIT licensed.
+AmbyKit is built with AmbyKit — see [`CONTRIBUTING.md`](./CONTRIBUTING.md),
+[`AGENTS.md`](./AGENTS.md), and [`docs/contributing.md`](./docs/contributing.md).
+Changes are logged in [`CHANGELOG.md`](./CHANGELOG.md). MIT licensed.

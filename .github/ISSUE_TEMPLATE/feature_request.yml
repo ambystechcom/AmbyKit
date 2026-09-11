@@ -1,0 +1,44 @@
+name: Feature request
+description: Propose a new phase, CLI verb, or capability
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For open-ended ideas, [Discussions](https://github.com/ambystechcom/AmbyKit/discussions)
+        is often the better place to start.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do today, and where does AmbyKit get in the way?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you'd like instead
+      description: The command, phase, or behaviour you have in mind.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - New workflow phase (/amby.*)
+        - New or changed CLI verb
+        - Change to an artifact template
+        - Docs
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Including "do nothing" — what happens if AmbyKit doesn't do this?

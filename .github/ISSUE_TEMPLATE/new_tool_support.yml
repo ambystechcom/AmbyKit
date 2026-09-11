@@ -1,0 +1,46 @@
+name: Support a new AI assistant
+description: Ask for AmbyKit to emit native files for another coding assistant
+labels: ["enhancement", "emitter"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        AmbyKit's rule is **never guess a tool's config format**. The more of the boxes below you can
+        fill in with links to official docs, the faster this can ship.
+
+  - type: input
+    id: tool
+    attributes:
+      label: Which assistant?
+      placeholder: e.g. Windsurf, Zed, Aider
+    validations:
+      required: true
+
+  - type: input
+    id: docs
+    attributes:
+      label: Link to its official configuration docs
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: How does it expose custom commands?
+      options:
+        - Slash commands from markdown files
+        - Skills (a directory per skill with a SKILL.md)
+        - Workflows
+        - No command surface — rules/instructions file only
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: paths
+    attributes:
+      label: Known paths and formats
+      description: |
+        Where does it read its rules file, commands, and MCP config from? What frontmatter keys does
+        it expect? What placeholder does it use for user arguments (AmbyKit's neutral form is `$ARGUMENTS`)?
+      render: shell

@@ -1,0 +1,71 @@
+name: Bug report
+description: Something in the CLI or an emitted file is wrong
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. If this is a security vulnerability, please **stop** and follow
+        [SECURITY.md](https://github.com/ambystechcom/AmbyKit/blob/main/SECURITY.md) instead.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you expect, and what did you get instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The exact commands you ran, starting from a clean project if possible.
+      placeholder: |
+        1. npx @ambystech/ambykit init
+        2. selected Claude Code + Cursor
+        3. ran /amby.specify "..."
+      render: shell
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of AmbyKit?
+      options:
+        - CLI command (init / sync / add / check / …)
+        - An emitted tool file is wrong or in the wrong place
+        - A phase prompt (/amby.*) behaved incorrectly
+        - A template or artifact format
+        - Docs or the docs site
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: target
+    attributes:
+      label: Assistant(s) affected
+      description: Claude Code, Copilot, Copilot CLI, OpenCode, Cursor, Cursor CLI, Antigravity, Antigravity CLI, Codex CLI — or "all".
+      placeholder: Claude Code, Cursor
+
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: Output of `ambykit --version` and `node --version`, plus your OS.
+      placeholder: |
+        ambykit 1.1.0
+        node v22.11.0
+        Windows 11 / macOS 15 / Ubuntu 24.04
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output
+      description: Terminal output, or the contents of the emitted file that looks wrong.
+      render: shell
