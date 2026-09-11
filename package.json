@@ -38,6 +38,7 @@
     "src/templates",
     "src/prompts",
     "src/reference",
+    "src/roles",
     "README.md"
   ],
   "engines": {
