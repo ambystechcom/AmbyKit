@@ -73,7 +73,7 @@
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
-    "zod": "^3.23.0"
+    "zod": "^4.6.4"
   },
   "allowScripts": {
     "esbuild@0.21.5": true
