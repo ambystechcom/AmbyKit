@@ -25,6 +25,9 @@ export function gitHistoryFixture(feature: string, steps: HistoryStep[]): string
   git(["config", "user.email", "test@example.com"]);
   git(["config", "user.name", "Test"]);
   git(["config", "commit.gpgsign", "false"]);
+  // No background gc/maintenance: it mutates .git/ after a commit returns, racing tests that read it.
+  git(["config", "gc.auto", "0"]);
+  git(["config", "maintenance.auto", "false"]);
 
   const dir = join(root, "specs", feature);
   mkdirSync(dir, { recursive: true });
