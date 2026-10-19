@@ -56,3 +56,32 @@ describe("detectCapabilities", () => {
     expect(detectCapabilities({ stdout: { isTTY: true } }).columns).toBe(80);
   });
 });
+
+describe("detectCapabilities — truecolor + background (feature 014, R-3)", () => {
+  it("COLORTERM=truecolor|24bit enables truecolor on a color TTY", () => {
+    for (const v of ["truecolor", "24bit"]) {
+      const caps = detectCapabilities({ env: { COLORTERM: v }, stdout: { isTTY: true } });
+      expect(caps.truecolor).toBe(true);
+    }
+  });
+
+  it("other or missing COLORTERM falls back to ansi16", () => {
+    expect(detectCapabilities({ env: {}, stdout: { isTTY: true } }).truecolor).toBe(false);
+    expect(detectCapabilities({ env: { COLORTERM: "yes" }, stdout: { isTTY: true } }).truecolor).toBe(false);
+  });
+
+  it("COLORFGBG background 7 or 15 is light; anything else or unset is dark", () => {
+    const bg = (v?: string) =>
+      detectCapabilities({ env: v === undefined ? {} : { COLORFGBG: v }, stdout: { isTTY: true } }).background;
+    expect(bg("0;15")).toBe("light");
+    expect(bg("0;default;7")).toBe("light");
+    expect(bg("15;0")).toBe("dark");
+    expect(bg()).toBe("dark");
+  });
+
+  it("no color ⇒ neither field is set", () => {
+    const caps = detectCapabilities({ env: { COLORTERM: "truecolor", NO_COLOR: "1" }, stdout: { isTTY: true } });
+    expect(caps.truecolor).toBeUndefined();
+    expect(caps.background).toBeUndefined();
+  });
+});

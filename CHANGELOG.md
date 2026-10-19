@@ -10,6 +10,29 @@ Release notes with full detail live on the
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-10-18
+
+Dashboard overview: widgets, charts, attention, up next, and burndown.
+
+### Added
+
+- `ambykit dashboard` overview (feature 014): summary cards, a story-status chart, an Attention panel
+  (blocked/waiting stories and dependency-graph problems), an Up next list of ready tasks
+  (`--next=N`), a burndown from the git history of `tasks.md`, and a per-feature completion chart
+  with workflow phase and open clarifications. Wide, narrow and plain (non-TTY) layouts; 24-bit
+  color when the terminal advertises it.
+- `ambykit dashboard --feature=X` feature view: artifacts, open clarifications, status, and the story
+  table with a `Waiting on` column.
+- `ambykit dashboard --json --overview`: the `--json` story list plus every aggregate.
+
+### Changed
+
+- **`ambykit dashboard` with no flags now shows the overview instead of the story table.** The table
+  is still available as `ambykit dashboard --stories`; `--json` output is unchanged.
+- `ambykit dashboard --interactive` opens the full-screen overview (feature view and story detail
+  are reachable from it); off a TTY it prints the plain overview.
+- The overview skips unreadable spec/task files and names them instead of failing.
+
 ## [1.1.1] — 2026-09-11
 
 Packaging fix.
@@ -94,7 +117,8 @@ Packaging fixes.
 
 Initial release: the enhanced terminal UI and the AmbyKit documentation site.
 
-[Unreleased]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/ambystechcom/AmbyKit/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ambystechcom/AmbyKit/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ambystechcom/AmbyKit/compare/v0.2.0...v1.0.0

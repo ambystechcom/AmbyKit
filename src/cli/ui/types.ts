@@ -14,6 +14,10 @@ export interface Capabilities {
   unicode: boolean;
   /** Terminal width in columns; defaults to 80 when unknown. */
   columns: number;
+  /** 24-bit color allowed (`color && COLORTERM ∈ {truecolor, 24bit}`); absent means false (feature 014). */
+  truecolor?: boolean;
+  /** Detected terminal background for truecolor palettes; absent means dark (feature 014, R-3). */
+  background?: "dark" | "light";
 }
 
 /** A glyph with a unicode form and an ASCII fallback, selected by `Capabilities.unicode`. */

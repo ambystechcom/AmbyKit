@@ -10,6 +10,7 @@ import { emitKeypressEvents } from "node:readline";
 export interface KeyEvent {
   name?: string;
   ctrl?: boolean;
+  shift?: boolean;
   sequence?: string;
 }
 
@@ -18,6 +19,11 @@ export interface FullscreenApp<S> {
   render(state: S): string;
   reduce(state: S, key: KeyEvent): S;
   isDone(state: S): boolean;
+  /**
+   * Optional: called once after the first frame with an `update` that applies a state change and
+   * redraws — for work that arrives after startup (feature 014: the burndown fills in place).
+   */
+  start?(update: (fn: (state: S) => S) => void): void;
 }
 
 interface OutputLike {
@@ -71,5 +77,11 @@ export function runFullscreen<S>(
     output.write(ENTER);
     frame();
     input.on("keypress", onKey);
+    app.start?.((fn) => {
+      if (finished) return;
+      state = fn(state);
+      if (app.isDone(state)) return finish();
+      frame();
+    });
   });
 }

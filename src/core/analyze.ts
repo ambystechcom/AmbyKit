@@ -31,7 +31,7 @@ export function storyDeps(s: StoryProgress): string[] {
  * dependency (e.g. `US-1`) resolves within the story's own feature. A dependency written as
  * `NNN:US-1` / `NNN/US-1` targets another feature explicitly.
  */
-function resolveDepKey(s: StoryProgress, dep: string): string {
+export function resolveDepKey(s: StoryProgress, dep: string): string {
   const qualified = /^(\d+)[:/]?(US\d+)$/.exec(dep);
   if (qualified) return storyKey(qualified[1] ?? s.featureRef, qualified[2] ?? dep);
   return storyKey(s.featureRef, dep);

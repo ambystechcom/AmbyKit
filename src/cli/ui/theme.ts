@@ -68,6 +68,29 @@ export function paint(caps: Capabilities, style: Style, s: string): string {
   return `${ESC}${codes}m${s}${ESC}${SGR.reset}m`;
 }
 
+/** A token color: truecolor values per background (hex or SGR) and an ansi16 SGR fallback. */
+export interface ColorToken {
+  truecolor: { dark: string; light: string };
+  ansi16: string;
+}
+
+/**
+ * Paint `s` with a design-token color (feature 014): truecolor for the detected background, else the
+ * ansi16 fallback, else unchanged when color is off. `bold` adds the heading weight.
+ */
+export function paintToken(caps: Capabilities, color: ColorToken, s: string, bold = false): string {
+  if (!caps.color) return s;
+  const value = caps.truecolor ? color.truecolor[caps.background ?? "dark"] : color.ansi16;
+  const codes = [value.startsWith("#") ? truecolorSgr(value) : value];
+  if (bold) codes.unshift(SGR.bold);
+  return `${ESC}${codes.join(";")}m${s}${ESC}${SGR.reset}m`;
+}
+
+function truecolorSgr(hex: string): string {
+  const n = Number.parseInt(hex.slice(1), 16);
+  return `38;2;${(n >> 16) & 255};${(n >> 8) & 255};${n & 255}`;
+}
+
 /** The resolved symbol set for the current capabilities (unicode or ASCII fallback). */
 export function symbols(caps: Capabilities): Symbols {
   const pick = (g: Glyph): string => (caps.unicode ? g.u : g.a);
