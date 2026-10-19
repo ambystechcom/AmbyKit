@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -6,12 +7,16 @@ import { HAS_GIT } from "../helpers/git-repo.js";
 import { gitHistoryFixture } from "../helpers/git-history-fixture.js";
 import { dashboardFixture } from "../helpers/dashboard-fixture.js";
 
-/** Every file (outside .git internals' lock-free reads) with its size, mtime and content. */
+/**
+ * Every working-tree file with its mtime and length. `.git/` is skipped: git may touch its own
+ * internals (locks, maintenance) independently of the dashboard; the repo is checked via git instead.
+ */
 function snapshot(root: string): Map<string, string> {
   const out = new Map<string, string>();
   const walk = (dir: string): void => {
     for (const e of readdirSync(dir, { withFileTypes: true })) {
       const p = join(dir, e.name);
+      if (e.isDirectory() && e.name === ".git") continue;
       if (e.isDirectory()) walk(p);
       else out.set(relative(root, p), `${statSync(p).mtimeMs}:${readFileSync(p, "utf8").length}`);
     }
@@ -45,9 +50,13 @@ describe("dashboard is read-only (FR-017)", () => {
       { date: "2026-08-03", done: 0, total: 4 },
       { date: "2026-08-12", done: 2 },
     ]);
-    const before = snapshot(root);
+    const git = (args: string[]) => execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
+    const before = { files: snapshot(root), head: git(["rev-parse", "HEAD"]), refs: git(["show-ref"]) };
     await run(root, {});
     await run(root, { json: true, overview: true });
-    expect(snapshot(root)).toEqual(before);
+    expect(snapshot(root)).toEqual(before.files);
+    expect(git(["rev-parse", "HEAD"])).toBe(before.head);
+    expect(git(["show-ref"])).toBe(before.refs);
+    expect(git(["status", "--porcelain"])).toBe("");
   });
 });
