@@ -10,6 +10,10 @@ Release notes with full detail live on the
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-10-18
+
+Dashboard overview: widgets, charts, attention, up next, and burndown.
+
 ### Added
 
 - `ambykit dashboard` overview (feature 014): summary cards, a story-status chart, an Attention panel
@@ -113,7 +117,8 @@ Packaging fixes.
 
 Initial release: the enhanced terminal UI and the AmbyKit documentation site.
 
-[Unreleased]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/ambystechcom/AmbyKit/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ambystechcom/AmbyKit/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ambystechcom/AmbyKit/compare/v0.2.0...v1.0.0
