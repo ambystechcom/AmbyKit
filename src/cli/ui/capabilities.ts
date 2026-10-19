@@ -35,7 +35,28 @@ export function detectCapabilities(input: DetectInput = {}): Capabilities {
 
   const unicode = isTTY && supportsUnicode(env);
 
-  return { isTTY, color, unicode, columns };
+  const caps: Capabilities = { isTTY, color, unicode, columns };
+  // Truecolor + background only matter when color is on; omitted otherwise (feature 014, R-3).
+  if (color) {
+    caps.truecolor = supportsTruecolor(env);
+    caps.background = detectBackground(env);
+  }
+  return caps;
+}
+
+/** De-facto `COLORTERM` convention — not a standard, so anything else falls back to ansi16. */
+function supportsTruecolor(env: NodeJS.ProcessEnv): boolean {
+  const v = (env["COLORTERM"] ?? "").toLowerCase();
+  return v === "truecolor" || v === "24bit";
+}
+
+/**
+ * De-facto `COLORFGBG` convention (`fg;bg`, set by rxvt/Konsole/iTerm2): background index 7 or 15 is
+ * light; anything else, or unset, is dark — the default the 014 tokens specify.
+ */
+function detectBackground(env: NodeJS.ProcessEnv): "dark" | "light" {
+  const bg = (env["COLORFGBG"] ?? "").split(";").pop()?.trim();
+  return bg === "7" || bg === "15" ? "light" : "dark";
 }
 
 /** Heuristic unicode detection — no portable runtime query exists, so infer from env, else false. */

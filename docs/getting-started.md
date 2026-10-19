@@ -81,7 +81,7 @@ appends tasks and updates story status.
 From the terminal, watch progress across the story/task graph:
 
 ```bash
-npx ambykit dashboard          # table of all stories with % complete
+npx ambykit dashboard          # overview: progress, blockers, next tasks, burndown
 npx ambykit dashboard 001:US-3 # detail for one story (qualify id with the feature ref)
 ```
 

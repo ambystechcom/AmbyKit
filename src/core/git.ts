@@ -24,6 +24,19 @@ export function git(cwd: string, args: string[]): string {
   }
 }
 
+/**
+ * Run git in `cwd` with `input` on stdin and return raw stdout bytes (e.g. `cat-file --batch`, whose
+ * output mixes headers and blob bodies). Throws with stderr on non-zero exit.
+ */
+export function gitWithInput(cwd: string, args: string[], input: string): Buffer {
+  try {
+    return execFileSync("git", args, { cwd, input, stdio: ["pipe", "pipe", "pipe"], maxBuffer: 256 * 1024 * 1024 });
+  } catch (err) {
+    const e = err as { stderr?: Buffer | string; message: string };
+    throw new Error((e.stderr?.toString() ?? e.message).trim());
+  }
+}
+
 /** Whether `git` is available on PATH. */
 export function gitAvailable(): boolean {
   try {

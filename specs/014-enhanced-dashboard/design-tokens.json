@@ -1,0 +1,574 @@
+{
+  "$schema": "https://ambystech.dev/schemas/design-tokens.json",
+  "$note": "Terminal UI tokens for 014-enhanced-dashboard. Extends specs/006-enhanced-tui/design-tokens.json (same tiers; glyphs are {u,a} pairs picked by Capabilities.unicode; 'space' is character columns). New: 'rgb' primitives from the Ambystech identity (Oct 2026). Each semantic color resolves by capability tier: truecolor.dark / truecolor.light (by detected terminal background; dark when unknown) -> ansi16 SGR -> no color under NO_COLOR or non-TTY. Tints marked 'derived' in $contrast are added for terminal legibility and are not part of the Ambystech design system. Contrast measured on canvas-900 #0e152d (dark) and #ffffff (light).",
+  "primitive": {
+    "sgr": {
+      "reset": "0",
+      "bold": "1",
+      "dim": "2",
+      "inverse": "7",
+      "fg-default": "39",
+      "fg-red": "31",
+      "fg-green": "32",
+      "fg-yellow": "33",
+      "fg-blue": "34",
+      "fg-magenta": "35",
+      "fg-cyan": "36",
+      "fg-gray": "90"
+    },
+    "rgb": {
+      "fuchsia-500": "#f20c95",
+      "fuchsia-text": "#c21489",
+      "pink-on-dark": "#ff4db7",
+      "brand-violet": "#6f50d1",
+      "violet-tint": "#a58bff",
+      "brand-blue": "#316aea",
+      "brand-azure": "#0391fe",
+      "brand-cyan": "#00c9ff",
+      "cyan-deep": "#00799a",
+      "muted-300": "#8a93a9",
+      "muted-500": "#67728e",
+      "line-dark": "#33405f",
+      "amber": "#f5b400",
+      "amber-deep": "#9a6700",
+      "red": "#ff5c5c",
+      "red-deep": "#c62828"
+    },
+    "glyph": {
+      "tick": {
+        "u": "✓",
+        "a": "[ok]"
+      },
+      "cross": {
+        "u": "✗",
+        "a": "[x]"
+      },
+      "warn": {
+        "u": "⚠",
+        "a": "[!]"
+      },
+      "partial": {
+        "u": "◐",
+        "a": "[~]"
+      },
+      "todo": {
+        "u": "○",
+        "a": "[ ]"
+      },
+      "dash": {
+        "u": "–",
+        "a": "[.]"
+      },
+      "wait": {
+        "u": "→",
+        "a": "[>]"
+      },
+      "other": {
+        "u": "?",
+        "a": "[?]"
+      },
+      "cursor": {
+        "u": "▸",
+        "a": ">"
+      },
+      "brand": {
+        "u": "◆",
+        "a": "#"
+      },
+      "breadcrumb": {
+        "u": "›",
+        "a": ">"
+      },
+      "rule-heavy": {
+        "u": "━",
+        "a": "="
+      },
+      "bar-fill": {
+        "u": "█",
+        "a": "#"
+      },
+      "bar-empty": {
+        "u": "░",
+        "a": "-"
+      },
+      "bar-eighths": {
+        "u": [
+          "",
+          "▏",
+          "▎",
+          "▍",
+          "▌",
+          "▋",
+          "▊",
+          "▉"
+        ],
+        "a": [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      },
+      "fill-done": {
+        "u": "█",
+        "a": "#"
+      },
+      "fill-progress": {
+        "u": "▓",
+        "a": "="
+      },
+      "fill-ready": {
+        "u": "▒",
+        "a": "+"
+      },
+      "fill-draft": {
+        "u": "░",
+        "a": "-"
+      },
+      "fill-blocked": {
+        "u": "▚",
+        "a": "!"
+      },
+      "fill-deferred": {
+        "u": "·",
+        "a": "."
+      },
+      "fill-other": {
+        "u": ":",
+        "a": ":"
+      },
+      "not-planned": {
+        "u": "╌",
+        "a": "-"
+      },
+      "box-tl": {
+        "u": "╭",
+        "a": "+"
+      },
+      "box-tr": {
+        "u": "╮",
+        "a": "+"
+      },
+      "box-bl": {
+        "u": "╰",
+        "a": "+"
+      },
+      "box-br": {
+        "u": "╯",
+        "a": "+"
+      },
+      "box-h": {
+        "u": "─",
+        "a": "-"
+      },
+      "box-v": {
+        "u": "│",
+        "a": "|"
+      },
+      "box-focus-tl": {
+        "u": "┏",
+        "a": "#"
+      },
+      "box-focus-tr": {
+        "u": "┓",
+        "a": "#"
+      },
+      "box-focus-bl": {
+        "u": "┗",
+        "a": "#"
+      },
+      "box-focus-br": {
+        "u": "┛",
+        "a": "#"
+      },
+      "box-focus-h": {
+        "u": "━",
+        "a": "="
+      },
+      "box-focus-v": {
+        "u": "┃",
+        "a": "#"
+      },
+      "elision": {
+        "u": "⋮",
+        "a": ":"
+      },
+      "empty": {
+        "u": "—",
+        "a": "-"
+      },
+      "none": {
+        "u": "·",
+        "a": "."
+      },
+      "bar-done": {
+        "u": "░",
+        "a": ":"
+      },
+      "axis-tick": {
+        "u": "┤",
+        "a": "|"
+      },
+      "axis-v": {
+        "u": "│",
+        "a": "|"
+      },
+      "axis-h": {
+        "u": "─",
+        "a": "-"
+      },
+      "axis-corner": {
+        "u": "└",
+        "a": "+"
+      }
+    },
+    "space": {
+      "col-1": 1,
+      "col-2": 2,
+      "card-gap": 1,
+      "panel-gap": 1,
+      "card-min-width": 17,
+      "story-bar-width": 10,
+      "wide-min": 100,
+      "min-columns": 60,
+      "wide-feature-bar": 30,
+      "narrow-feature-bar": 16,
+      "name-wide": 30,
+      "name-narrow": 24,
+      "burndown-height-wide": 6,
+      "burndown-height-narrow": 5,
+      "burndown-bar-max": 8
+    },
+    "limit": {
+      "up-next-max": 5,
+      "attention-max": 8,
+      "burndown-min-points": 2
+    }
+  },
+  "semantic": {
+    "color": {
+      "accent": {
+        "truecolor": {
+          "dark": "{primitive.rgb.pink-on-dark}",
+          "light": "{primitive.rgb.fuchsia-text}"
+        },
+        "ansi16": "{primitive.sgr.fg-magenta}"
+      },
+      "accent-strong": {
+        "truecolor": {
+          "dark": "{primitive.rgb.fuchsia-500}",
+          "light": "{primitive.rgb.fuchsia-500}"
+        },
+        "ansi16": "{primitive.sgr.fg-magenta}"
+      },
+      "state-done": {
+        "truecolor": {
+          "dark": "{primitive.rgb.brand-cyan}",
+          "light": "{primitive.rgb.cyan-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-green}"
+      },
+      "state-in-progress": {
+        "truecolor": {
+          "dark": "{primitive.rgb.violet-tint}",
+          "light": "{primitive.rgb.brand-violet}"
+        },
+        "ansi16": "{primitive.sgr.fg-yellow}"
+      },
+      "state-ready": {
+        "truecolor": {
+          "dark": "{primitive.rgb.brand-azure}",
+          "light": "{primitive.rgb.brand-blue}"
+        },
+        "ansi16": "{primitive.sgr.fg-cyan}"
+      },
+      "state-blocked": {
+        "truecolor": {
+          "dark": "{primitive.rgb.red}",
+          "light": "{primitive.rgb.red-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-red}"
+      },
+      "warn": {
+        "truecolor": {
+          "dark": "{primitive.rgb.amber}",
+          "light": "{primitive.rgb.amber-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-yellow}"
+      },
+      "text": {
+        "truecolor": {
+          "dark": "{primitive.sgr.fg-default}",
+          "light": "{primitive.sgr.fg-default}"
+        },
+        "ansi16": "{primitive.sgr.fg-default}"
+      },
+      "muted": {
+        "truecolor": {
+          "dark": "{primitive.rgb.muted-300}",
+          "light": "{primitive.rgb.muted-500}"
+        },
+        "ansi16": "{primitive.sgr.dim}"
+      },
+      "frame": {
+        "truecolor": {
+          "dark": "{primitive.rgb.line-dark}",
+          "light": "{primitive.rgb.muted-300}"
+        },
+        "ansi16": "{primitive.sgr.fg-gray}"
+      },
+      "state-draft": {
+        "truecolor": {
+          "dark": "{primitive.rgb.muted-300}",
+          "light": "{primitive.rgb.muted-500}"
+        },
+        "ansi16": "{primitive.sgr.dim}"
+      },
+      "state-deferred": {
+        "truecolor": {
+          "dark": "{primitive.rgb.line-dark}",
+          "light": "{primitive.rgb.muted-300}"
+        },
+        "ansi16": "{primitive.sgr.fg-gray}"
+      }
+    },
+    "symbol": {
+      "done": "{primitive.glyph.tick}",
+      "in-progress": "{primitive.glyph.partial}",
+      "ready": "{primitive.glyph.todo}",
+      "draft": "{primitive.glyph.todo}",
+      "blocked": "{primitive.glyph.cross}",
+      "deferred": "{primitive.glyph.dash}",
+      "other": "{primitive.glyph.other}",
+      "waiting": "{primitive.glyph.wait}",
+      "graph-problem": "{primitive.glyph.warn}",
+      "cursor": "{primitive.glyph.cursor}"
+    },
+    "weight": {
+      "heading": "{primitive.sgr.bold}",
+      "selected": "{primitive.sgr.bold}"
+    },
+    "space": {
+      "gutter": "{primitive.space.col-2}",
+      "indent": "{primitive.space.col-2}",
+      "panel-gap": "{primitive.space.panel-gap}"
+    }
+  },
+  "component": {
+    "header": {
+      "brand": "{primitive.glyph.brand}",
+      "brand-fg": "{semantic.color.accent-strong}",
+      "title-weight": "{semantic.weight.heading}",
+      "breadcrumb": "{primitive.glyph.breadcrumb}",
+      "meta-fg": "{semantic.color.muted}",
+      "rule": "{primitive.glyph.rule-heavy}",
+      "rule-fg": "{semantic.color.accent-strong}"
+    },
+    "layout": {
+      "wide-min": "{primitive.space.wide-min}",
+      "min-columns": "{primitive.space.min-columns}",
+      "card-gap": "{primitive.space.card-gap}",
+      "panel-gap": "{primitive.space.panel-gap}",
+      "card-min-width": "{primitive.space.card-min-width}"
+    },
+    "panel": {
+      "frame-fg": "{semantic.color.frame}",
+      "title-fg": "{semantic.color.muted}",
+      "corner-tl": "{primitive.glyph.box-tl}",
+      "corner-tr": "{primitive.glyph.box-tr}",
+      "corner-bl": "{primitive.glyph.box-bl}",
+      "corner-br": "{primitive.glyph.box-br}",
+      "edge-h": "{primitive.glyph.box-h}",
+      "edge-v": "{primitive.glyph.box-v}",
+      "focused": {
+        "frame-fg": "{semantic.color.accent-strong}",
+        "title-fg": "{semantic.color.accent}",
+        "corner-tl": "{primitive.glyph.box-focus-tl}",
+        "corner-tr": "{primitive.glyph.box-focus-tr}",
+        "corner-bl": "{primitive.glyph.box-focus-bl}",
+        "corner-br": "{primitive.glyph.box-focus-br}",
+        "edge-h": "{primitive.glyph.box-focus-h}",
+        "edge-v": "{primitive.glyph.box-focus-v}"
+      }
+    },
+    "summary-card": {
+      "value-fg": "{semantic.color.text}",
+      "value-weight": "{semantic.weight.heading}",
+      "caption-fg": "{semantic.color.muted}",
+      "empty": "{primitive.glyph.empty}"
+    },
+    "completion-bar": {
+      "fill": "{primitive.glyph.bar-fill}",
+      "empty": "{primitive.glyph.bar-empty}",
+      "eighths": "{primitive.glyph.bar-eighths}",
+      "fg-complete": "{semantic.color.state-done}",
+      "fg-partial": "{semantic.color.accent-strong}",
+      "fg-empty": "{semantic.color.frame}",
+      "not-planned": "{primitive.glyph.not-planned}",
+      "not-planned-fg": "{semantic.color.muted}"
+    },
+    "status-chart": {
+      "done": {
+        "fg": "{semantic.color.state-done}",
+        "symbol": "{semantic.symbol.done}",
+        "fill": "{primitive.glyph.fill-done}"
+      },
+      "in-progress": {
+        "fg": "{semantic.color.state-in-progress}",
+        "symbol": "{semantic.symbol.in-progress}",
+        "fill": "{primitive.glyph.fill-progress}"
+      },
+      "ready": {
+        "fg": "{semantic.color.state-ready}",
+        "symbol": "{semantic.symbol.ready}",
+        "fill": "{primitive.glyph.fill-ready}"
+      },
+      "draft": {
+        "fg": "{semantic.color.state-draft}",
+        "symbol": "{semantic.symbol.draft}",
+        "fill": "{primitive.glyph.fill-draft}"
+      },
+      "blocked": {
+        "fg": "{semantic.color.state-blocked}",
+        "symbol": "{semantic.symbol.blocked}",
+        "fill": "{primitive.glyph.fill-blocked}"
+      },
+      "deferred": {
+        "fg": "{semantic.color.state-deferred}",
+        "symbol": "{semantic.symbol.deferred}",
+        "fill": "{primitive.glyph.fill-deferred}"
+      },
+      "other": {
+        "fg": "{semantic.color.muted}",
+        "symbol": "{semantic.symbol.other}",
+        "fill": "{primitive.glyph.fill-other}"
+      },
+      "legend-fg": "{semantic.color.text}",
+      "share-fg": "{semantic.color.muted}"
+    },
+    "attention-item": {
+      "blocked": {
+        "symbol": "{semantic.symbol.blocked}",
+        "fg": "{semantic.color.state-blocked}"
+      },
+      "waiting": {
+        "symbol": "{semantic.symbol.waiting}",
+        "fg": "{semantic.color.state-in-progress}"
+      },
+      "graph-problem": {
+        "symbol": "{semantic.symbol.graph-problem}",
+        "fg": "{semantic.color.warn}"
+      },
+      "id-fg": "{semantic.color.text}",
+      "reason-fg": "{semantic.color.muted}",
+      "max-items": "{primitive.limit.attention-max}"
+    },
+    "up-next-item": {
+      "task-id-fg": "{semantic.color.accent}",
+      "story-id-fg": "{semantic.color.muted}",
+      "text-fg": "{semantic.color.text}",
+      "max-items": "{primitive.limit.up-next-max}"
+    },
+    "feature-row": {
+      "ref-fg": "{semantic.color.muted}",
+      "name-fg": "{semantic.color.text}",
+      "phase-fg": "{semantic.color.muted}",
+      "phase-done-fg": "{semantic.color.state-done}",
+      "clarif-fg": "{semantic.color.warn}",
+      "clarif-none": "{primitive.glyph.none}",
+      "bar-width-wide": "{primitive.space.wide-feature-bar}",
+      "bar-width-narrow": "{primitive.space.narrow-feature-bar}",
+      "name-width-wide": "{primitive.space.name-wide}",
+      "name-width-narrow": "{primitive.space.name-narrow}"
+    },
+    "burndown": {
+      "remaining-fill": "{primitive.glyph.bar-fill}",
+      "remaining-fg": "{semantic.color.accent-strong}",
+      "done-fill": "{primitive.glyph.bar-done}",
+      "done-fg": "{semantic.color.state-done}",
+      "axis-tick": "{primitive.glyph.axis-tick}",
+      "axis-v": "{primitive.glyph.axis-v}",
+      "axis-h": "{primitive.glyph.axis-h}",
+      "axis-corner": "{primitive.glyph.axis-corner}",
+      "axis-fg": "{semantic.color.frame}",
+      "label-fg": "{semantic.color.muted}",
+      "height-wide": "{primitive.space.burndown-height-wide}",
+      "height-narrow": "{primitive.space.burndown-height-narrow}",
+      "bar-width-max": "{primitive.space.burndown-bar-max}",
+      "min-points": "{primitive.limit.burndown-min-points}",
+      "empty": "{primitive.glyph.empty}",
+      "empty-fg": "{semantic.color.muted}"
+    },
+    "artifact-item": {
+      "present": {
+        "symbol": "{semantic.symbol.done}",
+        "fg": "{semantic.color.state-done}"
+      },
+      "partial": {
+        "symbol": "{semantic.symbol.in-progress}",
+        "fg": "{semantic.color.state-in-progress}"
+      },
+      "pending": {
+        "symbol": "{semantic.symbol.draft}",
+        "fg": "{semantic.color.muted}"
+      }
+    },
+    "story-row": {
+      "bar-width": "{primitive.space.story-bar-width}",
+      "waiting-fg": "{semantic.color.state-in-progress}"
+    },
+    "row": {
+      "cursor": "{semantic.symbol.cursor}",
+      "cursor-fg": "{semantic.color.accent}",
+      "selected-weight": "{semantic.weight.selected}"
+    },
+    "elision": {
+      "glyph": "{primitive.glyph.elision}",
+      "fg": "{semantic.color.muted}"
+    },
+    "key-hints": {
+      "key-fg": "{semantic.color.text}",
+      "label-fg": "{semantic.color.muted}"
+    },
+    "hint-line": {
+      "fg": "{semantic.color.muted}",
+      "command-fg": "{semantic.color.accent}"
+    },
+    "notice": {
+      "symbol": "{semantic.symbol.graph-problem}",
+      "fg": "{semantic.color.warn}"
+    }
+  },
+  "$contrast": {
+    "dark": {
+      "accent (pink-on-dark)": 6.01,
+      "accent-strong (fuchsia-500)": 4.52,
+      "state-done (brand-cyan)": 9.28,
+      "state-in-progress (violet-tint, derived)": 6.65,
+      "state-ready (brand-azure)": 5.57,
+      "state-blocked (red, derived)": 5.96,
+      "warn (amber, derived)": 9.8,
+      "muted (muted-300)": 5.87,
+      "frame (line-dark)": 1.75,
+      "state-draft (muted-300)": 5.87,
+      "state-deferred (line-dark) — fill only, never text": 1.75
+    },
+    "light": {
+      "accent (fuchsia-text)": 5.59,
+      "accent-strong (fuchsia-500)": 3.99,
+      "state-done (cyan-deep, derived)": 5.0,
+      "state-in-progress (brand-violet)": 5.61,
+      "state-ready (brand-blue)": 4.79,
+      "state-blocked (red-deep, derived)": 5.62,
+      "warn (amber-deep, derived)": 4.87,
+      "muted (muted-500)": 4.8,
+      "frame (muted-300)": 3.08,
+      "state-draft (muted-500)": 4.8,
+      "state-deferred (muted-300) — fill only, never text": 3.08
+    }
+  }
+}
