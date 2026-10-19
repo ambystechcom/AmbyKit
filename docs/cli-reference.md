@@ -17,7 +17,8 @@ interactive terminal, and **degrades cleanly** everywhere else so logs and pipes
 - Piped / redirected / non-interactive (CI): plain text, no color, no control sequences.
 - `NO_COLOR` set: color is dropped (glyphs and words remain).
 - Terminals without extended glyphs: an ASCII fallback (`[ok]`/`x`, `#`/`-` bars) is used.
-- Narrow terminals: the dashboard drops lower-priority columns rather than wrapping.
+- Narrow terminals: the dashboard switches to a stacked layout (and plain text below 60 columns),
+  and tables drop lower-priority columns rather than wrapping.
 - `--json` output is always unstyled and byte-stable — safe to parse.
 
 Multi-step commands (`init`, `add`, `sync`, `update`) show a spinner while working and a
@@ -110,24 +111,52 @@ branch is already merged. Opt in to automatic creation from `/amby.specify` by a
 
 ## `ambykit dashboard [story-id]`
 
-Progress view over the story/task graph, computed locally from `specs/*/spec.md` + `tasks.md` (no
-model tokens).
+Progress view over the story/task graph, computed locally from `specs/*/` files and, for the
+burndown, read-only git history (no model tokens, no network, writes nothing).
 
-- **No arg** — a table of all user stories: `Feat | Story | description | X of Y tasks | % | status | priority | blocked-by`, with an overall roll-up.
+- **No arg** — the overview, top to bottom:
+  - summary cards: features, stories, tasks done/total, overall completion;
+  - **story status** stacked bar with a legend (each status has its own fill pattern and glyph, so
+    it reads without color);
+  - **Attention** — dependency cycles and unknown references first, then blocked stories (status
+    `blocked`, or a `blocked-by` story that is not done), then stories waiting on an unfinished
+    `depends-on`;
+  - **Up next** — the next undone tasks whose story is not in Attention (`--next=N`, default 5);
+  - **burndown** — remaining vs. done tasks per day/week/month from the git history of `tasks.md`
+    (the last column is your working tree); shows "No history available" outside a git repo;
+  - **feature completion** — one row per feature with its bar, workflow phase (specified → designed →
+    planned → tasked → implementing → done) and open `[NEEDS CLARIFICATION]` count. A feature with no
+    `tasks.md` reads "not planned".
+
+  Unreadable files are skipped and named in a notice line. Off a TTY (pipes, CI) the same content is
+  printed as plain text.
+- **`--feature=X`** — the feature view for one feature (`X` is its number, e.g. `014`, or its
+  directory name): artifacts present, open clarifications, status, the story table with a
+  `Waiting on` column, and Attention / Up next / burndown scoped to the feature.
+- **`--status=X`** — narrow every widget to stories with that status.
+- **`--stories`** — the previous story table (`Feat | Story | description | progress | status |
+  priority | blocked-by`) with an overall roll-up.
 - **`story-id`** — detail for one story. Story ids **restart per feature**, so a bare `US-3` may
   match several; qualify it with the feature ref as `NNN:US-3` (also accepts `NNN/US-3`). A bare id
   that matches more than one feature prints the matches so you can pick.
-- **`--interactive`** — opt-in full-screen navigable view (TTY only): `↑`/`↓` move, `enter` opens a
-  story's tasks, `←`/`esc` goes back, `q` quits. On a non-interactive terminal it falls back to the
-  one-shot table.
+- **`--interactive`** — the overview full screen (TTY only): `tab` moves focus between Attention, Up
+  next and Feature completion, `↑`/`↓` move, `enter` opens the feature view (and a story's tasks from
+  there), `esc` goes back, `f` filters by feature, `s` cycles the status filter, `q` quits. On a
+  non-interactive terminal it prints the plain overview.
+- **`--json`** — the story list as JSON, unchanged from earlier releases.
+- **`--json --overview`** — one object: `stories` (exactly the `--json` list) plus `summary`,
+  `statusCounts`, `features`, `attention`, `upNext`, `burndown`, `issues` and the applied `filters`.
 
 ```bash
 ambykit dashboard
-ambykit dashboard --interactive   # full-screen navigable view (TTY only)
-ambykit dashboard 001:US-3        # feature-qualified (recommended)
-ambykit dashboard --status blocked
-ambykit dashboard --feature 001-password-reset
-ambykit dashboard --json
+ambykit dashboard --interactive          # full-screen overview (TTY only)
+ambykit dashboard --feature=014          # feature view
+ambykit dashboard --next=10              # longer Up next list
+ambykit dashboard --status=blocked
+ambykit dashboard --stories              # the story table
+ambykit dashboard 001:US-3               # story detail (feature-qualified)
+ambykit dashboard --json                 # story list
+ambykit dashboard --json --overview      # story list + every aggregate
 ```
 
 ## `ambykit analyze`

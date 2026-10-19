@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import type { ParseIssue } from "./overview-types.js";
 
 export interface StoryProgress {
   id: string; // feature-local canonical, e.g. "US1" (NOT globally unique — restarts per feature)
@@ -146,20 +147,34 @@ export function applyTasks(stories: StoryProgress[], tasks: TaskLine[]): void {
   }
 }
 
-/** Compute dashboard data for a whole project by reading specs/. */
-export function computeDashboard(projectRoot: string): StoryProgress[] {
+/**
+ * Compute dashboard data for a whole project by reading specs/. A file that cannot be read is
+ * skipped and recorded in `issues` (FR-014): an unreadable spec drops its feature, an unreadable
+ * tasks.md leaves its stories at zero tasks.
+ */
+export function computeDashboard(projectRoot: string, issues: ParseIssue[] = []): StoryProgress[] {
   const specsRoot = join(projectRoot, "specs");
   if (!existsSync(specsRoot)) return [];
   const all: StoryProgress[] = [];
+  const read = (feature: string, file: string): string | null => {
+    try {
+      return readFileSync(join(specsRoot, feature, file), "utf8");
+    } catch (err) {
+      const e = err as { code?: string; message?: string };
+      const reason = e.code === "EISDIR" ? "is a directory, not a file" : (e.message ?? String(err)).split("\n")[0]!;
+      issues.push({ file: `specs/${feature}/${file}`, reason });
+      return null;
+    }
+  };
   for (const entry of readdirSync(specsRoot, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
     const dir = join(specsRoot, entry.name);
-    const specPath = join(dir, "spec.md");
-    if (!existsSync(specPath)) continue;
-    const stories = parseStories(readFileSync(specPath, "utf8"), entry.name);
-    const tasksPath = join(dir, "tasks.md");
-    const tasks = existsSync(tasksPath) ? parseTasks(readFileSync(tasksPath, "utf8")) : [];
-    applyTasks(stories, tasks);
+    if (!existsSync(join(dir, "spec.md"))) continue;
+    const spec = read(entry.name, "spec.md");
+    if (spec === null) continue;
+    const stories = parseStories(spec, entry.name);
+    const tasksBody = existsSync(join(dir, "tasks.md")) ? read(entry.name, "tasks.md") : null;
+    applyTasks(stories, tasksBody === null ? [] : parseTasks(tasksBody));
     all.push(...stories);
   }
   return all;

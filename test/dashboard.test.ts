@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   applyTasks,
   canonicalStoryId,
+  computeDashboard,
   parseStories,
   parseTasks,
 } from "../src/core/dashboard.js";
+import { dashboardFixture } from "./helpers/dashboard-fixture.js";
 
 describe("canonicalStoryId", () => {
   it("normalizes US-1 / US1 / 'us 1' to US1", () => {
@@ -69,5 +71,15 @@ describe("parseTasks + applyTasks", () => {
     const stories = parseStories("### US-9 — Lonely  (priority: P2)", "001-x");
     applyTasks(stories, []);
     expect(stories[0]!.percent).toBe(0);
+  });
+});
+
+describe("computeDashboard skips unreadable files (T108, FR-014)", () => {
+  it("records the issue and keeps the other features", () => {
+    const issues: { file: string; reason: string }[] = [];
+    const stories = computeDashboard(dashboardFixture({ edges: true }), issues);
+    expect(issues).toEqual([{ file: "specs/009-broken/tasks.md", reason: "is a directory, not a file" }]);
+    expect(stories.find((s) => s.feature === "009-broken")).toMatchObject({ tasksTotal: 0 });
+    expect(stories.some((s) => s.feature === "001-core")).toBe(true);
   });
 });
