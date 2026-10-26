@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
 import { compareFeatureDirs, assignDisplayRefs, readFeatures } from "./features.js";
-import { defaultBranch, git, isDirty, isRepo, worktreeList } from "./git.js";
+import { gitAsync, parseWorktreeList } from "./git.js";
 import type { Checkout, FeatureSnapshot, ParseIssue } from "./overview-types.js";
 import { WORKTREES_DIR, featureWorktrees } from "./worktree.js";
 
@@ -30,45 +30,64 @@ export function primaryRoot(root: string): string {
 }
 
 /**
+ * The default branch, as `defaultBranch` resolves it (origin's HEAD, else `main`, else `master`),
+ * with the fallbacks probed side by side.
+ */
+async function baseBranch(cwd: string): Promise<string | null> {
+  try {
+    const ref = await gitAsync(cwd, ["symbolic-ref", "--short", "-q", "refs/remotes/origin/HEAD"]);
+    if (ref) return ref.replace(/^origin\//, "");
+  } catch {
+    /* no remote HEAD */
+  }
+  const exists = (b: string) => gitAsync(cwd, ["rev-parse", "--verify", "-q", `refs/heads/${b}`]).then(() => true, () => false);
+  const [main, master] = await Promise.all([exists("main"), exists("master")]);
+  return main ? "main" : master ? "master" : null;
+}
+
+/** Branches merged into `base`, with their commits; `base` itself is among them. */
+async function mergedInto(cwd: string, base: string): Promise<Map<string, string>> {
+  const out = await gitAsync(cwd, ["branch", "--merged", base, "--format=%(refname:short) %(objectname)"]);
+  const merged = new Map<string, string>();
+  for (const line of out.split("\n")) {
+    const [name, sha] = line.trim().split(" ");
+    if (name && sha) merged.set(name, sha);
+  }
+  return merged;
+}
+
+/**
  * Resolve the primary checkout and its feature worktrees. Git state costs one `status` per worktree
- * plus one `branch --merged` in total, keeping the one-shot view inside its 1 s budget (SC-003).
+ * plus one `branch --merged` in total, and those run concurrently: process startup dominates on
+ * Windows, and running them one by one broke the one-shot 1 s budget (SC-003).
  * Not a git repository, or git failing ⇒ the primary checkout alone (FR-008).
  */
-export function resolveCheckouts(root: string): ProjectCheckouts {
+export async function resolveCheckouts(root: string): Promise<ProjectCheckouts> {
   const primary: Checkout = { root: primaryRoot(root), kind: "main" };
-  if (!isRepo(primary.root)) return { primary, worktrees: [] };
   let found: ReturnType<typeof featureWorktrees>;
   try {
-    found = featureWorktrees(primary.root, worktreeList(primary.root));
+    found = featureWorktrees(primary.root, parseWorktreeList(await gitAsync(primary.root, ["worktree", "list", "--porcelain"])));
   } catch {
-    return { primary, worktrees: [] };
+    return { primary, worktrees: [] }; // not a repository
   }
   if (found.length === 0) return { primary, worktrees: [] };
 
-  const base = defaultBranch(primary.root);
-  const merged = new Set<string>();
-  let baseHead = "";
-  if (base) {
-    try {
-      baseHead = git(primary.root, ["rev-parse", base]);
-      for (const b of git(primary.root, ["branch", "--merged", base, "--format=%(refname:short)"]).split("\n")) {
-        if (b.trim()) merged.add(b.trim());
-      }
-    } catch {
-      /* stale stays false */
-    }
-  }
+  const mergedState = baseBranch(primary.root).then(async (base) => {
+    if (!base) return { base, merged: new Map<string, string>() };
+    return { base, merged: await mergedInto(primary.root, base).catch(() => new Map<string, string>()) };
+  });
+  const dirtyStates = found.map(({ worktree }) =>
+    existsSync(worktree.path)
+      ? gitAsync(worktree.path, ["status", "--porcelain"]).then((s) => s.length > 0, () => false) // unreadable: reported by readProjectFeatures
+      : Promise.resolve(false),
+  );
+  const [{ base, merged }, dirty] = await Promise.all([mergedState, Promise.all(dirtyStates)]);
+  const baseHead = base ? merged.get(base) : undefined;
 
-  const worktrees = found.map(({ feature, worktree }): FeatureCheckout => {
+  const worktrees = found.map(({ feature, worktree }, i): FeatureCheckout => {
     const checkout: Checkout = { root: resolve(worktree.path), kind: "worktree" };
     if (worktree.branch) checkout.branch = worktree.branch;
-    let dirty = false;
-    try {
-      dirty = existsSync(worktree.path) && isDirty(worktree.path);
-    } catch {
-      /* unreadable: reported by readProjectFeatures */
-    }
-    checkout.dirty = dirty;
+    checkout.dirty = dirty[i]!;
     // A fresh worktree's branch is trivially "merged" (it *is* the base); only count it as stale once
     // the base has moved past it, i.e. its work landed and the worktree lingers.
     checkout.stale = !!(
@@ -109,7 +128,8 @@ export interface ProjectFeatures {
 }
 
 /** Read the whole project across checkouts. An unreadable worktree becomes a `ParseIssue` (FR-009). */
-export function readProjectFeatures(root: string, checkouts: ProjectCheckouts = resolveCheckouts(root)): ProjectFeatures {
+export async function readProjectFeatures(root: string, given?: ProjectCheckouts): Promise<ProjectFeatures> {
+  const checkouts = given ?? (await resolveCheckouts(root));
   const main = readFeatures(checkouts.primary.root);
   const issues = [...main.issues];
   const worktrees: { feature: string; checkout: Checkout; features: FeatureSnapshot[] }[] = [];

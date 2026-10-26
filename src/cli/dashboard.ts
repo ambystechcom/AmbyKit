@@ -14,7 +14,7 @@ import {
 } from "../core/dashboard.js";
 import { readProjectPresence, thresholdsFrom, type Thresholds } from "../core/activity.js";
 import { matchAgents, type AgentMatch } from "../core/agents.js";
-import { allCheckouts, readProjectFeatures, resolveCheckouts, type ProjectCheckouts } from "../core/checkouts.js";
+import { allCheckouts, readProjectFeatures, type ProjectCheckouts } from "../core/checkouts.js";
 import { loadConfig } from "../core/config.js";
 import type { Burndown, Checkout, FeatureSnapshot, Filters, ParseIssue } from "../core/overview-types.js";
 import { applyFilters, computeOverview } from "../core/overview.js";
@@ -74,7 +74,7 @@ export class DashboardCommand extends BaseCommand {
         this.info(JSON.stringify(stories, null, 2));
         return 0;
       }
-      this.info(JSON.stringify(this.overviewJson(root, filters, upNextCap, stories), null, 2));
+      this.info(JSON.stringify(await this.overviewJson(root, filters, upNextCap, stories), null, 2));
       return 0;
     }
 
@@ -89,7 +89,7 @@ export class DashboardCommand extends BaseCommand {
     }
 
     // The overview reads every checkout (017 FR-001) through `readFeatures`, which skips unreadable files (FR-014).
-    const { features, issues, checkouts } = readProjectFeatures(root);
+    const { features, issues, checkouts } = await readProjectFeatures(root);
     root = checkouts.primary.root;
     if (filters.feature && applyFilters(features, { feature: filters.feature }).length === 0) {
       this.error(`Feature ${filters.feature} not found.`, "Use its number (e.g. 014) or its directory name.");
@@ -184,8 +184,8 @@ export class DashboardCommand extends BaseCommand {
   }
 
   /** `--json --overview` (FR-012, contracts/dashboard-json.md): bare-`--json` stories plus aggregates. */
-  private overviewJson(root: string, filters: Filters, upNextCap: number, stories: StoryProgress[]): unknown {
-    const { features, issues, checkouts } = readProjectFeatures(root);
+  private async overviewJson(root: string, filters: Filters, upNextCap: number, stories: StoryProgress[]): Promise<unknown> {
+    const { features, issues, checkouts } = await readProjectFeatures(root);
     const o = computeOverview(features, filters, { upNextCap }, issues);
     return {
       stories,
@@ -281,10 +281,14 @@ export class DashboardCommand extends BaseCommand {
     const rearmNeeded = (): boolean => watcher?.mode !== "paused" && targetsSignature(watchTargets(checkouts)) !== armed;
 
     // Re-read every checkout and swap the data in, keeping cursors and input (FR-010–FR-012).
-    const refresh = (): void => {
+    // Reads are async, so overlapping refreshes can finish out of order: only the latest one applies.
+    let generation = 0;
+    const refresh = async (): Promise<void> => {
       if (stopped) return;
+      const mine = ++generation;
       try {
-        const read = readProjectFeatures(root, resolveCheckouts(root));
+        const read = await readProjectFeatures(root);
+        if (stopped || mine !== generation) return;
         checkouts = read.checkouts;
         const prev = data;
         cache.clear();
@@ -302,7 +306,7 @@ export class DashboardCommand extends BaseCommand {
       if (stopped) return;
       if (rearmNeeded()) {
         arm();
-        refresh();
+        void refresh();
       }
       const now = Date.now();
       data = withBurndown({ ...data, presence: presenceOf(data.features, now) });
@@ -322,7 +326,7 @@ export class DashboardCommand extends BaseCommand {
         // `r` restarts monitoring when it is paused (ui.md LiveIndicator).
         if (key.name === "r" && s.input === null && s.live?.mode === "paused") {
           arm();
-          refresh();
+          void refresh();
           return { ...s, live: { mode: watcher?.mode ?? "paused", lastChange: Date.now() } };
         }
         return reduceOverviewTui(data, s, key);
