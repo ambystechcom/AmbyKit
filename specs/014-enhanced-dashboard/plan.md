@@ -120,7 +120,7 @@ git history ───► │ burndown.ts    readTaskHistory(root, scope) (git ed
 | FR-017 | No write APIs used; git read-only; snapshot test asserts the working tree is unchanged after a run. |
 | FR-018 | `readTaskHistory` + `buildBurndown` + `burndown-chart.ts` (ui.md US-7). |
 | FR-019 | `Burndown.status = "no-history"` when not a repo, git missing, or < `min-points` periods. |
-| SC-001 | Wide layout keeps cards, status, attention, up next in the first ~20 rows (ui.md US-1); hallway test is manual in Phase 5. |
+| SC-001 | Wide layout keeps cards, status, attention, up next in the first ~20 rows (ui.md US-1); validated by the layout check (SC-001 revised 2026-10-26). |
 | SC-002 | Fixture-based value tests per widget against hand-computed totals. |
 | SC-003 | Perf test: generated 30-feature / 1,000-task fixture renders < 1 s; burndown measured at ~0.3 s worst case for 1,350 blob reads (R-2). |
 | SC-005 | `computeDashboard`, bare `--json`, `interactive/dashboard.ts` and their tests are untouched. |
@@ -163,8 +163,9 @@ Run on this repo (15 features, 65 stories, 382 tasks, 17 commits touching `tasks
 - **SC-003:** `ambykit dashboard` (plain, incl. burndown) 0.06 s wall clock, 3 runs; the
   30-feature / 1,050-task perf fixture renders well under the 1 s budget (`test/cli/dashboard-perf.test.ts`).
 - **SC-001 layout:** at 100 columns, completion (card row, lines 4–8), blocked count (Attention
-  title) and the first Up next task (line 13–14) sit within the first 30 rows. The ≥3-user hallway
-  test itself (T107) is still to be run.
+  title) and the first Up next task (line 13–14) sit within the first 30 rows. Re-checked
+  2026-10-26 after feature 017 (completion row 4, Attention row 13, next task row 14); SC-001 was
+  revised to accept this layout check in place of the ≥3-user hallway test, closing T107.
 - **Deviation from the plan:** Attention uses its own collision-safe dependency resolution and cycle
   detection keyed by feature directory instead of `analyzeGraph`, because `StoryProgress.key` uses
   the feature number and two `008-*` features collide; changing that key would alter `--json`

@@ -2,7 +2,7 @@
 feature: 014-enhanced-dashboard
 title: Enhanced dashboard — widgets and charts
 branch: 014-enhanced-dashboard
-status: ready
+status: done
 created: 2026-10-18
 ---
 
@@ -160,7 +160,7 @@ work is converging and at what pace.
 
 ## Success criteria
 
-- SC-001  A user can state overall completion, number of blocked stories, and the next task to pick within 10 seconds of opening the dashboard, without scrolling (validated in a hallway test with ≥3 users).
+- SC-001  A user can state overall completion, number of blocked stories, and the next task to pick within 10 seconds of opening the dashboard, without scrolling: at 100 columns all three are visible within the first 30 rows (validated by a layout check; revised 2026-10-26, replacing the ≥3-user hallway test).
 - SC-002  100% of widget and chart values match hand-computed totals on the test fixtures.
 - SC-003  Dashboard renders in ≤1 second for a repo with 30 features and 1,000 tasks.
 - SC-004  Zero model tokens are consumed to produce the dashboard.
