@@ -43,6 +43,9 @@ export function worktreePerfFixture(features = 50, worktrees = 10): string {
     gitRun(root, ["worktree", "add", "-q", "-b", id, path, "main"]);
     const tasks = join(path, "specs", id, "tasks.md");
     writeFileSync(tasks, readFileSync(tasks, "utf8").replace("- [ ]", "- [x]"));
+    // Settle the index the way any later git command would: the first status after a checkout
+    // re-hashes every "racily clean" file (2–3× slower), which real worktrees don't pay per run.
+    gitRun(path, ["status", "--porcelain"]);
   }
   return root;
 }
