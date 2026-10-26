@@ -9,6 +9,8 @@ Act as the **Developer** in `@.amby/roles/developer.md` and say so in your first
 
 Implement work for `$ARGUMENTS` (default: the next unblocked task in priority order).
 
+Run `ambykit activity <feature> --agent=claude --phase=implement` first, with that feature's number; ignore any error.
+
 1. From `tasks.md`, pick the target task(s). Respect the Foundational-before-features gate and the
    story dependency graph — never start a task whose story is `blocked-by` unfinished work.
 2. Load **only** the slice you need: the task line, the relevant `plan.md` section, and the specific
@@ -17,5 +19,6 @@ Implement work for `$ARGUMENTS` (default: the next unblocked task in priority or
    tests for the acceptance criteria.
 4. **Patch in place:** flip the completed task's checkbox to `- [x]` in `tasks.md`; when all of a
    story's tasks are done, set that story's `status: done` in `spec.md` (or `in-progress` while
-   partway). Don't rewrite untouched sections.
+   partway). Don't rewrite untouched sections. After each checked task, run
+   `ambykit activity <feature> --agent=claude --phase=implement --task=T###` (ignore errors).
 5. Report what you did and the next unblocked task. Stop at a story checkpoint for review.

@@ -1,8 +1,8 @@
-import { execFileSync } from "node:child_process";
+import { execFile, execFileSync } from "node:child_process";
 
 /**
- * Thin wrappers over the `git` CLI (feature 012). Every call is synchronous and scoped to one
- * repository via `cwd`. Failures surface as `Error` with git's stderr so callers can decide what to
+ * Thin wrappers over the `git` CLI (feature 012). Calls are synchronous (except `gitAsync`) and
+ * scoped to one repository via `cwd`. Failures surface as `Error` with git's stderr so callers can decide what to
  * show; nothing here prints.
  */
 
@@ -22,6 +22,19 @@ export function git(cwd: string, args: string[]): string {
     const e = err as { stderr?: string; message: string };
     throw new Error((e.stderr ?? e.message).trim());
   }
+}
+
+/**
+ * Async `git`, for callers that run several commands side by side (feature 017: process startup
+ * dominates on Windows, so independent calls should overlap). Same contract as `git`.
+ */
+export function gitAsync(cwd: string, args: string[]): Promise<string> {
+  return new Promise((resolve, reject) => {
+    execFile("git", args, { cwd, encoding: "utf8", windowsHide: true }, (err, stdout, stderr) => {
+      if (err) reject(new Error((stderr || err.message).trim()));
+      else resolve(stdout.trim());
+    });
+  });
 }
 
 /**

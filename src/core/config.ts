@@ -8,6 +8,12 @@ const configSchema = z.object({
   tools: z.array(z.string()).default([]),
   manageRules: z.boolean().optional(),
   worktrees: z.boolean().optional(),
+  dashboard: z
+    .object({
+      activeMinutes: z.number().positive().optional(),
+      idleMinutes: z.number().positive().optional(),
+    })
+    .optional(),
 });
 
 /** Path to a project's config file. */

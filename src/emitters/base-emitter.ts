@@ -92,7 +92,12 @@ export abstract class BaseEmitter {
     const roleLine = this.roleLine(spec, ctx);
     // The role line is prepended *before* transformBody so tool-specific placeholder rewrites
     // (e.g. Copilot's `$ARGUMENTS`) apply to its `--as` clause too.
-    const body = this.transformBody(roleLine ? { ...spec, body: `${roleLine}\n\n${spec.body}` } : spec);
+    // `$AGENT` (the activity self-report, feature 017 FR-020) becomes this tool's id, after the
+    // tool-specific rewrites so none of them can touch it.
+    const body = this.transformBody(roleLine ? { ...spec, body: `${roleLine}\n\n${spec.body}` } : spec).replaceAll(
+      "$AGENT",
+      this.toolId,
+    );
     // Tools with no command frontmatter (e.g. Cursor plain commands) get no `---` block.
     const head = pairs.length > 0 ? `${this.renderFrontmatter(pairs)}\n` : "";
     const contents = `${head}${notice}\n\n${body}\n`;

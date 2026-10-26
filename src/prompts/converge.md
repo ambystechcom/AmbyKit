@@ -13,6 +13,8 @@ allowedTools: [read, edit]
 Converge feature `$ARGUMENTS` (default: the current feature): does the code satisfy its artifacts?
 Never edit source code — only that feature's `tasks.md` and `spec.md` are writable.
 
+Run `ambykit activity <feature> --agent=$AGENT --phase=converge` first, with that feature's number; ignore any error.
+
 1. No `tasks.md` → stop, say to run `/amby.tasks`. No `plan.md` → converge on spec + tasks and say so.
 2. For every `FR-###`/`SC-###`, plan decision (incl. `data-model.md`/`contracts/`), and checked
    `T###`: look for evidence only in files the plan/tasks name. Classify **covered**, **gap**

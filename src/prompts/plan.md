@@ -14,6 +14,8 @@ Write the implementation plan for feature `$ARGUMENTS` (default: the current fea
 
 Context: read that feature's `spec.md` and `ui.md`, plus `@.amby/constitution.md`.
 
+Run `ambykit activity <feature> --agent=$AGENT --phase=plan` first, with that feature's number; ignore any error.
+
 1. Write `plan.md` following `@.amby/templates/plan.md`: technical context (stack, libraries,
    constraints), architecture, and a phased approach (Phase 0 research → Phase 1 foundation → feature phases).
 2. This is the **first artifact with technology decisions.** Ensure every choice honors the

@@ -35,6 +35,16 @@ export class ClaudeEmitter extends BaseEmitter {
     ];
   }
 
+  /**
+   * Phases without shell access still self-report activity (feature 017, FR-020), so they get only
+   * that command, scoped with Claude's `Bash(prefix:*)` rule — no prompt, and no other shell use.
+   */
+  protected override mappedTools(spec: CommandSpec): string {
+    const tools = super.mappedTools(spec);
+    const reports = spec.body.includes("ambykit activity ");
+    return reports && !spec.allowedTools.includes("bash") ? `${tools}, Bash(ambykit activity:*)` : tools;
+  }
+
   /** Sub-agents at `.claude/agents/<name>.md` — `name` + `description` required (verified, feature 013). */
   protected override roleFiles(roles: Role[], _ctx: RulesContext): EmittedFile[] {
     return roles.map((role) => ({

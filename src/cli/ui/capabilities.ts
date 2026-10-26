@@ -41,6 +41,8 @@ export function detectCapabilities(input: DetectInput = {}): Capabilities {
     caps.truecolor = supportsTruecolor(env);
     caps.background = detectBackground(env);
   }
+  // Nerd Font glyphs need a patched font we cannot detect, so they are strictly opt-in (feature 017).
+  if (unicode && (env["AMBYKIT_ICONS"] ?? "").toLowerCase() === "nerd") caps.icons = "nerd";
   return caps;
 }
 
@@ -66,4 +68,10 @@ function supportsUnicode(env: NodeJS.ProcessEnv): boolean {
   if (program === "vscode" || program === "Apple_Terminal" || program === "iTerm.app") return true;
   const locale = env["LC_ALL"] || env["LC_CTYPE"] || env["LANG"] || "";
   return /UTF-?8/i.test(locale);
+}
+
+/** Agent-icon mode (feature 017): ASCII tags without unicode, Nerd glyphs when opted in, else unicode. */
+export function iconMode(caps: Capabilities): "ascii" | "unicode" | "nerd" {
+  if (!caps.unicode || caps.icons === "ascii") return "ascii";
+  return caps.icons === "nerd" ? "nerd" : "unicode";
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { detectCapabilities } from "../../src/cli/ui/capabilities.js";
+import { detectCapabilities, iconMode } from "../../src/cli/ui/capabilities.js";
 
 describe("detectCapabilities", () => {
   it("non-TTY ⇒ no color, no unicode, default width (FR-002/012)", () => {
@@ -83,5 +83,21 @@ describe("detectCapabilities — truecolor + background (feature 014, R-3)", () 
     const caps = detectCapabilities({ env: { COLORTERM: "truecolor", NO_COLOR: "1" }, stdout: { isTTY: true } });
     expect(caps.truecolor).toBeUndefined();
     expect(caps.background).toBeUndefined();
+  });
+});
+
+describe("icon mode (feature 017, FR-025)", () => {
+  const utf8 = { LANG: "en_US.UTF-8" };
+  it("unicode by default, nerd only when AMBYKIT_ICONS=nerd", () => {
+    expect(iconMode(detectCapabilities({ env: utf8, stdout: { isTTY: true } }))).toBe("unicode");
+    const nerd = detectCapabilities({ env: { ...utf8, AMBYKIT_ICONS: "Nerd" }, stdout: { isTTY: true } });
+    expect(nerd.icons).toBe("nerd");
+    expect(iconMode(nerd)).toBe("nerd");
+  });
+
+  it("ASCII terminals ignore the opt-in", () => {
+    const caps = detectCapabilities({ env: { LANG: "C", AMBYKIT_ICONS: "nerd" }, stdout: { isTTY: true } });
+    expect(caps.icons).toBeUndefined();
+    expect(iconMode(caps)).toBe("ascii");
   });
 });

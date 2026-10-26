@@ -116,7 +116,7 @@ export function phaseOf(f: FeatureSnapshot): Phase {
 /** One row of the feature completion chart (FR-004, FR-005, FR-010). */
 export function featureRow(f: FeatureSnapshot): FeatureRow {
   const tasks = f.tasks ? { done: f.tasks.filter((t) => t.done).length, total: f.tasks.length } : null;
-  return {
+  const row: FeatureRow = {
     ref: f.displayRef,
     name: f.dir,
     tasks,
@@ -124,6 +124,9 @@ export function featureRow(f: FeatureSnapshot): FeatureRow {
     phase: phaseOf(f),
     clarifications: f.clarifications.length,
   };
+  // Only worktree rows carry their source, so output without worktrees is unchanged (017 FR-007/FR-008).
+  if (f.checkout?.kind === "worktree") row.checkout = f.checkout;
+  return row;
 }
 
 /** Feature-qualified, unambiguous story key for display, e.g. `014:US-3` or `008-alpha:US-1`. */

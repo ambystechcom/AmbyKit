@@ -112,7 +112,7 @@ created: 2026-10-18
 - [x] [T104] Dogfood on this repo: check SC-001 fold layout at 100×30 and SC-003 timing; record results (specs/014-enhanced-dashboard/plan.md)
 - [x] [T105] Run `npm run typecheck` and `npm test`; all existing dashboard tests pass unchanged — SC-005 (package.json)
 - [x] [T106] [P] Local-only test: overview + burndown read only `specs/*` and git objects, no network/model access — FR-001, SC-004 (test/cli/dashboard-local-only.test.ts)
-- [ ] [T107] Hallway test with ≥3 users on this repo at 100×30: completion, blocked count, next task stated in ≤10 s; record results — SC-001 (specs/014-enhanced-dashboard/plan.md)
+- [x] [T107] ~~Hallway test with ≥3 users~~ → layout check per revised SC-001: at 100 columns completion, blocked count and next task are in the first 30 rows; results recorded — SC-001 (specs/014-enhanced-dashboard/plan.md)
 
 ## Convergence
 

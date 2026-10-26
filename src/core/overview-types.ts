@@ -33,8 +33,22 @@ export interface Clarification {
   text: string;
 }
 
+/**
+ * Where a feature's artifacts were read from (feature 017). `main` is the primary checkout and
+ * carries no git state, so projects without worktrees render exactly as before (FR-008).
+ */
+export interface Checkout {
+  root: string; // absolute checkout path
+  kind: "main" | "worktree";
+  branch?: string;
+  dirty?: boolean;
+  stale?: boolean; // branch merged into the default branch since it diverged
+}
+
 /** Everything the dashboard knows about one `specs/NNN-slug/` directory. */
 export interface FeatureSnapshot {
+  /** Source checkout (feature 017); absent ≡ the primary checkout. */
+  checkout?: Checkout;
   dir: string; // "014-enhanced-dashboard"
   ref: string; // featureRefOf(dir); may collide across features
   displayRef: string; // ref, or dir when ref collides (unique)
@@ -70,6 +84,8 @@ export interface FeatureRow {
   percent: number | null;
   phase: Phase;
   clarifications: number;
+  /** Source worktree (feature 017); absent for the primary checkout. */
+  checkout?: Checkout;
 }
 
 export interface AttentionItem {

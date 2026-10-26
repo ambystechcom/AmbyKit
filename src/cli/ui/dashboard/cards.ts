@@ -13,6 +13,8 @@ export interface HeaderMeta {
   interactive?: boolean;
   /** Replaces the path/version meta (feature view: `implementing · 35%`). */
   right?: string;
+  /** Pre-painted live indicator (feature 017, FR-014); replaces `interactive` and is never dropped. */
+  live?: string;
 }
 
 /** Separator between header/caption parts: ` · `, or ` - ` on ASCII terminals. */
@@ -31,18 +33,22 @@ export function header(caps: Capabilities, meta: HeaderMeta, width: number): str
 
   const parts = meta.right
     ? [meta.right]
-    : [meta.cwd, `v${meta.version}`, ...(meta.interactive ? ["interactive"] : [])];
+    : [meta.cwd, `v${meta.version}`, ...(meta.interactive && !meta.live ? ["interactive"] : [])];
+  const live = meta.live ? (parts.length ? paintToken(caps, h["meta-fg"], sep(caps)) : "") + meta.live : "";
+  const liveWidth = visibleWidth(live);
   const candidates = [parts, parts.slice(1), parts.slice(2), []];
   let right = "";
   for (const c of candidates) {
     const text = c.join(sep(caps));
-    if (visibleWidth(left) + 2 + text.length <= width || c.length === 0) {
+    if (visibleWidth(left) + 2 + text.length + liveWidth <= width || c.length === 0) {
       right = text;
       break;
     }
   }
-  const gap = Math.max(1, width - visibleWidth(left) - right.length);
-  const title = right ? left + " ".repeat(gap) + paintToken(caps, h["meta-fg"], right) : left;
+  const rightLive = right ? live : meta.live ?? "";
+  const gap = Math.max(1, width - visibleWidth(left) - right.length - visibleWidth(rightLive));
+  const title =
+    right || rightLive ? left + " ".repeat(gap) + (right ? paintToken(caps, h["meta-fg"], right) : "") + rightLive : left;
   const rule = paintToken(caps, h["rule-fg"], glyph(caps, h.rule).repeat(width));
   return [title, rule];
 }

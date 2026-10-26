@@ -123,6 +123,8 @@ export interface AmbyConfig {
   manageRules?: boolean;
   /** When true, `/amby.specify` creates a `.worktrees/<feature>` worktree for each new feature (feature 012). */
   worktrees?: boolean;
+  /** Dashboard tuning (feature 017): agent-presence thresholds in minutes. */
+  dashboard?: { activeMinutes?: number; idleMinutes?: number };
 }
 
 /** How a tool materializes phase prompts. */

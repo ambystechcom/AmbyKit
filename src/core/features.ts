@@ -16,13 +16,13 @@ export interface ReadFeaturesResult {
  * parsed becomes a `ParseIssue` and is skipped, so the rest still renders (FR-014). Features are
  * ordered by number, then directory name (I-3).
  */
-export function readFeatures(projectRoot: string): ReadFeaturesResult {
+export function readFeatures(projectRoot: string, opts: { only?: string } = {}): ReadFeaturesResult {
   const specsRoot = join(projectRoot, "specs");
   const issues: ParseIssue[] = [];
   if (!existsSync(specsRoot)) return { features: [], issues };
 
   const dirs = readdirSync(specsRoot, { withFileTypes: true })
-    .filter((e) => e.isDirectory() && existsSync(join(specsRoot, e.name, "spec.md")))
+    .filter((e) => e.isDirectory() && (!opts.only || e.name === opts.only) && existsSync(join(specsRoot, e.name, "spec.md")))
     .map((e) => e.name)
     .sort(compareFeatureDirs);
 
@@ -80,12 +80,15 @@ export function readFeatures(projectRoot: string): ReadFeaturesResult {
     });
   }
 
-  // Feature numbers can collide (two `008-*`); fall back to the directory name so refs stay unique (I-5).
+  assignDisplayRefs(features);
+  return { features, issues };
+}
+
+/** Feature numbers can collide (two `008-*`); fall back to the directory name so refs stay unique (I-5). */
+export function assignDisplayRefs(features: FeatureSnapshot[]): void {
   const seen = new Map<string, number>();
   for (const f of features) seen.set(f.ref, (seen.get(f.ref) ?? 0) + 1);
-  for (const f of features) if ((seen.get(f.ref) ?? 0) > 1) f.displayRef = f.dir;
-
-  return { features, issues };
+  for (const f of features) f.displayRef = (seen.get(f.ref) ?? 0) > 1 ? f.dir : f.ref;
 }
 
 /** Order by leading number (numerically), then by full directory name. */

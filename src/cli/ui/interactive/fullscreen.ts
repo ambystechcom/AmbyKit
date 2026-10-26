@@ -24,14 +24,29 @@ export interface FullscreenApp<S> {
    * redraws — for work that arrives after startup (feature 014: the burndown fills in place).
    */
   start?(update: (fn: (state: S) => S) => void): void;
+  /** Optional: called on terminal resize, before the redraw (feature 017, FR-013). */
+  resize?(columns: number): void;
+  /** Optional: release watchers/timers; called once on every exit path (feature 017, FR-016). */
+  stop?(): void;
 }
 
 interface OutputLike {
   write(s: string): unknown;
+  columns?: number;
+  on?(event: "resize", listener: () => void): unknown;
+  off?(event: "resize", listener: () => void): unknown;
 }
 
 const ENTER = "\x1b[?1049h\x1b[?25l"; // alt screen + hide cursor
 const EXIT = "\x1b[?25h\x1b[?1049l"; // show cursor + leave alt screen
+
+/**
+ * One frame, repainted in place (feature 017): cursor home, each line followed by erase-to-end-of-line,
+ * then erase below. Unlike a full clear this never flashes, which matters once frames arrive unprompted.
+ */
+export function frameText(body: string): string {
+  return `\x1b[H${body.split("\n").join("\x1b[K\n")}\x1b[K\x1b[J`;
+}
 
 /** Run the app to completion; resolves with the final state. */
 export function runFullscreen<S>(
@@ -41,7 +56,7 @@ export function runFullscreen<S>(
   const { input, output } = io;
   let state = app.initial;
 
-  const frame = (): void => output.write(`\x1b[2J\x1b[H${app.render(state)}`) as unknown as void;
+  const frame = (): void => output.write(frameText(app.render(state))) as unknown as void;
 
   emitKeypressEvents(input);
   const wasRaw = Boolean(input.isRaw);
@@ -52,11 +67,16 @@ export function runFullscreen<S>(
       if (finished) return;
       finished = true;
       input.off("keypress", onKey);
+      output.off?.("resize", onResize);
       process.off("SIGINT", onSignal);
       process.off("SIGTERM", onSignal);
       input.setRawMode?.(wasRaw);
       input.pause();
-      output.write(EXIT);
+      try {
+        app.stop?.();
+      } finally {
+        output.write(EXIT);
+      }
     };
     const finish = (): void => {
       cleanup();
@@ -69,6 +89,11 @@ export function runFullscreen<S>(
       frame();
     };
     const onSignal = (): void => finish();
+    const onResize = (): void => {
+      if (finished) return;
+      app.resize?.(output.columns ?? 80);
+      frame();
+    };
 
     input.setRawMode?.(true);
     input.resume();
@@ -77,6 +102,7 @@ export function runFullscreen<S>(
     output.write(ENTER);
     frame();
     input.on("keypress", onKey);
+    output.on?.("resize", onResize);
     app.start?.((fn) => {
       if (finished) return;
       state = fn(state);
