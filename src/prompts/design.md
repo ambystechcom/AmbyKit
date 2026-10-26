@@ -16,6 +16,8 @@ Context: read that feature's `spec.md`, the templates `@.amby/templates/ui.md` +
 `@.amby/templates/design-tokens.json`, and — for detailed rules — `@.amby/reference/design-conventions.md`.
 Design for the spec's user stories.
 
+Run `ambykit activity <feature> --agent=$AGENT --phase=design` first, with that feature's number; ignore any error.
+
 1. Write `ui.md` following the template: per story, a layout/wireframe (ASCII or embedded SVG), a
    component inventory (props + full state set + token names), interaction criteria in
    Given/When/Then tied to the `US-#`, and content/accessibility notes (WCAG AA).

@@ -14,6 +14,7 @@ import { CheckCommand } from "./check.js";
 import { RestoreCommand } from "./restore.js";
 import { UpdateCommand } from "./update.js";
 import { WorktreeCommand } from "./worktree.js";
+import { ActivityCommand } from "./activity.js";
 import { outdatedWarning } from "./ui/callout.js";
 import { packageVersion } from "../core/paths.js";
 
@@ -27,6 +28,7 @@ const COMMANDS: BaseCommand[] = [
   new RestoreCommand(),
   new UpdateCommand(),
   new WorktreeCommand(),
+  new ActivityCommand(),
 ];
 
 /** Parse argv (after the command name) into positionals + flags. */

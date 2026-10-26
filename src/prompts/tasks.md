@@ -14,6 +14,8 @@ Generate `tasks.md` for feature `$ARGUMENTS` (default: the current feature).
 
 Context: read that feature's `plan.md` (and `spec.md` for story IDs/priorities/dependencies).
 
+Run `ambykit activity <feature> --agent=$AGENT --phase=tasks` first, with that feature's number; ignore any error.
+
 1. Write tasks following `@.amby/templates/tasks.md` as checkbox lines:
    `- [ ] [T###] [P?] [US#] description (file/path)`.
 2. Group into phases: **Setup → Foundational → User stories (by priority) → Polish**. Enforce the

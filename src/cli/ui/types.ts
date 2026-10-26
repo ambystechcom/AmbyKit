@@ -18,6 +18,11 @@ export interface Capabilities {
   truecolor?: boolean;
   /** Detected terminal background for truecolor palettes; absent means dark (feature 014, R-3). */
   background?: "dark" | "light";
+  /**
+   * Agent-icon override (feature 017): Nerd Font glyphs opted in (`AMBYKIT_ICONS=nerd` / `--icons=nerd`),
+   * or ASCII tags forced (`--icons=ascii`); absent means unicode when the terminal supports it.
+   */
+  icons?: "nerd" | "ascii";
 }
 
 /** A glyph with a unicode form and an ASCII fallback, selected by `Capabilities.unicode`. */

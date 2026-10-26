@@ -45,7 +45,8 @@ describe.skipIf(!HAS_GIT)("dashboard is local-only (FR-001, SC-004)", () => {
     expect(calls.length).toBeGreaterThan(0);
     for (const [bin, ...args] of calls) {
       expect(bin).toBe("git");
-      expect(["--version", "rev-parse", "log", "cat-file"]).toContain(args[0]);
+      expect(["--version", "rev-parse", "log", "cat-file", "worktree"]).toContain(args[0]);
+      if (args[0] === "worktree") expect(args[1]).toBe("list"); // 017: discover feature worktrees
     }
   });
 });

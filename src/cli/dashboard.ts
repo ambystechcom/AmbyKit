@@ -12,8 +12,11 @@ import {
   type StoryProgress,
   type TaskLine,
 } from "../core/dashboard.js";
-import { readFeatures } from "../core/features.js";
-import type { Burndown, FeatureSnapshot, Filters, ParseIssue } from "../core/overview-types.js";
+import { readProjectPresence, thresholdsFrom, type Thresholds } from "../core/activity.js";
+import { matchAgents, type AgentMatch } from "../core/agents.js";
+import { allCheckouts, readProjectFeatures, resolveCheckouts, type ProjectCheckouts } from "../core/checkouts.js";
+import { loadConfig } from "../core/config.js";
+import type { Burndown, Checkout, FeatureSnapshot, Filters, ParseIssue } from "../core/overview-types.js";
 import { applyFilters, computeOverview } from "../core/overview.js";
 import { packageVersion } from "../core/paths.js";
 import { maxPeriodsFor } from "./ui/dashboard/burndown-chart.js";
@@ -23,13 +26,20 @@ import { renderFeatureView, renderOverview } from "./ui/dashboard/render-overvie
 import { TOKENS } from "./ui/dashboard/tokens.js";
 import { progressCell, renderTable, statusCell } from "./ui/table.js";
 import type { Cell } from "./ui/types.js";
+import type { AmbyConfig } from "../core/types.js";
+import { LIVE_TOKENS } from "./ui/dashboard/live-tokens.js";
+import type { PresenceView } from "./ui/dashboard/worktrees-panel.js";
+import { guardedScanner, listAgentProcesses } from "./ui/interactive/agent-scan.js";
 import { runFullscreen } from "./ui/interactive/fullscreen.js";
+import { targetsSignature, watchProject, watchTargets, type ProjectWatcher, type WatchMode } from "./ui/interactive/live.js";
 import {
+  applyData,
   initOverviewTui,
   isOverviewDone,
   reduceOverviewTui,
   renderOverviewTui,
   type OverviewTuiData,
+  type OverviewTuiState,
 } from "./ui/interactive/overview.js";
 
 /** Periods for the plain series line and for `--json --overview` (a 100-column panel). */
@@ -40,11 +50,12 @@ export class DashboardCommand extends BaseCommand {
   readonly name = "dashboard";
   readonly summary = "Progress view over the story/task graph.";
   readonly usage =
-    "ambykit dashboard [story-id] [--interactive] [--stories] [--next=N] [--json [--overview]] [--status=X] [--feature=X]";
+    "ambykit dashboard [story-id] [--interactive] [--stories] [--next=N] [--json [--overview]] [--status=X] [--feature=X] [--icons=nerd|unicode|ascii]";
 
   protected async execute(opts: CliOptions): Promise<number> {
-    const root = this.projectRoot(opts.cwd);
+    let root = this.projectRoot(opts.cwd);
     const filters: Filters = { feature: stringFlag(opts, "feature"), status: stringFlag(opts, "status") };
+    if (!this.applyIcons(opts)) return 1;
 
     const storyArg = opts.positionals[0];
     if (storyArg) {
@@ -77,8 +88,9 @@ export class DashboardCommand extends BaseCommand {
       return 0;
     }
 
-    // The overview reads through `readFeatures`, which skips unreadable files (FR-014).
-    const { features, issues } = readFeatures(root);
+    // The overview reads every checkout (017 FR-001) through `readFeatures`, which skips unreadable files (FR-014).
+    const { features, issues, checkouts } = readProjectFeatures(root);
+    root = checkouts.primary.root;
     if (filters.feature && applyFilters(features, { feature: filters.feature }).length === 0) {
       this.error(`Feature ${filters.feature} not found.`, "Use its number (e.g. 014) or its directory name.");
       return 1;
@@ -86,19 +98,44 @@ export class DashboardCommand extends BaseCommand {
     const meta = this.meta(root);
     // Opt-in interactive view — only on a real terminal; otherwise fall back to one-shot (FR-016).
     if (flag(opts, "interactive") && this.caps.isTTY) {
-      return this.interactive(root, { features, issues, meta, upNextCap }, filters);
+      return this.interactive(root, { features, issues, meta, upNextCap }, filters, checkouts);
     }
 
     const plain = layoutMode(this.caps) === "plain";
     const burndown = this.burndown(root, features, filters, plain ? PLAIN_PERIODS : maxPeriodsFor(this.caps.columns));
     const overview = computeOverview(features, filters, { upNextCap }, issues);
+    // One-shot output reads self-reported markers only; the process scan is interactive-only (FR-017).
+    const marked = readProjectPresence({ checkouts, features, matches: [], now: Date.now(), thresholds: this.thresholds(root) });
+    const presence = marked.byFeature.size > 0 ? { ...marked, now: Date.now() } : undefined;
+    const extra = presence ? { presence } : {};
     if (filters.feature) {
       const feature = featureInScope(features, filters);
-      this.info(renderFeatureView(this.caps, { overview, feature, meta, burndown }));
+      this.info(renderFeatureView(this.caps, { overview, feature, meta, burndown, ...extra }));
       return 0;
     }
-    this.info(renderOverview(this.caps, { overview, meta, burndown }));
+    this.info(renderOverview(this.caps, { overview, meta, burndown, ...extra }));
     return 0;
+  }
+
+  /** Presence thresholds: `.amby/config.json` `dashboard`, else the token defaults (C-1). */
+  private thresholds(root: string): Thresholds {
+    return thresholdsFrom(readConfig(root), {
+      activeMinutes: LIVE_TOKENS.time["active-min"],
+      idleMinutes: LIVE_TOKENS.time["idle-min"],
+    });
+  }
+
+  /** `--icons=nerd|unicode|ascii` overrides the detected agent-icon mode (FR-025). */
+  private applyIcons(opts: CliOptions): boolean {
+    const icons = stringFlag(opts, "icons");
+    if (icons === undefined) return true;
+    if (icons !== "nerd" && icons !== "unicode" && icons !== "ascii") {
+      this.error(`--icons expects nerd, unicode or ascii, got '${icons}'.`, "e.g. ambykit dashboard --icons=nerd");
+      return false;
+    }
+    const { icons: _drop, ...rest } = this.caps;
+    this.caps = icons === "unicode" ? rest : { ...rest, icons };
+    return true;
   }
 
   /** The legacy story list, filtered as `--json` and `--stories` always have been. */
@@ -134,24 +171,31 @@ export class DashboardCommand extends BaseCommand {
     return { crumb: [], cwd, version: packageVersion() };
   }
 
-  /** Burndown over the filtered features (FR-018/019). */
+  /**
+   * Burndown over the filtered features (FR-018/019). A scope that lives entirely in one worktree reads
+   * that worktree's history, which follows its branch (017 FR-006); otherwise the primary checkout's.
+   */
   private burndown(root: string, features: FeatureSnapshot[], filters: Filters, maxPeriods: number): Burndown {
-    const { scope, current } = scopeOf(applyFilters(features, filters), Boolean(filters.status));
-    return readBurndown({ root, scope, current, maxPeriods, minPoints: TOKENS.component.burndown["min-points"] });
+    const scoped = applyFilters(features, filters);
+    const { scope, current } = scopeOf(scoped, Boolean(filters.status));
+    const roots = new Set(scoped.map((f) => checkoutRoot(root, f)));
+    const historyRoot = roots.size === 1 ? [...roots][0]! : root;
+    return readBurndown({ root: historyRoot, scope, current, maxPeriods, minPoints: TOKENS.component.burndown["min-points"] });
   }
 
   /** `--json --overview` (FR-012, contracts/dashboard-json.md): bare-`--json` stories plus aggregates. */
   private overviewJson(root: string, filters: Filters, upNextCap: number, stories: StoryProgress[]): unknown {
-    const { features, issues } = readFeatures(root);
+    const { features, issues, checkouts } = readProjectFeatures(root);
     const o = computeOverview(features, filters, { upNextCap }, issues);
     return {
       stories,
       summary: o.summary,
       statusCounts: o.statusCounts,
-      features: o.features,
+      // Each feature's source checkout (017 FR-007), without the machine-local path.
+      features: o.features.map((r) => ({ ...r, checkout: checkoutJson(r.checkout) })),
       attention: o.attention,
       upNext: o.upNext,
-      burndown: this.burndown(root, features, filters, JSON_PERIODS),
+      burndown: this.burndown(checkouts.primary.root, features, filters, JSON_PERIODS),
       issues: o.issues,
       filters: { feature: filters.feature ?? null, status: filters.status ?? null, next: upNextCap },
     };
@@ -187,33 +231,127 @@ export class DashboardCommand extends BaseCommand {
     this.info(`Overall: ${stories.length} stories · ${doneTasks}/${totalTasks} tasks · ${pct}%`);
   }
 
-  /** Launch the full-screen overview (US-5). Assumes a TTY (checked by the caller). */
+  /**
+   * Launch the full-screen overview (US-5), live (feature 017, US-2/US-3): a watcher re-reads every
+   * checkout on change, a heartbeat refreshes "ago" text, presence and the agent scan, and `stop()`
+   * releases all of it on exit (FR-016). Assumes a TTY (checked by the caller).
+   */
   private async interactive(
     root: string,
     base: Omit<OverviewTuiData, "burndownFor">,
     filters: Filters,
+    initialCheckouts: ProjectCheckouts,
   ): Promise<number> {
     const cache = new Map<string, Burndown>();
-    const maxPeriods = maxPeriodsFor(this.caps.columns);
-    const data: OverviewTuiData = {
-      ...base,
+    let maxPeriods = maxPeriodsFor(this.caps.columns);
+    let checkouts = initialCheckouts;
+    let matches: AgentMatch[] = [];
+    const thresholds = this.thresholds(root);
+    const presenceOf = (features: FeatureSnapshot[], now: number): PresenceView => ({
+      ...readProjectPresence({ checkouts, features, matches, now, thresholds }),
+      now,
+    });
+    const withBurndown = (d: Omit<OverviewTuiData, "burndownFor">): OverviewTuiData => ({
+      ...d,
       burndownFor: (f) => {
         const key = JSON.stringify([f.feature ?? null, f.status ?? null]);
-        if (!cache.has(key)) cache.set(key, this.burndown(root, base.features, f, maxPeriods));
+        if (!cache.has(key)) cache.set(key, this.burndown(root, d.features, f, maxPeriods));
         return cache.get(key)!;
       },
+    });
+    let data = withBurndown({ ...base, presence: presenceOf(base.features, Date.now()) });
+
+    let update: ((fn: (s: OverviewTuiState) => OverviewTuiState) => void) | null = null;
+    let watcher: ProjectWatcher | null = null;
+    let heartbeat: NodeJS.Timeout | null = null;
+    let stopped = false;
+    const scan = guardedScanner(() => listAgentProcesses());
+
+    const setLive = (mode: WatchMode): void =>
+      update?.((s) => ({ ...s, now: Date.now(), live: { mode, lastChange: s.live?.lastChange ?? Date.now() } }));
+
+    let armed = "";
+    const arm = (): void => {
+      watcher?.stop();
+      const targets = watchTargets(checkouts);
+      armed = targetsSignature(targets);
+      watcher = watchProject(targets, refresh, undefined, { onMode: setLive });
     };
+    // A worktree came or went, or a watched dir appeared after we armed (FR-011).
+    const rearmNeeded = (): boolean => watcher?.mode !== "paused" && targetsSignature(watchTargets(checkouts)) !== armed;
+
+    // Re-read every checkout and swap the data in, keeping cursors and input (FR-010–FR-012).
+    const refresh = (): void => {
+      if (stopped) return;
+      try {
+        const read = readProjectFeatures(root, resolveCheckouts(root));
+        checkouts = read.checkouts;
+        const prev = data;
+        cache.clear();
+        const now = Date.now();
+        data = withBurndown({ ...prev, features: read.features, issues: read.issues, presence: presenceOf(read.features, now) });
+        if (rearmNeeded()) arm();
+        update?.((s) => ({ ...applyData(s, prev, data), now, live: { mode: watcher?.mode ?? "paused", lastChange: now } }));
+      } catch {
+        setLive("paused");
+      }
+    };
+
+    // Heartbeat (FR-014, FR-027): clears the changed highlight, ages presence, and scans for agents.
+    const beat = (): void => {
+      if (stopped) return;
+      if (rearmNeeded()) {
+        arm();
+        refresh();
+      }
+      const now = Date.now();
+      data = withBurndown({ ...data, presence: presenceOf(data.features, now) });
+      update?.((s) => ({ ...s, now, changed: new Set(), changedTasks: new Set() }));
+      void scan().then((found) => {
+        if (stopped || found === null) return;
+        matches = matchAgents(found, allCheckouts(checkouts), process.pid);
+        data = withBurndown({ ...data, presence: presenceOf(data.features, Date.now()) });
+        update?.((s) => ({ ...s }));
+      });
+    };
+
     await runFullscreen({
-      initial: initOverviewTui(filters),
-      render: (s) => renderOverviewTui(this.caps, data, s, (story) => tasksForStory(root, story)),
-      reduce: (s, key) => reduceOverviewTui(data, s, key),
+      initial: { ...initOverviewTui(filters), live: { mode: "watching", lastChange: Date.now() } },
+      render: (s) => renderOverviewTui(this.caps, data, s),
+      reduce: (s, key) => {
+        // `r` restarts monitoring when it is paused (ui.md LiveIndicator).
+        if (key.name === "r" && s.input === null && s.live?.mode === "paused") {
+          arm();
+          refresh();
+          return { ...s, live: { mode: watcher?.mode ?? "paused", lastChange: Date.now() } };
+        }
+        return reduceOverviewTui(data, s, key);
+      },
       isDone: isOverviewDone,
-      // History is read after the first frame, so the burndown shows "computing" then fills in place.
-      start: (update) =>
+      start: (u) => {
+        update = u;
+        arm();
+        setLive(watcher!.mode);
+        heartbeat = setInterval(beat, LIVE_TOKENS.time["heartbeat-s"] * 1000);
+        // History is read after the first frame, so the burndown shows "computing" then fills in place.
         setImmediate(() => {
+          if (stopped) return;
           data.burndownFor(filters);
-          update((s) => ({ ...s, burndownReady: true }));
-        }),
+          u((s) => ({ ...s, burndownReady: true }));
+          beat();
+        });
+      },
+      resize: (columns) => {
+        this.caps = { ...this.caps, columns };
+        maxPeriods = maxPeriodsFor(columns);
+        cache.clear();
+      },
+      stop: () => {
+        stopped = true;
+        watcher?.stop();
+        if (heartbeat) clearInterval(heartbeat);
+        update = null;
+      },
     });
     return 0;
   }
@@ -271,6 +409,17 @@ function resolveStories(stories: StoryProgress[], arg: string): StoryProgress[] 
   return stories.filter((s) => s.id === local);
 }
 
+/** The checkout a feature was read from (017 FR-006): its worktree, else the primary checkout. */
+function checkoutRoot(primary: string, f: FeatureSnapshot): string {
+  return f.checkout?.root ?? primary;
+}
+
+function checkoutJson(c: Checkout | undefined): Omit<Checkout, "root"> {
+  if (!c || c.kind === "main") return { kind: "main" };
+  const { root: _root, ...rest } = c;
+  return rest;
+}
+
 function tasksForStory(root: string, story: StoryProgress): TaskLine[] {
   const tasksPath = join(root, "specs", story.feature, "tasks.md");
   if (!existsSync(tasksPath)) return [];
@@ -287,6 +436,15 @@ function featureInScope(features: FeatureSnapshot[], filters: Filters): FeatureS
   if (scoped) return scoped;
   const base = applyFilters(features, { feature: filters.feature })[0]!;
   return { ...base, stories: [], tasks: base.tasks ? [] : null };
+}
+
+/** The project config, or null when it is missing or invalid (the dashboard never requires one). */
+function readConfig(root: string): AmbyConfig | null {
+  try {
+    return loadConfig(root);
+  } catch {
+    return null;
+  }
 }
 
 function truncate(s: string, n: number): string {

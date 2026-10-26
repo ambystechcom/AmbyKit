@@ -55,11 +55,42 @@ non-destructively (preserve, back up, skip hand-edits), keeping your agent docs 
 ## `ambykit dashboard [story-id]`
 
 ```text
-ambykit dashboard [story-id] [--interactive] [--json] [--status=X] [--feature=X]
+ambykit dashboard [story-id] [--interactive] [--json] [--status=X] [--feature=X] [--icons=nerd|unicode|ascii]
 ```
 
 Progress view over the story/task graph, computed locally from `specs/*/spec.md` + `tasks.md` (zero
-model tokens). `--interactive` opens a full-screen navigable view on a TTY.
+model tokens). It reads every feature worktree under `.worktrees/` too, so progress made in a
+worktree shows up from any checkout. `--interactive` opens a full-screen navigable view on a TTY
+that updates live as files change and shows which assistant is working on which feature.
+
+### Icons
+
+The dashboard uses Unicode icons by default (`⎇` for a worktree, `✸ Claude`, `◎ Codex`, …) and
+ASCII tags (`wt`, `[CC] Claude`) where Unicode isn't supported. If your terminal font is a
+[Nerd Font](https://www.nerdfonts.com/), you can switch the worktree tag to the git-branch icon
+(`oct-git_branch`, U+F418). Agent icons stay Unicode in every mode, because older Nerd Fonts lack
+the brand glyphs.
+
+| Way | Scope |
+| --- | --- |
+| `ambykit dashboard --interactive --icons=nerd` | One run |
+| `AMBYKIT_ICONS=nerd` environment variable | Every run where it's set |
+
+The flag wins over the variable, so `--icons=unicode` turns Nerd icons off for one run, and
+`--icons=ascii` forces ASCII tags. To set the variable permanently:
+
+```powershell
+# Windows (PowerShell); open a new terminal afterwards
+[Environment]::SetEnvironmentVariable("AMBYKIT_ICONS", "nerd", "User")
+```
+
+```bash
+# macOS / Linux: add to ~/.zshrc or ~/.bashrc
+export AMBYKIT_ICONS=nerd
+```
+
+There is no project setting for this on purpose: whether Nerd icons render depends on each
+person's terminal font, and `.amby/config.json` is shared through git.
 
 ## `ambykit analyze`
 
@@ -101,6 +132,16 @@ ambykit worktree remove <feature>   # delete the working copy; branch is kept (-
 Per-feature git worktrees for parallel work without checkout switching. Worktrees live at
 `.worktrees/<feature>/` (gitignored); new branches start from the default branch. Enable automatic
 creation from `/amby.specify` at `ambykit init` or with `"worktrees": true` in `.amby/config.json`.
+
+## `ambykit activity`
+
+```text
+ambykit activity <feature> --agent=<tool-id> --phase=<phase> [--task=T###]
+```
+
+Records that an assistant started a phase on a feature, for the dashboard's agent presence. The
+phase prompts run it for you; it writes `.amby/activity/<feature>.<agent>.json` (git-ignored) and
+never fails: problems are warnings and it always exits 0.
 
 ## `ambykit update`
 

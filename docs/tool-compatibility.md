@@ -63,6 +63,39 @@ Several targets share one emitter's output (why `BaseEmitter` + thin subclasses 
   wins) with a 32 KiB combined-size cap; AmbyKit does not special-case this, consistent with every
   other `AGENTS.md`-native tool.
 
+## Agent detection (dashboard, feature 017)
+
+The interactive dashboard shows which assistant works on which feature. Two signals, keyed by the
+target ids above (`src/core/agents.ts`; a test keeps it in step with `TARGETS`):
+
+- **Self-report (primary, every tool).** The specify, design, plan, tasks, implement and converge
+  prompts run `ambykit activity <feature> --agent=$AGENT --phase=<phase>`. `BaseEmitter` replaces
+  `$AGENT` with the emitter's `toolId`, so aliases report their emitter's id (`claude-vscode` →
+  `claude`). The marker lands in `<checkout>/.amby/activity/` with a self-ignoring `.gitignore`.
+  Claude Code restricts command tools through `allowed-tools`, so phases without `bash` get only
+  `Bash(ambykit activity:*)` (Claude's documented prefix rule). No other tool emits a tool allowlist.
+- **Process detection (fallback, CLI agents only; `--interactive` only).** Executables checked
+  2026-10-26 (spec C-2):
+
+| Target | Executable | Source |
+|---|---|---|
+| `claude` | `claude` (native and npm installs) | code.claude.com/docs/en/setup |
+| `codex` | `codex` | learn.chatgpt.com/docs/codex/cli |
+| `opencode` | `opencode`, or node running `opencode-ai` | opencode.ai/docs |
+| `copilot-cli` | `copilot`, or node running `@github/copilot` | docs.github.com (Copilot CLI command reference) |
+| `cursor-cli` | `cursor-agent`, or `agent` only when its path contains `cursor` | cursor.com/docs/cli/installation |
+
+IDE-hosted agents (`claude-vscode`, `copilot`, `cursor`, `antigravity`) run inside the editor process
+and can't be told apart, so they are self-report only. `antigravity-cli` has no documented executable
+name yet, so it is also self-report only. Working directories come from `lsof` (macOS) or
+`/proc/<pid>/cwd` (Linux). Windows exposes no cwd through CIM, so Windows detections are shown as
+"unknown location", never tied to a feature.
+
+**Icons (spec C-3).** Nerd Font glyphs are opt-in (`AMBYKIT_ICONS=nerd` or `--icons=nerd`) and
+currently affect only the worktree tag, which uses Octicons `oct-git_branch` U+F418. Agent icons stay
+Unicode in every mode: the brand glyphs (`cod-claude` U+EC82, `cod-openai` U+EC81) only arrived in
+recent Nerd Fonts (present in v3.5.1), and older installs render them as empty boxes.
+
 ## To verify against a live install
 
 Docs conflicted on a couple of points; confirm before shipping those emitters:

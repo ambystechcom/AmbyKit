@@ -114,6 +114,20 @@ branch is already merged. Opt in to automatic creation from `/amby.specify` by a
 Progress view over the story/task graph, computed locally from `specs/*/` files and, for the
 burndown, read-only git history (no model tokens, no network, writes nothing).
 
+**Worktrees.** The dashboard reads the primary checkout plus every feature worktree under
+`.worktrees/` (see `ambykit worktree`), and shows the same numbers wherever you run it. A worktree
+contributes only its own feature's directory, which replaces the copy on the default branch. Rows
+read from a worktree carry a checkout tag (`⎇`, `⎇●` dirty, `⎇⊘` merged; `wt`, `wt*`, `wt merged` in
+plain output), and a **Worktrees & agents** panel lists them. Projects without worktrees look
+exactly as before. A worktree that can't be read is named in a notice line.
+
+**Agents.** Assistants report the phase and task they are on with `ambykit activity` (the phase
+prompts do this). The dashboard shows them as `● active` (activity in the last 2 minutes),
+`○ idle` (30 minutes) or `– stale`. Change the thresholds with
+`"dashboard": { "activeMinutes": 2, "idleMinutes": 30 }` in `.amby/config.json`. In
+`--interactive` mode, running CLI agents are also detected from the process list and marked `~`.
+Detection reads the process list only, never sends anything, and stops when you quit.
+
 - **No arg** — the overview, top to bottom:
   - summary cards: features, stories, tasks done/total, overall completion;
   - **story status** stacked bar with a legend (each status has its own fill pattern and glyph, so
@@ -140,12 +154,22 @@ burndown, read-only git history (no model tokens, no network, writes nothing).
   match several; qualify it with the feature ref as `NNN:US-3` (also accepts `NNN/US-3`). A bare id
   that matches more than one feature prints the matches so you can pick.
 - **`--interactive`** — the overview full screen (TTY only): `tab` moves focus between Attention, Up
-  next and Feature completion, `↑`/`↓` move, `enter` opens the feature view (and a story's tasks from
-  there), `esc` goes back, `f` filters by feature, `s` cycles the status filter, `q` quits. On a
-  non-interactive terminal it prints the plain overview.
+  next, Worktrees & agents and Feature completion, `↑`/`↓` move, `enter` opens the feature view and,
+  from there, the story detail (tasks, relations, checkout and agent). `esc` goes back (on the
+  overview it clears the filters), `f` filters by feature, `s` cycles the status filter, `?` shows
+  the keys and glyph legend, `q` quits. The screen is **live**: a change to any checkout's specs or
+  activity markers repaints within a second, keeping your place and any filter you're typing. The
+  header shows `● live · 3s ago`; where file watching is unavailable it polls every 2 s
+  (`◌ polling`), and if monitoring fails it shows `⚠ live paused` and `r` retries. On a
+  non-interactive terminal it prints the plain overview, and nothing is watched.
+- **`--icons=nerd|unicode|ascii`** — icon set. `nerd` (also `AMBYKIT_ICONS=nerd`) shows the
+  worktree tag as the Nerd Font git-branch icon; agent icons stay Unicode. `ascii` uses tags like
+  `[CC] Claude` and `wt`. The default is unicode when the terminal supports it.
 - **`--json`** — the story list as JSON, unchanged from earlier releases.
 - **`--json --overview`** — one object: `stories` (exactly the `--json` list) plus `summary`,
   `statusCounts`, `features`, `attention`, `upNext`, `burndown`, `issues` and the applied `filters`.
+  Each feature has a `checkout`: `{ "kind": "main" }`, or
+  `{ "kind": "worktree", "branch", "dirty", "stale" }`.
 
 ```bash
 ambykit dashboard
@@ -157,6 +181,20 @@ ambykit dashboard --stories              # the story table
 ambykit dashboard 001:US-3               # story detail (feature-qualified)
 ambykit dashboard --json                 # story list
 ambykit dashboard --json --overview      # story list + every aggregate
+ambykit dashboard --interactive --icons=nerd
+```
+
+## `ambykit activity <feature>`
+
+Records that an assistant started a phase on a feature, for the dashboard's agent presence. You
+rarely run it yourself: the specify, design, plan, tasks, implement and converge prompts run it,
+with `--agent` already set to the tool's id. It writes
+`.amby/activity/<feature>.<agent>.json` in the checkout it runs in. The directory has its own
+`.gitignore`, so markers never reach git. It never fails the assistant: an unknown feature or a
+missing flag is a warning, and the exit code is always 0.
+
+```bash
+ambykit activity 017 --agent=claude --phase=implement --task=T014
 ```
 
 ## `ambykit analyze`

@@ -10,6 +10,8 @@ Generate `tasks.md` for feature `the user's request that followed this skill inv
 
 Context: read that feature's `plan.md` (and `spec.md` for story IDs/priorities/dependencies).
 
+Run `ambykit activity <feature> --agent=codex --phase=tasks` first, with that feature's number; ignore any error.
+
 1. Write tasks following `@.amby/templates/tasks.md` as checkbox lines:
    `- [ ] [T###] [P?] [US#] description (file/path)`.
 2. Group into phases: **Setup → Foundational → User stories (by priority) → Polish**. Enforce the

@@ -1,0 +1,344 @@
+{
+  "$schema": "https://ambystech.dev/schemas/design-tokens.json",
+  "$note": "Terminal UI tokens for 017-live-dashboard. EXTENDS specs/014-enhanced-dashboard/design-tokens.json: every 014 token is inherited unchanged; only additions are listed here. Same tiers and capability resolution as 014. Agent colors are identity (never status) and are always paired with the agent's glyph and name. 'nerd' glyphs are Nerd Fonts v3.5.1 Codicons (glyphnames.json 2026-08-21), used only when icons=nerd; agents without a verified glyph reuse their Unicode glyph. Contrast measured on canvas-900 #0e152d (dark) and #ffffff (light).",
+  "$extends": "specs/014-enhanced-dashboard/design-tokens.json",
+  "primitive": {
+    "sgr": {
+      "fg-white": "37"
+    },
+    "rgb": {
+      "clay-on-dark": "#e8896b",
+      "clay-deep": "#a8462a",
+      "silver": "#d4d8e0",
+      "slate-deep": "#3b4252",
+      "teal": "#4fd1c5",
+      "teal-deep": "#0f766e",
+      "sky": "#8fb8ff",
+      "sky-deep": "#2f5bd3",
+      "leaf": "#7dd36f",
+      "leaf-deep": "#2e7d32"
+    },
+    "glyph": {
+      "agent-claude": {
+        "u": "\u2738",
+        "a": "[CC]"
+      },
+      "agent-codex": {
+        "u": "\u25ce",
+        "a": "[CX]"
+      },
+      "agent-opencode": {
+        "u": "\u25c7",
+        "a": "[OC]"
+      },
+      "agent-cursor": {
+        "u": "\u27a4",
+        "a": "[CU]"
+      },
+      "agent-copilot": {
+        "u": "\u25c9",
+        "a": "[CP]"
+      },
+      "agent-antigravity": {
+        "u": "\u25b2",
+        "a": "[AG]"
+      },
+      "agent-generic": {
+        "u": "\u25cf",
+        "a": "[??]"
+      },
+      "worktree": {
+        "u": "\u2387",
+        "a": "wt"
+      },
+      "dirty": {
+        "u": "\u25cf",
+        "a": "*"
+      },
+      "merged": {
+        "u": "\u2298",
+        "a": "-merged"
+      },
+      "live": {
+        "u": "\u25cf",
+        "a": "live"
+      },
+      "polling": {
+        "u": "\u25cc",
+        "a": "poll"
+      },
+      "active": {
+        "u": "\u25cf",
+        "a": "[*]"
+      },
+      "idle": {
+        "u": "\u25cb",
+        "a": "[o]"
+      },
+      "stale": {
+        "u": "\u2013",
+        "a": "[-]"
+      },
+      "detected": {
+        "u": "~",
+        "a": "~"
+      },
+      "caret": {
+        "u": "\u258f",
+        "a": "_"
+      }
+    },
+    "nerd": {
+      "worktree": {
+        "u": "",
+        "a": "{primitive.glyph.worktree.a}"
+      },
+      "claude": {
+        "u": "\uec82",
+        "a": "{primitive.glyph.agent-claude.a}"
+      },
+      "codex": {
+        "u": "\uec81",
+        "a": "{primitive.glyph.agent-codex.a}"
+      },
+      "copilot": {
+        "u": "\uec1e",
+        "a": "{primitive.glyph.agent-copilot.a}"
+      },
+      "generic": {
+        "u": "\uec20",
+        "a": "{primitive.glyph.agent-generic.a}"
+      }
+    },
+    "time": {
+      "heartbeat-s": 5,
+      "debounce-ms": 150,
+      "poll-s": 2,
+      "active-min": 2,
+      "idle-min": 30
+    },
+    "limit": {
+      "worktrees-max-wide": 8,
+      "worktrees-max-narrow": 5,
+      "notice-max": 3
+    }
+  },
+  "semantic": {
+    "color": {
+      "agent-claude": {
+        "truecolor": {
+          "dark": "{primitive.rgb.clay-on-dark}",
+          "light": "{primitive.rgb.clay-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-yellow}"
+      },
+      "agent-codex": {
+        "truecolor": {
+          "dark": "{primitive.rgb.silver}",
+          "light": "{primitive.rgb.slate-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-white}"
+      },
+      "agent-opencode": {
+        "truecolor": {
+          "dark": "{primitive.rgb.amber}",
+          "light": "{primitive.rgb.amber-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-yellow}"
+      },
+      "agent-cursor": {
+        "truecolor": {
+          "dark": "{primitive.rgb.teal}",
+          "light": "{primitive.rgb.teal-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-cyan}"
+      },
+      "agent-copilot": {
+        "truecolor": {
+          "dark": "{primitive.rgb.sky}",
+          "light": "{primitive.rgb.sky-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-blue}"
+      },
+      "agent-antigravity": {
+        "truecolor": {
+          "dark": "{primitive.rgb.leaf}",
+          "light": "{primitive.rgb.leaf-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-green}"
+      }
+    },
+    "symbol": {
+      "worktree": "{primitive.glyph.worktree}",
+      "dirty": "{primitive.glyph.dirty}",
+      "merged": "{primitive.glyph.merged}",
+      "active": "{primitive.glyph.active}",
+      "idle": "{primitive.glyph.idle}",
+      "stale": "{primitive.glyph.stale}"
+    },
+    "time": {
+      "active": "{primitive.time.active-min}",
+      "idle": "{primitive.time.idle-min}",
+      "heartbeat": "{primitive.time.heartbeat-s}"
+    }
+  },
+  "component": {
+    "checkout-tag": {
+      "glyph": "{semantic.symbol.worktree}",
+      "nerd": "{primitive.nerd.worktree}",
+      "fg": "{semantic.color.state-ready}",
+      "dirty": {
+        "glyph": "{semantic.symbol.dirty}",
+        "fg": "{semantic.color.warn}"
+      },
+      "stale": {
+        "glyph": "{semantic.symbol.merged}",
+        "fg": "{semantic.color.muted}"
+      }
+    },
+    "live": {
+      "watching": {
+        "glyph": "{primitive.glyph.live}",
+        "fg": "{semantic.color.state-done}"
+      },
+      "polling": {
+        "glyph": "{primitive.glyph.polling}",
+        "fg": "{semantic.color.muted}"
+      },
+      "paused": {
+        "glyph": "{semantic.symbol.graph-problem}",
+        "fg": "{semantic.color.warn}"
+      },
+      "ago-fg": "{semantic.color.muted}",
+      "changed": {
+        "fg": "{semantic.color.accent}",
+        "weight": "{semantic.weight.heading}"
+      }
+    },
+    "agent": {
+      "claude": {
+        "name": "Claude",
+        "glyph": "{primitive.glyph.agent-claude}",
+        "nerd": "{primitive.nerd.claude}",
+        "fg": "{semantic.color.agent-claude}"
+      },
+      "claude-vscode": {
+        "name": "Claude",
+        "glyph": "{primitive.glyph.agent-claude}",
+        "nerd": "{primitive.nerd.claude}",
+        "fg": "{semantic.color.agent-claude}"
+      },
+      "codex": {
+        "name": "Codex",
+        "glyph": "{primitive.glyph.agent-codex}",
+        "nerd": "{primitive.nerd.codex}",
+        "fg": "{semantic.color.agent-codex}"
+      },
+      "opencode": {
+        "name": "OpenCode",
+        "glyph": "{primitive.glyph.agent-opencode}",
+        "nerd": "{primitive.glyph.agent-opencode}",
+        "fg": "{semantic.color.agent-opencode}"
+      },
+      "copilot": {
+        "name": "Copilot",
+        "glyph": "{primitive.glyph.agent-copilot}",
+        "nerd": "{primitive.nerd.copilot}",
+        "fg": "{semantic.color.agent-copilot}"
+      },
+      "copilot-cli": {
+        "name": "Copilot CLI",
+        "glyph": "{primitive.glyph.agent-copilot}",
+        "nerd": "{primitive.nerd.copilot}",
+        "fg": "{semantic.color.agent-copilot}"
+      },
+      "cursor": {
+        "name": "Cursor",
+        "glyph": "{primitive.glyph.agent-cursor}",
+        "nerd": "{primitive.glyph.agent-cursor}",
+        "fg": "{semantic.color.agent-cursor}"
+      },
+      "cursor-cli": {
+        "name": "Cursor CLI",
+        "glyph": "{primitive.glyph.agent-cursor}",
+        "nerd": "{primitive.glyph.agent-cursor}",
+        "fg": "{semantic.color.agent-cursor}"
+      },
+      "antigravity": {
+        "name": "Antigravity",
+        "glyph": "{primitive.glyph.agent-antigravity}",
+        "nerd": "{primitive.glyph.agent-antigravity}",
+        "fg": "{semantic.color.agent-antigravity}"
+      },
+      "antigravity-cli": {
+        "name": "Antigravity CLI",
+        "glyph": "{primitive.glyph.agent-antigravity}",
+        "nerd": "{primitive.glyph.agent-antigravity}",
+        "fg": "{semantic.color.agent-antigravity}"
+      },
+      "generic": {
+        "name": "",
+        "glyph": "{primitive.glyph.agent-generic}",
+        "nerd": "{primitive.nerd.generic}",
+        "fg": "{semantic.color.muted}"
+      },
+      "detected": {
+        "prefix": "{primitive.glyph.detected}",
+        "fg": "{semantic.color.muted}"
+      }
+    },
+    "presence": {
+      "active": {
+        "glyph": "{semantic.symbol.active}",
+        "fg": "{semantic.color.state-done}"
+      },
+      "idle": {
+        "glyph": "{semantic.symbol.idle}",
+        "fg": "{semantic.color.state-in-progress}"
+      },
+      "stale": {
+        "glyph": "{semantic.symbol.stale}",
+        "fg": "{semantic.color.muted}"
+      }
+    },
+    "worktrees-panel": {
+      "max-wide": "{primitive.limit.worktrees-max-wide}",
+      "max-narrow": "{primitive.limit.worktrees-max-narrow}"
+    },
+    "overlay": {
+      "backdrop": "{semantic.color.muted}",
+      "frame": "{component.panel.focused}"
+    },
+    "input": {
+      "label-fg": "{semantic.color.muted}",
+      "fg": "{semantic.color.text}",
+      "caret": "{primitive.glyph.caret}",
+      "frame-fg": "{semantic.color.accent-strong}"
+    },
+    "empty-state": {
+      "title-fg": "{semantic.color.text}",
+      "hint-fg": "{semantic.color.muted}"
+    },
+    "notice": {
+      "max-lines": "{primitive.limit.notice-max}"
+    }
+  },
+  "$contrast": {
+    "dark": {
+      "agent-claude (clay-on-dark)": 7.06,
+      "agent-codex (silver)": 12.63,
+      "agent-cursor (teal)": 9.67,
+      "agent-copilot (sky)": 8.99,
+      "agent-antigravity (leaf)": 9.81,
+      "agent-opencode (amber, 014)": 9.8
+    },
+    "light": {
+      "agent-claude (clay-deep)": 5.88,
+      "agent-codex (slate-deep)": 10.06,
+      "agent-cursor (teal-deep)": 5.47,
+      "agent-copilot (sky-deep)": 5.9,
+      "agent-antigravity (leaf-deep)": 5.13,
+      "agent-opencode (amber-deep, 014)": 4.87
+    }
+  }
+}

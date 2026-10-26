@@ -1,8 +1,10 @@
+import type { Presence } from "../../../core/activity.js";
 import type { AttentionItem, Clarification, FeatureSnapshot } from "../../../core/overview-types.js";
 import { statusCounts, statusOf, storyLabel } from "../../../core/overview.js";
 import { progressCell, renderTable } from "../table.js";
 import { paintToken } from "../theme.js";
 import type { Capabilities, Cell } from "../types.js";
+import { agentBadge, checkoutBadge, phaseLabel, presenceLabel } from "./agent-badge.js";
 import { glyph, panel, sideBySide } from "./panel.js";
 import { statusBar } from "./status-chart.js";
 import { TOKENS } from "./tokens.js";
@@ -62,10 +64,74 @@ function renderStatus(caps: Capabilities, f: FeatureSnapshot, width: number): st
   return [legend, statusBar(caps, counts, Math.max(1, width))];
 }
 
-/** The three header panels: side by side when wide, stacked when narrow. */
-export function featurePanels(caps: Capabilities, f: FeatureSnapshot, width: number, mode: "wide" | "narrow"): string[] {
+/** Agent context for the CHECKOUT & AGENT panel (feature 017). */
+export interface AgentContext {
+  presence?: Presence;
+  now: number;
+}
+
+/** CHECKOUT & AGENT body (ui.md US-4): checkout badge, agent + phase, presence, then `also:` others. */
+export function checkoutAgentLines(caps: Capabilities, f: FeatureSnapshot, ctx: AgentContext): string[] {
+  const muted = TOKENS.semantic.color.muted;
+  const lines = [checkoutBadge(caps, f.checkout)];
+  const p = ctx.presence;
+  if (!p) return [...lines, paintToken(caps, muted, "No agent reported")];
+  const phase = phaseLabel(caps, p);
+  lines.push(`${agentBadge(caps, p)}${phase ? "  " + phase : ""}`, presenceLabel(caps, p, ctx.now));
+  const dot = caps.unicode ? " · " : " - ";
+  for (const o of p.others) {
+    lines.push(paintToken(caps, muted, "also: ") + agentBadge(caps, o) + paintToken(caps, muted, [o.phase, o.state].filter(Boolean).map((x) => dot + x).join("")));
+  }
+  return lines;
+}
+
+/** One line when the spec is clarified, else the full 014 panel (ui.md US-4 feature view). */
+function clarificationsBlock(caps: Capabilities, f: FeatureSnapshot, width: number): string[] {
+  const dot = caps.unicode ? " · " : " - ";
+  const title = `OPEN CLARIFICATIONS${dot}${f.clarifications.length}`;
+  if (f.clarifications.length === 0) {
+    return [paintToken(caps, TOKENS.semantic.color.muted, ` ${title}${caps.unicode ? " — " : " - "}spec fully clarified.`)];
+  }
+  return panel(caps, { title, width }, renderClarifications(caps, f.clarifications));
+}
+
+/**
+ * The three header panels: side by side when wide, stacked when narrow. With an agent context
+ * (feature 017) CHECKOUT & AGENT takes the clarifications slot and clarifications move below.
+ */
+export function featurePanels(
+  caps: Capabilities,
+  f: FeatureSnapshot,
+  width: number,
+  mode: "wide" | "narrow",
+  agent?: AgentContext,
+): string[] {
   const dot = caps.unicode ? " · " : " - ";
   const clarTitle = `OPEN CLARIFICATIONS${dot}${f.clarifications.length}`;
+  if (agent) {
+    if (mode === "narrow") {
+      return [
+        ...panel(caps, { title: "ARTIFACTS", width }, renderArtifacts(caps, f)),
+        ...panel(caps, { title: "CHECKOUT & AGENT", width }, checkoutAgentLines(caps, f, agent)),
+        ...panel(caps, { title: "STATUS", width }, renderStatus(caps, f, width - 6)),
+        ...clarificationsBlock(caps, f, width),
+      ];
+    }
+    const w = Math.floor((width - 2) / 3);
+    const last = width - 2 - 2 * w;
+    return [
+      ...sideBySide(
+        [
+          panel(caps, { title: "ARTIFACTS", width: w }, renderArtifacts(caps, f)),
+          panel(caps, { title: "CHECKOUT & AGENT", width: w }, checkoutAgentLines(caps, f, agent)),
+          panel(caps, { title: "STATUS", width: last }, renderStatus(caps, f, last - 6)),
+        ],
+        [w, w, last],
+        1,
+      ),
+      ...clarificationsBlock(caps, f, width),
+    ];
+  }
   if (mode === "narrow") {
     return [
       ...panel(caps, { title: "ARTIFACTS", width }, renderArtifacts(caps, f)),
