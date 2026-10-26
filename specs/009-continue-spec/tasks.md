@@ -50,5 +50,5 @@ created: 2026-07-20
 
 - [x] [T090] Add site workflow page `revise.mdx` (phase/command/reads/writes) + renumber `order` after clarify for A3 contiguity (site/src/content/docs/workflow/revise.mdx, site/src/content/docs/workflow/*.mdx)
 - [x] [T091] [P] Mention `/amby.revise` in the workflow docs (docs/workflow.md)
-- [ ] [T092] docs-sync green ✓ + emitter/e2e file-count updated ✓; **pending:** run `ambykit sync` to regenerate the repo's own `.claude/commands/amby.revise.md` (self-host, user-controlled) (repo root, test/*)
+- [x] [T092] docs-sync green ✓ + emitter/e2e file-count updated ✓; **pending:** run `ambykit sync` to regenerate the repo's own `.claude/commands/amby.revise.md` (self-host, user-controlled) (repo root, test/*)
 - [x] [T093] `npm run typecheck` + `npm test` green (repo root)

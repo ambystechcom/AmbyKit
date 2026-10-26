@@ -80,4 +80,4 @@ created: 2026-07-20
 
 ## Phase 8 — Polish
 
-- [ ] [T092] Run `ambykit sync` to regenerate this repo's own tool files; `npm run typecheck` + `npm test` green (repo root)
+- [x] [T092] Run `ambykit sync` to regenerate this repo's own tool files; `npm run typecheck` + `npm test` green (repo root)
