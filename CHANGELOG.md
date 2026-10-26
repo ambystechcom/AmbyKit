@@ -10,6 +10,40 @@ Release notes with full detail live on the
 
 ## [Unreleased]
 
+## [1.3.0] — 2026-10-26
+
+Live dashboard: worktree-aware, realtime, with agent presence.
+
+### Added
+
+- The dashboard reads every feature worktree under `.worktrees/` (feature 017), so progress made in
+  a worktree shows from any checkout. Worktree rows carry a checkout tag (`⎇`, dirty `●`, merged
+  `⊘`), a **Worktrees & agents** panel lists them, and `--json --overview` adds a `checkout` to each
+  feature. Projects without worktrees look as before.
+- `ambykit dashboard --interactive` is live: changes to any checkout's specs repaint within a second,
+  keeping your place and any filter you're typing. Falls back to polling where file watching is
+  unavailable; `r` retries if monitoring pauses.
+- Agent presence: the new `ambykit activity` command records which assistant is on which feature
+  and phase. Interactive mode also detects running CLI agents (Claude Code, Codex, OpenCode, Copilot
+  CLI, Cursor CLI) from the process list.
+- New interactive screens: story detail (tasks, relations, checkout and agent), a `?` help overlay,
+  and empty states.
+- `--icons=nerd|unicode|ascii` (or `AMBYKIT_ICONS`): Nerd Font mode shows the worktree tag as a
+  git-branch icon.
+
+### Changed
+
+- **Phase prompts now self-report.** The specify, design, plan, tasks, implement and converge
+  commands run `ambykit activity …` with the tool's id. Run `ambykit update` to pick this up; the
+  step's errors are ignored, so assistants without `ambykit` on PATH are unaffected. In Claude Code,
+  phases without shell access are granted only `Bash(ambykit activity:*)`.
+- The interactive story view is replaced by the new story detail screen.
+
+### Fixed
+
+- Faster worktree resolution: git state is read concurrently, keeping one-shot output under 1 s
+  with 10 worktrees on Windows.
+
 ## [1.2.0] — 2026-10-18
 
 Dashboard overview: widgets, charts, attention, up next, and burndown.
@@ -117,7 +151,8 @@ Packaging fixes.
 
 Initial release: the enhanced terminal UI and the AmbyKit documentation site.
 
-[Unreleased]: https://github.com/ambystechcom/AmbyKit/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/ambystechcom/AmbyKit/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/ambystechcom/AmbyKit/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ambystechcom/AmbyKit/compare/v1.0.0...v1.1.0
