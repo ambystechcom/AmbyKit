@@ -31,9 +31,9 @@ created: 2026-11-04
 
 ## Phase 3 — User story US-1  (priority: P1)
 
-- [ ] [T020] [US1] Make `AntigravityEmitter` extend `SkillsEmitter` with `.agents/skills`; no workflow output; update the doc comments (FR-001, FR-002, FR-003) (src/emitters/antigravity.ts, src/emitters/antigravity-cli.ts)
-- [ ] [T021] [P] [US1] Regenerate the two Antigravity golden fixtures and review the diff is only workflows to skills (test/fixtures/emitters-golden/antigravity.json, test/fixtures/emitters-golden/antigravity-cli.json)
-- [ ] [T022] [P] [US1] Snapshot test per Antigravity target: paths, `name`/`description` frontmatter, no `$ARGUMENTS`, edit-a-prompt-and-resync (FR-014) (test/antigravity-skills-018.test.ts)
+- [x] [T020] [US1] Make `AntigravityEmitter` extend `SkillsEmitter` with `.agents/skills`; no workflow output; update the doc comments (FR-001, FR-002, FR-003) (src/emitters/antigravity.ts, src/emitters/antigravity-cli.ts)
+- [x] [T021] [P] [US1] Regenerate the two Antigravity golden fixtures and review the diff is only workflows to skills (test/fixtures/emitters-golden/antigravity.json, test/fixtures/emitters-golden/antigravity-cli.json)
+- [x] [T022] [P] [US1] Snapshot test per Antigravity target: paths, `name`/`description` frontmatter, no `$ARGUMENTS`, edit-a-prompt-and-resync (FR-014) (test/antigravity-skills-018.test.ts)
 - **Checkpoint:** US-1 is demoable: a sync with either Antigravity target writes `.agents/skills/amby-*/SKILL.md`.
 
 ## Phase 4 — User story US-2  (priority: P1)

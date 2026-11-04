@@ -54,17 +54,19 @@ describe("CursorCliEmitter (surface: none)", () => {
   });
 });
 
-describe("AntigravityEmitter (surface: workflows)", () => {
-  it("emits a workflow at .agents/workflows with description-only frontmatter", () => {
+describe("AntigravityEmitter (surface: skills, feature 018)", () => {
+  it("emits a skill at .agents/skills/<name>/SKILL.md with name + description frontmatter", () => {
     const file = new AntigravityEmitter().emit([spec], ctx(false))[0]!;
-    expect(file.path).toBe(".agents/workflows/amby.specify.md");
+    expect(file.path).toBe(".agents/skills/amby-specify/SKILL.md");
+    expect(file.contents).toContain("name: amby-specify");
     expect(file.contents).toContain('description: "Turn a feature idea into a spec."');
     expect(file.contents).not.toContain("agent:");
+    expect(file.contents).not.toContain("$ARGUMENTS");
   });
 });
 
 describe("AntigravityCliEmitter", () => {
-  it("reuses the IDE emitter's workflow output", () => {
+  it("reuses the IDE emitter's skill output", () => {
     const ide = new AntigravityEmitter().emit([spec], ctx(false))[0]!;
     const cli = new AntigravityCliEmitter().emit([spec], ctx(false))[0]!;
     expect(cli.path).toBe(ide.path);

@@ -33,7 +33,7 @@ currently loads, so that `/amby.specify` and the other phases appear and run aft
   and confirm every phase command is listed and expands its prompt.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a project configured for the Antigravity IDE target, When I sync, Then each phase is emitted as
