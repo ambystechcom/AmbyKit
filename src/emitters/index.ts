@@ -94,20 +94,22 @@ export function getTarget(id: string): TargetDef | undefined {
 }
 
 /**
- * Targets that resolve to the same emitter and so share its output files (feature 016, FR-007):
- * one entry per emitter with two or more configured owners, e.g. `pi` + `codex` → `.agents/skills`.
- * Files are written once; removing one owner leaves them for the rest.
+ * Targets whose emitters write the same command directory share its output files (feature 016,
+ * FR-007; by directory since 018, so Antigravity and Codex, which are separate emitters, list as
+ * co-owners): one entry per directory with two or more configured owners, e.g. `pi` + `codex` +
+ * `antigravity` → `.agents/skills`. Files are written once; removing one owner leaves them for the rest.
  */
 export function sharedOutputs(ids: string[]): { dir: string; owners: string[] }[] {
-  const byEmitter = new Map<string, { dir: string; owners: string[] }>();
+  const byDir = new Map<string, { dir: string; owners: string[] }>();
   for (const id of ids) {
     const target = getTarget(id);
-    if (!target) continue;
-    const entry = byEmitter.get(target.emitter.toolId) ?? { dir: target.emitter.commandDir, owners: [] };
+    if (!target || target.emitter.commandSurface === "none") continue; // rules-only targets own no command dir
+    const dir = target.emitter.commandDir;
+    const entry = byDir.get(dir) ?? { dir, owners: [] };
     if (!entry.owners.includes(id)) entry.owners.push(id);
-    byEmitter.set(target.emitter.toolId, entry);
+    byDir.set(dir, entry);
   }
-  return [...byEmitter.values()].filter((e) => e.owners.length > 1);
+  return [...byDir.values()].filter((e) => e.owners.length > 1);
 }
 
 /** Distinct emitters for a set of target ids (deduped, so shared emitters emit once). */

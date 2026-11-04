@@ -17,8 +17,8 @@ Several targets share one emitter's output (why `BaseEmitter` + thin subclasses 
 | OpenCode | `OpenCodeEmitter` | `commands` |
 | Cursor | `CursorEmitter` | `commands` |
 | Cursor CLI (`cursor-agent`) | `CursorCliEmitter` | `none` (rules-only) |
-| Antigravity (IDE) | `AntigravityEmitter` | `workflows` |
-| Antigravity CLI (`agy`) | `AntigravityCliEmitter` | reuses Antigravity |
+| Antigravity (IDE) | `AntigravityEmitter` | `skills` (workflows retired 2026-10-19) |
+| Antigravity CLI (`agy`) | `AntigravityCliEmitter` | `skills` (reuses Antigravity) |
 | Codex CLI (`codex`) | `CodexEmitter` | `skills` |
 | Gemini CLI (`gemini`) | `GeminiEmitter` | `commands` (TOML) |
 | LLxprt Code (`llxprt`) | `LlxprtEmitter` | `commands` (TOML) |
@@ -34,10 +34,10 @@ Several targets share one emitter's output (why `BaseEmitter` + thin subclasses 
 | Concern | Claude Code | OpenCode | Copilot (VS Code) | Copilot CLI | Cursor | Cursor CLI | Antigravity | Codex CLI |
 |---|---|---|---|---|---|---|---|---|
 | Rules file | `CLAUDE.md` (+`@AGENTS.md` bridge) | `AGENTS.md` | `.github/copilot-instructions.md` + `AGENTS.md` | same as Copilot VS Code | `.cursor/rules/*.mdc` + `AGENTS.md` | Cursor config + `AGENTS.md` | `AGENTS.md` (+`GEMINI.md`) + `.agents/rules/*.md` | `AGENTS.md` |
-| Commands/prompts | `.claude/commands/amby/*.md` | `.opencode/commands/*.md` | `.github/prompts/*.prompt.md` | **none** → skills | `.cursor/commands/*.md` | none | `.agents/workflows/*.md` | `.agents/skills/*/SKILL.md` |
-| Command frontmatter | `description`, `argument-hint`, `allowed-tools`, `model` | `description`, `agent`, `model`, `subtask` | `description`, `name`, `agent`, `model`, `tools` | (skills) `name`, `description`, `allowed-tools` | plain body | — | `description` (+ `// turbo` line) | `name`, `description` |
+| Commands/prompts | `.claude/commands/amby/*.md` | `.opencode/commands/*.md` | `.github/prompts/*.prompt.md` | **none** → skills | `.cursor/commands/*.md` | none | `.agents/skills/<name>/SKILL.md` (shared with Codex) | `.agents/skills/*/SKILL.md` |
+| Command frontmatter | `description`, `argument-hint`, `allowed-tools`, `model` | `description`, `agent`, `model`, `subtask` | `description`, `name`, `agent`, `model`, `tools` | (skills) `name`, `description`, `allowed-tools` | plain body | — | `name`, `description` | `name`, `description` |
 | Scoped instructions | `.claude/rules/*.md` (`paths:`) | `instructions[]` in `opencode.json` | `.github/instructions/*.instructions.md` (`applyTo`) | same (`applyTo`, `excludeAgent`) | `.mdc` `globs`/`alwaysApply` | via `.mdc` | `.agents/rules/*.md` | nested `AGENTS.md`/`AGENTS.override.md` per directory (no glob key) |
-| Args placeholder | `$ARGUMENTS`, `$N`, `$name` | `$ARGUMENTS`, `$1` | `${input:x}` | — | prompt text | — | steps in body | none — trailing free text only (AmbyKit reworks `$ARGUMENTS` into prose) |
+| Args placeholder | `$ARGUMENTS`, `$N`, `$name` | `$ARGUMENTS`, `$1` | `${input:x}` | — | prompt text | — | none — reworded as prose (as Codex) | none — trailing free text only (AmbyKit reworks `$ARGUMENTS` into prose) |
 | Agents | `.claude/agents/*.md` | `.opencode/agents/*.md` | `.github/agents/*.agent.md` | `.github/agents/*.agent.md` | UI modes (no file) | — | none (SDK only) | none (skills only) |
 | Agent frontmatter | `name`*, `description`*, `tools`, `model` (body = system prompt) | `description`* (+`mode`, `permission`; filename = id) | `description`*, `name`, `tools` | same as Copilot VS Code | — | — | — | — |
 | MCP file | `.mcp.json` | `opencode.json` → `mcp` | `.vscode/mcp.json` | `~/.copilot/mcp-config.json` (user) | `.cursor/mcp.json` | reads `.cursor/mcp.json` | `mcp_config.json` (user) | `.codex/config.toml` (TOML) — **out of scope**, AmbyKit does not write it |
@@ -88,8 +88,20 @@ identical and `.augment/` takes precedence, so Claude plus Augment yields no dup
   `agy plugin import gemini`).
 - **Antigravity workflows are retired.** `.agents/workflows/*.md` stopped being indexed or run on
   2026-10-19; skills at `.agents/skills/<name>/SKILL.md` replace them. The `antigravity` and
-  `antigravity-cli` targets still emit workflows (tracked as feature 018); selecting `codex` or `pi`
-  already writes the skills Antigravity reads.
+  `antigravity-cli` targets now emit skills instead (feature 018), the same files as `codex` and `pi`.
+- **Antigravity skills** (antigravity.google/docs/skills/): frontmatter is `name` (optional, lowercase
+  and hyphens, defaults to the folder) and `description` (required). The CLI turns a skill into a slash
+  command named after the skill (the page's example: `deploy-staging` → `/deploy-staging`), so AmbyKit's
+  phases appear as `/amby-specify` etc. (dots become hyphens), not `/amby.specify`. The IDE lists skills
+  in the agent panel's Customizations menu and picks them by description. The migration guide states the
+  cutoff for the IDE and App and does not say whether the CLI is affected; both targets moved.
+- **Shared skill files.** Codex, Pi and both Antigravity targets write one file set under
+  `.agents/skills/`, differing only in the `--agent=<id>` the prompt reports. It is written once and
+  carries the highest-ranked id: `codex`, then `antigravity`, then `antigravity-cli`. `ambykit check`
+  names every owner. A skill file without AmbyKit's generated notice is never overwritten.
+- **Stale workflows.** Files from earlier releases at `.agents/workflows/amby.<phase>.md` are left in
+  place; `ambykit sync --prune-legacy` backs them up under `.amby/backups/` and removes only those
+  that carry the generated notice (`ambykit restore <file>` brings one back).
 
 ### Out of scope (FR-002)
 
@@ -113,11 +125,12 @@ identical and `.augment/` takes precedence, so Claude plus Augment yields no dup
   writes these only with explicit consent and excludes them from the "repo in sync" check.
 - **Scoped-instruction key differs**: Copilot `applyTo` vs Cursor `globs` (+ `alwaysApply`).
 - **Command surface differs**: Copilot CLI has no `.prompt.md`; phases map to `SKILL.md`. Antigravity
-  uses `.agents/workflows/*.md` with a `// turbo` line to auto-run a step. Cursor CLI is rules-only.
+  now uses skills (`.agents/skills/<name>/SKILL.md`); workflows (`.agents/workflows/*.md`, with a
+  `// turbo` line) are retired and only Windsurf still emits `workflows`. Cursor CLI is rules-only.
 - **OpenCode** uses plural dirs (`agents/`, `commands/`) and `provider/model-id` model strings.
 - **Antigravity** dir is `.agents/` (plural); `.agent/` is legacy read-compat.
-- **Codex** shares the `.agents/` root with Antigravity but a different subdirectory (`skills/` vs
-  `workflows/`) — the two coexist without collision when both targets are selected. Codex's skills
+- **Codex** shares `.agents/skills/` with Antigravity — the files are identical apart from the
+  self-report id and are written once (see the shared-file note above). Codex's skills
   frontmatter has no argument-placeholder key, so AmbyKit rewrites the neutral `$ARGUMENTS` token into
   prose rather than leaving a literal, un-substituted placeholder in the emitted `SKILL.md`. Codex's
   deprecated, user-level custom-prompts mechanism (`~/.codex/prompts/`, which does support

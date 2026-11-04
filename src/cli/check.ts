@@ -9,6 +9,7 @@ import { defaultBranch, isMerged, isRepo, worktreeList } from "../core/git.js";
 import { featureWorktrees } from "../core/worktree.js";
 import { ROLES_DIR, loadRoles, validateRoles } from "../core/roles.js";
 import { SHIPPED_ROLES } from "../core/scaffold.js";
+import { legacyWorkflowFiles } from "../core/legacy.js";
 
 export class CheckCommand extends BaseCommand {
   readonly name = "check";
@@ -53,6 +54,11 @@ export class CheckCommand extends BaseCommand {
 
     const files = buildEmittedFiles(root, config);
     const result = applyFiles(root, files, { dryRun: true, includeUser: false });
+    if (result.skippedForeign.length > 0) {
+      this.warn(`${result.skippedForeign.length} file(s) AmbyKit did not generate block its own output:`);
+      for (const p of result.skippedForeign) this.info(`  ! ${p}`);
+      ok = false;
+    }
     if (result.wouldChange.length > 0) {
       this.warn(`${result.wouldChange.length} generated file(s) are out of sync — run \`ambykit sync\`.`);
       for (const p of result.wouldChange) this.info(`  ~ ${p}`);
@@ -62,6 +68,13 @@ export class CheckCommand extends BaseCommand {
     // Targets that share one emitter write the same files once (feature 016, FR-007); name the owners.
     for (const s of sharedOutputs(config.tools)) {
       this.info(`  Shared output ${s.dir}/ is owned by: ${s.owners.join(", ")}.`);
+    }
+
+    // Stale generated Antigravity workflows (feature 018, FR-007): informational, never drift.
+    const stale = legacyWorkflowFiles(root, config);
+    if (stale.length > 0) {
+      this.warn(`${stale.length} stale Antigravity workflow file(s) no longer run — \`ambykit sync --prune-legacy\` removes them (backed up).`);
+      for (const p of stale) this.info(`  ~ ${p}`);
     }
 
     // Stale feature worktrees (feature 012, FR-013): branch already merged into the default branch.

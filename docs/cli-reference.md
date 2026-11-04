@@ -77,7 +77,17 @@ running it keeps your agent docs current without a full re-init.
 ```bash
 ambykit sync
 ambykit sync --dry-run
+ambykit sync --prune-legacy
 ```
+
+**Antigravity migration.** Antigravity retired workflows on 2026-10-19; the `antigravity` and
+`antigravity-cli` targets now write skills (`.agents/skills/amby-*/SKILL.md`, the same files Codex and Pi
+write). Workflow files that an earlier release generated at `.agents/workflows/amby.<phase>.md` are left
+in place and reported; `--prune-legacy` backs each up under `.amby/backups/` and removes only the ones
+that carry AmbyKit's generated notice (your own workflows are never touched; `ambykit restore <file>`
+brings one back). `sync` never overwrites an existing skill file that AmbyKit did not generate. When
+several targets write one skill file it is written once and reports one assistant id (`codex`, then
+`antigravity`, then `antigravity-cli`).
 
 Also installs any newly shipped templates, reference docs, and **roles** into `.amby/` (write-if-absent —
 your edits are kept), warns when a role in `.amby/roles/` exceeds 150 words, and refuses to emit

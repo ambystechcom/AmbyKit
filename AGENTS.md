@@ -59,7 +59,7 @@ Each emitter maps a neutral `CommandSpec` + rules context to native files. Get t
 paths and frontmatter keys from `docs/tool-compatibility.md` — they differ in ways that bite:
 - Rules file: `CLAUDE.md` (Claude, needs `@AGENTS.md` bridge) vs native `AGENTS.md` (everyone else).
 - Command surface: `commands` (`.prompt.md`/`.md`) vs `skills` (`SKILL.md`, Copilot CLI) vs
-  `workflows` (`.agents/workflows/*.md`, Antigravity) vs `none` (Cursor CLI, rules-only).
+  `workflows` (`.windsurf/workflows/*.md`, Windsurf; Antigravity's `.agents/workflows` is retired in favor of skills) vs `none` (Cursor CLI, rules-only).
 - Scoped instructions: Copilot `applyTo` vs Cursor `globs`.
 - MCP top-level key: `.mcp.json`/`servers`/`mcpServers`/`mcp` — and scope (project vs user-level).
 

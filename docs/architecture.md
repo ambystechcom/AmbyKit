@@ -21,7 +21,7 @@ src/prompts/    ── neutral phase CommandSpecs (constitution → implement)
         ├── .github/skills/amby-*/SKILL.md    (CopilotCliEmitter)
         ├── .opencode/commands/*.md           (OpenCodeEmitter)
         ├── .cursor/commands/*.md + rules     (CursorEmitter / CursorCliEmitter)
-        ├── .agents/workflows/*.md            (AntigravityEmitter / AntigravityCliEmitter)
+        ├── .agents/skills/amby-*/SKILL.md    (CodexEmitter, AntigravityEmitter / AntigravityCliEmitter)
         └── AGENTS.md (+ CLAUDE.md bridge)     (shared rules layer)
 ```
 

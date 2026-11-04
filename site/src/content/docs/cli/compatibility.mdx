@@ -20,8 +20,8 @@ emitter (VS Code extensions, sibling CLIs).
 | `opencode` | OpenCode | `commands` |
 | `cursor` | Cursor | `commands` |
 | `cursor-cli` | Cursor CLI | `none` (rules-only) |
-| `antigravity` | Antigravity (IDE) | `workflows` |
-| `antigravity-cli` | Antigravity CLI | `workflows` (reuses Antigravity) |
+| `antigravity` | Antigravity (IDE) | `skills` |
+| `antigravity-cli` | Antigravity CLI | `skills` (reuses Antigravity) |
 | `codex` | Codex CLI | `skills` |
 | `gemini` | Gemini CLI | `commands` (TOML) |
 | `llxprt` | LLxprt Code | `commands` (TOML) |
@@ -56,7 +56,7 @@ for sources.
 | Concern | Claude Code | OpenCode | Copilot (VS Code) | Copilot CLI | Cursor | Cursor CLI | Antigravity | Codex CLI |
 |---|---|---|---|---|---|---|---|---|
 | Rules file | `CLAUDE.md` (+`@AGENTS.md` bridge) | `AGENTS.md` | `.github/copilot-instructions.md` + `AGENTS.md` | same as Copilot | `.cursor/rules/*.mdc` + `AGENTS.md` | Cursor config + `AGENTS.md` | `AGENTS.md` + `.agents/rules/*.md` | `AGENTS.md` |
-| Commands | `.claude/commands/amby/*.md` | `.opencode/commands/*.md` | `.github/prompts/*.prompt.md` | **skills** | `.cursor/commands/*.md` | none | `.agents/workflows/*.md` | **skills** — `.agents/skills/*/SKILL.md` |
+| Commands | `.claude/commands/amby/*.md` | `.opencode/commands/*.md` | `.github/prompts/*.prompt.md` | **skills** | `.cursor/commands/*.md` | none | **skills** — `.agents/skills/*/SKILL.md` (shared with Codex) | **skills** — `.agents/skills/*/SKILL.md` |
 | MCP file | `.mcp.json` | `opencode.json` → `mcp` | `.vscode/mcp.json` (`servers`) | `~/.copilot/mcp-config.json` (`mcpServers`, user) | `.cursor/mcp.json` (`mcpServers`) | reads `.cursor/mcp.json` | `mcp_config.json` (`mcpServers`, user) | `.codex/config.toml` — not written (out of scope) |
 
 :::note
