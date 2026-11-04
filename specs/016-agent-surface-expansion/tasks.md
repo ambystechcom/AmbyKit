@@ -11,8 +11,8 @@ created: 2026-10-26
 
 ## Phase 1 — Setup
 
-- [ ] [T001] [P] Helper: emit one target into a temp project and return the path→contents map (test/helpers/emit-target.ts)
-- [ ] [T002] Golden test: record every file of the ten existing targets, then assert byte-identical — FR-010, SC-004 (test/emitters-golden.test.ts, test/fixtures/emitters-golden/)
+- [x] [T001] [P] Helper: emit one target into a temp project and return the path→contents map (test/helpers/emit-target.ts)
+- [x] [T002] Golden test: record every file of the ten existing targets, then assert byte-identical — FR-010, SC-004 (test/emitters-golden.test.ts, test/fixtures/emitters-golden/)
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
