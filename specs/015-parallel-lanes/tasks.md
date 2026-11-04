@@ -76,4 +76,4 @@ created: 2026-10-26
 - [x] [T093] [P] README + AGENTS.md project-structure line for the `lane` verb (README.md, AGENTS.md)
 - [x] [T094] [P] CHANGELOG Unreleased entry (CHANGELOG.md)
 - [x] [T095] FR→test traceability check; `npm run typecheck` + `npm test` + docs-sync — SC-006 (test/check-docs-sync.test.ts)
-- [ ] [T096] Dogfood: set `worktrees: true`, run `ambykit analyze` clean on this tasks.md, execute two Phase 7 tasks in separate lanes and merge — SC-007 (.amby/config.json)
+- [x] [T096] Dogfood: set `worktrees: true`, run `ambykit analyze` clean on this tasks.md, execute two Phase 7 tasks in separate lanes and merge — SC-007 (.amby/config.json)

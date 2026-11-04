@@ -4,5 +4,6 @@
     "claude",
     "codex"
   ],
-  "manageRules": false
+  "manageRules": false,
+  "worktrees": true
 }

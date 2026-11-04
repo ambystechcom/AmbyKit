@@ -11,8 +11,7 @@ Implement work for `$ARGUMENTS` (default: the next unblocked task in priority or
 
 Run `ambykit activity <feature> --agent=claude --phase=implement` first, with that feature's number; ignore any error.
 
-1. From `tasks.md`, pick the target task(s). If `.amby/lane/lane.json` exists you are in a lane: work
-   only the task ids it lists. Respect the Foundational-before-features gate and the
+1. From `tasks.md`, pick the target task(s). Respect the Foundational-before-features gate and the
    story dependency graph — never start a task whose story is `blocked-by` unfinished work.
 2. Load **only** the slice you need: the task line, the relevant `plan.md` section, and the specific
    files named. Don't read the whole spec tree (token-frugal).
