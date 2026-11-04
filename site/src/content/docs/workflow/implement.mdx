@@ -33,4 +33,10 @@ story's `status`, stopping at story checkpoints for review.
   writes={["specs/NNN-slug/tasks.md", "specs/NNN-slug/spec.md"]}
 />
 
+## Working in a lane
+
+When `ambykit lane <feature>` has split a phase into parallel lanes, run `/amby.implement` inside a
+lane's directory (`.worktrees/<feature>.lane-<phase>-<k>`). It reads `.amby/lane/lane.json` and works
+only the task ids listed there. Merge the lanes back with `ambykit lane merge <feature>`.
+
 Track progress any time with `ambykit dashboard`.

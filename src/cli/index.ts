@@ -15,6 +15,7 @@ import { RestoreCommand } from "./restore.js";
 import { UpdateCommand } from "./update.js";
 import { WorktreeCommand } from "./worktree.js";
 import { ActivityCommand } from "./activity.js";
+import { LaneCommand } from "./lane.js";
 import { outdatedWarning } from "./ui/callout.js";
 import { packageVersion } from "../core/paths.js";
 
@@ -29,6 +30,7 @@ const COMMANDS: BaseCommand[] = [
   new UpdateCommand(),
   new WorktreeCommand(),
   new ActivityCommand(),
+  new LaneCommand(),
 ];
 
 /** Parse argv (after the command name) into positionals + flags. */

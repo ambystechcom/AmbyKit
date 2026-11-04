@@ -20,6 +20,13 @@ Polish**, gated so no story task starts before Foundational completes. Tasks are
 dependency graph, tagged with their `US-#`, marked `[P]` when parallelizable, and each carries a
 stable `T###` id and a concrete file path.
 
+## File ownership
+
+Each task ends with its file paths as the last parenthesized group, for example
+`(src/core/lanes.ts, test/core/lanes.test.ts)`: repo-relative, comma-separated, directories end in `/`,
+no globs. `[P]` means "safe to run alongside other tasks in the phase", so no other task in that phase
+may share or nest one of its paths. `ambykit analyze` checks this and exits non-zero on a conflict.
+
 ## Command
 
 ```bash

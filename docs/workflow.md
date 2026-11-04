@@ -101,6 +101,26 @@ name. Opt in at `ambykit init` (or `"worktrees": true` in `.amby/config.json`) a
 creates the worktree for each new feature; `ambykit worktree list|remove` and `ambykit check` keep
 them tidy.
 
+## Parallel lanes
+
+Worktrees isolate *features*; **lanes** isolate *tasks within one feature*. Every task line ends with
+the files it owns, as its last parenthesized group:
+
+```text
+- [ ] [T031] [P] [US2] Conflict tests (test/core/lane-conflicts.test.ts, test/helpers/)
+```
+
+Paths are repo-relative and comma-separated, directories end in `/`, and globs are not allowed. Two
+open tasks in the same phase **conflict** when their paths overlap (a directory overlaps every file
+beneath it) and at least one is marked `[P]`; `ambykit analyze` reports them and exits non-zero, so
+CI can gate on it. Fix a conflict by dropping `[P]` or moving one task to a later phase.
+
+When a phase is clean, `ambykit lane <feature>` creates one worktree per lane, each with only its own
+tasks in a manifest, and `/amby.implement` run inside a lane works only those task ids. Lane progress
+shows in the dashboard's WORKTREES & AGENTS panel and counts toward the feature. When the lanes are
+done, `ambykit lane merge <feature>` merges them back, resolving check-off-only `tasks.md`
+differences automatically.
+
 ## Supported assistants
 
 The same neutral prompts are emitted for eighteen targets: Claude Code (CLI + VS Code), GitHub Copilot

@@ -142,11 +142,12 @@ target is a thin `BaseEmitter` subclass.
 | `ambykit add <tool…>` | Add/refresh one tool's integration |
 | `ambykit sync` | Re-emit all configured tools from the neutral source |
 | `ambykit dashboard [story-id]` | Progress view over the story/task graph |
-| `ambykit analyze` | Validate the dependency graph (cycles, blockers, orphans) |
+| `ambykit analyze` | Validate the dependency graph (cycles, blockers, orphans) and lane file ownership |
 | `ambykit check` | Doctor: verify integrations |
 | `ambykit restore [file]` | Restore an agent-doc file from its `.amby/backups/` backup |
 | `ambykit update` | Update the CLI to the latest, then refresh this project's prompts |
 | `ambykit worktree <feature>` | Isolated working copy per feature (`list`, `remove`) for parallel work |
+| `ambykit lane <feature>` | Split a phase's `[P]` tasks into conflict-free parallel lanes (`list`, `merge`, `remove`) |
 | `ambykit activity <feature>` | Record which assistant works on a feature (run by the phase prompts) |
 
 See [`docs/cli-reference.md`](./docs/cli-reference.md).

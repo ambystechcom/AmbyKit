@@ -125,6 +125,29 @@ branch is already merged. Opt in to automatic creation from `/amby.specify` by a
 `ambykit init`, or set `"worktrees": true` in `.amby/config.json`. Inside a worktree, phases resolve
 "the current feature" from the directory name.
 
+## `ambykit lane <feature> | list | remove <feature> [<lane>] | merge <feature> [<lane>]`
+
+**Parallel lanes**: split one phase's `[P]` tasks into isolated worktrees that cannot touch the same
+files, then merge them back. Lane `k` of phase `p` is the worktree and branch
+`.worktrees/<feature>.lane-<p>-<k>`, created from the feature branch. Each lane holds a manifest
+(`.amby/lane/lane.json`, self-ignoring) listing only its tasks. Zero model tokens. Requires
+`"worktrees": true` in `.amby/config.json`.
+
+```bash
+ambykit lane 015-slug                          # 2 lanes from the first phase with open [P] tasks
+ambykit lane 015-slug --phase=3 --lanes=3      # choose the phase and lane count
+ambykit lane list [015-slug]                   # tasks, done/total, clean/dirty/merged, drift
+ambykit lane merge 015-slug [3-1]              # merge finished lanes into the feature branch
+ambykit lane remove 015-slug [3-1] [--force]   # remove working copies (branches are kept)
+```
+
+Tasks are dealt round-robin in task order. Creating is refused when the phase has path conflicts
+(see `ambykit analyze`) and is a no-op when the lanes already exist. `merge` runs in the feature's
+checkout, which must be clean. Check-offs that land on adjacent `tasks.md` lines are resolved
+automatically (a box is ticked if either side ticked it); any other conflict aborts that lane's merge
+and leaves the checkout clean. `list` reports **drift** when a lane task is missing from, or has
+different paths in, the feature's current `tasks.md`.
+
 ## `ambykit dashboard [story-id]`
 
 Progress view over the story/task graph, computed locally from `specs/*/` files and, for the
@@ -220,9 +243,14 @@ Validate the story dependency graph, computed locally from `specs/` (no model to
 stories and **orphans** (stories with no tasks). Exits non-zero on structural errors, so it can gate
 CI. Complements the generative `/amby.analyze` phase.
 
+Also checks **lane ownership**: open tasks in the same phase that declare overlapping file paths,
+where at least one is `[P]`, are reported as **Lane conflicts** (by task id and path) and exit
+non-zero. Open tasks with no usable path, or a glob, are listed as warnings and do not affect the
+exit code.
+
 ```bash
 ambykit analyze
-ambykit analyze --json
+ambykit analyze --json   # includes lanes.conflicts and lanes.declarations
 ```
 
 ## `ambykit check`

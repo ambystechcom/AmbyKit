@@ -1,4 +1,6 @@
 import { computeDashboard, displayKey, storyKey, type StoryProgress } from "./dashboard.js";
+import { readFeatures } from "./features.js";
+import { declarations, laneConflicts, type Declaration, type LaneConflict } from "./lanes.js";
 
 export interface GraphIssue {
   kind: "cycle" | "dangling-reference";
@@ -19,6 +21,8 @@ export interface AnalysisReport {
   blocked: BlockedStory[];
   buildable: string[]; // qualified display ids: not done, all blockers done
   orphans: string[]; // qualified display ids: no tasks
+  /** Feature 015: parallel-lane ownership check over every feature's open tasks. */
+  lanes: { conflicts: LaneConflict[]; declarations: Declaration[] };
 }
 
 /** Combined hard dependencies of a story (depends-on ∪ blocked-by), deduped, as local ids. */
@@ -123,10 +127,16 @@ export function analyzeGraph(stories: StoryProgress[]): AnalysisReport {
 
   const orphans = stories.filter((s) => s.tasksTotal === 0).map((s) => displayKey(s));
 
-  return { total: stories.length, issues, blocked, buildable, orphans };
+  return { total: stories.length, issues, blocked, buildable, orphans, lanes: { conflicts: [], declarations: [] } };
 }
 
 /** Convenience: analyze a project by reading its specs/. */
 export function analyzeProject(projectRoot: string): AnalysisReport {
-  return analyzeGraph(computeDashboard(projectRoot));
+  const report = analyzeGraph(computeDashboard(projectRoot));
+  for (const f of readFeatures(projectRoot).features) {
+    if (f.tasks === null) continue;
+    report.lanes.conflicts.push(...laneConflicts(f.dir, f.tasks));
+    report.lanes.declarations.push(...declarations(f.dir, f.tasks));
+  }
+  return report;
 }

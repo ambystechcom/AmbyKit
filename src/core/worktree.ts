@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { basename, dirname, join, resolve, sep } from "node:path";
 import type { GitWorktree } from "./git.js";
+import { parseLaneName } from "./lanes.js";
 
 /** Directory (relative to the project root) that holds per-feature worktrees (FR-002). */
 export const WORKTREES_DIR = ".worktrees";
@@ -73,6 +74,8 @@ export function featureFromWorktreePath(dir: string): string | null {
   const i = parts.lastIndexOf(WORKTREES_DIR);
   if (i === -1 || i + 1 >= parts.length) return null;
   const id = parts[i + 1] ?? "";
+  const lane = parseLaneName(id); // a lane checkout belongs to its feature (015 FR-018)
+  if (lane) return lane.feature;
   return FEATURE_ID.test(id) ? id : null;
 }
 
@@ -153,6 +156,22 @@ export interface WorktreeStatus {
 export function featureWorktrees(root: string, list: GitWorktree[]): { feature: string; worktree: GitWorktree }[] {
   const base = resolve(root, WORKTREES_DIR);
   return list
-    .filter((w) => samePath(resolve(w.path, ".."), base))
+    .filter((w) => samePath(resolve(w.path, ".."), base) && !parseLaneName(basename(w.path)))
     .map((w) => ({ feature: featureFromWorktreePath(w.path) ?? (w.path.split(/[\\/]/).pop() ?? w.path), worktree: w }));
+}
+
+/** Lane worktrees under `.worktrees/` (feature 015), the counterpart of `featureWorktrees`. */
+export function laneWorktrees(
+  root: string,
+  list: GitWorktree[],
+): { feature: string; name: string; phase: number; index: number; worktree: GitWorktree }[] {
+  const base = resolve(root, WORKTREES_DIR);
+  const out: { feature: string; name: string; phase: number; index: number; worktree: GitWorktree }[] = [];
+  for (const w of list) {
+    if (!samePath(resolve(w.path, ".."), base)) continue;
+    const name = basename(w.path);
+    const lane = parseLaneName(name);
+    if (lane) out.push({ ...lane, name, worktree: w });
+  }
+  return out;
 }

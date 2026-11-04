@@ -57,10 +57,21 @@ const targets: WatchTarget[] = [
 ];
 
 describe("watchProject (feature 017, US-2)", () => {
+  it("also watches each lane's own feature dir and markers (feature 015)", () => {
+    const t = watchTargets({
+      primary: { root: "/p", kind: "main" },
+      worktrees: [],
+      lanes: [{ feature: "002-b", name: "002-b.lane-1-1", phase: 1, index: 1, manifest: null, checkout: { root: "/p/.worktrees/002-b.lane-1-1", kind: "lane" } }],
+    }).map((x) => x.path.replace(/[\\]/g, "/"));
+    expect(t).toContain("/p/.worktrees/002-b.lane-1-1/specs/002-b");
+    expect(t).toContain("/p/.worktrees/002-b.lane-1-1/.amby/activity");
+  });
+
   it("watches each checkout's specs and markers, and .worktrees", () => {
     const t = watchTargets({
       primary: { root: "/p", kind: "main" },
       worktrees: [{ feature: "002-b", checkout: { root: "/p/.worktrees/002-b", kind: "worktree" } }],
+      lanes: [],
     }).map((x) => x.path.replace(/\\/g, "/"));
     expect(t).toEqual(["/p/specs", "/p/.amby/activity", "/p/.worktrees", "/p", "/p/.worktrees/002-b/specs/002-b", "/p/.worktrees/002-b/.amby/activity"]);
   });

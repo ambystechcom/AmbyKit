@@ -39,10 +39,21 @@ export interface Clarification {
  */
 export interface Checkout {
   root: string; // absolute checkout path
-  kind: "main" | "worktree";
+  kind: "main" | "worktree" | "lane"; // "lane" = a feature-015 parallel lane
   branch?: string;
   dirty?: boolean;
   stale?: boolean; // branch merged into the default branch since it diverged
+}
+
+/** One parallel lane of a feature (feature 015): its task progress, git state and manifest drift. */
+export interface LaneView {
+  name: string; // NNN-slug.lane-P-K
+  phase: number;
+  index: number;
+  done: number;
+  total: number;
+  state: "clean" | "dirty" | "merged";
+  drift: string[]; // task ids missing from / changed in the feature's tasks.md
 }
 
 /** Everything the dashboard knows about one `specs/NNN-slug/` directory. */
@@ -56,6 +67,8 @@ export interface FeatureSnapshot {
   tasks: TaskLine[] | null; // null = no tasks.md
   artifacts: { spec: boolean; ui: boolean; uiSignedOff: boolean; plan: boolean; tasks: boolean };
   clarifications: Clarification[];
+  /** Feature 015: parallel lanes of this feature; absent when it has none. */
+  lanes?: LaneView[];
 }
 
 export interface Filters {
@@ -86,6 +99,8 @@ export interface FeatureRow {
   clarifications: number;
   /** Source worktree (feature 017); absent for the primary checkout. */
   checkout?: Checkout;
+  /** Feature 015: lanes, only when the feature has some. */
+  lanes?: LaneView[];
 }
 
 export interface AttentionItem {

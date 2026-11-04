@@ -126,6 +126,7 @@ export function featureRow(f: FeatureSnapshot): FeatureRow {
   };
   // Only worktree rows carry their source, so output without worktrees is unchanged (017 FR-007/FR-008).
   if (f.checkout?.kind === "worktree") row.checkout = f.checkout;
+  if (f.lanes && f.lanes.length > 0) row.lanes = f.lanes;
   return row;
 }
 
