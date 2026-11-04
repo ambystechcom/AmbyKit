@@ -42,9 +42,9 @@ created: 2026-10-26
 ## Phase 5 — User story US-2  (priority: P1)
 
 - [ ] [T030] [P] [US2] QwenEmitter: `.qwen/commands/*.md`, description + argument-hint, `$ARGUMENTS`→`{{args}}` (src/emitters/qwen.ts)
-- [ ] [T031] [P] [US2] KiloEmitter: `.kilo/commands/*.md`, description (src/emitters/kilo.ts)
+- [x] [T031] [P] [US2] KiloEmitter: `.kilo/commands/*.md`, description (src/emitters/kilo.ts)
 - [ ] [T032] [P] [US2] AugmentEmitter: `.augment/commands/*.md`, description + argument-hint (src/emitters/augment.ts)
-- [ ] [T033] [P] [US2] WindsurfEmitter: `.windsurf/workflows/*.md`, no frontmatter, `$ARGUMENTS`→prose (src/emitters/windsurf.ts)
+- [x] [T033] [P] [US2] WindsurfEmitter: `.windsurf/workflows/*.md`, no frontmatter, `$ARGUMENTS`→prose (src/emitters/windsurf.ts)
 - [ ] [T034] [US2] Register qwen, kilo, augment, windsurf targets (src/emitters/index.ts)
 - [ ] [T035] [P] [US2] Tests per target: exact file set, keys and nothing else, no rules file (AGENTS.md native), Windsurf files ≤ 12,000 chars (test/markdown-emitters-016.test.ts)
 - **Checkpoint:** US-2 — four markdown targets emit natively.
