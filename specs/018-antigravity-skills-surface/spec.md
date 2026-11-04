@@ -14,8 +14,7 @@ created: 2026-11-04
 **Why now.** AmbyKit's two Antigravity targets (IDE and CLI) hand the assistant its phase commands as
 *workflows*. Antigravity's own migration guide says workflows "will stop working on October 19, 2026"
 and that afterwards "legacy workflow directories are no longer indexed or executable using slash
-commands". It replaces them with *skills*, which the CLI turns into slash commands automatically and
-which win over a workflow of the same name. Today (2026-11-04) an Antigravity user who runs
+commands". It replaces them with *skills*, which the CLI turns into slash commands automatically. Today (2026-11-04) an Antigravity user who runs
 `ambykit sync` gets files the product no longer reads: no `/amby.*` commands appear. Sources:
 antigravity.google/docs/migration/workflows-to-skills/ and antigravity.google/docs/skills/, checked
 2026-11-04 (see `specs/016-agent-surface-expansion/research.md`).
@@ -188,7 +187,8 @@ reality, so that no other assistant's output moves and the compatibility matrix 
 - A project's own skill uses a name that collides with an AmbyKit phase skill: AmbyKit refuses to
   overwrite a file without its generated-file notice and reports it (FR-016).
 - A user keeps an old Antigravity build that still runs workflows: they are not served, because the
-  cutoff has passed and a skill wins over a workflow of the same name. (Assumption, 2026-11-04: the
+  cutoff has passed and workflow output is dropped. (Antigravity does not document which of a skill and a
+  workflow of the same name wins, and the design does not depend on it.) (Assumption, 2026-11-04: the
   answer "it's ok" is read as accepting this; no transition period emits both surfaces. Overrule to
   keep dual output.)
 - Antigravity's replacement for workflows ("a more powerful, dynamic way to define and use workflows")
