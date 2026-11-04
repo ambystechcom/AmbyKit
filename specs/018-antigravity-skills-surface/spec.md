@@ -43,9 +43,8 @@ currently loads, so that `/amby.specify` and the other phases appear and run aft
 - Given any phase prompt is edited in the neutral source, When I sync, Then the Antigravity skills
   reflect the edit with no hand editing.
 - Given a phase prompt that uses the argument placeholder, When it is emitted for Antigravity, Then no
-  literal placeholder token is left in the skill. [NEEDS CLARIFICATION: Antigravity documents no
-  argument placeholder for skills; confirm whether one exists before choosing between prose rewording
-  (as Codex) and a native placeholder.]
+  literal placeholder token is left in the skill: the argument is reworded as prose, as for Codex
+  (decided 2026-11-04; Antigravity documents no placeholder for skills).
 
 ### US-2 — Existing projects migrate without surprises  (priority: P1)
 
@@ -64,10 +63,10 @@ commands, and none of my own files are touched.
 **Acceptance criteria**
 - Given a project containing the previously generated workflow files, When I run the doctor command,
   Then it reports them as stale generated files and says how to resolve them.
-- Given the same project, When I run sync, Then the outcome matches the decision recorded for stale
-  workflow files. [NEEDS CLARIFICATION: remove them automatically, leave them and warn, or remove
-  only on an explicit opt-in? AmbyKit has never deleted an emitted file, and Principle 7 prefers the
-  least surprising, reversible change.]
+- Given the same project, When I run sync without the opt-in, Then the stale workflow files are left
+  in place and sync says they are stale and how to remove them.
+- Given the same project, When I run sync with the explicit opt-in, Then only the stale files that
+  AmbyKit generated are removed (decided 2026-11-04: delete only on opt-in).
 - Given a workflow file in that directory that AmbyKit did not generate (a user's own workflow), When
   I sync, Then it is left exactly as it is, whatever the decision above.
 - Given a project that never had the old files, When I sync, Then no stale-file message appears.
@@ -93,10 +92,11 @@ assistants never produces conflicts or the wrong behavior.
   follows the rule recorded for shared files, and a difference that is not the self-report id is
   reported as an error naming both targets (as in feature 016 FR-007).
 - Given Antigravity is deselected while Codex stays, When I sync, Then the shared skills remain.
-- Given the shared skill reports which assistant is working, When both targets are selected, Then the
-  reported identity is the one decided below. [NEEDS CLARIFICATION: a single shared file can carry only
-  one self-report id (`antigravity`, `antigravity-cli` or `codex`). Which wins, and does the dashboard
-  lose the ability to tell the two apart?]
+- Given the shared skill reports which assistant is working, When several targets are selected, Then
+  the reported identity follows one rule: `codex` wins over the Antigravity ids, and `antigravity`
+  wins over `antigravity-cli`. The dashboard may then show the winning id for work done by the other
+  target. (Assumption, 2026-11-04: the answer was left blank; this rule keeps Codex output
+  byte-identical. Overrule if the dashboard distinction matters more.)
 
 ### US-4 — Everything else is unchanged and the docs are true  (priority: P2)
 
@@ -128,25 +128,27 @@ reality, so that no other assistant's output moves and the compatibility matrix 
   matches its directory and uses only lowercase letters, digits and hyphens, and a description taken
   from the neutral phase prompt.
 - FR-003  WHEN the neutral prompt uses the argument placeholder, THE SYSTEM SHALL rework it so no
-  literal token remains in the Antigravity skill (feature 016 FR-005). [NEEDS CLARIFICATION: depends
-  on whether skills document an argument placeholder; see US-1.]
+  literal token remains in the Antigravity skill (feature 016 FR-005), by rewording it as prose.
 - FR-004  THE SYSTEM SHALL keep the project-scoped, reversible nature of every emitted file and SHALL
   NOT write user-level Antigravity locations without explicit consent (Principle 7).
 - FR-005  WHEN a project contains workflow files that a previous release generated for Antigravity, THE
-  SYSTEM SHALL identify them as AmbyKit-generated (by their generated-file notice) and handle them
-  per the decision in US-2. [NEEDS CLARIFICATION: see US-2.]
+  SYSTEM SHALL identify them as AmbyKit-generated (by their generated-file notice), leave them in
+  place by default, and remove them only when the user passes an explicit opt-in.
 - FR-006  THE SYSTEM SHALL NOT modify or remove any file in the retired workflows directory that
   AmbyKit did not generate.
 - FR-007  WHEN the doctor command runs on a project with stale generated workflow files, THE SYSTEM
-  SHALL report them, name the fix, and treat them as drift only if the decision in US-2 says so.
+  SHALL report them, name the opt-in that removes them, and NOT treat them as drift.
 - FR-008  WHEN two or more selected targets write the same skill file, THE SYSTEM SHALL write it once,
   name every owner in the doctor output, and keep the file for any remaining owner when one is
   removed (feature 016 FR-007).
 - FR-009  IF two selected targets would write different contents to one path and the difference is more
   than the self-report identity, THEN THE SYSTEM SHALL fail with an error naming both targets and the
   path.
+- FR-016  IF a skill path to be written already holds a file that AmbyKit did not generate (no
+  generated-file notice), THEN THE SYSTEM SHALL NOT overwrite it and SHALL report the collision.
 - FR-010  WHEN Antigravity and another skills-based target share a skill file, THE SYSTEM SHALL apply a
-  single, documented rule for the self-report identity it carries. [NEEDS CLARIFICATION: see US-3.]
+  single, documented rule for the self-report identity it carries: `codex` over `antigravity` over
+  `antigravity-cli`.
 - FR-011  THE SYSTEM SHALL leave the emitted output of every other target byte-identical.
 - FR-012  THE SYSTEM SHALL keep recognizing Antigravity assistants in the dashboard under their
   existing identities.
@@ -155,10 +157,10 @@ reality, so that no other assistant's output moves and the compatibility matrix 
   its cutoff date, citing Antigravity's documentation.
 - FR-014  THE SYSTEM SHALL provide, for each Antigravity target, a snapshot test of the emitted paths
   and metadata against the matrix, and a test for each requirement above (Principle 5).
-- FR-015  IF Antigravity's documentation later states that the cutoff does not apply to one of the two
-  products, THEN THE SYSTEM SHALL be able to emit workflows for that product alone without affecting
-  the other. [NEEDS CLARIFICATION: the migration guide describes the IDE app and does not say whether
-  the cutoff applies to the CLI; should the CLI target also move now?]
+- FR-015  THE SYSTEM SHALL move both the IDE and the CLI target to skills now (decided 2026-11-04; the
+  CLI already treats skills as slash commands). IF Antigravity's documentation later states that the
+  cutoff does not apply to one product, THEN THE SYSTEM SHALL be able to emit workflows for that
+  product alone without affecting the other.
 
 ## Success criteria
 
@@ -183,13 +185,12 @@ reality, so that no other assistant's output moves and the compatibility matrix 
   files must be written once with a single self-report identity (US-3).
 - A project selects Antigravity and Codex, so the same skill directory is read by both tools and a
   user could see each phase twice if a tool also reads another command surface.
-- A project's own skill uses a name that collides with an AmbyKit phase skill: AmbyKit's file would
-  overwrite it. [NEEDS CLARIFICATION: is the generated-file notice enough to refuse overwriting a file
-  AmbyKit did not generate?]
-- A user keeps an old Antigravity build that still runs workflows before the cutoff: they would lose
-  commands if workflow output were dropped immediately. [NEEDS CLARIFICATION: is a transition period
-  that emits both surfaces worth the duplicate files, given Antigravity says a skill wins over a
-  workflow of the same name?]
+- A project's own skill uses a name that collides with an AmbyKit phase skill: AmbyKit refuses to
+  overwrite a file without its generated-file notice and reports it (FR-016).
+- A user keeps an old Antigravity build that still runs workflows: they are not served, because the
+  cutoff has passed and a skill wins over a workflow of the same name. (Assumption, 2026-11-04: the
+  answer "it's ok" is read as accepting this; no transition period emits both surfaces. Overrule to
+  keep dual output.)
 - Antigravity's replacement for workflows ("a more powerful, dynamic way to define and use workflows")
   is announced but undocumented; a later change could require another migration.
 - The retired workflows directory holds user-authored workflows that no longer run; AmbyKit does not
