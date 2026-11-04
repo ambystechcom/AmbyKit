@@ -16,11 +16,11 @@ created: 2026-10-26
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T005] Extract `renderCommand(pairs, notice, body)` hook from commandFile; no output change (src/emitters/base-emitter.ts)
-- [ ] [T006] `SkillsEmitter` abstract (skillName, SKILL.md path, name+description, `$ARGUMENTS`→prose) (src/emitters/skills-emitter.ts)
-- [ ] [T007] Move Codex and Copilot CLI onto SkillsEmitter; golden test still green (src/emitters/codex.ts, src/emitters/copilot-cli.ts)
-- [ ] [T008] Collision guard: same path + different contents throws naming both tool ids — FR-007 (src/core/emit.ts)
-- [ ] [T009] [P] Guard tests: identical shared output written once; differing output throws (test/emit-collision.test.ts)
+- [x] [T005] Extract `renderCommand(pairs, notice, body)` hook from commandFile; no output change (src/emitters/base-emitter.ts)
+- [x] [T006] `SkillsEmitter` abstract (skillName, SKILL.md path, name+description, `$ARGUMENTS`→prose) (src/emitters/skills-emitter.ts)
+- [x] [T007] Move Codex and Copilot CLI onto SkillsEmitter; golden test still green (src/emitters/codex.ts, src/emitters/copilot-cli.ts)
+- [x] [T008] Collision guard: same path + different contents throws naming both tool ids — FR-007 (src/core/emit.ts)
+- [x] [T009] [P] Guard tests: identical shared output written once; differing output throws (test/emit-collision.test.ts)
 
 ## Phase 3 — User story US-1  (priority: P1)
 

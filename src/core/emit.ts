@@ -25,8 +25,27 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
       merge: "region", // preserve any user-authored AGENTS.md content (feature 008 / FR-001)
     });
   }
+  const owners = new Map<string, { owner: string; file: EmittedFile }>();
+  for (const f of files) owners.set(f.path, { owner: "rules", file: f });
   for (const emitter of emittersForTargets(config.tools)) {
-    files.push(...emitter.emit(specs, ctx));
+    for (const file of emitter.emit(specs, ctx)) {
+      const seen = owners.get(file.path);
+      if (seen) {
+        // Two targets writing one path is fine only when the bytes agree (FR-007); it is written once.
+        if (!sameOutput(seen.file, file)) {
+          throw new Error(
+            `Output collision at ${file.path}: '${seen.owner}' and '${emitter.toolId}' emit different contents.`,
+          );
+        }
+        continue;
+      }
+      owners.set(file.path, { owner: emitter.toolId, file });
+      files.push(file);
+    }
   }
   return files;
+}
+
+function sameOutput(a: EmittedFile, b: EmittedFile): boolean {
+  return a.contents === b.contents && a.scope === b.scope && a.merge === b.merge && a.requiredPrefix === b.requiredPrefix;
 }

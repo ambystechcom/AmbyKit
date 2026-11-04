@@ -1,6 +1,7 @@
 import { join } from "node:path/posix";
 import type { CommandSpec, CommandSurface } from "../core/types.js";
 import { CopilotEmitter } from "./copilot.js";
+import { skillFrontmatter, skillPath } from "./skills-emitter.js";
 
 /**
  * GitHub Copilot CLI (`copilot`) emitter. Reuses Copilot's `.github/` rules/instructions, but the
@@ -14,19 +15,12 @@ export class CopilotCliEmitter extends CopilotEmitter {
   override readonly commandSurface: CommandSurface = "skills";
   override readonly commandDir = join(".github", "skills");
 
-  /** Skill id: lowercase-hyphen, e.g. amby.specify → amby-specify. */
-  private skillName(spec: CommandSpec): string {
-    return spec.name.replace(/\./g, "-").toLowerCase();
-  }
-
+  // Inherits Copilot (rules, personas, `${input:args}`), so it reuses the skills helpers, not the class.
   protected override commandFilePath(spec: CommandSpec): string {
-    return join(this.commandDir, this.skillName(spec), "SKILL.md");
+    return skillPath(this.commandDir, spec);
   }
 
   protected override commandFrontmatter(spec: CommandSpec): Array<[string, string]> {
-    return [
-      ["name", this.skillName(spec)],
-      ["description", this.yamlQuote(spec.description)],
-    ];
+    return skillFrontmatter(spec, (v) => this.yamlQuote(v));
   }
 }
