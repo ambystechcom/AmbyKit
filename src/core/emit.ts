@@ -42,8 +42,12 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
       const earlier = files[seen.index]!;
       if (sameOutput(earlier, file)) continue;
       if (sameOutput(earlier, file, [seen.owner, emitter.toolId])) {
-        files[seen.index] = file;
-        owners.set(file.path, { owner: emitter.toolId, index: seen.index });
+        // Only the self-report id differs: keep the higher-ranked tool's file, whatever the config
+        // order (feature 018, FR-010). Unranked ids keep the long-standing "later wins".
+        if (selfReportRank(emitter.toolId) <= selfReportRank(seen.owner)) {
+          files[seen.index] = file;
+          owners.set(file.path, { owner: emitter.toolId, index: seen.index });
+        }
         continue;
       }
       throw new Error(
@@ -52,6 +56,17 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
     }
   }
   return files;
+}
+
+/**
+ * Which tool's `--agent=<id>` a shared file carries when targets differ only in that id (feature 018,
+ * FR-010). Earlier = wins. Codex stays byte-identical, and the Antigravity IDE beats its CLI.
+ */
+export const SELF_REPORT_PRIORITY = ["codex", "antigravity", "antigravity-cli"] as const;
+
+function selfReportRank(toolId: string): number {
+  const i = (SELF_REPORT_PRIORITY as readonly string[]).indexOf(toolId);
+  return i < 0 ? Number.MAX_SAFE_INTEGER : i;
 }
 
 /** Same file, byte for byte; with `ids`, ignoring the `--agent=<id>` self-report of those two tools. */

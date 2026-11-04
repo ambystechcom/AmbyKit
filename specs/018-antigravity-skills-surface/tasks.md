@@ -12,21 +12,21 @@ created: 2026-11-04
 
 ## Phase 1 — Setup
 
-- [ ] [T001] Rebase this branch onto `016-agent-surface-expansion` (R1); confirm `SkillsEmitter` and the guard are present (specs/018-antigravity-skills-surface/)
-- [ ] [T002] Phase 0 research: verify skill frontmatter keys, the CLI slash name a skill gets, and the CLI cutoff scope against Antigravity's docs or a live install (specs/018-antigravity-skills-surface/research.md)
-- [ ] [T003] Update the compatibility matrix first (P4): Antigravity rows to skills, retired workflows and cutoff, the shared-file identity rule, the stale-file opt-in, sources (docs/tool-compatibility.md)
+- [x] [T001] Rebase this branch onto `016-agent-surface-expansion` (R1); confirm `SkillsEmitter` and the guard are present (specs/018-antigravity-skills-surface/)
+- [x] [T002] Phase 0 research: verify skill frontmatter keys, the CLI slash name a skill gets, and the CLI cutoff scope against Antigravity's docs or a live install (specs/018-antigravity-skills-surface/research.md)
+- [x] [T003] Update the compatibility matrix first (P4): Antigravity rows to skills, retired workflows and cutoff, the shared-file identity rule, the stale-file opt-in, sources (docs/tool-compatibility.md)
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T010] [P] Rank shared-file self-report ids `codex` > `antigravity` > `antigravity-cli` in the collision guard, order-independent; unlisted ids keep last-writer-wins (FR-010) (src/core/emit.ts)
-- [ ] [T011] [P] Add `protectForeign` to `EmittedFile`, skip existing files lacking the generated notice into `WriteResult.skippedForeign`, export `backupFile` (FR-016) (src/core/types.ts, src/cli/io/fsops.ts)
-- [ ] [T012] [P] Group `sharedOutputs` by command directory instead of emitter so Antigravity and Codex list as co-owners (FR-008) (src/emitters/index.ts)
-- [ ] [T013] [P] Add pure `legacyWorkflowFiles(root, config)`: known-phase `.agents/workflows/amby.<id>.md` with the generated notice, only when an Antigravity target is selected (FR-005, FR-006) (src/core/legacy.ts)
-- [ ] [T014] Make `SkillsEmitter` set `protectForeign` on its command files (after T011) (src/emitters/skills-emitter.ts)
-- [ ] [T015] [P] Test the priority rule: both config orders, codex+antigravity, IDE+CLI, and a real content difference still throws (test/emit-collision.test.ts)
-- [ ] [T016] [P] Test the foreign-file guard: foreign file kept and reported, generated file overwritten, dry-run safe (test/apply-foreign.test.ts)
-- [ ] [T017] [P] Test `sharedOutputs` by directory, including antigravity with codex and with pi (test/shared-outputs.test.ts)
-- [ ] [T018] [P] Test `legacyWorkflowFiles`: generated files found, user workflow and non-phase names ignored, nothing without an Antigravity target (test/legacy.test.ts)
+- [x] [T010] [P] Rank shared-file self-report ids `codex` > `antigravity` > `antigravity-cli` in the collision guard, order-independent; unlisted ids keep last-writer-wins (FR-010) (src/core/emit.ts)
+- [x] [T011] [P] Add `protectForeign` to `EmittedFile`, skip existing files lacking the generated notice into `WriteResult.skippedForeign`, export `backupFile` (FR-016) (src/core/types.ts, src/cli/io/fsops.ts)
+- [x] [T012] [P] Group `sharedOutputs` by command directory instead of emitter so Antigravity and Codex list as co-owners (FR-008) (src/emitters/index.ts)
+- [x] [T013] [P] Add pure `legacyWorkflowFiles(root, config)`: known-phase `.agents/workflows/amby.<id>.md` with the generated notice, only when an Antigravity target is selected (FR-005, FR-006) (src/core/legacy.ts)
+- [x] [T014] Make `SkillsEmitter` set `protectForeign` on its command files (after T011) (src/emitters/skills-emitter.ts)
+- [x] [T015] [P] Test the priority rule: both config orders, codex+antigravity, IDE+CLI, and a real content difference still throws (test/emit-collision.test.ts)
+- [x] [T016] [P] Test the foreign-file guard: foreign file kept and reported, generated file overwritten, dry-run safe (test/apply-foreign.test.ts)
+- [x] [T017] [P] Test `sharedOutputs` by directory, including antigravity with codex and with pi (test/shared-outputs.test.ts)
+- [x] [T018] [P] Test `legacyWorkflowFiles`: generated files found, user workflow and non-phase names ignored, nothing without an Antigravity target (test/legacy.test.ts)
 - **Checkpoint:** foundations are covered by tests; `npm run typecheck` passes.
 
 ## Phase 3 — User story US-1  (priority: P1)

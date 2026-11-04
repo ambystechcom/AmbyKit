@@ -46,6 +46,11 @@ export interface EmittedFile {
    * bridge import). Ensured on both create and merge; never duplicated (FR-011).
    */
   requiredPrefix?: string;
+  /**
+   * Never overwrite an existing file that lacks AmbyKit's generated notice (feature 018, FR-016): a
+   * user's own skill with the same name is left alone and reported instead.
+   */
+  protectForeign?: boolean;
 }
 
 export type MergeStrategy = "overwrite" | "region";

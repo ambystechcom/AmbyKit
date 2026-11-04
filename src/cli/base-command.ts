@@ -127,6 +127,11 @@ export abstract class BaseCommand {
       for (const p of result.skippedRegions) this.info(`  ~ ${p}`);
       this.info("  Revert your edits (or remove the region) and re-run to let AmbyKit refresh it.");
     }
+    if (result.skippedForeign.length > 0) {
+      this.warn(`Left ${result.skippedForeign.length} file(s) AmbyKit did not generate untouched:`);
+      for (const p of result.skippedForeign) this.info(`  ~ ${p}`);
+      this.info("  Rename or move them (the path is an AmbyKit skill name) and re-run to let AmbyKit write its own.");
+    }
     if (result.aborted.length > 0) {
       this.warn(`Could not safely update ${result.aborted.length} file(s):`);
       for (const p of result.aborted) this.info(`  ! ${p}`);

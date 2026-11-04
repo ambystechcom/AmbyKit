@@ -1,5 +1,5 @@
 import { join } from "node:path/posix";
-import type { CommandSpec } from "../core/types.js";
+import type { CommandSpec, EmittedFile, RulesContext } from "../core/types.js";
 import { BaseEmitter } from "./base-emitter.js";
 
 /** Skill id: lowercase-hyphen, e.g. `amby.specify` → `amby-specify` (dots are not valid in every host). */
@@ -35,6 +35,10 @@ export abstract class SkillsEmitter extends BaseEmitter {
 
   protected override commandFrontmatter(spec: CommandSpec): Array<[string, string]> {
     return skillFrontmatter(spec, (v) => this.yamlQuote(v));
+  }
+
+  protected override commandFile(spec: CommandSpec, ctx?: RulesContext): EmittedFile {
+    return { ...super.commandFile(spec, ctx), protectForeign: true };
   }
 
   protected override transformBody(spec: CommandSpec): string {
