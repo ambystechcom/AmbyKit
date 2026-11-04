@@ -73,8 +73,7 @@ native format.
   decisions; `plan.md` captures the technical approach separately.
 - **Parallel work is built in.** `ambykit worktree` gives each feature its own git worktree, so
   several features — or several assistants — run side by side without checkout switching.
-- **Author once, emit per tool.** One neutral source → Claude Code, OpenCode, GitHub Copilot
-  (VS Code + CLI), Cursor (+ CLI), Antigravity (IDE + CLI), Codex CLI.
+- **Author once, emit per tool.** One neutral source → Claude Code, OpenCode, GitHub Copilot (VS Code + CLI), Cursor (+ CLI), Antigravity (IDE + CLI), Codex CLI, Gemini CLI, Windsurf, Qwen Code, Kiro, Kilo Code, Augment Code, LLxprt Code and Pi.
 
 ## How AmbyKit compares
 
@@ -126,7 +125,8 @@ work can be ordered and blocked; `ambykit dashboard` reports progress across the
 ## Supported tools
 
 Claude Code (CLI + VS Code), GitHub Copilot (VS Code + CLI), OpenCode, Cursor (+ CLI),
-Antigravity (IDE + CLI), Codex CLI. See [`docs/tool-compatibility.md`](./docs/tool-compatibility.md).
+Antigravity (IDE + CLI), Codex CLI, Gemini CLI, Windsurf, Qwen Code, Kiro, Kilo Code, Augment Code,
+LLxprt Code and Pi (eighteen selectable targets). See [`docs/tool-compatibility.md`](./docs/tool-compatibility.md).
 
 Missing yours? [Open a request](https://github.com/ambystechcom/AmbyKit/issues/new/choose) — a new
 target is a thin `BaseEmitter` subclass.

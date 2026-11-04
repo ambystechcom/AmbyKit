@@ -19,16 +19,34 @@ export interface PromptState {
   selected: Set<number>;
   done: boolean;
   cancelled: boolean;
+  /** Viewport height in options (feature 016, FR-013); equals `options.length` when everything fits. */
+  rows: number;
+  /** Index of the first visible option. */
+  top: number;
 }
 
 export type PromptKey = "up" | "down" | "space" | "enter" | "escape";
 
-export function initPromptState(options: PromptOption[], preselected: string[] = []): PromptState {
+export function initPromptState(options: PromptOption[], preselected: string[] = [], rows?: number): PromptState {
   const selected = new Set<number>();
   options.forEach((o, i) => {
     if (preselected.includes(o.value)) selected.add(i);
   });
-  return { options, cursor: 0, selected, done: false, cancelled: false };
+  const height = Math.max(1, Math.min(rows ?? options.length, options.length));
+  return { options, cursor: 0, selected, done: false, cancelled: false, rows: height, top: 0 };
+}
+
+/** Viewport rows for a terminal `termRows` tall: leave room for the message, two hints and a margin. */
+export function viewportRows(optionCount: number, termRows: number | undefined): number {
+  return Math.max(3, Math.min(optionCount, (termRows ?? 24) - 6));
+}
+
+/** Slide the window just enough to keep the cursor visible. */
+function scrolled(state: PromptState, cursor: number): PromptState {
+  let { top } = state;
+  if (cursor < top) top = cursor;
+  else if (cursor >= top + state.rows) top = cursor - state.rows + 1;
+  return { ...state, cursor, top };
 }
 
 /** Pure state transition — `(state, key) → state`. */
@@ -36,9 +54,9 @@ export function reducePrompt(state: PromptState, key: PromptKey): PromptState {
   const n = state.options.length;
   switch (key) {
     case "up":
-      return { ...state, cursor: (state.cursor - 1 + n) % n };
+      return scrolled(state, (state.cursor - 1 + n) % n);
     case "down":
-      return { ...state, cursor: (state.cursor + 1) % n };
+      return scrolled(state, (state.cursor + 1) % n);
     case "space": {
       const selected = new Set(state.selected);
       if (selected.has(state.cursor)) selected.delete(state.cursor);
@@ -57,21 +75,38 @@ export function selectedValues(state: PromptState): string[] {
   return state.options.filter((_, i) => state.selected.has(i)).map((o) => o.value);
 }
 
-/** Render the prompt as an array of lines (pure) — one message line + one line per option. */
+/** Number of lines `renderPromptLines` produces. It is constant while the user scrolls, so redraws stay aligned. */
+export function promptHeight(state: PromptState): number {
+  return 1 + state.rows + (state.rows < state.options.length ? 2 : 0);
+}
+
+/**
+ * Render the prompt as an array of lines (pure): one message line, then the visible options. When
+ * the list is taller than the viewport, a `↑ n more` line above and a `↓ n more` line below (blank
+ * when nothing is hidden that way) show what is off-screen; with everything visible the output is
+ * exactly one line per option.
+ */
 export function renderPromptLines(caps: Capabilities, message: string, state: PromptState): string[] {
   const sym = symbols(caps);
   const hint = paint(caps, "muted", "(space toggle · enter confirm · esc cancel)");
   const lines = [`${paint(caps, "accent", "?")} ${message}   ${hint}`];
-  state.options.forEach((opt, i) => {
+  const windowed = state.rows < state.options.length;
+  const hidden = (n: number, arrow: string): string => (n > 0 ? "  " + paint(caps, "muted", `${arrow} ${n} more`) : "");
+  if (windowed) lines.push(hidden(state.top, caps.unicode ? "↑" : "^"));
+  for (let i = state.top; i < Math.min(state.options.length, state.top + state.rows); i++) {
+    const opt = state.options[i]!;
     const cursor = i === state.cursor ? paint(caps, "accent", sym.cursor) : " ";
     const box = state.selected.has(i) ? sym.checked : sym.unchecked;
     lines.push(`  ${cursor} ${box} ${opt.label}`);
-  });
+  }
+  if (windowed) lines.push(hidden(state.options.length - state.top - state.rows, caps.unicode ? "↓" : "v"));
   return lines;
 }
 
 interface OutputLike {
   write(s: string): unknown;
+  /** Terminal height; sizes the option viewport. */
+  rows?: number;
 }
 
 /**
@@ -84,9 +119,9 @@ export function multiSelect(
   io: { input: NodeJS.ReadStream; output: OutputLike } = { input: process.stdin, output: process.stdout },
 ): Promise<string[] | null> {
   const { input, output } = io;
-  let state = initPromptState(args.options, args.preselected);
+  let state = initPromptState(args.options, args.preselected, viewportRows(args.options.length, output.rows));
 
-  const lineCount = args.options.length + 1;
+  const lineCount = promptHeight(state);
   const draw = (first: boolean): void => {
     if (!first) output.write(`\x1b[${lineCount}A`); // move up to overwrite the previous render
     for (const line of renderPromptLines(caps, args.message, state)) output.write(`\r\x1b[K${line}\n`);

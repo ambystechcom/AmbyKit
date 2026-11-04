@@ -43,9 +43,20 @@ describe("AgentBadge", () => {
     expect(agentBadge(unicode, p("codex"), "glyph")).toBe("◎");
   });
 
+  it("every agent family has its own glyph and ASCII tag (feature 016)", () => {
+    const ids = Object.keys(LIVE_TOKENS.component.agent).filter((id) => !["generic", "detected"].includes(id));
+    const aliases = new Set(["claude-vscode", "copilot-cli", "cursor-cli", "antigravity-cli", "pi"]);
+    const glyphs = ids.filter((id) => !aliases.has(id)).map((id) => (LIVE_TOKENS.component.agent as Record<string, { glyph: { u: string; a: string } }>)[id]!.glyph);
+    expect(new Set(glyphs.map((g) => g.u)).size).toBe(glyphs.length);
+    expect(new Set(glyphs.map((g) => g.a)).size).toBe(glyphs.length);
+    for (const id of ["gemini", "qwen", "llxprt", "kiro", "kilo", "augment", "windsurf"]) {
+      expect(agentBadge(unicode, p(id)).toLowerCase()).toContain(id);
+    }
+  });
+
   it("an unknown id gets the generic badge with its raw id as the name (FR-026)", () => {
-    expect(agentBadge(unicode, p("windsurf"))).toBe("● windsurf");
-    expect(agentBadge(ascii, p("windsurf"))).toBe("[??] windsurf");
+    expect(agentBadge(unicode, p("zed"))).toBe("● zed");
+    expect(agentBadge(ascii, p("zed"))).toBe("[??] zed");
   });
 
   it("color is identity: painted with the agent token, stripped with NO_COLOR", () => {

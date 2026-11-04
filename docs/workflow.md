@@ -101,6 +101,14 @@ name. Opt in at `ambykit init` (or `"worktrees": true` in `.amby/config.json`) a
 creates the worktree for each new feature; `ambykit worktree list|remove` and `ambykit check` keep
 them tidy.
 
+## Supported assistants
+
+The same neutral prompts are emitted for eighteen targets: Claude Code (CLI + VS Code), GitHub Copilot
+(VS Code + CLI), OpenCode, Cursor (+ CLI), Antigravity (IDE + CLI), Codex CLI, Gemini CLI, LLxprt
+Code, Qwen Code, Kilo Code, Augment Code, Windsurf, Kiro and Pi. Each gets its native command format
+(Markdown, TOML, workflows or skills); see [tool compatibility](./tool-compatibility.md). Editing a
+prompt once and running `ambykit sync` updates all of them.
+
 ## Dependencies & prioritization
 
 Stories and features carry `priority` (P1/P2/P3) and `depends-on`/`blocked-by` references by stable

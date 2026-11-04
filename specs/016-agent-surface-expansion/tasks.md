@@ -31,11 +31,11 @@ created: 2026-10-26
 
 ## Phase 4 — User story US-3  (priority: P1)
 
-- [ ] [T020] [US3] `TomlCommandEmitter`: `# notice`, basic-escaped description, literal `'''` prompt with `"""` fallback, `{{args}}` (src/emitters/toml-command-emitter.ts)
-- [ ] [T021] [US3] GeminiEmitter: `.gemini/commands/amby.<phase>.toml` + GEMINI.md pointer region (src/emitters/gemini.ts)
-- [ ] [T022] [US3] LlxprtEmitter: `.llxprt/commands/amby.<phase>.toml` + LLXPRT.md pointer region (src/emitters/llxprt.ts)
-- [ ] [T023] [US3] Register gemini + llxprt targets (src/emitters/index.ts)
-- [ ] [T024] [P] [US3] Tests: paths/keys per matrix, `{{args}}`, escaping (backslash, quotes, `'''` fallback), TOML round-trip parse in test only, prompts contain no `!{`/`@{` (test/toml-emitters.test.ts)
+- [x] [T020] [US3] `TomlCommandEmitter`: `# notice`, basic-escaped description, literal `'''` prompt with `"""` fallback, `{{args}}` (src/emitters/toml-command-emitter.ts)
+- [x] [T021] [US3] GeminiEmitter: `.gemini/commands/amby.<phase>.toml` + GEMINI.md pointer region (src/emitters/gemini.ts)
+- [x] [T022] [US3] LlxprtEmitter: `.llxprt/commands/amby.<phase>.toml` + LLXPRT.md pointer region (src/emitters/llxprt.ts)
+- [x] [T023] [US3] Register gemini + llxprt targets (src/emitters/index.ts)
+- [x] [T024] [P] [US3] Tests: paths/keys per matrix, `{{args}}`, escaping (backslash, quotes, `'''` fallback), TOML round-trip parse in test only, prompts contain no `!{`/`@{` (test/toml-emitters.test.ts)
 - [ ] [T025] [US3] Manual: load `/amby.specify` in a live Gemini CLI from emitted files; record result — SC-006 (specs/016-agent-surface-expansion/research.md)
 - **Checkpoint:** US-3 — non-markdown commands are expressible; existing output unchanged.
 
@@ -45,33 +45,33 @@ created: 2026-10-26
 - [x] [T031] [P] [US2] KiloEmitter: `.kilo/commands/*.md`, description (src/emitters/kilo.ts)
 - [x] [T032] [P] [US2] AugmentEmitter: `.augment/commands/*.md`, description + argument-hint (src/emitters/augment.ts)
 - [x] [T033] [P] [US2] WindsurfEmitter: `.windsurf/workflows/*.md`, no frontmatter, `$ARGUMENTS`→prose (src/emitters/windsurf.ts)
-- [ ] [T034] [US2] Register qwen, kilo, augment, windsurf targets (src/emitters/index.ts)
-- [ ] [T035] [P] [US2] Tests per target: exact file set, keys and nothing else, no rules file (AGENTS.md native), Windsurf files ≤ 12,000 chars (test/markdown-emitters-016.test.ts)
+- [x] [T034] [US2] Register qwen, kilo, augment, windsurf targets (src/emitters/index.ts)
+- [x] [T035] [P] [US2] Tests per target: exact file set, keys and nothing else, no rules file (AGENTS.md native), Windsurf files ≤ 12,000 chars (test/markdown-emitters-016.test.ts)
 - **Checkpoint:** US-2 — four markdown targets emit natively.
 
 ## Phase 6 — User story US-4  (priority: P2)
 
-- [ ] [T040] [US4] KiroEmitter on SkillsEmitter: `.kiro/skills/amby-<phase>/SKILL.md` (src/emitters/kiro.ts)
-- [ ] [T041] [US4] Pi target as alias of the Codex emitter; register kiro + pi (src/emitters/index.ts)
-- [ ] [T042] [P] [US4] Tests: Kiro names match dirs (no dots); Pi alone = Codex files; Pi+Codex written once; dropping one keeps files (test/skills-emitters-016.test.ts)
-- [ ] [T043] [US4] `ambykit check` lists owners of shared outputs (src/cli/check.ts)
+- [x] [T040] [US4] KiroEmitter on SkillsEmitter: `.kiro/skills/amby-<phase>/SKILL.md` (src/emitters/kiro.ts)
+- [x] [T041] [US4] Pi target as alias of the Codex emitter; register kiro + pi (src/emitters/index.ts)
+- [x] [T042] [P] [US4] Tests: Kiro names match dirs (no dots); Pi alone = Codex files; Pi+Codex written once; dropping one keeps files (test/skills-emitters-016.test.ts)
+- [x] [T043] [US4] `ambykit check` lists owners of shared outputs (src/cli/check.ts)
 - **Checkpoint:** US-4 — skill hosts reuse the skills surface.
 
 ## Phase 7 — User story US-5  (priority: P2)
 
-- [ ] [T050] [US5] Selector viewport: scroll with cursor, ↑/↓ more hints, ASCII fallback — FR-013 (src/cli/ui/interactive/prompt.ts)
-- [ ] [T051] [P] [US5] Selector tests: 18 options in 12 rows, every option reachable, hints correct (test/ui/prompt-viewport.test.ts)
-- [ ] [T052] [P] [US5] AgentFamily + AGENTS entries for new ids (executables per T011) (src/core/agents.ts)
-- [ ] [T053] [P] [US5] Glyph, ASCII tag and color per new family, AA contrast row (specs/017-live-dashboard/design-tokens.json, src/cli/ui/dashboard/live-tokens.ts)
-- [ ] [T054] [P] [US5] `ambykit check` e2e per new target: present → clean; hand edit → drift — FR-012 (test/cli/check-targets.test.ts)
-- [ ] [T055] [P] [US5] One-prompt-edit e2e: all 18 targets update via sync, `sync --check` clean — SC-005 (test/cli/sync-all-targets.test.ts)
-- [ ] [T056] [P] [US5] Every new emitted file is `scope: "project"` — FR-008 (test/emit-scope.test.ts)
+- [x] [T050] [US5] Selector viewport: scroll with cursor, ↑/↓ more hints, ASCII fallback — FR-013 (src/cli/ui/interactive/prompt.ts)
+- [x] [T051] [P] [US5] Selector tests: 18 options in 12 rows, every option reachable, hints correct (test/ui/prompt-viewport.test.ts)
+- [x] [T052] [P] [US5] AgentFamily + AGENTS entries for new ids (executables per T011) (src/core/agents.ts)
+- [x] [T053] [P] [US5] Glyph, ASCII tag and color per new family, AA contrast row (specs/017-live-dashboard/design-tokens.json, src/cli/ui/dashboard/live-tokens.ts)
+- [x] [T054] [P] [US5] `ambykit check` e2e per new target: present → clean; hand edit → drift — FR-012 (test/cli/check-targets.test.ts)
+- [x] [T055] [P] [US5] One-prompt-edit e2e: all 18 targets update via sync, `sync --check` clean — SC-005 (test/cli/sync-all-targets.test.ts)
+- [x] [T056] [P] [US5] Every new emitted file is `scope: "project"` — FR-008 (test/emit-scope.test.ts)
 - **Checkpoint:** US-5 — eighteen targets with no extra maintenance cost.
 
 ## Phase 8 — Polish
 
-- [ ] [T090] [P] README supported-assistants list (README.md)
-- [ ] [T091] [P] CLI reference `--tools` ids and workflow guide target list (docs/cli-reference.md, docs/workflow.md)
-- [ ] [T092] [P] Site compatibility page (site/src/content/docs/cli/compatibility.mdx)
-- [ ] [T093] [P] CHANGELOG Unreleased entry (CHANGELOG.md)
-- [ ] [T094] FR→test traceability; `npm run typecheck` + `npm test` + docs-sync — SC-007 (test/check-docs-sync.test.ts)
+- [x] [T090] [P] README supported-assistants list (README.md)
+- [x] [T091] [P] CLI reference `--tools` ids and workflow guide target list (docs/cli-reference.md, docs/workflow.md)
+- [x] [T092] [P] Site compatibility page (site/src/content/docs/cli/compatibility.mdx)
+- [x] [T093] [P] CHANGELOG Unreleased entry (CHANGELOG.md)
+- [x] [T094] FR→test traceability; `npm run typecheck` + `npm test` + docs-sync — SC-007 (test/check-docs-sync.test.ts)

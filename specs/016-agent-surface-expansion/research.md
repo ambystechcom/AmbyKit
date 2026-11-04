@@ -77,3 +77,11 @@ Not verified, so not used:
 
   - `pi` is too short to match by name alone, and Pi reports as `codex` anyway (R5), so it gets no
     `AGENTS` entry. `windsurf` stays self-report only.
+
+## SC-006 live check (T025) — pending
+
+The Gemini CLI is not installed on the machine where the emitters were built, so the load check could
+not be run. To close it: install `@google/gemini-cli`, run `ambykit add gemini` in a scratch project,
+start `gemini`, and confirm `/amby.specify` appears and expands its prompt. Record the result here.
+The emitted TOML is covered by a strict round-trip parse in `test/toml-emitters.test.ts`, which is
+evidence of well-formedness but not of Gemini's loader accepting it.

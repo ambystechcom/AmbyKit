@@ -40,7 +40,7 @@ before an emitter exists, so that AmbyKit never writes a file shape it invented.
   traceable to an official source; anything unverified is listed as out of scope with the reason.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a candidate target, When its row is added to the compatibility matrix, Then command directory,
@@ -64,7 +64,7 @@ my assistant's native commands, so that I can run the workflow without translati
   files at the documented paths with the documented frontmatter, and a snapshot test asserts both.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a verified markdown-command target, When sync runs, Then one command file per phase appears at
@@ -90,7 +90,7 @@ an exception.
   non-markdown format that the assistant loads successfully, verified against a live install.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** in-progress
 
 **Acceptance criteria**
 - Given a target whose commands are not markdown with YAML frontmatter, When sync runs, Then its files
@@ -118,7 +118,7 @@ that support costs almost nothing and behaves like the existing skill targets.
   Pi and Codex both selected, the shared directory is written once and both are recorded as owners.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a skill-host target, When sync runs, Then skill packages appear at the documented project-local
@@ -140,7 +140,7 @@ one-line edit plus a regenerate rather than a day of snapshot triage.
   hand editing and the sync check reports no drift.
 - **depends-on:** [US-2, US-3, US-4]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a change to one neutral prompt, When sync runs, Then every target reflects it with no per-tool

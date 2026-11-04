@@ -10,6 +10,22 @@ Release notes with full detail live on the
 
 ## [Unreleased]
 
+### Added
+
+- Eight more assistants (feature 016): Gemini CLI and LLxprt Code (TOML commands), Qwen Code, Kilo
+  Code and Augment Code (Markdown commands), Windsurf (workflows), Kiro (skills) and Pi (shares the
+  Codex output), for eighteen selectable targets. Only formats documented by the vendor are emitted;
+  Amazon Q is out of scope because it is now Kiro CLI.
+- The target selector scrolls when the list is taller than the terminal.
+- `ambykit check` names the owners of outputs shared by several targets.
+- The dashboard recognizes the new assistants (glyph, color and process detection).
+
+### Changed
+
+- Shared output is written once, and two targets that would write different contents to one path now
+  fail with an error naming both, instead of the last one silently winning. Antigravity IDE and CLI,
+  which differ only in their self-report id, keep the old behavior.
+
 ## [1.3.0] — 2026-10-26
 
 Live dashboard: worktree-aware, realtime, with agent presence.

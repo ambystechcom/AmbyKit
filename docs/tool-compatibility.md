@@ -134,9 +134,16 @@ target ids above (`src/core/agents.ts`; a test keeps it in step with `TARGETS`):
 | `opencode` | `opencode`, or node running `opencode-ai` | opencode.ai/docs |
 | `copilot-cli` | `copilot`, or node running `@github/copilot` | docs.github.com (Copilot CLI command reference) |
 | `cursor-cli` | `cursor-agent`, or `agent` only when its path contains `cursor` | cursor.com/docs/cli/installation |
+| `gemini` | `gemini`, or node running `@google/gemini-cli` | github.com/google-gemini/gemini-cli |
+| `qwen` | `qwen`, or node running `@qwen-code/qwen-code` | github.com/QwenLM/qwen-code |
+| `llxprt` | `llxprt`, or node running `@vybestack/llxprt-code` | github.com/vybestack/llxprt-code |
+| `kiro` | `kiro-cli` | kiro.dev/docs/cli/ |
+| `kilo` | `kilo`, or node running `@kilocode/cli` | kilo.ai/docs/cli |
+| `augment` | `auggie`, or node running `@augmentcode/auggie` | docs.augmentcode.com/cli/overview |
 
-IDE-hosted agents (`claude-vscode`, `copilot`, `cursor`, `antigravity`) run inside the editor process
-and can't be told apart, so they are self-report only. `antigravity-cli` has no documented executable
+IDE-hosted agents (`claude-vscode`, `copilot`, `cursor`, `antigravity`, `windsurf`) run inside the editor
+process and can't be told apart, so they are self-report only. `pi` reports as `codex` (it shares the
+Codex emitter) and its executable, `pi`, is too short to match by name. `antigravity-cli` has no documented executable
 name yet, so it is also self-report only. Working directories come from `lsof` (macOS) or
 `/proc/<pid>/cwd` (Linux). Windows exposes no cwd through CIM, so Windows detections are shown as
 "unknown location", never tied to a feature.

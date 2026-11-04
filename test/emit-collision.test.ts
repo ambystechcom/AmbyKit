@@ -39,6 +39,19 @@ describe("emit collision guard", () => {
     ).toThrow(/\.agents\/skills\/amby-.*'codex' and 'clash'/);
   });
 
+  it("keeps the later target's file when two tools differ only in their self-report id", () => {
+    // Antigravity IDE and CLI share `.agents/workflows/`; this was last-writer-wins before the guard.
+    const both = emitFiles(["antigravity", "antigravity-cli"]);
+    const paths = both.map((f) => f.path);
+    expect(new Set(paths).size).toBe(paths.length);
+    const workflow = both.find((f) => f.path === ".agents/workflows/amby.specify.md")!;
+    expect(workflow.contents).toContain("--agent=antigravity-cli");
+    expect(workflow.contents).not.toContain("--agent=antigravity ");
+    expect(emitFiles(["antigravity-cli", "antigravity"]).find((f) => f.path === workflow.path)!.contents).toContain(
+      "--agent=antigravity ",
+    );
+  });
+
   it("is not triggered by targets with disjoint output", () => {
     expect(() => emitFiles(["codex", "antigravity", "claude"])).not.toThrow();
   });

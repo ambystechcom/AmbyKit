@@ -52,7 +52,13 @@ npx @ambystech/ambykit init --dry-run   # preview merges, write nothing
 Add or refresh integration for one or more targets (see [tool compatibility](./tool-compatibility.md)
 for target names). On an interactive terminal, running it with **no target** opens a multi-select
 prompt (`space` toggle, `enter` confirm, `esc` cancel); non-interactively it errors with the list of
-available targets instead of blocking. `init` behaves the same when `--tools` is omitted.
+available targets instead of blocking. `init` behaves the same when `--tools` is omitted. The
+selector scrolls when the list is taller than the terminal (`↑ n more` / `↓ n more`).
+
+Target ids: `claude`, `claude-vscode`, `copilot`, `copilot-cli`, `opencode`, `cursor`, `cursor-cli`,
+`antigravity`, `antigravity-cli`, `codex`, `gemini`, `llxprt`, `qwen`, `kilo`, `augment`, `windsurf`,
+`kiro`, `pi`. Targets that share an emitter (for example `codex` and `pi`) write their files once;
+`ambykit check` names the owners of each shared output.
 
 ```bash
 ambykit add cursor claude

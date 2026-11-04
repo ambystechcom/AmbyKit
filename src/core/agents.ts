@@ -10,7 +10,20 @@ import type { Checkout } from "./overview-types.js";
  * the editor process and cannot be told apart, so they have no matchers — self-report only.
  */
 
-export type AgentFamily = "claude" | "codex" | "opencode" | "copilot" | "cursor" | "antigravity";
+export type AgentFamily =
+  | "claude"
+  | "codex"
+  | "opencode"
+  | "copilot"
+  | "cursor"
+  | "antigravity"
+  | "gemini"
+  | "qwen"
+  | "llxprt"
+  | "kiro"
+  | "kilo"
+  | "augment"
+  | "windsurf";
 
 export interface AgentDef {
   family: AgentFamily;
@@ -33,6 +46,15 @@ export const AGENTS: Record<string, AgentDef> = {
   "cursor-cli": { family: "cursor", executables: ["cursor-agent"], generic: [{ name: "agent", pathHint: "cursor" }] },
   antigravity: { family: "antigravity" },
   "antigravity-cli": { family: "antigravity" },
+  // Feature 016. Executables verified from each product's install docs (research R9, 2026-11-03).
+  gemini: { family: "gemini", executables: ["gemini"], packages: ["@google/gemini-cli"] },
+  llxprt: { family: "llxprt", executables: ["llxprt"], packages: ["@vybestack/llxprt-code"] },
+  qwen: { family: "qwen", executables: ["qwen"], packages: ["@qwen-code/qwen-code"] },
+  kilo: { family: "kilo", executables: ["kilo"], packages: ["@kilocode/cli"] },
+  augment: { family: "augment", executables: ["auggie"], packages: ["@augmentcode/auggie"] },
+  kiro: { family: "kiro", executables: ["kiro-cli"] },
+  windsurf: { family: "windsurf" }, // IDE-hosted: self-report only
+  pi: { family: "codex" }, // alias of the Codex emitter: reports as `codex`, and `pi` is too short to match by name (R5)
 };
 
 /** One running process, as listed by the platform scanner. */

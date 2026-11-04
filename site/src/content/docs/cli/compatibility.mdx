@@ -23,6 +23,33 @@ emitter (VS Code extensions, sibling CLIs).
 | `antigravity` | Antigravity (IDE) | `workflows` |
 | `antigravity-cli` | Antigravity CLI | `workflows` (reuses Antigravity) |
 | `codex` | Codex CLI | `skills` |
+| `gemini` | Gemini CLI | `commands` (TOML) |
+| `llxprt` | LLxprt Code | `commands` (TOML) |
+| `qwen` | Qwen Code | `commands` |
+| `kilo` | Kilo Code | `commands` |
+| `augment` | Augment Code | `commands` |
+| `windsurf` | Windsurf | `workflows` |
+| `kiro` | Kiro (IDE + CLI) | `skills` |
+| `pi` | Pi | `skills` (alias of `codex`) |
+
+## Where files land (additional targets)
+
+| Target | Commands | Format | Args placeholder | Rules |
+|---|---|---|---|---|
+| Gemini CLI | `.gemini/commands/*.toml` | TOML: `prompt`, `description` | `{{args}}` | `GEMINI.md` pointer region |
+| LLxprt Code | `.llxprt/commands/*.toml` | TOML: `prompt`, `description` | `{{args}}` | `LLXPRT.md` pointer region |
+| Qwen Code | `.qwen/commands/*.md` | `description`, `argument-hint` | `{{args}}` | `AGENTS.md` |
+| Kilo Code | `.kilo/commands/*.md` | `description` | `$ARGUMENTS` | `AGENTS.md` |
+| Augment Code | `.augment/commands/*.md` | `description`, `argument-hint` | `$ARGUMENTS` | `AGENTS.md` |
+| Windsurf | `.windsurf/workflows/*.md` | none (12,000-character limit) | reworded as prose | `AGENTS.md` |
+| Kiro | `.kiro/skills/<name>/SKILL.md` | `name`, `description` | reworded as prose | `AGENTS.md` |
+| Pi | `.agents/skills/<name>/SKILL.md` | same files as Codex, written once | reworded as prose | `AGENTS.md` |
+
+Every format above is taken from the vendor's own documentation or source. Unverified surfaces
+(Amazon Q, which is now Kiro CLI; Kiro prompt files; persona files) are not emitted. Windsurf's
+`.windsurf/` is a legacy path that current builds still read. See
+[tool compatibility](https://github.com/ambystechcom/AmbyKit/blob/main/docs/tool-compatibility.md)
+for sources.
 
 ## Where files land
 

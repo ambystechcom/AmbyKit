@@ -30,6 +30,34 @@ export const LIVE_TOKENS = {
       "u": "▲",
       "a": "[AG]"
     },
+    "agent-gemini": {
+      "u": "✦",
+      "a": "[GM]"
+    },
+    "agent-qwen": {
+      "u": "❖",
+      "a": "[QW]"
+    },
+    "agent-llxprt": {
+      "u": "◈",
+      "a": "[LX]"
+    },
+    "agent-kiro": {
+      "u": "⬡",
+      "a": "[KR]"
+    },
+    "agent-kilo": {
+      "u": "◆",
+      "a": "[KL]"
+    },
+    "agent-augment": {
+      "u": "✚",
+      "a": "[AU]"
+    },
+    "agent-windsurf": {
+      "u": "≋",
+      "a": "[WS]"
+    },
     "agent-generic": {
       "u": "●",
       "a": "[??]"
@@ -152,6 +180,55 @@ export const LIVE_TOKENS = {
           "light": "#2e7d32"
         },
         "ansi16": "32"
+      },
+      "agent-gemini": {
+        "truecolor": {
+          "dark": "#b79cff",
+          "light": "#5b3fc4"
+        },
+        "ansi16": "35"
+      },
+      "agent-qwen": {
+        "truecolor": {
+          "dark": "#f08fc6",
+          "light": "#a8236d"
+        },
+        "ansi16": "35"
+      },
+      "agent-llxprt": {
+        "truecolor": {
+          "dark": "#ffa45c",
+          "light": "#a64b00"
+        },
+        "ansi16": "33"
+      },
+      "agent-kiro": {
+        "truecolor": {
+          "dark": "#c8e06a",
+          "light": "#5a6b00"
+        },
+        "ansi16": "32"
+      },
+      "agent-kilo": {
+        "truecolor": {
+          "dark": "#ffd166",
+          "light": "#8a6100"
+        },
+        "ansi16": "33"
+      },
+      "agent-augment": {
+        "truecolor": {
+          "dark": "#8c9eff",
+          "light": "#3043b8"
+        },
+        "ansi16": "34"
+      },
+      "agent-windsurf": {
+        "truecolor": {
+          "dark": "#46d6a4",
+          "light": "#0b7a58"
+        },
+        "ansi16": "36"
       }
     },
     "symbol": {
@@ -467,6 +544,150 @@ export const LIVE_TOKENS = {
             "light": "#2e7d32"
           },
           "ansi16": "32"
+        }
+      },
+      "gemini": {
+        "name": "Gemini",
+        "glyph": {
+          "u": "✦",
+          "a": "[GM]"
+        },
+        "nerd": {
+          "u": "✦",
+          "a": "[GM]"
+        },
+        "fg": {
+          "truecolor": {
+            "dark": "#b79cff",
+            "light": "#5b3fc4"
+          },
+          "ansi16": "35"
+        }
+      },
+      "qwen": {
+        "name": "Qwen",
+        "glyph": {
+          "u": "❖",
+          "a": "[QW]"
+        },
+        "nerd": {
+          "u": "❖",
+          "a": "[QW]"
+        },
+        "fg": {
+          "truecolor": {
+            "dark": "#f08fc6",
+            "light": "#a8236d"
+          },
+          "ansi16": "35"
+        }
+      },
+      "llxprt": {
+        "name": "LLxprt",
+        "glyph": {
+          "u": "◈",
+          "a": "[LX]"
+        },
+        "nerd": {
+          "u": "◈",
+          "a": "[LX]"
+        },
+        "fg": {
+          "truecolor": {
+            "dark": "#ffa45c",
+            "light": "#a64b00"
+          },
+          "ansi16": "33"
+        }
+      },
+      "kiro": {
+        "name": "Kiro",
+        "glyph": {
+          "u": "⬡",
+          "a": "[KR]"
+        },
+        "nerd": {
+          "u": "⬡",
+          "a": "[KR]"
+        },
+        "fg": {
+          "truecolor": {
+            "dark": "#c8e06a",
+            "light": "#5a6b00"
+          },
+          "ansi16": "32"
+        }
+      },
+      "kilo": {
+        "name": "Kilo",
+        "glyph": {
+          "u": "◆",
+          "a": "[KL]"
+        },
+        "nerd": {
+          "u": "◆",
+          "a": "[KL]"
+        },
+        "fg": {
+          "truecolor": {
+            "dark": "#ffd166",
+            "light": "#8a6100"
+          },
+          "ansi16": "33"
+        }
+      },
+      "augment": {
+        "name": "Augment",
+        "glyph": {
+          "u": "✚",
+          "a": "[AU]"
+        },
+        "nerd": {
+          "u": "✚",
+          "a": "[AU]"
+        },
+        "fg": {
+          "truecolor": {
+            "dark": "#8c9eff",
+            "light": "#3043b8"
+          },
+          "ansi16": "34"
+        }
+      },
+      "windsurf": {
+        "name": "Windsurf",
+        "glyph": {
+          "u": "≋",
+          "a": "[WS]"
+        },
+        "nerd": {
+          "u": "≋",
+          "a": "[WS]"
+        },
+        "fg": {
+          "truecolor": {
+            "dark": "#46d6a4",
+            "light": "#0b7a58"
+          },
+          "ansi16": "36"
+        }
+      },
+      "pi": {
+        "name": "Codex",
+        "glyph": {
+          "u": "◎",
+          "a": "[CX]"
+        },
+        "nerd": {
+          "u": "",
+          "a": "[CX]"
+        },
+        "fg": {
+          "truecolor": {
+            "dark": "#d4d8e0",
+            "light": "#3b4252"
+          },
+          "ansi16": "37"
         }
       },
       "generic": {

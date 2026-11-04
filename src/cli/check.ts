@@ -4,7 +4,7 @@ import { BaseCommand, type CliOptions } from "./base-command.js";
 import { applyFiles } from "./io/fsops.js";
 import { buildEmittedFiles } from "../core/emit.js";
 import { loadConfig } from "../core/config.js";
-import { getTarget } from "../emitters/index.js";
+import { getTarget, sharedOutputs } from "../emitters/index.js";
 import { defaultBranch, isMerged, isRepo, worktreeList } from "../core/git.js";
 import { featureWorktrees } from "../core/worktree.js";
 import { ROLES_DIR, loadRoles, validateRoles } from "../core/roles.js";
@@ -57,6 +57,11 @@ export class CheckCommand extends BaseCommand {
       this.warn(`${result.wouldChange.length} generated file(s) are out of sync — run \`ambykit sync\`.`);
       for (const p of result.wouldChange) this.info(`  ~ ${p}`);
       ok = false;
+    }
+
+    // Targets that share one emitter write the same files once (feature 016, FR-007); name the owners.
+    for (const s of sharedOutputs(config.tools)) {
+      this.info(`  Shared output ${s.dir}/ is owned by: ${s.owners.join(", ")}.`);
     }
 
     // Stale feature worktrees (feature 012, FR-013): branch already merged into the default branch.

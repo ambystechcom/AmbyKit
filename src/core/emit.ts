@@ -25,27 +25,40 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
       merge: "region", // preserve any user-authored AGENTS.md content (feature 008 / FR-001)
     });
   }
-  const owners = new Map<string, { owner: string; file: EmittedFile }>();
-  for (const f of files) owners.set(f.path, { owner: "rules", file: f });
+  // Two targets can write one path (FR-007). Identical bytes are written once. Bytes that differ only
+  // in the `--agent=<id>` self-report (Antigravity IDE and CLI share `.agents/workflows/`) keep the
+  // long-standing behavior, where the later target in config order wins. Any other difference is a
+  // real conflict and fails loudly, naming both tools.
+  const owners = new Map<string, { owner: string; index: number }>();
+  files.forEach((f, index) => owners.set(f.path, { owner: "rules", index }));
   for (const emitter of emittersForTargets(config.tools)) {
     for (const file of emitter.emit(specs, ctx)) {
       const seen = owners.get(file.path);
-      if (seen) {
-        // Two targets writing one path is fine only when the bytes agree (FR-007); it is written once.
-        if (!sameOutput(seen.file, file)) {
-          throw new Error(
-            `Output collision at ${file.path}: '${seen.owner}' and '${emitter.toolId}' emit different contents.`,
-          );
-        }
+      if (!seen) {
+        owners.set(file.path, { owner: emitter.toolId, index: files.length });
+        files.push(file);
         continue;
       }
-      owners.set(file.path, { owner: emitter.toolId, file });
-      files.push(file);
+      const earlier = files[seen.index]!;
+      if (sameOutput(earlier, file)) continue;
+      if (sameOutput(earlier, file, [seen.owner, emitter.toolId])) {
+        files[seen.index] = file;
+        owners.set(file.path, { owner: emitter.toolId, index: seen.index });
+        continue;
+      }
+      throw new Error(
+        `Output collision at ${file.path}: '${seen.owner}' and '${emitter.toolId}' emit different contents.`,
+      );
     }
   }
   return files;
 }
 
-function sameOutput(a: EmittedFile, b: EmittedFile): boolean {
-  return a.contents === b.contents && a.scope === b.scope && a.merge === b.merge && a.requiredPrefix === b.requiredPrefix;
+/** Same file, byte for byte; with `ids`, ignoring the `--agent=<id>` self-report of those two tools. */
+function sameOutput(a: EmittedFile, b: EmittedFile, ids?: [string, string]): boolean {
+  if (a.scope !== b.scope || a.merge !== b.merge || a.requiredPrefix !== b.requiredPrefix) return false;
+  if (!ids) return a.contents === b.contents;
+  const longestFirst = [...ids].sort((x, y) => y.length - x.length); // `antigravity-cli` before `antigravity`
+  const strip = (text: string): string => longestFirst.reduce((t, id) => t.replaceAll(`--agent=${id}`, "--agent=@"), text);
+  return strip(a.contents) === strip(b.contents);
 }
