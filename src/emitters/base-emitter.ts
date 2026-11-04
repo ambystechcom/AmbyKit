@@ -98,10 +98,18 @@ export abstract class BaseEmitter {
       "$AGENT",
       this.toolId,
     );
+    return { path: this.commandFilePath(spec), contents: this.renderCommand(pairs, notice, body), scope: "project" };
+  }
+
+  /**
+   * Assemble one command file from its native frontmatter pairs, generated notice and body. The
+   * default is YAML frontmatter + HTML-comment notice; a target with another file shape (TOML)
+   * overrides only this (feature 016, FR-004).
+   */
+  protected renderCommand(pairs: Array<[string, string]>, notice: string, body: string): string {
     // Tools with no command frontmatter (e.g. Cursor plain commands) get no `---` block.
     const head = pairs.length > 0 ? `${this.renderFrontmatter(pairs)}\n` : "";
-    const contents = `${head}${notice}\n\n${body}\n`;
-    return { path: this.commandFilePath(spec), contents, scope: "project" };
+    return `${head}${notice}\n\n${body}\n`;
   }
 
   /**
