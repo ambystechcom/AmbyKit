@@ -63,3 +63,17 @@ Not verified, so not used:
     `gemini`, `qwen`, `llxprt`, `kiro-cli`, `kilo`, `auggie` and `pi`.
   - Any executable that cannot be verified, and the IDE-only targets (Windsurf), are self-report only,
     as `antigravity-cli` is today.
+  - **Verified 2026-11-03 (T011)** from each product's own install docs:
+
+    | Target id | Executable | Install | Source |
+    |---|---|---|---|
+    | `gemini` | `gemini` | `npm i -g @google/gemini-cli` | github.com/google-gemini/gemini-cli |
+    | `qwen` | `qwen` | `npm i -g @qwen-code/qwen-code` | github.com/QwenLM/qwen-code |
+    | `llxprt` | `llxprt` | `npm i -g @vybestack/llxprt-code` | github.com/vybestack/llxprt-code |
+    | `kiro` | `kiro-cli` | `curl -fsSL https://cli.kiro.dev/install \| bash` | kiro.dev/docs/cli/ |
+    | `kilo` | `kilo` | `npm i -g @kilocode/cli` | kilo.ai/docs/cli |
+    | `augment` | `auggie` | `npm i -g @augmentcode/auggie` | docs.augmentcode.com/cli/overview |
+    | `pi` | `pi` (package `@earendil-works/pi-coding-agent`) | `npm i -g @earendil-works/pi-coding-agent` | github.com/earendil-works/pi |
+
+  - `pi` is too short to match by name alone, and Pi reports as `codex` anyway (R5), so it gets no
+    `AGENTS` entry. `windsurf` stays self-report only.

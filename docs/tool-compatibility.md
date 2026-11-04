@@ -20,6 +20,14 @@ Several targets share one emitter's output (why `BaseEmitter` + thin subclasses 
 | Antigravity (IDE) | `AntigravityEmitter` | `workflows` |
 | Antigravity CLI (`agy`) | `AntigravityCliEmitter` | reuses Antigravity |
 | Codex CLI (`codex`) | `CodexEmitter` | `skills` |
+| Gemini CLI (`gemini`) | `GeminiEmitter` | `commands` (TOML) |
+| LLxprt Code (`llxprt`) | `LlxprtEmitter` | `commands` (TOML) |
+| Qwen Code (`qwen`) | `QwenEmitter` | `commands` |
+| Kilo Code (`kilo`) | `KiloEmitter` | `commands` |
+| Augment Code (`auggie`) | `AugmentEmitter` | `commands` |
+| Windsurf | `WindsurfEmitter` | `workflows` |
+| Kiro (IDE + `kiro-cli`) | `KiroEmitter` | `skills` |
+| Pi (`pi`) | `CodexEmitter` (alias) | `skills`, identical to Codex |
 
 ## Matrix
 
@@ -35,6 +43,48 @@ Several targets share one emitter's output (why `BaseEmitter` + thin subclasses 
 | MCP file | `.mcp.json` | `opencode.json` → `mcp` | `.vscode/mcp.json` | `~/.copilot/mcp-config.json` (user) | `.cursor/mcp.json` | reads `.cursor/mcp.json` | `mcp_config.json` (user) | `.codex/config.toml` (TOML) — **out of scope**, AmbyKit does not write it |
 | MCP top-level key | (per-server `type`) | `mcp` | `servers` | `mcpServers` | `mcpServers` | — | `mcpServers` | `mcp_servers.<id>` (not written) |
 | AGENTS.md native | No (bridge) | Yes | Yes (opt-in) | Yes | Yes | Yes | Yes | Yes |
+
+## Matrix — additional targets (feature 016)
+
+Checked 2026-10-26 against vendor docs or the product's own repository (docs or loader source). Only
+documented surfaces are emitted (Principle 4).
+
+| Concern | Gemini CLI | LLxprt Code | Qwen Code | Kilo Code | Augment Code | Windsurf | Kiro | Pi |
+|---|---|---|---|---|---|---|---|---|
+| Rules file | `GEMINI.md` (pointer region) | `LLXPRT.md` (pointer region) | `AGENTS.md` (see below) | `AGENTS.md` | `AGENTS.md` (+`.augment/rules/`) | `AGENTS.md` (+`.windsurf/rules/`) | `AGENTS.md` (+`.kiro/steering/`) | `AGENTS.md` |
+| Commands/prompts | `.gemini/commands/*.toml` | `.llxprt/commands/*.toml` | `.qwen/commands/*.md` | `.kilo/commands/*.md` | `.augment/commands/*.md` | `.windsurf/workflows/*.md` | `.kiro/skills/<name>/SKILL.md` | `.agents/skills/<name>/SKILL.md` (as Codex) |
+| Command format | TOML: `prompt` (required), `description` | TOML: `prompt` (required), `description` | Markdown + YAML: `description`, `argument-hint` | Markdown + YAML: `description` | Markdown + YAML: `description`, `argument-hint` | Markdown, no frontmatter; 12,000-character limit | `name` (must equal the dir; lowercase, digits, `-`; ≤ 64), `description` | `name`, `description` |
+| Args placeholder | `{{args}}` | `{{args}}` | `{{args}}` | `$ARGUMENTS`, `$N` | `$ARGUMENTS` | none — reworded as prose | `$ARGUMENTS` in the CLI only — reworded as prose | n/a for skills — reworded as prose |
+| Command name | path under the dir, `/` ⇒ `:`; dots kept | as Gemini | as Gemini; dots kept | filename | filename; subdir ⇒ `:` | filename | directory name | invoked `/skill:<name>` |
+| AGENTS.md native | No (opt-in via `context.fileName`) | No (`contextFileName`) | Yes per source; the docs page still says `QWEN.md` only | Yes | Yes | Yes | Yes | Yes (also `CLAUDE.md`) |
+| Agents/personas | not emitted | not emitted | not emitted | not emitted | not emitted | not emitted | not emitted | not emitted |
+| Sources | github.com/google-gemini/gemini-cli (docs/cli/custom-commands.md, gemini-md.md) | github.com/vybestack/llxprt-code (docs/cli/commands.md, configuration.md) | qwenlm.github.io/qwen-code-docs (features/commands); github.com/QwenLM/qwen-code | kilo.ai/docs (customize/workflows, agents-md) | docs.augmentcode.com/cli (custom-commands, rules) | docs.devin.ai/desktop/cascade (workflows, memories) | kiro.dev/docs (skills, steering) | github.com/earendil-works/pi (packages/coding-agent/docs/skills.md) |
+
+**Gemini and LLxprt (TOML).** The prompt is a TOML literal multi-line string (`'''…'''`), so
+backslashes and quotes need no escaping; a body containing `'''` falls back to a basic `"""` string.
+The generated notice is a `#` comment. Gemini treats `!{…}` and `@{…}` as shell/file injection, so a
+test forbids both in the neutral prompts. AmbyKit adds a `GEMINI.md` / `LLXPRT.md` pointer region and
+never edits `.gemini/settings.json`.
+
+**Windsurf.** `.windsurf/workflows/` is read by older Windsurf builds and by Devin Desktop (which
+calls it legacy); `.devin/workflows/` works only on the newest builds. The trade-off is recorded
+here, and switching is one emitter field.
+
+**Pi** is an alias of the Codex emitter: it reads `.agents/skills/` natively, so the files are
+identical and written once. Its activity self-report says `codex`.
+
+**The `.agents/skills/` overlap.** Gemini, Qwen, LLxprt, Kilo, Augment, Windsurf and Pi also read
+`.agents/skills/`. With Codex selected they can see each phase twice (once as a command, once as a
+skill). This is documented, not suppressed. Augment also reads `.claude/commands/`; the names are
+identical and `.augment/` takes precedence, so Claude plus Augment yields no duplicates.
+
+### Out of scope (FR-002)
+
+- **Amazon Q Developer CLI** is now Kiro CLI (docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/upgrade-to-kiro.html), which the Kiro target covers.
+- **Kiro CLI prompt files** (`.kiro/prompts/`): file format undocumented.
+- **Pi prompt templates** with dotted names: undocumented.
+- **LLxprt sub-agents:** there is no file format, only `/subagent save`.
+- **Agent/persona files** for every new target: not emitted until the format is verified (feature 013).
 
 ## Gotchas the emitters encode
 
@@ -102,10 +152,15 @@ Docs conflicted on a couple of points; confirm before shipping those emitters:
 
 - Antigravity `.agents/` vs `.agent/` default on the targeted version.
 - Whether the `agy` CLI's `--output-format json` exists.
+- Qwen Code reads `AGENTS.md` (true per its source, `memory-constants.ts`; its docs page says `QWEN.md`
+  only). If a live install ignores it, add a `QWEN.md` pointer region (a one-override change).
+- Gemini CLI loads `/amby.specify` from the emitted `.gemini/commands/amby.specify.toml` (SC-006).
+- Windsurf still reads `.windsurf/workflows/` on the current Devin Desktop build.
 
 ## Sources
 
 Claude Code: code.claude.com/docs · OpenCode: opencode.ai/docs · Copilot: code.visualstudio.com/docs
 and docs.github.com/copilot · Cursor: cursor.com/docs · Antigravity: antigravity.google/docs and
 Google Cloud blog. Codex CLI: developers.openai.com/codex (skills, custom prompts, config reference,
-AGENTS.md guide). AGENTS.md standard: agents.md.
+AGENTS.md guide). Gemini CLI, LLxprt, Qwen Code, Kilo, Augment, Windsurf, Kiro and Pi: see the
+"Sources" row of the additional-targets matrix. AGENTS.md standard: agents.md.

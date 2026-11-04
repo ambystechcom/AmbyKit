@@ -24,9 +24,9 @@ created: 2026-10-26
 
 ## Phase 3 — User story US-1  (priority: P1)
 
-- [ ] [T010] [US1] Matrix: eight new columns, sources, "Out of scope" (Amazon Q, Kiro prompts, persona files), live-verify list, `.agents/skills` overlap note — FR-001/002 (docs/tool-compatibility.md)
-- [ ] [T011] [P] [US1] Verify CLI executable names from official install docs; record in research R9 (specs/016-agent-surface-expansion/research.md)
-- [ ] [T012] [US1] docs-sync passes with the new matrix (scripts/check-docs-sync.mjs)
+- [x] [T010] [US1] Matrix: eight new columns, sources, "Out of scope" (Amazon Q, Kiro prompts, persona files), live-verify list, `.agents/skills` overlap note — FR-001/002 (docs/tool-compatibility.md)
+- [x] [T011] [P] [US1] Verify CLI executable names from official install docs; record in research R9 (specs/016-agent-surface-expansion/research.md)
+- [x] [T012] [US1] docs-sync passes with the new matrix (scripts/check-docs-sync.mjs)
 - **Checkpoint:** US-1 — every target has a sourced row; nothing is emitted yet.
 
 ## Phase 4 — User story US-3  (priority: P1)
