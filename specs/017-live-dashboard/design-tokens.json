@@ -16,7 +16,21 @@
       "sky": "#8fb8ff",
       "sky-deep": "#2f5bd3",
       "leaf": "#7dd36f",
-      "leaf-deep": "#2e7d32"
+      "leaf-deep": "#2e7d32",
+      "gemini": "#b79cff",
+      "gemini-deep": "#5b3fc4",
+      "qwen": "#f08fc6",
+      "qwen-deep": "#a8236d",
+      "llxprt": "#ffa45c",
+      "llxprt-deep": "#a64b00",
+      "kiro": "#c8e06a",
+      "kiro-deep": "#5a6b00",
+      "kilo": "#ffd166",
+      "kilo-deep": "#8a6100",
+      "augment": "#8c9eff",
+      "augment-deep": "#3043b8",
+      "windsurf": "#46d6a4",
+      "windsurf-deep": "#0b7a58"
     },
     "glyph": {
       "agent-claude": {
@@ -42,6 +56,34 @@
       "agent-antigravity": {
         "u": "\u25b2",
         "a": "[AG]"
+      },
+      "agent-gemini": {
+        "u": "\u2726",
+        "a": "[GM]"
+      },
+      "agent-qwen": {
+        "u": "\u2756",
+        "a": "[QW]"
+      },
+      "agent-llxprt": {
+        "u": "\u25c8",
+        "a": "[LX]"
+      },
+      "agent-kiro": {
+        "u": "\u2b21",
+        "a": "[KR]"
+      },
+      "agent-kilo": {
+        "u": "\u25c6",
+        "a": "[KL]"
+      },
+      "agent-augment": {
+        "u": "\u271a",
+        "a": "[AU]"
+      },
+      "agent-windsurf": {
+        "u": "\u224b",
+        "a": "[WS]"
       },
       "agent-generic": {
         "u": "\u25cf",
@@ -166,6 +208,55 @@
           "light": "{primitive.rgb.leaf-deep}"
         },
         "ansi16": "{primitive.sgr.fg-green}"
+      },
+      "agent-gemini": {
+        "truecolor": {
+          "dark": "{primitive.rgb.gemini}",
+          "light": "{primitive.rgb.gemini-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-magenta}"
+      },
+      "agent-qwen": {
+        "truecolor": {
+          "dark": "{primitive.rgb.qwen}",
+          "light": "{primitive.rgb.qwen-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-magenta}"
+      },
+      "agent-llxprt": {
+        "truecolor": {
+          "dark": "{primitive.rgb.llxprt}",
+          "light": "{primitive.rgb.llxprt-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-yellow}"
+      },
+      "agent-kiro": {
+        "truecolor": {
+          "dark": "{primitive.rgb.kiro}",
+          "light": "{primitive.rgb.kiro-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-green}"
+      },
+      "agent-kilo": {
+        "truecolor": {
+          "dark": "{primitive.rgb.kilo}",
+          "light": "{primitive.rgb.kilo-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-yellow}"
+      },
+      "agent-augment": {
+        "truecolor": {
+          "dark": "{primitive.rgb.augment}",
+          "light": "{primitive.rgb.augment-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-blue}"
+      },
+      "agent-windsurf": {
+        "truecolor": {
+          "dark": "{primitive.rgb.windsurf}",
+          "light": "{primitive.rgb.windsurf-deep}"
+        },
+        "ansi16": "{primitive.sgr.fg-cyan}"
       }
     },
     "symbol": {
@@ -276,6 +367,54 @@
         "nerd": "{primitive.glyph.agent-antigravity}",
         "fg": "{semantic.color.agent-antigravity}"
       },
+      "gemini": {
+        "name": "Gemini",
+        "glyph": "{primitive.glyph.agent-gemini}",
+        "nerd": "{primitive.glyph.agent-gemini}",
+        "fg": "{semantic.color.agent-gemini}"
+      },
+      "qwen": {
+        "name": "Qwen",
+        "glyph": "{primitive.glyph.agent-qwen}",
+        "nerd": "{primitive.glyph.agent-qwen}",
+        "fg": "{semantic.color.agent-qwen}"
+      },
+      "llxprt": {
+        "name": "LLxprt",
+        "glyph": "{primitive.glyph.agent-llxprt}",
+        "nerd": "{primitive.glyph.agent-llxprt}",
+        "fg": "{semantic.color.agent-llxprt}"
+      },
+      "kiro": {
+        "name": "Kiro",
+        "glyph": "{primitive.glyph.agent-kiro}",
+        "nerd": "{primitive.glyph.agent-kiro}",
+        "fg": "{semantic.color.agent-kiro}"
+      },
+      "kilo": {
+        "name": "Kilo",
+        "glyph": "{primitive.glyph.agent-kilo}",
+        "nerd": "{primitive.glyph.agent-kilo}",
+        "fg": "{semantic.color.agent-kilo}"
+      },
+      "augment": {
+        "name": "Augment",
+        "glyph": "{primitive.glyph.agent-augment}",
+        "nerd": "{primitive.glyph.agent-augment}",
+        "fg": "{semantic.color.agent-augment}"
+      },
+      "windsurf": {
+        "name": "Windsurf",
+        "glyph": "{primitive.glyph.agent-windsurf}",
+        "nerd": "{primitive.glyph.agent-windsurf}",
+        "fg": "{semantic.color.agent-windsurf}"
+      },
+      "pi": {
+        "name": "Codex",
+        "glyph": "{primitive.glyph.agent-codex}",
+        "nerd": "{primitive.nerd.codex}",
+        "fg": "{semantic.color.agent-codex}"
+      },
       "generic": {
         "name": "",
         "glyph": "{primitive.glyph.agent-generic}",
@@ -330,7 +469,14 @@
       "agent-cursor (teal)": 9.67,
       "agent-copilot (sky)": 8.99,
       "agent-antigravity (leaf)": 9.81,
-      "agent-opencode (amber, 014)": 9.8
+      "agent-opencode (amber, 014)": 9.8,
+      "agent-gemini (gemini)": 7.92,
+      "agent-qwen (qwen)": 8.12,
+      "agent-llxprt (llxprt)": 9.21,
+      "agent-kiro (kiro)": 12.31,
+      "agent-kilo (kilo)": 12.51,
+      "agent-augment (augment)": 7.26,
+      "agent-windsurf (windsurf)": 9.81
     },
     "light": {
       "agent-claude (clay-deep)": 5.88,
@@ -338,7 +484,14 @@
       "agent-cursor (teal-deep)": 5.47,
       "agent-copilot (sky-deep)": 5.9,
       "agent-antigravity (leaf-deep)": 5.13,
-      "agent-opencode (amber-deep, 014)": 4.87
+      "agent-opencode (amber-deep, 014)": 4.87,
+      "agent-gemini (gemini-deep)": 7.11,
+      "agent-qwen (qwen-deep)": 6.72,
+      "agent-llxprt (llxprt-deep)": 5.79,
+      "agent-kiro (kiro-deep)": 5.94,
+      "agent-kilo (kilo-deep)": 5.54,
+      "agent-augment (augment-deep)": 8.01,
+      "agent-windsurf (windsurf-deep)": 5.33
     }
   }
 }

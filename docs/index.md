@@ -20,7 +20,7 @@ tools omit.
 
 You write the workflow and artifacts once. AmbyKit's **emitters** compile them into each assistant's
 native format — Claude Code, OpenCode, GitHub Copilot (VS Code + CLI), Cursor (+ CLI), Antigravity
-(IDE + CLI). One source of truth, no per-tool drift. See [architecture](./architecture.md).
+(IDE + CLI), Codex CLI, Gemini CLI, Windsurf, Qwen Code, Kiro, Kilo Code, Augment Code, LLxprt Code and Pi. One source of truth, no per-tool drift. See [architecture](./architecture.md).
 
 ## Read next
 

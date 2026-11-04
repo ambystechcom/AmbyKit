@@ -63,3 +63,53 @@ Not verified, so not used:
     `gemini`, `qwen`, `llxprt`, `kiro-cli`, `kilo`, `auggie` and `pi`.
   - Any executable that cannot be verified, and the IDE-only targets (Windsurf), are self-report only,
     as `antigravity-cli` is today.
+  - **Verified 2026-11-03 (T011)** from each product's own install docs:
+
+    | Target id | Executable | Install | Source |
+    |---|---|---|---|
+    | `gemini` | `gemini` | `npm i -g @google/gemini-cli` | github.com/google-gemini/gemini-cli |
+    | `qwen` | `qwen` | `npm i -g @qwen-code/qwen-code` | github.com/QwenLM/qwen-code |
+    | `llxprt` | `llxprt` | `npm i -g @vybestack/llxprt-code` | github.com/vybestack/llxprt-code |
+    | `kiro` | `kiro-cli` | `curl -fsSL https://cli.kiro.dev/install \| bash` | kiro.dev/docs/cli/ |
+    | `kilo` | `kilo` | `npm i -g @kilocode/cli` | kilo.ai/docs/cli |
+    | `augment` | `auggie` | `npm i -g @augmentcode/auggie` | docs.augmentcode.com/cli/overview |
+    | `pi` | `pi` (package `@earendil-works/pi-coding-agent`) | `npm i -g @earendil-works/pi-coding-agent` | github.com/earendil-works/pi |
+
+  - `pi` is too short to match by name alone, and Pi reports as `codex` anyway (R5), so it gets no
+    `AGENTS` entry. `windsurf` stays self-report only.
+
+## Gemini CLI status, and the SC-006 live check (T025) — waived
+
+Checked 2026-11-04 against Google's own pages:
+
+- **Gemini CLI is being transitioned to Antigravity CLI, not formally deprecated.** Antigravity CLI
+  launched on 2026-05-19. On 2026-06-18 Gemini CLI stopped serving free individual users and Google AI
+  Pro/Ultra subscribers. It remains available for Gemini Code Assist Standard/Enterprise licences and
+  for paid Gemini / Vertex API keys. The announcement never uses the word "deprecated".
+  Sources: developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/,
+  the notice at the top of github.com/google-gemini/gemini-cli.
+- **Decision:** keep the `gemini` target (enterprise and API-key users still run it, and LLxprt shares
+  its TOML shape), but treat it as a legacy-audience target. It is not promoted anywhere.
+- **Antigravity CLI reads `GEMINI.md` and `AGENTS.md`** and does not document `.gemini/commands/*.toml`;
+  it converts them with `agy plugin import gemini` (antigravity.google/docs/cli/gcli-migration).
+- **T025 is waived.** The live load check needs a Gemini CLI install, which the main audience no longer
+  has. To run it anyway: install `@google/gemini-cli`, `ambykit add gemini` in a scratch project,
+  start `gemini`, and confirm `/amby.specify` expands its prompt. The emitted TOML is covered by a
+  strict round-trip parse in `test/toml-emitters.test.ts`, which shows well-formedness but not that
+  Gemini's loader accepts it.
+
+## Antigravity's workflows surface is retired (found while validating Gemini)
+
+- Antigravity's migration guide says "Current workflows will stop working on October 19, 2026", and
+  after that date "legacy workflow directories are no longer indexed or executable using slash
+  commands" (antigravity.google/docs/migration/workflows-to-skills/).
+- The replacement is skills at `.agents/skills/<name>/SKILL.md` (`name` optional, lowercase and
+  hyphenated; `description` required). The CLI turns every skill into a slash command
+  (antigravity.google/docs/skills/). Neither page says what happens when a skill and a workflow share
+  a name (checked again 2026-11-04; an earlier note here claimed the skill wins, which is unconfirmed).
+- **Impact:** the `antigravity` and `antigravity-cli` targets still emit `.agents/workflows/*.md`, which
+  no longer runs. The Codex and Pi targets already write `.agents/skills/amby-*/SKILL.md`, which
+  Antigravity reads. Moving the Antigravity targets to skills changes existing output (016 FR-010), so
+  it is specced separately as feature 018, which moves both targets to skills (the sentence above
+  describes this branch as shipped; 018 supersedes it).
+- Open question: the guide describes the IDE app and does not say whether the cutoff applies to the CLI.

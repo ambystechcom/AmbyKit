@@ -25,8 +25,55 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
       merge: "region", // preserve any user-authored AGENTS.md content (feature 008 / FR-001)
     });
   }
+  // Two targets can write one path (FR-007). Identical bytes are written once. Bytes that differ only
+  // in the `--agent=<id>` self-report (Antigravity IDE and CLI share `.agents/workflows/`) keep the
+  // long-standing behavior, where the later target in config order wins. Any other difference is a
+  // real conflict and fails loudly, naming both tools.
+  const owners = new Map<string, { owner: string; index: number }>();
+  files.forEach((f, index) => owners.set(f.path, { owner: "rules", index }));
   for (const emitter of emittersForTargets(config.tools)) {
-    files.push(...emitter.emit(specs, ctx));
+    for (const file of emitter.emit(specs, ctx)) {
+      const seen = owners.get(file.path);
+      if (!seen) {
+        owners.set(file.path, { owner: emitter.toolId, index: files.length });
+        files.push(file);
+        continue;
+      }
+      const earlier = files[seen.index]!;
+      if (sameOutput(earlier, file)) continue;
+      if (sameOutput(earlier, file, [seen.owner, emitter.toolId])) {
+        // Only the self-report id differs: keep the higher-ranked tool's file, whatever the config
+        // order (feature 018, FR-010). Unranked ids keep the long-standing "later wins".
+        if (selfReportRank(emitter.toolId) <= selfReportRank(seen.owner)) {
+          files[seen.index] = file;
+          owners.set(file.path, { owner: emitter.toolId, index: seen.index });
+        }
+        continue;
+      }
+      throw new Error(
+        `Output collision at ${file.path}: '${seen.owner}' and '${emitter.toolId}' emit different contents.`,
+      );
+    }
   }
   return files;
+}
+
+/**
+ * Which tool's `--agent=<id>` a shared file carries when targets differ only in that id (feature 018,
+ * FR-010). Earlier = wins. Codex stays byte-identical, and the Antigravity IDE beats its CLI.
+ */
+export const SELF_REPORT_PRIORITY = ["codex", "antigravity", "antigravity-cli"] as const;
+
+function selfReportRank(toolId: string): number {
+  const i = (SELF_REPORT_PRIORITY as readonly string[]).indexOf(toolId);
+  return i < 0 ? Number.MAX_SAFE_INTEGER : i;
+}
+
+/** Same file, byte for byte; with `ids`, ignoring the `--agent=<id>` self-report of those two tools. */
+function sameOutput(a: EmittedFile, b: EmittedFile, ids?: [string, string]): boolean {
+  if (a.scope !== b.scope || a.merge !== b.merge || a.requiredPrefix !== b.requiredPrefix) return false;
+  if (!ids) return a.contents === b.contents;
+  const longestFirst = [...ids].sort((x, y) => y.length - x.length); // `antigravity-cli` before `antigravity`
+  const strip = (text: string): string => longestFirst.reduce((t, id) => t.replaceAll(`--agent=${id}`, "--agent=@"), text);
+  return strip(a.contents) === strip(b.contents);
 }

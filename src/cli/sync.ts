@@ -1,5 +1,8 @@
+import { rmSync } from "node:fs";
+import { join } from "node:path";
 import { BaseCommand, flag, type CliOptions } from "./base-command.js";
-import { applyFiles } from "./io/fsops.js";
+import { applyFiles, backupFile } from "./io/fsops.js";
+import { legacyWorkflowFiles } from "../core/legacy.js";
 import { buildEmittedFiles } from "../core/emit.js";
 import { loadConfig } from "../core/config.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
@@ -8,7 +11,7 @@ import { loadRoles, validateRoles } from "../core/roles.js";
 export class SyncCommand extends BaseCommand {
   readonly name = "sync";
   readonly summary = "Re-emit all configured tools from the neutral source.";
-  readonly usage = "ambykit sync [--check] [--include-user] [--dry-run]";
+  readonly usage = "ambykit sync [--check] [--include-user] [--prune-legacy] [--dry-run]";
 
   protected async execute(opts: CliOptions): Promise<number> {
     const root = this.projectRoot(opts.cwd);
@@ -60,6 +63,29 @@ export class SyncCommand extends BaseCommand {
     const changed = this.dryRun ? result.wouldChange : result.written;
     this.success(`${this.dryRun ? "Would sync" : "Synced"} ${changed.length} file(s).`);
     this.printSummary(result);
+    this.handleLegacyWorkflows(root, legacyWorkflowFiles(root, config), flag(opts, "prune-legacy"));
     return 0;
+  }
+
+  /**
+   * Stale AmbyKit-generated Antigravity workflows (feature 018, FR-005): left in place and reported by
+   * default; with `--prune-legacy` each is backed up under `.amby/backups/` (so `ambykit restore`
+   * brings it back) and then removed. Files AmbyKit did not generate never reach this list.
+   */
+  private handleLegacyWorkflows(root: string, stale: string[], prune: boolean): void {
+    if (stale.length === 0) return;
+    if (!prune) {
+      this.warn(`${stale.length} stale Antigravity workflow file(s) from an earlier release no longer run:`);
+      for (const p of stale) this.info(`  ~ ${p}`);
+      this.info("  Run `ambykit sync --prune-legacy` to back them up and remove them.");
+      return;
+    }
+    for (const rel of stale) {
+      if (this.dryRun) continue;
+      const abs = join(root, rel);
+      backupFile(root, abs, rel);
+      rmSync(abs);
+    }
+    this.success(`${this.dryRun ? "Would remove" : "Removed"} ${stale.length} stale workflow file(s) (backed up under .amby/backups/; \`ambykit restore <file>\` undoes it).`);
   }
 }

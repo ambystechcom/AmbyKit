@@ -52,7 +52,13 @@ npx @ambystech/ambykit init --dry-run   # preview merges, write nothing
 Add or refresh integration for one or more targets (see [tool compatibility](./tool-compatibility.md)
 for target names). On an interactive terminal, running it with **no target** opens a multi-select
 prompt (`space` toggle, `enter` confirm, `esc` cancel); non-interactively it errors with the list of
-available targets instead of blocking. `init` behaves the same when `--tools` is omitted.
+available targets instead of blocking. `init` behaves the same when `--tools` is omitted. The
+selector scrolls when the list is taller than the terminal (`↑ n more` / `↓ n more`).
+
+Target ids: `claude`, `claude-vscode`, `copilot`, `copilot-cli`, `opencode`, `cursor`, `cursor-cli`,
+`antigravity`, `antigravity-cli`, `codex`, `gemini`, `llxprt`, `qwen`, `kilo`, `augment`, `windsurf`,
+`kiro`, `pi`. Targets that share an emitter (for example `codex` and `pi`) write their files once;
+`ambykit check` names the owners of each shared output.
 
 ```bash
 ambykit add cursor claude
@@ -71,7 +77,17 @@ running it keeps your agent docs current without a full re-init.
 ```bash
 ambykit sync
 ambykit sync --dry-run
+ambykit sync --prune-legacy
 ```
+
+**Antigravity migration.** Antigravity retired workflows on 2026-10-19; the `antigravity` and
+`antigravity-cli` targets now write skills (`.agents/skills/amby-*/SKILL.md`, the same files Codex and Pi
+write). Workflow files that an earlier release generated at `.agents/workflows/amby.<phase>.md` are left
+in place and reported; `--prune-legacy` backs each up under `.amby/backups/` and removes only the ones
+that carry AmbyKit's generated notice (your own workflows are never touched; `ambykit restore <file>`
+brings one back). `sync` never overwrites an existing skill file that AmbyKit did not generate. When
+several targets write one skill file it is written once and reports one assistant id (`codex`, then
+`antigravity`, then `antigravity-cli`).
 
 Also installs any newly shipped templates, reference docs, and **roles** into `.amby/` (write-if-absent —
 your edits are kept), warns when a role in `.amby/roles/` exceeds 150 words, and refuses to emit

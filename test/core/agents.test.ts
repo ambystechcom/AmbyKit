@@ -24,6 +24,14 @@ describe("agentOfProcess (C-2 executables)", () => {
     ['"C:\\Program Files\\nodejs\\node.exe" C:\\npm\\node_modules\\@github\\copilot\\index.js', "copilot-cli"],
     ["/home/me/.local/bin/cursor-agent", "cursor-cli"],
     ["/home/me/.local/share/cursor-agent/versions/1/agent", "cursor-cli"],
+    ["gemini", "gemini"],
+    ["node /usr/lib/node_modules/@google/gemini-cli/bundle/gemini.js", "gemini"],
+    ["/usr/local/bin/qwen", "qwen"],
+    ["llxprt --yolo", "llxprt"],
+    ["/home/me/.local/bin/kiro-cli chat", "kiro"],
+    ["kilo", "kilo"],
+    ["auggie", "augment"],
+    ["node /usr/lib/node_modules/@augmentcode/auggie/dist/index.js", "augment"],
   ])("%s → %s", (cmd, id) => {
     expect(agentOfProcess(cmd)).toBe(id);
   });
@@ -32,6 +40,8 @@ describe("agentOfProcess (C-2 executables)", () => {
     ["/usr/bin/agent"], // generic name without a cursor path
     ["C:\\Users\\me\\AppData\\Local\\AnthropicClaude\\Claude.exe"], // desktop app, not the CLI
     ["node /srv/app/claude-helper.js"],
+    ["/usr/bin/pi"], // Pi is too short to match by name
+    ["/usr/bin/windsurf"], // IDE-hosted: self-report only
     ["vim notes-about-codex.md"],
   ])("ignores %s", (cmd) => {
     expect(agentOfProcess(cmd)).toBeNull();

@@ -121,6 +121,15 @@ shows in the dashboard's WORKTREES & AGENTS panel and counts toward the feature.
 done, `ambykit lane merge <feature>` merges them back, resolving check-off-only `tasks.md`
 differences automatically.
 
+## Supported assistants
+
+The same neutral prompts are emitted for eighteen targets: Claude Code (CLI + VS Code), GitHub Copilot
+(VS Code + CLI), OpenCode, Cursor (+ CLI), Antigravity (IDE + CLI), Codex CLI, Gemini CLI, LLxprt
+Code, Qwen Code, Kilo Code, Augment Code, Windsurf, Kiro and Pi. Each gets its native command format
+(Markdown, TOML, workflows or skills; Antigravity uses skills, since its workflows were retired on
+2026-10-19, and its CLI lists them as `/amby-specify` and so on); see [tool compatibility](./tool-compatibility.md). Editing a
+prompt once and running `ambykit sync` updates all of them.
+
 ## Dependencies & prioritization
 
 Stories and features carry `priority` (P1/P2/P3) and `depends-on`/`blocked-by` references by stable
