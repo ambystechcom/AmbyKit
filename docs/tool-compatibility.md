@@ -78,6 +78,19 @@ identical and written once. Its activity self-report says `codex`.
 skill). This is documented, not suppressed. Augment also reads `.claude/commands/`; the names are
 identical and `.augment/` takes precedence, so Claude plus Augment yields no duplicates.
 
+### Status notes (checked 2026-11-04)
+
+- **Gemini CLI** is being transitioned to Antigravity CLI. Since 2026-06-18 it no longer serves free
+  individual or Google AI Pro/Ultra users; it remains for Gemini Code Assist Standard/Enterprise
+  licences and paid Gemini/Vertex API keys. The target stays for those users.
+- **Antigravity CLI** reads `GEMINI.md` and `AGENTS.md`, and treats skills in `.agents/skills/` as
+  slash commands. It does not document `.gemini/commands/*.toml` (it converts them with
+  `agy plugin import gemini`).
+- **Antigravity workflows are retired.** `.agents/workflows/*.md` stopped being indexed or run on
+  2026-10-19; skills at `.agents/skills/<name>/SKILL.md` replace them. The `antigravity` and
+  `antigravity-cli` targets still emit workflows (tracked as feature 018); selecting `codex` or `pi`
+  already writes the skills Antigravity reads.
+
 ### Out of scope (FR-002)
 
 - **Amazon Q Developer CLI** is now Kiro CLI (docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/upgrade-to-kiro.html), which the Kiro target covers.
@@ -162,6 +175,7 @@ Docs conflicted on a couple of points; confirm before shipping those emitters:
 - Qwen Code reads `AGENTS.md` (true per its source, `memory-constants.ts`; its docs page says `QWEN.md`
   only). If a live install ignores it, add a `QWEN.md` pointer region (a one-override change).
 - Gemini CLI loads `/amby.specify` from the emitted `.gemini/commands/amby.specify.toml` (SC-006).
+  Waived: the CLI is now enterprise/API-key only (see the status notes above).
 - Windsurf still reads `.windsurf/workflows/` on the current Devin Desktop build.
 
 ## Sources

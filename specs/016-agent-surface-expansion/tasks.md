@@ -36,7 +36,7 @@ created: 2026-10-26
 - [x] [T022] [US3] LlxprtEmitter: `.llxprt/commands/amby.<phase>.toml` + LLXPRT.md pointer region (src/emitters/llxprt.ts)
 - [x] [T023] [US3] Register gemini + llxprt targets (src/emitters/index.ts)
 - [x] [T024] [P] [US3] Tests: paths/keys per matrix, `{{args}}`, escaping (backslash, quotes, `'''` fallback), TOML round-trip parse in test only, prompts contain no `!{`/`@{` (test/toml-emitters.test.ts)
-- [ ] [T025] [US3] Manual: load `/amby.specify` in a live Gemini CLI from emitted files; record result — SC-006 (specs/016-agent-surface-expansion/research.md)
+- [x] [T025] [US3] (waived 2026-11-04: Gemini CLI is now enterprise/API only, see research) Manual: load `/amby.specify` in a live Gemini CLI from emitted files; record result — SC-006 (specs/016-agent-surface-expansion/research.md)
 - **Checkpoint:** US-3 — non-markdown commands are expressible; existing output unchanged.
 
 ## Phase 5 — User story US-2  (priority: P1)

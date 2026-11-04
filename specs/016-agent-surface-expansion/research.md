@@ -78,10 +78,36 @@ Not verified, so not used:
   - `pi` is too short to match by name alone, and Pi reports as `codex` anyway (R5), so it gets no
     `AGENTS` entry. `windsurf` stays self-report only.
 
-## SC-006 live check (T025) — pending
+## Gemini CLI status, and the SC-006 live check (T025) — waived
 
-The Gemini CLI is not installed on the machine where the emitters were built, so the load check could
-not be run. To close it: install `@google/gemini-cli`, run `ambykit add gemini` in a scratch project,
-start `gemini`, and confirm `/amby.specify` appears and expands its prompt. Record the result here.
-The emitted TOML is covered by a strict round-trip parse in `test/toml-emitters.test.ts`, which is
-evidence of well-formedness but not of Gemini's loader accepting it.
+Checked 2026-11-04 against Google's own pages:
+
+- **Gemini CLI is being transitioned to Antigravity CLI, not formally deprecated.** Antigravity CLI
+  launched on 2026-05-19. On 2026-06-18 Gemini CLI stopped serving free individual users and Google AI
+  Pro/Ultra subscribers. It remains available for Gemini Code Assist Standard/Enterprise licences and
+  for paid Gemini / Vertex API keys. The announcement never uses the word "deprecated".
+  Sources: developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/,
+  the notice at the top of github.com/google-gemini/gemini-cli.
+- **Decision:** keep the `gemini` target (enterprise and API-key users still run it, and LLxprt shares
+  its TOML shape), but treat it as a legacy-audience target. It is not promoted anywhere.
+- **Antigravity CLI reads `GEMINI.md` and `AGENTS.md`** and does not document `.gemini/commands/*.toml`;
+  it converts them with `agy plugin import gemini` (antigravity.google/docs/cli/gcli-migration).
+- **T025 is waived.** The live load check needs a Gemini CLI install, which the main audience no longer
+  has. To run it anyway: install `@google/gemini-cli`, `ambykit add gemini` in a scratch project,
+  start `gemini`, and confirm `/amby.specify` expands its prompt. The emitted TOML is covered by a
+  strict round-trip parse in `test/toml-emitters.test.ts`, which shows well-formedness but not that
+  Gemini's loader accepts it.
+
+## Antigravity's workflows surface is retired (found while validating Gemini)
+
+- Antigravity's migration guide says "Current workflows will stop working on October 19, 2026", and
+  after that date "legacy workflow directories are no longer indexed or executable using slash
+  commands" (antigravity.google/docs/migration/workflows-to-skills/).
+- The replacement is skills at `.agents/skills/<name>/SKILL.md` (`name` optional, lowercase and
+  hyphenated; `description` required). The CLI turns every skill into a slash command, and a skill
+  wins over a workflow of the same name (antigravity.google/docs/skills/).
+- **Impact:** the `antigravity` and `antigravity-cli` targets still emit `.agents/workflows/*.md`, which
+  no longer runs. The Codex and Pi targets already write `.agents/skills/amby-*/SKILL.md`, which
+  Antigravity reads. Moving the Antigravity targets to skills changes existing output (016 FR-010), so
+  it is specced separately as feature 018.
+- Open question: the guide describes the IDE app and does not say whether the cutoff applies to the CLI.

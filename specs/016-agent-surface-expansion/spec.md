@@ -90,7 +90,7 @@ an exception.
   non-markdown format that the assistant loads successfully, verified against a live install.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** in-progress
+- **status:** done
 
 **Acceptance criteria**
 - Given a target whose commands are not markdown with YAML frontmatter, When sync runs, Then its files
