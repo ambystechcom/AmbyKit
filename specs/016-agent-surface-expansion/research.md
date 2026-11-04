@@ -104,8 +104,9 @@ Checked 2026-11-04 against Google's own pages:
   after that date "legacy workflow directories are no longer indexed or executable using slash
   commands" (antigravity.google/docs/migration/workflows-to-skills/).
 - The replacement is skills at `.agents/skills/<name>/SKILL.md` (`name` optional, lowercase and
-  hyphenated; `description` required). The CLI turns every skill into a slash command, and a skill
-  wins over a workflow of the same name (antigravity.google/docs/skills/).
+  hyphenated; `description` required). The CLI turns every skill into a slash command
+  (antigravity.google/docs/skills/). Neither page says what happens when a skill and a workflow share
+  a name (checked again 2026-11-04; an earlier note here claimed the skill wins, which is unconfirmed).
 - **Impact:** the `antigravity` and `antigravity-cli` targets still emit `.agents/workflows/*.md`, which
   no longer runs. The Codex and Pi targets already write `.agents/skills/amby-*/SKILL.md`, which
   Antigravity reads. Moving the Antigravity targets to skills changes existing output (016 FR-010), so
