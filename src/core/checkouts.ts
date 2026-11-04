@@ -1,9 +1,11 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
 import { compareFeatureDirs, assignDisplayRefs, readFeatures } from "./features.js";
+import { applyTasks, parseTasks } from "./dashboard.js";
 import { gitAsync, parseWorktreeList } from "./git.js";
-import type { Checkout, FeatureSnapshot, ParseIssue } from "./overview-types.js";
-import { WORKTREES_DIR, featureWorktrees } from "./worktree.js";
+import { laneState, manifestDrift, readManifest, unionLaneDone, type LaneManifest } from "./lanes.js";
+import type { Checkout, FeatureSnapshot, LaneView, ParseIssue } from "./overview-types.js";
+import { WORKTREES_DIR, featureWorktrees, laneWorktrees } from "./worktree.js";
 
 /**
  * Worktree-aware feature reading (feature 017, US-1). The dashboard sees the primary checkout plus
@@ -17,9 +19,20 @@ export interface FeatureCheckout {
   checkout: Checkout;
 }
 
+/** A parallel lane (feature 015): a checkout of `feature` holding one disjoint group of its tasks. */
+export interface LaneCheckout {
+  feature: string;
+  name: string;
+  phase: number;
+  index: number;
+  checkout: Checkout; // kind "lane"; `stale` = merged into the feature branch
+  manifest: LaneManifest | null;
+}
+
 export interface ProjectCheckouts {
   primary: Checkout;
   worktrees: FeatureCheckout[];
+  lanes: LaneCheckout[];
 }
 
 /** The primary checkout's root: `root` itself, or the project that holds the `.worktrees/<id>` it is in. */
@@ -65,12 +78,15 @@ async function mergedInto(cwd: string, base: string): Promise<Map<string, string
 export async function resolveCheckouts(root: string): Promise<ProjectCheckouts> {
   const primary: Checkout = { root: primaryRoot(root), kind: "main" };
   let found: ReturnType<typeof featureWorktrees>;
+  let laneFound: ReturnType<typeof laneWorktrees>;
   try {
-    found = featureWorktrees(primary.root, parseWorktreeList(await gitAsync(primary.root, ["worktree", "list", "--porcelain"])));
+    const list = parseWorktreeList(await gitAsync(primary.root, ["worktree", "list", "--porcelain"]));
+    found = featureWorktrees(primary.root, list);
+    laneFound = laneWorktrees(primary.root, list);
   } catch {
-    return { primary, worktrees: [] }; // not a repository
+    return { primary, worktrees: [], lanes: [] }; // not a repository
   }
-  if (found.length === 0) return { primary, worktrees: [] };
+  if (found.length === 0 && laneFound.length === 0) return { primary, worktrees: [], lanes: [] };
 
   const mergedState = baseBranch(primary.root).then(async (base) => {
     if (!base) return { base, merged: new Map<string, string>() };
@@ -81,7 +97,22 @@ export async function resolveCheckouts(root: string): Promise<ProjectCheckouts> 
       ? gitAsync(worktree.path, ["status", "--porcelain"]).then((s) => s.length > 0, () => false) // unreadable: reported by readProjectFeatures
       : Promise.resolve(false),
   );
-  const [{ base, merged }, dirty] = await Promise.all([mergedState, Promise.all(dirtyStates)]);
+  // Lanes join the same concurrent batch: one `status` each, one `branch --merged <feature branch>` per feature.
+  const featureBranchOf = (feature: string): string => found.find((f) => f.feature === feature)?.worktree.branch ?? feature;
+  const laneFeatures = [...new Set(laneFound.map((l) => l.feature))];
+  const laneMerged = Promise.all(
+    laneFeatures.map(async (feature) => [feature, await mergedInto(primary.root, featureBranchOf(feature)).catch(() => new Map<string, string>())] as const),
+  );
+  const laneDirty = laneFound.map(({ worktree }) =>
+    existsSync(worktree.path) ? gitAsync(worktree.path, ["status", "--porcelain"]).then((s) => s.length > 0, () => false) : Promise.resolve(false),
+  );
+  const [{ base, merged }, dirty, mergedByFeature, laneDirtyStates] = await Promise.all([
+    mergedState,
+    Promise.all(dirtyStates),
+    laneMerged,
+    Promise.all(laneDirty),
+  ]);
+  const mergedMap = new Map(mergedByFeature);
   const baseHead = base ? merged.get(base) : undefined;
 
   const worktrees = found.map(({ feature, worktree }, i): FeatureCheckout => {
@@ -99,7 +130,18 @@ export async function resolveCheckouts(root: string): Promise<ProjectCheckouts> 
     );
     return { feature, checkout };
   });
-  return { primary, worktrees };
+  const lanes = laneFound.map((l, i): LaneCheckout => {
+    const manifest = readManifest(l.worktree.path);
+    const state = laneState({
+      dirty: laneDirtyStates[i]!,
+      tip: l.worktree.head,
+      ...(manifest?.baseHead !== undefined ? { baseHead: manifest.baseHead } : {}),
+      mergedIntoFeature: mergedMap.get(l.feature)?.has(l.name) ?? false,
+    });
+    const checkout: Checkout = { root: resolve(l.worktree.path), kind: "lane", branch: l.name, dirty: state === "dirty", stale: state === "merged" };
+    return { feature: l.feature, name: l.name, phase: l.phase, index: l.index, checkout, manifest };
+  });
+  return { primary, worktrees, lanes };
 }
 
 /**
@@ -147,10 +189,53 @@ export async function readProjectFeatures(root: string, given?: ProjectCheckouts
       issues.push({ file: label, reason: (err as Error).message.split("\n")[0] ?? "unreadable" });
     }
   }
-  return { features: mergeCheckouts(main.features, worktrees), issues, checkouts };
+  const features = mergeCheckouts(main.features, worktrees);
+  attachLanes(features, checkouts.lanes);
+  return { features, issues, checkouts };
+}
+
+/**
+ * Attach each feature's lanes (015 FR-012): per-lane counts from the lane's own `tasks.md`, manifest
+ * drift against the feature's, and lane check-offs folded into the feature's progress (D5). Features
+ * without lanes are left untouched, so their output is unchanged.
+ */
+function attachLanes(features: FeatureSnapshot[], lanes: LaneCheckout[]): void {
+  for (const f of features) {
+    const mine = lanes.filter((l) => l.feature === f.dir).sort((a, b) => a.phase - b.phase || a.index - b.index);
+    if (mine.length === 0) continue;
+    const featureTasks = f.tasks ?? [];
+    const read = mine.map((l) => {
+      const file = join(l.checkout.root, "specs", f.dir, "tasks.md");
+      let tasks: ReturnType<typeof parseTasks> = [];
+      try {
+        if (existsSync(file)) tasks = parseTasks(readFileSync(file, "utf8"));
+      } catch {
+        /* unreadable lane tasks.md: counts stay zero */
+      }
+      const ids = l.manifest?.tasks.map((t) => t.id) ?? [];
+      return { lane: l, ids, tasks };
+    });
+    f.lanes = read.map(({ lane, ids, tasks }): LaneView => ({
+      name: lane.name,
+      phase: lane.phase,
+      index: lane.index,
+      done: tasks.filter((t) => ids.includes(t.id) && t.done).length,
+      total: ids.length,
+      state: lane.checkout.dirty ? "dirty" : lane.checkout.stale ? "merged" : "clean",
+      drift: lane.manifest ? manifestDrift(lane.manifest, featureTasks) : [],
+    }));
+    if (f.tasks) {
+      f.tasks = unionLaneDone(f.tasks, read);
+      for (const s of f.stories) {
+        s.tasksTotal = 0;
+        s.tasksDone = 0;
+      }
+      applyTasks(f.stories, f.tasks);
+    }
+  }
 }
 
 /** Every checkout root, primary first (for watchers and agent attribution). */
 export function allCheckouts(c: ProjectCheckouts): Checkout[] {
-  return [c.primary, ...c.worktrees.map((w) => w.checkout)];
+  return [c.primary, ...c.worktrees.map((w) => w.checkout), ...c.lanes.map((l) => l.checkout)];
 }

@@ -39,7 +39,7 @@ ownership is explicit and checkable rather than implied by prose.
   task lines; the parse yields the declared paths per task and flags the path-less line.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a task line in the documented format, When tasks are parsed, Then the task's `[P]` marker and
@@ -62,7 +62,7 @@ file, so that I learn it from a local check instead of from a merge conflict.
   `src/core/config.ts`; the check names both task ids and the shared path, and exits non-zero.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given two `[P]` tasks in the same phase declaring the same path, When the check runs, Then it
@@ -87,7 +87,7 @@ separate working copies, so that each assistant edits its own checkout and the m
   working copies appear, each listing only its own tasks, and neither contains the other's paths.
 - **depends-on:** [US-1, US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a feature whose `[P]` tasks form disjoint path sets, When lanes are materialized, Then one
@@ -122,7 +122,7 @@ which lanes are done without visiting each working copy.
   task counts matching the checkboxes in `tasks.md`.
 - **depends-on:** [US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given lanes exist, When the progress view runs, Then each lane appears with its task counts and

@@ -10,6 +10,14 @@ Release notes with full detail live on the
 
 ## [Unreleased]
 
+### Added
+
+- Parallel lanes (feature 015): task lines declare the files they own, `ambykit analyze` reports
+  lane conflicts (same phase, overlapping paths, at least one `[P]`) and exits non-zero, and
+  `ambykit lane` splits a phase's `[P]` tasks into isolated worktrees, then lists, merges and removes
+  them. Check-off-only `tasks.md` conflicts merge automatically. Lane progress shows in the
+  dashboard's WORKTREES & AGENTS panel and in `--json --overview`, and counts toward the feature.
+
 ## [1.3.0] — 2026-10-26
 
 Live dashboard: worktree-aware, realtime, with agent presence.

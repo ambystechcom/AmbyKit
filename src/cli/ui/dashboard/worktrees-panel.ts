@@ -1,5 +1,5 @@
 import type { Presence, UnlocatedAgent } from "../../../core/activity.js";
-import type { FeatureRow } from "../../../core/overview-types.js";
+import type { FeatureRow, LaneView } from "../../../core/overview-types.js";
 import { paintToken } from "../theme.js";
 import type { Capabilities } from "../types.js";
 import { agentBadge, checkoutBadge, checkoutTag, phaseLabel, presenceLabel } from "./agent-badge.js";
@@ -34,7 +34,7 @@ export function worktreeItems(rows: FeatureRow[], presence?: PresenceView): Work
   const items: (WorktreeItem & { order: number })[] = [];
   rows.forEach((feature, order) => {
     const p = presence?.byFeature.get(feature.name);
-    if (feature.checkout || (p && p.state !== "stale")) items.push({ feature, ...(p ? { presence: p } : {}), order });
+    if (feature.checkout || (feature.lanes?.length ?? 0) > 0 || (p && p.state !== "stale")) items.push({ feature, ...(p ? { presence: p } : {}), order });
   });
   return items
     .sort((a, b) => (RANK[a.presence?.state ?? ""] ?? 3) - (RANK[b.presence?.state ?? ""] ?? 3) || a.order - b.order)
@@ -61,6 +61,15 @@ function itemLine(caps: Capabilities, item: WorktreeItem, now: number, narrow: b
   return `${name} ${where} ${agent} ${phase} ${state}`;
 }
 
+/** Lane sub-row (feature 015): `↳ lane 3-1 · 2/3 · dirty` (ASCII: `> lane 3-1 - 2/3 - dirty`). */
+function laneLine(caps: Capabilities, lane: LaneView): string {
+  const sep = caps.unicode ? " · " : " - ";
+  const arrow = caps.unicode ? "↳" : ">";
+  const drift = lane.drift.length > 0 ? `${sep}drift ${lane.drift.join(",")}` : "";
+  const text = `${arrow} lane ${lane.phase}-${lane.index}${sep}${lane.done}/${lane.total}${sep}${lane.state}${drift}`;
+  return "  " + paintToken(caps, TOKENS.semantic.color.muted, text);
+}
+
 function unlocatedLine(caps: Capabilities, u: UnlocatedAgent, narrow: boolean): string {
   const muted = TOKENS.semantic.color.muted;
   const label = u.where === "main" ? "(main checkout)" : "(unknown location)";
@@ -82,11 +91,17 @@ export function worktreesPanel(
   const r = TOKENS.component.row;
   const lead = opts.cursor !== undefined;
   const mark = (i: number) => (lead ? (i === opts.cursor ? paintToken(caps, r["cursor-fg"], glyph(caps, r.cursor)) + " " : "  ") : "");
-  const body = items.map((it, i) => mark(i) + itemLine(caps, it, now, Boolean(opts.narrow)));
+  const body: string[] = [];
+  const itemAt: number[] = []; // body line of each item, so the cursor ignores lane sub-rows
+  items.forEach((it, i) => {
+    itemAt.push(body.length);
+    body.push(mark(i) + itemLine(caps, it, now, Boolean(opts.narrow)));
+    for (const lane of it.feature.lanes ?? []) body.push((lead ? "  " : "") + laneLine(caps, lane));
+  });
   body.push(...unlocated.map((u) => (lead ? "  " : "") + unlocatedLine(caps, u, Boolean(opts.narrow))));
   if (body.length === 0) body.push(emptyLine(caps));
   const max = opts.narrow ? LIVE_TOKENS.component["worktrees-panel"]["max-narrow"] : LIVE_TOKENS.component["worktrees-panel"]["max-wide"];
-  const shown = scrollWindow(body, max, opts.cursor ?? 0, caps);
+  const shown = scrollWindow(body, max, itemAt[opts.cursor ?? 0] ?? 0, caps);
   const sep = caps.unicode ? " · " : " - ";
   return panel(caps, { title: `WORKTREES & AGENTS${sep}${items.length + unlocated.length}`, width, focused: opts.focused }, shown);
 }
@@ -121,6 +136,9 @@ export function plainWorktrees(caps: Capabilities, rows: FeatureRow[], presence:
     const agent = p ? `${p.source === "detected" ? "~" : ""}${agentBadge({ ...caps, unicode: false, color: false }, { ...p, source: "reported" })}` : "-";
     const what = p ? `${[p.phase, p.task].filter(Boolean).join(" ")}  ${presenceLabel({ ...caps, unicode: false, color: false }, p, now).replace(/^\[.\] /, "")}` : "";
     lines.push(`  ${featureLabel(it.feature)}  ${where}  ${agent}  ${what}`.trimEnd());
+    for (const l of it.feature.lanes ?? []) {
+      lines.push(`    lane ${l.phase}-${l.index}  ${l.done}/${l.total}  ${l.state}${l.drift.length > 0 ? `  drift ${l.drift.join(",")}` : ""}`);
+    }
   }
   for (const u of unlocated) {
     lines.push(`  ${u.where === "main" ? "(main checkout)" : "(unknown location)"}  ~${agentBadge({ ...caps, unicode: false, color: false }, { agent: u.agent, source: "reported" })}  running`);

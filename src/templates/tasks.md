@@ -5,8 +5,9 @@ created: {{DATE}}
 
 # Tasks — {{FEATURE_TITLE}}
 
-> Line format: `- [ ] [T###] [P?] [US#] description (file/path)`
+> Line format: `- [ ] [T###] [P?] [US#] description (file/path, other/path)`
 > `[x]` = done (source of truth for `ambykit dashboard`). `[P]` = parallelizable. `[US#]` = story tag.
+> Paths: repo-relative, comma-separated, dirs end `/`, no globs. `[P]` tasks in a phase must not share or nest paths.
 > Gate: no user-story task starts until Foundational completes.
 
 ## Phase 1 — Setup

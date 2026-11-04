@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ParseIssue } from "./overview-types.js";
+import { normalizePath } from "./lanes.js";
 
 export interface StoryProgress {
   id: string; // feature-local canonical, e.g. "US1" (NOT globally unique — restarts per feature)
@@ -39,6 +40,29 @@ export interface TaskLine {
   done: boolean;
   story: string | null; // canonical US id
   description: string;
+  /** N from the nearest preceding `## Phase N` heading (else the `##` ordinal; 0 before any heading). */
+  phase: number;
+  /** `[P]` marker present. */
+  parallel: boolean;
+  /** Declared file paths (normalized, lower-case, `/`-separated); empty when none or invalid. */
+  paths: string[];
+  /** Why `paths` is empty (feature 015): no usable path, or a glob was declared. */
+  pathIssue?: "missing" | "glob";
+}
+
+
+const GLOB_CHARS = /[*?[\]{}]/;
+
+/** Paths from the trailing parenthesized group of a task line (feature 015 FR-001/002/016). */
+export function parseDeclaredPaths(rest: string): { paths: string[]; pathIssue?: "missing" | "glob" } {
+  const group = /\(([^()]*)\)\s*$/.exec(rest);
+  const items = (group?.[1] ?? "")
+    .split(",")
+    .map((x) => x.replace(/`/g, "").trim())
+    .filter((x) => x.length > 0 && !/\s/.test(x) && /[/.]/.test(x));
+  if (items.some((x) => GLOB_CHARS.test(x))) return { paths: [], pathIssue: "glob" };
+  const paths = Array.from(new Set(items.map(normalizePath).filter((x) => x.length > 0)));
+  return paths.length > 0 ? { paths } : { paths: [], pathIssue: "missing" };
 }
 
 /** Canonicalize a story id like "US-1"/"US1"/"us 1" → "US1". */
@@ -115,7 +139,16 @@ export function parseTasks(content: string): TaskLine[] {
   const lines = content.split(/\r?\n/);
   const tasks: TaskLine[] = [];
   const taskRe = /^\s*-\s*\[([ xX])\]\s*\[(T\d+)\]\s*(.*)$/;
+  let phase = 0;
+  let headings = 0;
   for (const line of lines) {
+    const h = /^##\s+(.*)$/.exec(line);
+    if (h) {
+      headings += 1;
+      const n = /^Phase\s+(\d+)/i.exec(h[1] ?? "");
+      phase = n ? Number(n[1]) : headings;
+      continue;
+    }
     const m = taskRe.exec(line);
     if (!m) continue;
     const done = (m[1] ?? "").toLowerCase() === "x";
@@ -127,6 +160,9 @@ export function parseTasks(content: string): TaskLine[] {
       done,
       story: storyTag ? canonicalStoryId(storyTag[1] ?? "") : null,
       description: rest.replace(/^\s*(\[P\]\s*)?(\[US-?\d+\]\s*)?/i, "").trim(),
+      phase,
+      parallel: /^\s*\[P\]|\]\s*\[P\]/i.test(rest),
+      ...parseDeclaredPaths(rest),
     });
   }
   return tasks;

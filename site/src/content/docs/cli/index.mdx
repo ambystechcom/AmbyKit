@@ -133,6 +133,21 @@ Per-feature git worktrees for parallel work without checkout switching. Worktree
 `.worktrees/<feature>/` (gitignored); new branches start from the default branch. Enable automatic
 creation from `/amby.specify` at `ambykit init` or with `"worktrees": true` in `.amby/config.json`.
 
+## `ambykit lane`
+
+```text
+ambykit lane <feature> [--phase=N] [--lanes=N]   # one worktree per group of disjoint [P] tasks
+ambykit lane list [<feature>]                    # tasks, done/total, clean/dirty/merged, drift
+ambykit lane merge <feature> [<lane>]            # merge finished lanes into the feature branch
+ambykit lane remove <feature> [<lane>]           # remove working copies; branches are kept (--force if dirty)
+```
+
+Parallel lanes split one phase's `[P]` tasks into isolated worktrees named
+`.worktrees/<feature>.lane-<phase>-<k>`. Creation is refused when tasks share files, and needs
+`"worktrees": true` in `.amby/config.json`. `merge` resolves check-off-only `tasks.md` differences
+automatically and aborts on any other conflict. `ambykit analyze` also reports **lane conflicts**:
+overlapping task paths in a phase where one of the tasks is `[P]`.
+
 ## `ambykit activity`
 
 ```text

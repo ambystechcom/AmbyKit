@@ -19,6 +19,8 @@ Run `ambykit activity <feature> --agent=claude --phase=tasks` first, with that f
    gate: no user-story task before Foundational completes.
 3. Order tasks by the story **dependency graph** (`depends-on`/`blocked-by`) and priority. Mark
    independent tasks `[P]`. Tag each task with its `[US#]`. End each story group with a checkpoint.
-4. Give every task a stable `T###` id and a concrete file path.
+4. Give every task a stable `T###` id and its file paths as the line's last parenthesized group:
+   comma-separated, repo-relative, dirs end `/`, no globs. Mark `[P]` only when no other task in the
+   same phase shares or nests a path.
 
 Do not start implementing. Keep descriptions to one line each.

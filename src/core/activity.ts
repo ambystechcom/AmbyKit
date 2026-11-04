@@ -128,7 +128,7 @@ export function combinePresence(input: {
   }
   const unlocated: UnlocatedAgent[] = [];
   for (const m of input.matches) {
-    const feature = m.checkout && m.checkout.kind === "worktree" ? input.worktreeFeature(m.checkout) : null;
+    const feature = m.checkout && (m.checkout.kind === "worktree" || m.checkout.kind === "lane") ? input.worktreeFeature(m.checkout) : null;
     if (!feature) {
       unlocated.push({ agent: m.agent, where: m.checkout ? "main" : "unknown" });
       continue;
@@ -196,20 +196,25 @@ export function thresholdsFrom(config: { dashboard?: { activeMinutes?: number; i
 
 /** Markers from every checkout plus detected processes, combined per feature (FR-021–FR-023). */
 export function readProjectPresence(input: {
-  checkouts: { primary: Checkout; worktrees: { feature: string; checkout: Checkout }[] };
+  checkouts: {
+    primary: Checkout;
+    worktrees: { feature: string; checkout: Checkout }[];
+    lanes?: { feature: string; checkout: Checkout }[];
+  };
   features: FeatureSnapshot[];
   matches: AgentMatch[];
   now: number;
   thresholds: Thresholds;
 }): ProjectPresence {
   const { checkouts } = input;
-  const roots = [checkouts.primary, ...checkouts.worktrees.map((w) => w.checkout)];
+  const owned = [...checkouts.worktrees, ...(checkouts.lanes ?? [])]; // a lane belongs to its feature (015 FR-018)
+  const roots = [checkouts.primary, ...owned.map((w) => w.checkout)];
   return combinePresence({
     features: input.features,
     markers: roots.flatMap((c) => readMarkers(c.root)),
     tasksMtime: (f) => tasksMtime(f.checkout?.root ?? checkouts.primary.root, f.dir),
     matches: input.matches,
-    worktreeFeature: (c) => checkouts.worktrees.find((w) => w.checkout.root === c.root)?.feature ?? null,
+    worktreeFeature: (c) => owned.find((w) => w.checkout.root === c.root)?.feature ?? null,
     now: input.now,
     thresholds: input.thresholds,
   });

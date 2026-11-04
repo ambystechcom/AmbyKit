@@ -67,6 +67,12 @@ export function watchTargets(c: ProjectCheckouts): WatchTarget[] {
       { path: join(wt.checkout.root, ACTIVITY_DIR), recursive: false },
     );
   }
+  for (const lane of c.lanes) {
+    targets.push(
+      { path: join(lane.checkout.root, "specs", lane.feature), recursive: true },
+      { path: join(lane.checkout.root, ACTIVITY_DIR), recursive: false },
+    );
+  }
   return targets;
 }
 
