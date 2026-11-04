@@ -110,5 +110,6 @@ Checked 2026-11-04 against Google's own pages:
 - **Impact:** the `antigravity` and `antigravity-cli` targets still emit `.agents/workflows/*.md`, which
   no longer runs. The Codex and Pi targets already write `.agents/skills/amby-*/SKILL.md`, which
   Antigravity reads. Moving the Antigravity targets to skills changes existing output (016 FR-010), so
-  it is specced separately as feature 018.
+  it is specced separately as feature 018, which moves both targets to skills (the sentence above
+  describes this branch as shipped; 018 supersedes it).
 - Open question: the guide describes the IDE app and does not say whether the cutoff applies to the CLI.
