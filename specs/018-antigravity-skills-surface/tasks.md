@@ -38,30 +38,30 @@ created: 2026-11-04
 
 ## Phase 4 — User story US-2  (priority: P1)
 
-- [ ] [T030] [US2] Add `sync --prune-legacy` (back up each stale generated workflow, then delete it), print the stale notice by default, warn on `skippedForeign`, update usage (FR-005, FR-016) (src/cli/sync.ts)
-- [ ] [T031] [P] [US2] Make `check` report stale generated workflows with the opt-in and foreign-file collisions, without counting stale files as drift (FR-007) (src/cli/check.ts)
-- [ ] [T032] [P] [US2] E2E over a project synced with the old release: default keeps files, opt-in removes only generated ones, restore brings one back, a clean project prints nothing (SC-002) (test/antigravity-migration-018.test.ts)
+- [x] [T030] [US2] Add `sync --prune-legacy` (back up each stale generated workflow, then delete it), print the stale notice by default, warn on `skippedForeign`, update usage (FR-005, FR-016) (src/cli/sync.ts)
+- [x] [T031] [P] [US2] Make `check` report stale generated workflows with the opt-in and foreign-file collisions, without counting stale files as drift (FR-007) (src/cli/check.ts)
+- [x] [T032] [P] [US2] E2E over a project synced with the old release: default keeps files, opt-in removes only generated ones, restore brings one back, a clean project prints nothing (SC-002) (test/antigravity-migration-018.test.ts)
 - **Checkpoint:** US-2 migration is demoable from an old-release fixture.
 
 ## Phase 5 — User story US-3  (priority: P2)
 
-- [ ] [T040] [P] [US3] Test shared skills with Codex and Pi: written once, correct identity, deselecting Antigravity keeps the files (FR-008, FR-009, SC-003) (test/antigravity-shared-018.test.ts)
-- [ ] [T041] [P] [US3] Test `check` names every owner of `.agents/skills/` (test/check-antigravity-018.test.ts)
+- [x] [T040] [P] [US3] Test shared skills with Codex and Pi: written once, correct identity, deselecting Antigravity keeps the files (FR-008, FR-009, SC-003) (test/antigravity-shared-018.test.ts)
+- [x] [T041] [P] [US3] Test `check` names every owner of `.agents/skills/` (test/antigravity-shared-018.test.ts)
 - **Checkpoint:** US-3 holds for every skills-based combination.
 
 ## Phase 6 — User story US-4  (priority: P2)
 
-- [ ] [T050] [P] [US4] Assert every non-Antigravity golden fixture is unchanged in `git diff` and the golden suite passes (FR-011, SC-004) (test/emitters-golden.test.ts)
-- [ ] [T051] [P] [US4] Test both Antigravity ids still resolve to the antigravity family in the dashboard (FR-012) (test/dashboard-agents.test.ts)
+- [x] [T050] [P] [US4] Assert every non-Antigravity golden fixture is unchanged in `git diff` and the golden suite passes (FR-011, SC-004) (test/emitters-golden.test.ts)
+- [x] [T051] [P] [US4] Test both Antigravity ids still resolve to the antigravity family in the dashboard (FR-012) (test/core/antigravity-identity-018.test.ts)
 - **Checkpoint:** US-4 byte-identity and recognition proven.
 
 ## Phase 7 — Polish
 
-- [ ] [T090] [P] Antigravity wording in the README (FR-013) (README.md)
-- [ ] [T091] [P] Document `sync --prune-legacy` and the skills surface (FR-013) (docs/cli-reference.md)
-- [ ] [T092] [P] Update the workflow guide (FR-013) (docs/workflow.md)
-- [ ] [T093] [P] Fix the command-surface line: workflows now only Windsurf (AGENTS.md)
-- [ ] [T094] [P] Update the site compatibility page (site/src/content/docs/cli/compatibility.mdx)
-- [ ] [T095] [P] CHANGELOG: Changed (Antigravity now skills, guard, shared-id rule) and Added (`--prune-legacy`) (CHANGELOG.md)
-- [ ] [T096] Run `ambykit sync --check`, `npm run typecheck`, full `npm test`, docs-sync; fix drift (SC-006) (test/)
-- [ ] [T097] Live check SC-001 on a current Antigravity IDE and CLI, or waive it in writing with the date (specs/018-antigravity-skills-surface/research.md)
+- [x] [T090] [P] Antigravity wording in the README (FR-013) (README.md)
+- [x] [T091] [P] Document `sync --prune-legacy` and the skills surface (FR-013) (docs/cli-reference.md)
+- [x] [T092] [P] Update the workflow guide (FR-013) (docs/workflow.md)
+- [x] [T093] [P] Fix the command-surface line: workflows now only Windsurf (AGENTS.md)
+- [x] [T094] [P] Update the site compatibility page (site/src/content/docs/cli/compatibility.mdx)
+- [x] [T095] [P] CHANGELOG: Changed (Antigravity now skills, guard, shared-id rule) and Added (`--prune-legacy`) (CHANGELOG.md)
+- [x] [T096] Run `ambykit sync --check`, `npm run typecheck`, full `npm test`, docs-sync; fix drift (SC-006) (test/)
+- [x] [T097] (waived 2026-11-04, see research.md) Live check SC-001 on a current Antigravity IDE and CLI, or waive it in writing with the date (specs/018-antigravity-skills-surface/research.md)

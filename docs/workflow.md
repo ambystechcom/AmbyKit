@@ -106,7 +106,8 @@ them tidy.
 The same neutral prompts are emitted for eighteen targets: Claude Code (CLI + VS Code), GitHub Copilot
 (VS Code + CLI), OpenCode, Cursor (+ CLI), Antigravity (IDE + CLI), Codex CLI, Gemini CLI, LLxprt
 Code, Qwen Code, Kilo Code, Augment Code, Windsurf, Kiro and Pi. Each gets its native command format
-(Markdown, TOML, workflows or skills); see [tool compatibility](./tool-compatibility.md). Editing a
+(Markdown, TOML, workflows or skills; Antigravity uses skills, since its workflows were retired on
+2026-10-19, and its CLI lists them as `/amby-specify` and so on); see [tool compatibility](./tool-compatibility.md). Editing a
 prompt once and running `ambykit sync` updates all of them.
 
 ## Dependencies & prioritization

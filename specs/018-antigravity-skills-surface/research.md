@@ -29,3 +29,13 @@ antigravity.google/docs/migration/workflows-to-skills/.
 - Docs must say the phases appear as `/amby-<phase>` in the Antigravity CLI and are selected by
   description in the IDE, and must not promise `/amby.specify`.
 - SC-001 stays a live check (T097).
+
+## SC-001 live check (T097) — waived 2026-11-04
+
+The Antigravity IDE is installed on the build machine, but opening the app and listing the agent
+panel's skills is a GUI step that was not driven here, and the `agy` CLI is not installed. Evidence in
+its place: the emitted `SKILL.md` files match the documented layout (`name` = directory, `description`
+required, project path `.agents/skills/`) and are covered by `test/antigravity-skills-018.test.ts`.
+To close it: `ambykit add antigravity` in a scratch project, open it in Antigravity, confirm the
+`amby-*` skills appear under Customizations, and in the CLI confirm `/amby-specify` expands its prompt
+(this also settles whether the dotted name from R2 is accepted). Record the result here.

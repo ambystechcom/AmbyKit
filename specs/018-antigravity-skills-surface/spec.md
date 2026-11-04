@@ -2,7 +2,7 @@
 feature: 018-antigravity-skills-surface
 title: Antigravity skills surface — replace the retired workflows
 branch: 018-antigravity-skills-surface
-status: draft                     # draft | ready | in-progress | blocked | done
+status: done                     # draft | ready | in-progress | blocked | done
 created: 2026-11-04
 ---
 
@@ -58,7 +58,7 @@ commands, and none of my own files are touched.
   the sync, and compare the project against a fresh sync of the new release.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a project containing the previously generated workflow files, When I run the doctor command,
@@ -83,7 +83,7 @@ assistants never produces conflicts or the wrong behavior.
   every shared file exists once, is complete, and that the check command lists all of its owners.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given Antigravity and Codex are both selected, When I sync, Then each skill file is written once and
@@ -109,7 +109,7 @@ reality, so that no other assistant's output moves and the compatibility matrix 
   the compatibility matrix against Antigravity's current documentation.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given the recorded output of every target other than the two Antigravity ones, When I emit them after

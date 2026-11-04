@@ -128,6 +128,9 @@ Claude Code (CLI + VS Code), GitHub Copilot (VS Code + CLI), OpenCode, Cursor (+
 Antigravity (IDE + CLI), Codex CLI, Gemini CLI, Windsurf, Qwen Code, Kiro, Kilo Code, Augment Code,
 LLxprt Code and Pi (eighteen selectable targets). See [`docs/tool-compatibility.md`](./docs/tool-compatibility.md).
 
+Antigravity uses skills (`.agents/skills/`), since it retired workflows on 2026-10-19. If you synced with an
+earlier release, run `ambykit sync --prune-legacy` to remove the old `.agents/workflows/amby.*.md` files.
+
 Missing yours? [Open a request](https://github.com/ambystechcom/AmbyKit/issues/new/choose) — a new
 target is a thin `BaseEmitter` subclass.
 
