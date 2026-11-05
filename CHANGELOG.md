@@ -10,6 +10,8 @@ Release notes with full detail live on the
 
 ## [Unreleased]
 
+## [1.3.1] — 2026-11-04
+
 ### Added
 
 - Parallel lanes (feature 015): task lines declare the files they own, `ambykit analyze` reports
@@ -181,7 +183,8 @@ Packaging fixes.
 
 Initial release: the enhanced terminal UI and the AmbyKit documentation site.
 
-[Unreleased]: https://github.com/ambystechcom/AmbyKit/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/ambystechcom/AmbyKit/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/ambystechcom/AmbyKit/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/ambystechcom/AmbyKit/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ambystechcom/AmbyKit/compare/v1.1.0...v1.1.1
