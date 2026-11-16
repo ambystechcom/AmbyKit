@@ -20,7 +20,9 @@ Run `ambykit activity <feature> --agent=$AGENT --phase=implement` first, with th
 2. Load **only** the slice you need: the task line, the relevant `plan.md` section, and the specific
    files named. Don't read the whole spec tree (token-frugal).
 3. Implement to satisfy the mapped `FR-###`/acceptance criteria and the constitution. Add/adjust
-   tests for the acceptance criteria.
+   tests for the acceptance criteria. If you cannot finish a task, add `⚠ BLOCKED: <reason>` as the last
+   segment of its line (after the `(file/path)` group), stop that task and continue with another unblocked
+   one; note any departure from the plan as `↪ DEVIATION: <note>`. Remove `⚠ BLOCKED:` once resolved.
 4. **Patch in place:** flip the completed task's checkbox to `- [x]` in `tasks.md`; when all of a
    story's tasks are done, set that story's `status: done` in `spec.md` (or `in-progress` while
    partway). Don't rewrite untouched sections. After each checked task, run

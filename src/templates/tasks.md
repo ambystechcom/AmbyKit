@@ -9,6 +9,7 @@ created: {{DATE}}
 > `[x]` = done (source of truth for `ambykit dashboard`). `[P]` = parallelizable. `[US#]` = story tag.
 > Paths: repo-relative, comma-separated, dirs end `/`, no globs. `[P]` tasks in a phase must not share or nest paths.
 > Gate: no user-story task starts until Foundational completes.
+> Markers go last on the task line, after the path group: `⚠ BLOCKED: <reason>` for a task that cannot proceed, `↪ DEVIATION: <note>` for a change from the plan. The glyph is optional (`BLOCKED:` works too); remove `⚠ BLOCKED:` when resolved.
 
 ## Phase 1 — Setup
 

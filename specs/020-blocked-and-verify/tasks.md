@@ -35,12 +35,12 @@ created: 2026-11-16
 
 ## Phase 3 — User story US-1  (priority: P1)
 
-- [ ] [T020] [US1] Tell the implementer how to mark a block: add `⚠ BLOCKED: <reason>` as the last segment of the task line, optionally `↪ DEVIATION: <note>`, stop that task and continue with another unblocked one, remove the marker when resolved (FR-015, FR-016) (src/prompts/implement.md)
-- [ ] [T021] [P] [US1] Document the markers in the tasks template header: syntax, trailing position, glyph-less form (FR-015) (src/templates/tasks.md)
-- [ ] [T022] [P] [US1] Document the markers in the tasks artifact page with an example line carrying a path group and both markers (FR-015) (docs/artifacts/tasks.md)
-- [ ] [T023] [US1] Test the US-1 acceptance criteria through `parseTasks`: blocked with reason, removed marker, deviation leaves state/ownership untouched, empty reason, checked-but-blocked inconsistency, marker plus ownership recovered (FR-001, FR-002, FR-003, FR-004) (test/core/task-markers.test.ts)
+- [x] [T020] [US1] Tell the implementer how to mark a block: add `⚠ BLOCKED: <reason>` as the last segment of the task line, optionally `↪ DEVIATION: <note>`, stop that task and continue with another unblocked one, remove the marker when resolved (FR-015, FR-016) (src/prompts/implement.md)
+- [x] [T021] [P] [US1] Document the markers in the tasks template header: syntax, trailing position, glyph-less form (FR-015) (src/templates/tasks.md)
+- [x] [T022] [P] [US1] Document the markers in the tasks artifact page with an example line carrying a path group and both markers (FR-015) (docs/artifacts/tasks.md)
+- [x] [T023] [US1] Test the US-1 acceptance criteria through `parseTasks`: blocked with reason, removed marker, deviation leaves state/ownership untouched, empty reason, checked-but-blocked inconsistency, marker plus ownership recovered (FR-001, FR-002, FR-003, FR-004) (test/core/task-markers.test.ts)
 - **Checkpoint:** US-1 is demoable: a marked task line parses as blocked with its reason and unchanged ownership.
-- **Verify:** `npm run typecheck && npx vitest run test/core/task-markers.test.ts test/core/markers.test.ts`
+- **Verify:** `npm run typecheck && npx vitest run test/core/task-markers.test.ts test/core/markers.test.ts` ✓ passed
 
 ## Phase 4 — User story US-2  (priority: P1)
 

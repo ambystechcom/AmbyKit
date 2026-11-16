@@ -34,7 +34,7 @@ instead of buried in a silent unchecked box.
   task is read as blocked with that reason, while every other task is read as before.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given an unchecked task line, When a BLOCKED marker with a reason is added, Then the task is
