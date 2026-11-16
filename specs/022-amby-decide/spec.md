@@ -2,7 +2,7 @@
 feature: 022-amby-decide          # NNN-slug
 title: Decision records (amby.decide)
 branch: 022-amby-decide
-status: in-progress                     # draft | ready | in-progress | blocked | done
+status: done                     # draft | ready | in-progress | blocked | done
 created: 2026-11-12
 ---
 
@@ -168,7 +168,7 @@ that upgrading to 1.5 needs no migration.
   unchanged behavior.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** in-progress
+- **status:** done
 
 **Acceptance criteria**
 - Given a project with no decision records, When any existing command runs, Then its behavior and

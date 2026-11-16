@@ -2,7 +2,7 @@
 feature: 024-trace          # NNN-slug
 title: Requirement traceability (trace)
 branch: 024-trace
-status: in-progress                   # draft | ready | in-progress | blocked | done
+status: done                   # draft | ready | in-progress | blocked | done
 created: 2026-11-12
 ---
 
@@ -130,7 +130,7 @@ on what the matrix cannot answer, so that gap checks get cheaper and more consis
   begins from the matrix and does not re-derive coverage by reading all tests.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** in-progress
+- **status:** done
 
 **Acceptance criteria**
 - Given a feature, When `/amby.converge` starts, Then it reads the `trace` result and treats uncovered

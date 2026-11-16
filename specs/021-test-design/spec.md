@@ -2,7 +2,7 @@
 feature: 021-test-design          # NNN-slug
 title: Test design before code
 branch: 021-test-design
-status: ready                     # draft | ready | in-progress | blocked | done
+status: done                     # draft | ready | in-progress | blocked | done
 created: 2026-11-12
 ---
 

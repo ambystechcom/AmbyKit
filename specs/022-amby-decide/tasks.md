@@ -91,11 +91,11 @@ created: 2026-11-16
 
 ## Phase 9 — User story US-7  (priority: P1)
 
-- [ ] [T080] [US7] INTEGRATION STEP (once per batch, after merging, not in a lane branch): re-record the golden fixtures with `UPDATE_GOLDEN=1` and review the diff: only the new command and the rules bullet change (test/fixtures/emitters-golden/)
+- [x] [T080] [US7] INTEGRATION STEP (once per batch, after merging, not in a lane branch): re-record the golden fixtures with `UPDATE_GOLDEN=1` and review the diff: only the new command and the rules bullet change (test/fixtures/emitters-golden/)
 - [x] [T081] [P] [US7] Test that every target with a command surface emits `decide` (test/decide-emit.test.ts)
 - [x] [T082] [P] [US7] Adoption tests: with no decisions, analyze text and JSON are identical to before, and init creates no `.amby/decisions/` (test/core/decisions-adoption.test.ts)
 
-**Verify:** `npx vitest run test/emitters-golden.test.ts test/decide-emit.test.ts test/core/decisions-adoption.test.ts` passes. ? unverified
+**Verify:** `npx vitest run test/emitters-golden.test.ts test/decide-emit.test.ts test/core/decisions-adoption.test.ts` passes. ✓ passed
 
 - **Checkpoint:** US-7 is demoable: an existing project is unchanged until its first decision.
 
@@ -107,7 +107,7 @@ created: 2026-11-16
 - [x] [T093] [P] Add `/amby.decide` to the README command list (README.md)
 - [x] [T094] [P] Document the decision record format and the security role (docs/artifacts/decision-record.md)
 - [x] [T095] [P] Add the Unreleased changelog entry (CHANGELOG.md)
-- [ ] [T096] INTEGRATION STEP (once per batch, after merging, not in a lane branch): regenerate this repo's own tool files with `ambykit sync` and confirm a second run is a no-op (.claude/, .agents/, AGENTS.md, CLAUDE.md)
+- [x] [T096] INTEGRATION STEP (once per batch, after merging, not in a lane branch): regenerate this repo's own tool files with `ambykit sync` and confirm a second run is a no-op (.claude/, .agents/, AGENTS.md, CLAUDE.md)
 - [x] [T097] Record this feature's own design choices as ADRs (SC-006): files not a database, prompt-maintained index, no slug in the filename (.amby/decisions/)
 
-**Verify:** `npm run typecheck`, `npm test` and `node scripts/check-docs-sync.mjs` pass, and `ambykit sync` followed by `git status` shows no further diff. ? unverified
+**Verify:** `npm run typecheck`, `npm test` and `node scripts/check-docs-sync.mjs` pass, and `ambykit sync` followed by `git status` shows no further diff. ✓ passed

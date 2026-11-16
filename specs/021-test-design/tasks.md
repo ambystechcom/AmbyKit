@@ -64,6 +64,6 @@ created: 2026-11-16
 - [x] [T091] [P] Mention `tests.md` in the tasks artifact page and workflow table (docs/artifacts/tasks.md, docs/workflow.md)
 - [x] [T092] [P] Note the `analyze` test-design findings and JSON field (docs/cli-reference.md)
 - [x] [T093] [P] Add an Unreleased changelog entry (CHANGELOG.md)
-- [ ] [T094] INTEGRATION STEP (once per batch, after merges; not in the lane branch): re-run `ambykit sync` so the repo's own tool files and `.amby/templates/tests.md` match the source (.claude/, .codex/, .amby/)
-- [ ] [T095] INTEGRATION STEP (once per batch, after merges; not in the lane branch): re-record the emitter golden snapshots and review that only the three prompts changed (test/fixtures/emitters-golden/)
+- [x] [T094] INTEGRATION STEP (once per batch, after merges; not in the lane branch): re-run `ambykit sync` so the repo's own tool files and `.amby/templates/tests.md` match the source (.claude/, .codex/, .amby/)
+- [x] [T095] INTEGRATION STEP (once per batch, after merges; not in the lane branch): re-record the emitter golden snapshots and review that only the three prompts changed (test/fixtures/emitters-golden/)
 - **Verify:** `npm run typecheck`, `npm test` and `node scripts/check-docs-sync.mjs` pass, and a second `ambykit sync` produces no diff.

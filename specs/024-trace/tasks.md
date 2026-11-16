@@ -49,10 +49,10 @@ created: 2026-11-16
 - [x] [T030] [P] [US5] Make `/amby.converge` run `ambykit trace <feature> --json` first, then read `tests.md`, cite gaps as `(closes NNN:FR-###)`, and work as today if trace cannot run (src/prompts/converge.md)
 - [x] [T031] [P] [US5] BATCH 0 FOUNDATION (build first; specs 019 and 021 depend on it): generalize Claude's scoped shell grant from `ambykit activity` to any `ambykit <verb>` a prompt invokes (src/emitters/claude.ts)
 - [x] [T032] [US5] Update the emitter tests for converge's tools and body (test/activity-emit.test.ts, test/converge-emit.test.ts)
-- [ ] [T033] [US5] INTEGRATION STEP (once per batch after merges, not in the lane branch): re-record the emitter golden fixtures with `UPDATE_GOLDEN=1 npx vitest run test/emitters-golden.test.ts` (test/fixtures/emitters-golden/)
-- [ ] [T034] [US5] INTEGRATION STEP (once per batch after merges, not in the lane branch): run `ambykit sync` and confirm a second run produces no diff (.claude/commands/, .agents/skills/)
+- [x] [T033] [US5] INTEGRATION STEP (once per batch after merges, not in the lane branch): re-record the emitter golden fixtures with `UPDATE_GOLDEN=1 npx vitest run test/emitters-golden.test.ts` (test/fixtures/emitters-golden/)
+- [x] [T034] [US5] INTEGRATION STEP (once per batch after merges, not in the lane branch): run `ambykit sync` and confirm a second run produces no diff (.claude/commands/, .agents/skills/)
 - [x] [T035] [P] [US5] Note in the workflow guide that converge starts from the trace matrix (docs/workflow.md)
-- **Verify:** `npx vitest run test/converge-emit.test.ts test/activity-emit.test.ts test/emitters-golden.test.ts` passes and `ambykit sync` a second time leaves `git status` unchanged. ? unverified
+- **Verify:** `npx vitest run test/converge-emit.test.ts test/activity-emit.test.ts test/emitters-golden.test.ts` passes and `ambykit sync` a second time leaves `git status` unchanged. ✓ passed
 - **Checkpoint:** US-5 is demoable.
 
 ## Phase 5 — User story US-7  (priority: P1)
@@ -99,6 +99,6 @@ created: 2026-11-16
 - [x] [T091] [P] Record this repo's coverage baseline: covered, uncovered and uncited counts (specs/024-trace/baseline.md)
 - [x] [T092] [P] Add the 1.5 changelog entry (CHANGELOG.md)
 - [x] [T093] [P] Add `trace` to the CLI list in the project structure; spec 028 T122 edits the same `src/cli/` line, so whichever lands second rewrites the line (AGENTS.md)
-- [ ] [T094] INTEGRATION STEP (once per batch after merges): run `npm run typecheck`, `npm test` and `ambykit sync`, and confirm no diff; verification only, package.json is unchanged (.claude/commands/, .agents/skills/)
-- **Verify:** `ambykit trace 024` reports full coverage and `npm run typecheck && npm test` pass. ? unverified
+- [x] [T094] INTEGRATION STEP (once per batch after merges): run `npm run typecheck`, `npm test` and `ambykit sync`, and confirm no diff; verification only, package.json is unchanged (.claude/commands/, .agents/skills/) ↪ DEVIATION: release/1.4.0 also bumps package.json to 1.4.0
+- **Verify:** `ambykit trace 024` reports full coverage and `npm run typecheck && npm test` pass. ✓ passed
 - **Checkpoint:** feature 024 is traced by itself (the 1.5 gate).
