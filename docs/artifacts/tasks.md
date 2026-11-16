@@ -38,7 +38,9 @@ phase checkpoint. After a run the result is written on that same line as a suffi
 `✗ failed: <why>` or `? unverified` (for a check that needs a person or an external step). The glyphs are
 optional, so `passed`, `failed: <why>` and `unverified` read the same. A Verify line holds one result; a
 later run overwrites it, so an old failure is never shown as current. A phase checkpoint is not passed
-while its Verify line is `failed`.
+while its Verify line is `failed`. When a phase is built in parallel lanes, record its result after the
+phase's lanes are merged, not while neighbouring lanes are open: an edit on a Verify line next to a lane's
+check-off makes the merge conflict in `tasks.md`.
 
 ```
 **Verify:** `npm run typecheck && npx vitest run test/core/markers.test.ts` ✓ passed

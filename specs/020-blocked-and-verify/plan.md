@@ -46,7 +46,9 @@ tasks.md ──► parseTasks (dashboard.ts) ──► TaskLine {…, blocked?, 
   optional (`BLOCKED:` / `DEVIATION:` work alone). `parseMarkers(rest)` cuts the line at the first
   marker keyword, parses each marker's text up to the next keyword or end of line, and returns the
   remaining body, so a reason containing `(…)` or backticks can never be read as file ownership and the
-  existing `parseDeclaredPaths(body)` runs on exactly what it sees today.
+  existing `parseDeclaredPaths(body)` runs on exactly what it sees today. Keywords inside backtick code
+  spans are ignored, so prose that documents the syntax (including this feature's own `tasks.md`) is not
+  read as a marker.
 - **Phases and Verify (FR-005..008):** `parsePhases(content)` walks `## ` headings with the *same*
   numbering rule as `parseTasks` (extracted into one shared `phaseNumber` helper, so both agree), and
   in each phase reads `**Verify:** <check> [✓ passed | ✗ failed: <why> | ? unverified]`, with an

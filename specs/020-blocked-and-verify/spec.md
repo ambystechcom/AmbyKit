@@ -156,11 +156,14 @@ keep working unchanged, so that upgrading to 1.4 needs no migration.
 - FR-008  IF a Verify line cannot be run by the implementer, THEN THE SYSTEM SHALL require explicit
   person confirmation and record the phase as unverified.
 - FR-009  WHEN `ambykit analyze` runs, THE SYSTEM SHALL report blocked tasks (with reasons), phases
-  without a Verify line, and phases whose last Verify failed, each by stable ID, at zero model tokens.
+  without a Verify line (for features with open tasks), and phases whose last Verify failed, each by stable
+  ID, at zero model tokens.
 - FR-010  WHEN `ambykit dashboard` runs, THE SYSTEM SHALL show per-feature blocked counts and
-  per-phase verify state, in both the one-shot and `--json` outputs, at zero model tokens.
+  per-phase verify state, in the one-shot output and in `--json --overview` (bare `--json` is unchanged),
+  at zero model tokens.
 - FR-011  WHERE a `tasks.md` has no BLOCKED markers and no Verify lines, THE SYSTEM SHALL produce
-  `dashboard` and `analyze` output identical to today's apart from missing-Verify warnings.
+  `dashboard` and `analyze` output identical to today's apart from missing-Verify warnings, which apply
+  only to features with open tasks.
 - FR-012  THE SYSTEM SHALL parse every existing `tasks.md` in this repo with unchanged task IDs,
   checked state, `[P]` markers and file ownership.
 - FR-013  THE `--json` output of `dashboard` and `analyze` SHALL expose the new fields in a stable,
