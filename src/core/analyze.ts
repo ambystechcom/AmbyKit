@@ -1,4 +1,11 @@
-import { computeDashboard, displayKey, storyKey, type StoryProgress, type TaskLine } from "./dashboard.js";
+import {
+  computeDashboard,
+  displayKey,
+  parseDeclaredPaths,
+  storyKey,
+  type StoryProgress,
+  type TaskLine,
+} from "./dashboard.js";
 import { readFeatures } from "./features.js";
 import type { PhaseVerify } from "./markers.js";
 import { declarations, laneConflicts, type Declaration, type LaneConflict } from "./lanes.js";
@@ -35,7 +42,7 @@ export interface DeviationNote {
 export interface MarkerIssue {
   feature: string;
   task: string;
-  kind: "missing-reason" | "checked-but-blocked";
+  kind: "missing-reason" | "checked-but-blocked" | "path-after-marker";
   message: string;
 }
 
@@ -206,6 +213,21 @@ function collectMarkers(
       }
     }
     if (t.deviation !== undefined) deviations.push({ feature, task: t.id, note: t.deviation });
+    // A marker placed before the `(file/path)` group swallows the path into its text: the task then
+    // silently loses its file ownership for lane planning. Markers belong after the path group.
+    if (!t.done && t.paths.length === 0) {
+      for (const text of [t.blocked, t.deviation]) {
+        if (text && parseDeclaredPaths(text).paths.length > 0) {
+          markerIssues.push({
+            feature,
+            task: t.id,
+            kind: "path-after-marker",
+            message: `${feature}:${t.id} has a (file/path) group after its marker; put markers last so the paths count as ownership`,
+          });
+          break;
+        }
+      }
+    }
   }
 }
 
