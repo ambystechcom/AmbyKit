@@ -47,6 +47,11 @@ check-off makes the merge conflict in `tasks.md`.
 **Verify:** `npm test` ✗ failed: 3 tests in test/cli
 ```
 
+## Test design
+
+`/amby.tasks` also writes `tests.md` in the same phase: one test case per acceptance criterion, decided
+before any code. See [the tests artifact](./tests.md).
+
 ## Phase grouping
 
 Tasks are grouped so structure precedes features:

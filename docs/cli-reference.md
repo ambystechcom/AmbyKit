@@ -268,16 +268,24 @@ Also reports, as warnings only (the exit code never changes), what the task file
   line (only for features that still have open tasks, grouped per feature in text). Phases are named
   `<feature>:phase-N`.
 
+- **Test design** — for every feature that has a [`tests.md`](./artifacts/tests.md): unknown ids, requirements with no
+  case and no reason, criteria with neither case nor flag, duplicate case ids, bad or missing manual reasons, more
+  than 15 cases for a story and `[stale]` cases. Features without a `tests.md` print nothing.
+
 In `--json` these are the keys `blockedTasks` (`feature`, `task`, `story`, `reason`), `deviations`
 (`feature`, `task`, `note`), `markerIssues` (`feature`, `task`, `kind` `missing-reason` or
 `checked-but-blocked` or `path-after-marker` (a `(file/path)` group after the marker), `message`) and `verifyIssues` (`feature`, `phase`, `title`, `kind` `missing`
 or `failed`, `why` for failed). Each key is absent when it has no entries, so output for a project
 without markers is unchanged.
 
+Test design adds one more key, `testDesign`: `findings` (`feature`, `kind`, `message`, optional `ref` and `line`) and
+`missing` (the features that have no `tests.md`). It is present only when at least one feature has a `tests.md`,
+so a project without test design reports exactly what it did before.
+
 ```bash
 ambykit analyze
 ambykit analyze --json   # includes lanes.conflicts and lanes.declarations
-                         # plus blockedTasks, deviations, markerIssues, verifyIssues when present
+                         # plus blockedTasks, deviations, markerIssues, verifyIssues, testDesign when present
 ```
 
 ## `ambykit check`

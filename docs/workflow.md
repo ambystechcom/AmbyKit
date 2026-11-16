@@ -12,7 +12,7 @@ happy path is **specify → design → plan → tasks → implement**, with `con
 | Revise | `/amby.revise` | spec, ui | spec / ui (continues in place) |
 | Design (UI) | `/amby.design` | spec | `ui.md`, `design-tokens.json` |
 | Plan (HOW) | `/amby.plan` | spec, ui | `plan.md` (+ `data-model.md`, `contracts/`) |
-| Tasks | `/amby.tasks` | plan | `tasks.md` |
+| Tasks | `/amby.tasks` | plan | `tasks.md` + `tests.md` (test design) |
 | Analyze | `/amby.analyze` | all | consistency report |
 | Implement | `/amby.implement` | tasks (one slice) | code + task/status updates |
 | Converge | `/amby.converge` | spec, plan, tasks + code | `tasks.md` (appends gap tasks), story status |
@@ -59,7 +59,9 @@ needed. See [the plan artifact](./artifacts/plan.md).
 
 Turns the plan into an ordered, dependency-aware checklist: stable `T###` IDs, `[P]` parallel
 markers, `[US#]` story tags, and file paths, grouped so foundational work precedes feature work. See
-[the tasks artifact](./artifacts/tasks.md).
+[the tasks artifact](./artifacts/tasks.md). The same phase also writes `tests.md`, the test design: one case per
+acceptance criterion with an automate-or-manual decision, decided before any code. See
+[the tests artifact](./artifacts/tests.md).
 
 ## 8. Analyze
 

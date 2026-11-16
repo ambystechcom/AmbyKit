@@ -22,8 +22,17 @@ Release notes with full detail live on the
   the dashboard's "Up next" list, the feature chart and feature view show plain-text counts, and
   `analyze` reports the new findings as warnings that never change its exit status.
 
+- Test design before code (feature 021): `/amby.tasks` also writes `tests.md` in the same phase, one case per
+  acceptance criterion with an automate-or-manual decision (manual only for a reason from a fixed list), each
+  citing its criterion `US-n#k` and `FR-###`, with a one-line `skipped: <reason>` form (`--skip-tests`).
+  `/amby.implement` builds to the cases and names tests `NNN:FR-###`, `/amby.converge` treats them as the
+  expected tests, and `/amby.revise` marks cases `[stale]` or `[obsolete]`. `ambykit analyze` checks each
+  feature's `tests.md` at zero model tokens (warnings only).
+
 ### Changed
 
+- `ambykit analyze --json` gains `testDesign` (`findings` and `missing`), present only when a feature has a
+  `tests.md`. The `tests.md` template is installed into `.amby/templates/` by `ambykit sync`.
 - The `--json` output of `dashboard --overview` and `analyze` gains new optional keys (`blockedTasks`,
   `deviations`, `markerIssues`, `verifyIssues`, and per-feature `blocked` and `verify`), present only when
   they have content. Existing keys are unchanged, and every existing `tasks.md` is read exactly as before.
