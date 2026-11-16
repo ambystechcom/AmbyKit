@@ -26,7 +26,7 @@ created: 2026-11-16
 - [x] [T010] [P] Run bootstrap over spec 025's run store: create `<feature>.<n>` only on explicit request, read and update run.json through `updateRun`, rebuild from `tasks.md` through 025; add only 028's own supervision files (`lanes/`, `events.jsonl`, `prompts/`) through 025's helpers; no local run-id or state-file code (src/cli/run-files.ts, test/cli/run-files.test.ts)
 - [x] [T011] [P] Runner registry: `RunnerSpec` with claude and codex entries, `verified: false`, invocation fields marked "to verify on a live install" (src/core/runners.ts, test/core/runners.test.ts)
 - [x] [T012] [P] `buildLanePrompt`: task IDs, `@path` artifact references and file ownership only (src/core/run-prompt.ts, test/core/run-prompt.test.ts)
-- [x] [T013] [P] Extract the check-off-aware lane merge from `LaneCommand` into core with a structured per-lane result; `lane merge` behaviour unchanged (src/core/lane-merge.ts, src/cli/lane.ts, test/core/lane-merge.test.ts)
+- [x] [T013] [P] Extract the check-off-aware lane merge from `LaneCommand` into core with a structured per-lane result; `lane merge` behaviour unchanged (src/core/lane-merge.ts, src/cli/lane.ts, test/core/lane-merge-core.test.ts)
 - [x] [T014] [P] Pure scheduler `nextToStart`: total cap and per-type cap from `fleet.concurrency`, stable order; may use spec 023's `buildGraph` for cross-story `depends-on` (src/core/run-schedule.ts, test/core/run-schedule.test.ts)
 - [x] [T015] [P] Pure supervision rules: restart limit, reassignment gate, budget decision; stall comes from spec 025's `laneStatus` (waiting/blocked exempt), with no stall logic of its own (src/core/run-supervise.ts, test/core/run-supervise.test.ts)
 - [x] [T016] [P] Process edge: spawn, signal, wait and liveness behind an injectable interface; Windows executable resolution (src/cli/run-process.ts, test/cli/run-process.test.ts)
@@ -36,10 +36,10 @@ created: 2026-11-16
 
 ## Phase 3 — User story US-1  (priority: P1)
 
-- [ ] [T030] [P] [US1] Pure launch plan: lanes + assigned runner + prompt file → exact command per lane (src/core/run-launch-plan.ts, test/core/run-launch-plan.test.ts)
-- [ ] [T031] [P] [US1] `--emit-script` writer: `launch.sh` and `launch.ps1` under `.amby/fleet/<run>/`, launches nothing (src/cli/run-script.ts, test/cli/run-script.test.ts)
-- [ ] [T032] [US1] Wire preview (no `--yes`: print and exit), `--yes` (print then launch hook), `--emit-script`, no-lanes and unknown-feature messages (src/cli/run.ts, test/cli/run-preview.test.ts)
-- **Verify:** `npm run typecheck && npx vitest run test/core/run-launch-plan.test.ts test/cli/run-script.test.ts test/cli/run-preview.test.ts` — without `--yes` nothing is spawned (fake runner records zero starts).
+- [x] [T030] [P] [US1] Pure launch plan: lanes + assigned runner + prompt file → exact command per lane (src/core/run-launch-plan.ts, test/core/run-launch-plan.test.ts)
+- [x] [T031] [P] [US1] `--emit-script` writer: `launch.sh` and `launch.ps1` under `.amby/fleet/<run>/`, launches nothing (src/cli/run-script.ts, test/cli/run-script.test.ts)
+- [x] [T032] [US1] Wire preview (no `--yes`: print and exit), `--yes` (print then launch hook), `--emit-script`, no-lanes and unknown-feature messages (src/cli/run.ts, test/cli/run-preview.test.ts)
+- **Verify:** `npm run typecheck && npx vitest run test/core/run-launch-plan.test.ts test/cli/run-script.test.ts test/cli/run-preview.test.ts` — without `--yes` nothing is spawned (fake runner records zero starts). ✓ passed
 - **Checkpoint:** US-1 is demoable (SC-002).
 
 ## Phase 4 — User story US-3  (priority: P1)
