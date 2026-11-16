@@ -63,12 +63,12 @@ created: 2026-11-16
 
 ## Phase 5 — User story US-7  Load third-party code safely (priority: P1)
 
-- [ ] [T050] [P] [US7] Test trust rules: unlisted package never loaded, listing without an exact version refused, installed version ≠ pin refused, parent/global install ignored (test/plugins/trust.test.ts)
-- [ ] [T051] [P] [US7] Test `scope:"user"` plugin files need `--include-user` and stay out of `sync --check` (test/cli/sync-plugin-userscope.test.ts)
-- [ ] [T052] [P] [US7] Author `docs/plugin-trust.md`: what a plugin can and cannot do, pins, consent, no sandbox (docs/plugin-trust.md)
+- [x] [T050] [P] [US7] Test trust rules: unlisted package never loaded, listing without an exact version refused, installed version ≠ pin refused, parent/global install ignored (test/plugins/trust.test.ts)
+- [x] [T051] [P] [US7] Test `scope:"user"` plugin files need `--include-user` and stay out of `sync --check` (test/cli/sync-plugin-userscope.test.ts)
+- [x] [T052] [P] [US7] Author `docs/plugin-trust.md`: what a plugin can and cannot do, pins, consent, no sandbox (docs/plugin-trust.md)
 - **Checkpoint:** US-7 holds: nothing runs unlisted, unpinned or unconsented.
 
-**Verify:** `npx vitest run test/plugins/trust.test.ts test/cli/sync-plugin-userscope.test.ts` passes.
+**Verify:** `npx vitest run test/plugins/trust.test.ts test/cli/sync-plugin-userscope.test.ts` passes. ✓ passed
 
 ## Phase 6 — User story US-4  Trust a documented, versioned API (priority: P1)
 
