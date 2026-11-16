@@ -53,14 +53,14 @@ created: 2026-11-16
 
 ## Phase 5 — User story US-3: report activity and receive a directive  (priority: P1)
 
-- [ ] [T040] [US3] Directive reader and derived status (pending, pause requested, paused, obeyed), missing file means continue; file names use the short lane form (batch B step 1), with tests (src/core/fleet/directives.ts, test/core/fleet-directives.test.ts)
-- [ ] [T041] [US3] Shared `reportActivity` core: resolve run (a warning, nothing created, when there is no unfinished run), write the marker, read the directive, never throw, with tests (src/core/report.ts, test/core/report.test.ts)
-- [ ] [T042] [P] [US3] `ambykit activity` gains `--lane`, `--state`, `--run`; calls without them stay byte-identical, with tests (src/cli/activity.ts, test/cli/activity.test.ts)
-- [ ] [T043] [P] [US3] `report_activity` tool returning acknowledgement and directive, never failing the agent, with tests (src/mcp/tools/fleet.ts, src/mcp/tools/index.ts, test/mcp/report-tool.test.ts)
-- [ ] [T044] [US3] Document the worker reporting cadence in the tool descriptions and contract: report at task start, task end, and when blocked or waiting, never on a timer; finish the current task, then obey pause or stop at the next report (FR-013, FR-020); the same wording as spec 019's worker prompt, with a test asserting the description text (src/mcp/tools/fleet.ts, test/mcp/tool-descriptions.test.ts)
+- [x] [T040] [US3] Directive reader and derived status (pending, pause requested, paused, obeyed), missing file means continue; file names use the short lane form (batch B step 1), with tests (src/core/fleet/directives.ts, test/core/fleet-directives.test.ts)
+- [x] [T041] [US3] Shared `reportActivity` core: resolve run (a warning, nothing created, when there is no unfinished run), write the marker, read the directive, never throw, with tests (src/core/report.ts, test/core/report.test.ts)
+- [x] [T042] [P] [US3] `ambykit activity` gains `--lane`, `--state`, `--run`; calls without them stay byte-identical, with tests (src/cli/activity.ts, test/cli/activity.test.ts)
+- [x] [T043] [P] [US3] `report_activity` tool returning acknowledgement and directive, never failing the agent, with tests (src/mcp/tools/fleet.ts, src/mcp/tools/index.ts, test/mcp/report-tool.test.ts)
+- [x] [T044] [US3] Document the worker reporting cadence in the tool descriptions and contract: report at task start, task end, and when blocked or waiting, never on a timer; finish the current task, then obey pause or stop at the next report (FR-013, FR-020); the same wording as spec 019's worker prompt, with a test asserting the description text (src/mcp/tools/fleet.ts, test/mcp/tool-descriptions.test.ts)
 - **Checkpoint:** US-3 is demoable: two lanes of one agent kind leave two markers; a pause directive is returned by the next report.
 
-**Verify:** `npx vitest run test/core/fleet-directives.test.ts test/core/report.test.ts test/cli/activity.test.ts test/mcp/report-tool.test.ts test/mcp/tool-descriptions.test.ts` passes, and the 017 dashboard tests still pass unchanged.
+**Verify:** `npx vitest run test/core/fleet-directives.test.ts test/core/report.test.ts test/cli/activity.test.ts test/mcp/report-tool.test.ts test/mcp/tool-descriptions.test.ts` passes, and the 017 dashboard tests still pass unchanged. ✓ passed
 
 ## Phase 6 — User story US-7: steer a lane from any host  (priority: P1)
 

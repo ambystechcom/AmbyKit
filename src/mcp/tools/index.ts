@@ -1,4 +1,5 @@
 import { ToolRegistry } from "../registry.js";
+import { registerFleetTools } from "./fleet.js";
 import { registerReadTools } from "./read.js";
 import { registerWriteTools } from "./write.js";
 
@@ -7,5 +8,6 @@ export function buildRegistry(): ToolRegistry {
   const registry = new ToolRegistry();
   registerReadTools(registry);
   registerWriteTools(registry);
+  registerFleetTools(registry);
   return registry;
 }
