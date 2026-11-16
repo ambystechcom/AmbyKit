@@ -52,11 +52,11 @@ describe("roles (feature 013)", () => {
     expect(roleForSpec(roles, undefined)).toBeUndefined();
   });
 
-  it("ships six default roles, each within the word limit and mapped to phases (FR-002, SC-004)", () => {
+  it("ships seven default roles, each within the word limit and mapped to phases (FR-002, SC-004)", () => {
     const files = readdirSync(rolesDir()).filter((f) => f.endsWith(".md")).sort();
     expect(files).toEqual([...SHIPPED_ROLES].sort());
     const roles = files.map((f) => parseRole(readFileSync(join(rolesDir(), f), "utf8"), f));
-    expect(roles.map((r) => r.id).sort()).toEqual(["architect", "developer", "pm", "qa", "tech-lead", "ux"]);
+    expect(roles.map((r) => r.id).sort()).toEqual(["architect", "developer", "pm", "qa", "security", "tech-lead", "ux"]);
     for (const r of roles) {
       expect(r.words, r.id).toBeLessThanOrEqual(ROLE_WORD_LIMIT);
       expect(r.phases.length, r.id).toBeGreaterThan(0);
@@ -72,6 +72,6 @@ describe("roles (feature 013)", () => {
     expect(result.created).toContain(".amby/roles/pm.md");
     expect(result.present).toContain(".amby/roles/qa.md");
     expect(readFileSync(join(root, ".amby", "roles", "qa.md"), "utf8")).toContain("custom qa");
-    expect(loadRoles(root)).toHaveLength(6);
+    expect(loadRoles(root)).toHaveLength(7);
   });
 });

@@ -18,7 +18,7 @@ export const ARTIFACT_TEMPLATES = [
 export const REFERENCE_DOCS = ["design-conventions.md"] as const;
 
 /** Default role definitions installed into a consumer's `.amby/roles/` (feature 013, FR-001). */
-export const SHIPPED_ROLES = ["pm.md", "ux.md", "architect.md", "tech-lead.md", "developer.md", "qa.md"] as const;
+export const SHIPPED_ROLES = ["pm.md", "ux.md", "architect.md", "tech-lead.md", "developer.md", "qa.md", "security.md"] as const;
 
 export interface InstallResult {
   created: string[];
