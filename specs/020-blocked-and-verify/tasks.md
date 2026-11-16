@@ -49,11 +49,11 @@ created: 2026-11-16
 - [x] [T032] [P] [US2] Add token entries for the `task-blocked` and `verify-failed` attention kinds in both theme tables, with ASCII symbols (FR-014) (src/cli/ui/dashboard/tokens.ts, specs/014-enhanced-dashboard/design-tokens.json)
 - [x] [T033] [P] [US2] Show the blocked count as text in the feature chart row, only when greater than zero (FR-010, FR-014) (src/cli/ui/dashboard/feature-chart.ts)
 - [x] [T034] [P] [US2] Show a task's BLOCKED reason and DEVIATION note as text in the story detail, no glyph needed (FR-010, FR-014) (src/cli/ui/dashboard/story-detail.ts)
-- [ ] [T035] [US2] Test `analyzeProject`: blocked and deviation findings, markerIssues, exit status unchanged, no new keys populated when there are no markers (FR-009, FR-011) (test/core/analyze-markers.test.ts)
-- [ ] [T036] [US2] Test overview: attention item, Up next exclusion, `FeatureRow.blocked` omitted when zero, filters (FR-010) (test/core/overview-markers.test.ts)
-- [ ] [T037] [US2] E2E over a fixture project: `dashboard` one-shot, `--json --overview`, `analyze`, `analyze --json`, `--icons=ascii` plain layout, output identical to before without markers, one-shot under 1 second (FR-010, FR-011, FR-013, FR-014, SC-001) (test/cli/markers-surface.test.ts)
+- [x] [T035] [US2] Test `analyzeProject`: blocked and deviation findings, markerIssues, exit status unchanged, no new keys populated when there are no markers (FR-009, FR-011) (test/core/analyze-markers.test.ts)
+- [x] [T036] [US2] Test overview: attention item, Up next exclusion, `FeatureRow.blocked` omitted when zero, filters (FR-010) (test/core/overview-markers.test.ts)
+- [x] [T037] [US2] E2E over a fixture project: `dashboard` one-shot, `--json --overview`, `analyze`, `analyze --json`, `--icons=ascii` plain layout, output identical to before without markers, one-shot under 1 second (FR-010, FR-011, FR-013, FR-014, SC-001) (test/cli/markers-surface.test.ts)
 - **Checkpoint:** US-2 is demoable: `dashboard` and `analyze` name a blocked task and its reason with zero model tokens.
-- **Verify:** `npm run typecheck && npx vitest run test/core/analyze-markers.test.ts test/core/overview-markers.test.ts test/cli/markers-surface.test.ts test/analyze.test.ts test/core/overview-attention.test.ts test/cli/dashboard-perf.test.ts`
+- **Verify:** `npm run typecheck && npx vitest run test/core/analyze-markers.test.ts test/core/overview-markers.test.ts test/cli/markers-surface.test.ts test/analyze.test.ts test/core/overview-attention.test.ts test/cli/dashboard-perf.test.ts` ✓ passed
 
 ## Phase 5 — User story US-3  (priority: P1)
 
