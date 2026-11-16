@@ -10,18 +10,13 @@ Converge feature `the user's request that followed this skill invocation` (defau
 Never edit source code — only that feature's `tasks.md` and `spec.md` are writable.
 
 Run `ambykit activity <feature> --agent=codex --phase=converge` first, with that feature's number; ignore any error.
-Then run `ambykit trace <feature> --json`; if it fails, go on as without it. Its uncovered requirements are
-gaps already — do not re-derive coverage by reading every test; read tests only to judge whether the covered
-ones truly satisfy their requirement.
 
 1. No `tasks.md` → stop, say to run `/amby.tasks`. No `plan.md` → converge on spec + tasks and say so.
 2. For every `FR-###`/`SC-###`, plan decision (incl. `data-model.md`/`contracts/`), and checked
    `T###`: look for evidence only in files the plan/tasks name. Classify **covered**, **gap**
-   (absent), or **unverified** (inconclusive). Skip items the plan marks deferred/out of scope. If `tests.md`
-   exists, read it after the `trace` matrix (where there is one) and treat its cases as the expected tests; spend
-   effort only on what neither answers.
+   (absent), or **unverified** (inconclusive). Skip items the plan marks deferred/out of scope.
 3. **Append, don't rewrite.** Under `## Convergence` in `tasks.md` (create at the end if absent) add
-   `- [ ] [T###] [US#] … (closes NNN:FR-###)` per gap and `- [ ] [T###] [US#] [VERIFY] …` per unverified
+   `- [ ] [T###] [US#] … (closes FR-…)` per gap and `- [ ] [T###] [US#] [VERIFY] …` per unverified
    item. Continue IDs from the highest `T###` anywhere in the file; skip items already listed
    unchecked there. Nothing to add → leave the file untouched.
 4. In `spec.md`, patch only `status:` lines: a story → `done` when every FR/SC it maps to is

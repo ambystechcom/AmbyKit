@@ -24,8 +24,6 @@ of `@.amby/templates/spec.md`. This command **extends** an existing feature — 
    - New requirements use EARS (SHALL / WHEN / WHILE / IF-THEN / WHERE); new acceptance criteria use
      Given/When/Then — consistent with `specify`.
    - Leave any story already marked `status: done` untouched; you may still add new stories.
-   - If `tests.md` exists, mark each case citing a changed criterion `[stale]` and each citing a removed one
-     `[obsolete]` (never delete); change nothing else there.
 4. Set the `spec.md` frontmatter `status:` to `in-progress`.
 5. **Design (optional).** If the author is continuing the UI/design and `ui.md` exists, extend it in
    place, preserving existing sections. If `ui.md` does **not** exist, do not create it here — direct

@@ -17,8 +17,7 @@ Run `ambykit activity <feature> --agent=claude --phase=implement` first, with th
 2. Load **only** the slice you need: the task line, the relevant `plan.md` section, and the specific
    files named. Don't read the whole spec tree (token-frugal).
 3. Implement to satisfy the mapped `FR-###`/acceptance criteria and the constitution. Add/adjust
-   tests for the acceptance criteria: build to the story's cases in `tests.md` and name tests `NNN:FR-###: …`;
-   at the story checkpoint say if `tests.md` is missing, never pass silently. If you cannot finish a task, add `⚠ BLOCKED: <reason>` as the last
+   tests for the acceptance criteria. If you cannot finish a task, add `⚠ BLOCKED: <reason>` as the last
    segment of its line (after the `(file/path)` group), stop that task and continue with another unblocked
    one; note any departure from the plan as `↪ DEVIATION: <note>`. Remove `⚠ BLOCKED:` once resolved.
 4. **Patch in place:** flip the completed task's checkbox to `- [x]` in `tasks.md`; set the story's
