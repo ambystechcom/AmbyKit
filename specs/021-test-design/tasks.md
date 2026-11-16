@@ -43,11 +43,11 @@ created: 2026-11-16
 
 ## Phase 4 — User story US-7  (priority: P1)
 
-- [ ] [T030] [US7] Add the skip argument to the tasks prompt: write only `skipped: <reason>` (src/prompts/tasks.md)
-- [ ] [T031] [US7] Report features with no `tests.md` only under JSON `missing`, never in human output (src/core/analyze.ts, src/cli/analyze.ts)
-- [ ] [T032] [US7] Regression test: features without `tests.md` give byte-identical analyze output and `skipped:` is valid (test/cli/analyze-no-design.test.ts)
+- [x] [T030] [US7] Add the skip argument to the tasks prompt: write only `skipped: <reason>` (src/prompts/tasks.md)
+- [x] [T031] [US7] Report features with no `tests.md` only under JSON `missing`, never in human output (src/core/analyze.ts, src/cli/analyze.ts) ↪ DEVIATION: already delivered by T023 and T024 (testDesign is present only when a feature has a tests.md); T032 tests it
+- [x] [T032] [US7] Regression test: features without `tests.md` give byte-identical analyze output and `skipped:` is valid (test/cli/analyze-no-design.test.ts)
 - **Checkpoint:** US-7 is demoable: existing projects see no change.
-- **Verify:** `npx vitest run test/cli/analyze-no-design.test.ts test/analyze.test.ts test/cli/analyze-lanes.test.ts` pass unchanged.
+- **Verify:** `npx vitest run test/cli/analyze-no-design.test.ts test/analyze.test.ts test/cli/analyze-lanes.test.ts` pass unchanged. ✓ passed
 
 ## Phase 5 — User stories US-4, US-5, US-6  (priority: P2)
 

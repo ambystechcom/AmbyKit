@@ -163,7 +163,7 @@ already exist, so that upgrading to 1.5 needs no migration.
   they behave as before.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a feature with no test design, When any existing phase runs, Then it behaves as before.

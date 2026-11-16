@@ -42,6 +42,11 @@ describe("spec 021 prompt contract: /amby.tasks writes the test design", () => {
     expect(tasks).toMatch(/An FR with no case goes under `## Uncovered` with a reason/);
   });
 
+  it("021:FR-016: a person can skip test design explicitly, recorded as a one-line `skipped:` file", () => {
+    expect(frontmatter(tasks)).toMatch(/argument-hint: .*--skip-tests <reason>/);
+    expect(tasks).toMatch(/With `--skip-tests <reason>`, write `tests\.md` holding only the line `skipped: <reason>`/);
+  });
+
   it("P3: the test-design rules stay short (the whole tasks prompt under 3000 characters)", () => {
     expect(tasks.length).toBeLessThan(3000);
   });
