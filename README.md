@@ -149,6 +149,7 @@ target is a thin `BaseEmitter` subclass.
 | `ambykit worktree <feature>` | Isolated working copy per feature (`list`, `remove`) for parallel work |
 | `ambykit lane <feature>` | Split a phase's `[P]` tasks into conflict-free parallel lanes (`list`, `merge`, `remove`) |
 | `ambykit activity <feature>` | Record which assistant works on a feature (run by the phase prompts) |
+| `ambykit trace [feature]` | Show which requirements have tests (tests cite `NNN:FR-###`); `--json`, `--gate` |
 
 See [`docs/cli-reference.md`](./docs/cli-reference.md).
 

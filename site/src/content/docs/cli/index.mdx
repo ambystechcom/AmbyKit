@@ -148,6 +148,18 @@ Parallel lanes split one phase's `[P]` tasks into isolated worktrees named
 automatically and aborts on any other conflict. `ambykit analyze` also reports **lane conflicts**:
 overlapping task paths in a phase where one of the tasks is `[P]`.
 
+## `ambykit trace`
+
+```text
+ambykit trace [feature] [--json] [--gate]
+```
+
+Shows which requirements have tests, at zero model tokens and without editing anything. A test covers
+a requirement when its name begins with the qualified id: `it("019:FR-004: …")` (several ids may be
+listed). The report lists covered and uncovered requirements, orphans (tests citing an unknown id) and
+uncited tests. `--json` prints a versioned shape; `--gate` exits 1 when a requirement is uncovered. A
+requirement left untested on purpose is recorded as `uncovered: FR-### — reason` in `tests.md`.
+
 ## `ambykit activity`
 
 ```text

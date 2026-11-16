@@ -12,6 +12,12 @@ Release notes with full detail live on the
 
 ### Added
 
+- `ambykit trace [feature] [--json] [--gate]` (feature 024): a local, read-only matrix from each `FR-###` to
+  the tests that cite it. A test cites a requirement by starting its name with `NNN:FR-###:`; the report
+  lists uncovered requirements, orphans, ambiguous bare ids, skipped and uncited tests, designed cases
+  from `tests.md`, and `uncovered: FR-### — reason` notes. `--gate` exits 1 on uncovered requirements.
+  `/amby.converge` now starts from the trace matrix, and Claude Code grants prompts a scoped shell for
+  each `ambykit <verb>` they run. The dashboard shows coverage per feature next to task progress.
 - Blocked markers and Verify lines (feature 020): a task line can end with `⚠ BLOCKED: <reason>` and an
   optional `↪ DEVIATION: <note>` (the glyph-less `BLOCKED:` and `DEVIATION:` forms are read the same),
   and each `tasks.md` phase ends with one `**Verify:**` line that `/amby.implement` runs before the
