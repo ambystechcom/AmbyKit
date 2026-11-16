@@ -143,7 +143,7 @@ and jump from a story to its feature.
   jump to its feature.
 - **depends-on:** [US-3, US-5]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given `--interactive`, When the graph view is opened, Then it shows blockers, buildable stories and

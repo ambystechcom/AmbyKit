@@ -10,7 +10,7 @@ import { TOKENS } from "./tokens.js";
  * glyph legend, in a focused frame centered over the dimmed frame beneath. Pure.
  */
 
-export type HelpScreen = "overview" | "feature" | "story";
+export type HelpScreen = "overview" | "feature" | "story" | "graph";
 
 const KEYS: Record<HelpScreen, [string, string, string][]> = {
   // [unicode key, ascii key, label]
@@ -20,6 +20,7 @@ const KEYS: Record<HelpScreen, [string, string, string][]> = {
     ["⏎", "enter", "open"],
     ["f", "f", "filter by feature"],
     ["s", "s", "cycle status filter"],
+    ["g", "g", "dependency graph"],
     ["esc", "esc", "clear filters"],
     ["r", "r", "retry live updates (when paused)"],
     ["q", "q", "quit"],
@@ -27,6 +28,13 @@ const KEYS: Record<HelpScreen, [string, string, string][]> = {
   feature: [
     ["↑ ↓", "up / down", "move"],
     ["⏎", "enter", "story detail"],
+    ["esc", "esc", "back"],
+    ["r", "r", "retry live updates (when paused)"],
+    ["q", "q", "quit"],
+  ],
+  graph: [
+    ["↑ ↓", "up / down", "move"],
+    ["⏎", "enter", "open the story's feature"],
     ["esc", "esc", "back"],
     ["r", "r", "retry live updates (when paused)"],
     ["q", "q", "quit"],

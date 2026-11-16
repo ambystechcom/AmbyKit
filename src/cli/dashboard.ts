@@ -259,7 +259,9 @@ export class DashboardCommand extends BaseCommand {
         return cache.get(key)!;
       },
     });
-    let data = withBurndown({ ...base, presence: presenceOf(base.features, Date.now()) });
+    // Feature 023 (FR-015): the graph view is loaded only here, on the interactive path, never one-shot or --json.
+    const { graphViewApi } = await import("./ui/dashboard/graph-view.js");
+    let data = withBurndown({ ...base, graphView: graphViewApi, presence: presenceOf(base.features, Date.now()) });
 
     let update: ((fn: (s: OverviewTuiState) => OverviewTuiState) => void) | null = null;
     let watcher: ProjectWatcher | null = null;

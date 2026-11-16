@@ -77,15 +77,15 @@ created: 2026-11-16
 
 ## Phase 8 — User story US-6  (priority: P2)
 
-- [ ] [T070] [P] [US6] Build the pure graph-view renderer as a plain text list: blockers, buildable, critical path, selected story (src/cli/ui/dashboard/graph-view.ts)
-- [ ] [T071] [P] [US6] Add the `g` entry to the help overlay (src/cli/ui/dashboard/help-overlay.ts)
-- [ ] [T072] [US6] Add the `graph` view to the interactive reducer: `g` opens, cursor moves, `return` jumps to the story's feature, `escape` returns (src/cli/ui/interactive/overview.ts)
-- [ ] [T073] [US6] Load graph-view and graph-paths only on the interactive path so one-shot and `--json` never import them (src/cli/dashboard.ts)
-- [ ] [T074] [P] [US6] Test the view: content, jump to feature, narrow and plain-text fallback (test/ui/dashboard-graph.test.ts)
-- [ ] [T075] [P] [US6] Extend the one-shot perf test: the graph view is not loaded and the 1-second budget holds (test/cli/dashboard-perf.test.ts)
+- [x] [T070] [P] [US6] Build the pure graph-view renderer as a plain text list: blockers, buildable, critical path, selected story (src/cli/ui/dashboard/graph-view.ts)
+- [x] [T071] [P] [US6] Add the `g` entry to the help overlay (src/cli/ui/dashboard/help-overlay.ts)
+- [x] [T072] [US6] Add the `graph` view to the interactive reducer: `g` opens, cursor moves, `return` jumps to the story's feature, `escape` returns (src/cli/ui/interactive/overview.ts)
+- [x] [T073] [US6] Load graph-view and graph-paths only on the interactive path so one-shot and `--json` never import them (src/cli/dashboard.ts)
+- [x] [T074] [P] [US6] Test the view: content, jump to feature, narrow and plain-text fallback (test/ui/dashboard-graph.test.ts)
+- [x] [T075] [P] [US6] Extend the one-shot perf test: the graph view is not loaded and the 1-second budget holds (test/cli/dashboard-perf.test.ts)
 - **Checkpoint:** US-6 is demoable: open `ambykit dashboard --interactive`, press `g`, select a story, jump to its feature.
 
-**Verify:** `npm test -- dashboard-graph dashboard-perf` passes; note under Open decisions that the view still needs `/amby.design` sign-off.
+**Verify:** `npm test -- dashboard-graph dashboard-perf` passes; note under Open decisions that the view still needs `/amby.design` sign-off. ✓ passed
 
 ## Phase 9 — Polish
 
