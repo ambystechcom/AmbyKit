@@ -5,6 +5,7 @@ import type { BurndownState } from "../dashboard/burndown-chart.js";
 import type { HeaderMeta } from "../dashboard/cards.js";
 import { emptyState, noMatchLine } from "../dashboard/empty-state.js";
 import type { GraphViewApi } from "../dashboard/graph-view.js";
+import { renderQualityView } from "../dashboard/quality-view.js";
 import { renderHelp, type HelpScreen } from "../dashboard/help-overlay.js";
 import { liveIndicator, type LiveStatus } from "../dashboard/live-indicator.js";
 import { LIVE_TOKENS } from "../dashboard/live-tokens.js";
@@ -64,6 +65,8 @@ export interface OverviewTuiState {
   graph: { cursor: number } | null;
   /** Help overlay open (FR-030). */
   help: boolean;
+  /** Quality view open (feature 024, FR-013): uncovered requirements and analyze findings. */
+  quality: boolean;
   burndownReady: boolean;
   done: boolean;
   /** Live-update status (feature 017); absent outside live mode. */
@@ -90,6 +93,7 @@ export function initOverviewTui(filters: Filters = {}): OverviewTuiState {
     story: null,
     graph: null,
     help: false,
+    quality: false,
     burndownReady: false,
     done: false,
     changed: new Set(),
@@ -230,6 +234,7 @@ export function applyData(state: OverviewTuiState, prev: OverviewTuiData, next: 
 export function reduceOverviewTui(data: OverviewTuiData, state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
   if (state.help) return { ...state, help: false }; // any key closes help and is not passed on
   if (state.input !== null) return reduceInput(state, key);
+  if (state.quality) return key.name === "q" ? { ...state, done: true } : { ...state, quality: false };
   if (key.sequence === "?") return { ...state, help: true };
   if (state.view === "feature") return reduceFeature(data, state, key);
   if (state.view === "graph") return reduceGraph(data, state, key);
@@ -256,6 +261,8 @@ export function reduceOverviewTui(data: OverviewTuiData, state: OverviewTuiState
       return openSelected(data, state);
     case "escape":
       return state.filters.feature || state.filters.status ? { ...state, filters: {}, cursors: NO_CURSORS } : state;
+    case "c":
+      return { ...state, quality: true };
     case "f":
       return { ...state, input: state.filters.feature ?? "" };
     case "s": {
@@ -442,6 +449,7 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
           ["f", "filter"],
           ["s", "status"],
           ...(data.graphView ? ([["g", "graph"]] as [string, string][]) : []),
+          ["c", "quality"],
           ["?", "help"],
           ["q", "quit"],
         ]) + filterNote(state.filters);
@@ -450,6 +458,13 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
 
 /** Render the current frame, with the help overlay on top when it is open. */
 export function renderOverviewTui(caps: Capabilities, data: OverviewTuiData, state: OverviewTuiState): string {
+  if (state.quality && state.view === "overview") {
+    const o = overviewOf(data, state.filters);
+    const hints = keyHints(caps, [["any key", "back"], ["q", "quit"]]);
+    return `${renderQualityView(caps, applyFilters(data.features, state.filters), o.attention)}
+
+${hints}`;
+  }
   const { frame, screen } = renderScreen(caps, data, state);
   if (!state.help) return frame;
   return renderHelp(caps, frame, screen, data.issues.map((i) => `${i.file}: ${i.reason}`));

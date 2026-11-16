@@ -130,6 +130,8 @@ export interface AmbyConfig {
   worktrees?: boolean;
   /** Dashboard tuning (feature 017): agent-presence thresholds in minutes. */
   dashboard?: { activeMinutes?: number; idleMinutes?: number };
+  /** Requirement traceability (feature 024): where to look for tests, and extra directory names to skip. */
+  trace?: { roots?: string[]; ignore?: string[] };
 }
 
 /** How a tool materializes phase prompts. */

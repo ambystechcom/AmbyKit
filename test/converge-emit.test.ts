@@ -48,4 +48,23 @@ describe("converge command (feature 011)", () => {
       );
     }
   });
+
+  // Feature 024 (FR-015, FR-016, FR-021): converge starts from the trace matrix, authored once.
+  it("024:FR-015: starts from the trace matrix and cites gaps by qualified id", () => {
+    expect(converge!.body).toMatch(/run `ambykit trace <feature> --json`/);
+    expect(converge!.body).toContain("do not re-derive coverage");
+    expect(converge!.body).toContain("(closes NNN:FR-###)");
+  });
+
+  it("024:FR-016: works as today when trace cannot run", () => {
+    expect(converge!.body).toContain("if it fails, go on as without it");
+  });
+
+  it("024:FR-021: Claude grants converge only the scoped trace and activity verbs, no wider shell", () => {
+    const ctx: RulesContext = { projectName: "demo", specs, manageRules: false };
+    const file = new ClaudeEmitter().emit(specs, ctx).find((f) => f.path.endsWith("amby.converge.md"))!;
+    const tools = /allowed-tools: (.*)/.exec(file.contents)![1]!;
+    expect(tools).toContain("Bash(ambykit trace:*)");
+    expect(tools.split(", ").filter((t) => t === "Bash")).toEqual([]);
+  });
 });

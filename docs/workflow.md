@@ -86,7 +86,8 @@ closed. `ambykit dashboard` and `ambykit analyze` surface both at zero model tok
 Closes the loop after implementation: checks the code against every `FR-###`/`SC-###`, plan
 decision, and checked task; appends one unchecked task per gap under `## Convergence` in `tasks.md`
 (`[VERIFY]` for inconclusive items); marks fully covered stories `done`. Append-only and idempotent —
-it never edits source. Loop `implement → converge` until it reports **converged**.
+it never edits source. It starts from `ambykit trace <feature> --json` (which requirements have tests),
+so it spends effort only on what the matrix cannot answer. Loop `implement → converge` until it reports **converged**.
 
 ## 11. Review
 

@@ -43,7 +43,7 @@ export function artifactLines(f: FeatureSnapshot): ArtifactLine[] {
       : { file: "ui.md", state: "pending", detail: "pending" },
     f.artifacts.plan ? { file: "plan.md", state: "present", detail: "" } : { file: "plan.md", state: "pending", detail: "pending" },
     tasks
-      ? { file: "tasks.md", state: done === tasks.length ? "present" : "partial", detail: `${done} / ${tasks.length}${verifyDetail(f)}` }
+      ? { file: "tasks.md", state: done === tasks.length ? "present" : "partial", detail: `${done} / ${tasks.length}${verifyDetail(f)}${f.coverage ? `  cov ${f.coverage.covered}/${f.coverage.total}` : ""}` }
       : { file: "tasks.md", state: "pending", detail: "pending" },
   ];
 }

@@ -21,6 +21,7 @@ const KEYS: Record<HelpScreen, [string, string, string][]> = {
     ["f", "f", "filter by feature"],
     ["s", "s", "cycle status filter"],
     ["g", "g", "dependency graph"],
+    ["c", "c", "quality view (coverage, findings)"],
     ["esc", "esc", "clear filters"],
     ["r", "r", "retry live updates (when paused)"],
     ["q", "q", "quit"],

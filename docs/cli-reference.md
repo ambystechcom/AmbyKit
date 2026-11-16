@@ -322,6 +322,42 @@ into a Mermaid renderer to view it.
 
 Output is the same for the same files whatever the directory order.
 
+## `ambykit trace [feature] [--json] [--gate]`
+
+Shows which requirements have tests, computed locally from `specs/` and your test files (no model
+tokens, read-only). For each feature it lists every `FR-###` as covered (with the tests that cite it),
+uncovered (with its text), or deliberately uncovered. It also lists **orphans** (tests citing an id that
+exists in no spec), **ambiguous** bare ids, **skipped** tests that cite a requirement, and **uncited**
+tests (no id in the name; the first 20 are shown, all are in `--json`). A feature argument is a number
+or directory name and limits the report to that feature.
+
+- `--json` prints the versioned shape in `specs/024-trace/contracts/trace-json.md`; fields are only
+  ever added.
+- `--gate` exits 1 when any requirement is uncovered, else 0. Without it `trace` always exits 0.
+- A requirement left without a test on purpose is not counted uncovered by the gate. Record it as one
+  line, `uncovered: FR-### — reason`, in the feature's `tests.md` (or, without a test design, in
+  `spec.md`).
+- If a feature has a `tests.md` (spec 021), each designed `auto` case is reported `matched` or
+  `missing` and each `manual` case is listed as `manual`.
+- Tests are found as `*.test.*` / `*.spec.*` files under the project, skipping `node_modules`, `dist`,
+  `coverage`, `.git`, `.worktrees`, `.amby` and `specs`. Override with
+  `"trace": { "roots": ["src"], "ignore": ["fixtures"] }` in `.amby/config.json`.
+
+### Citing requirements
+
+A test covers a requirement when its name **begins** with the qualified id and a colon:
+
+```ts
+it("019:FR-004: rejects an empty name", () => { … });
+it("019:FR-004, 020:FR-001: shared behavior", () => { … });   // several ids
+```
+
+- Use `NNN:FR-###` (feature number, then requirement). A bare `FR-004` never matches: it is reported
+  ambiguous when several features define it, otherwise unqualified.
+- An id anywhere but the start (`… (FR-004)`) does not cite. `skip`/`todo` tests never cover.
+- Only `it`/`test` titles are read: an id in a `describe(...)` name does not cite the tests beneath it,
+  and `.each` titles are not expanded.
+
 ## `ambykit check`
 
 Doctor: verify integrations are present and well-formed and that expected assistant CLIs are

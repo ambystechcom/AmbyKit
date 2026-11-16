@@ -135,6 +135,8 @@ export function featureRow(f: FeatureSnapshot): FeatureRow {
   // Feature 020: Verify lines by state; omitted when the feature has no Verify lines at all.
   const verify = verifyCounts(f);
   if (verify) row.verify = verify;
+  // Feature 024: covered/total requirements; omitted without requirements so existing output is unchanged.
+  if (f.coverage) row.coverage = { covered: f.coverage.covered, total: f.coverage.total };
   return row;
 }
 

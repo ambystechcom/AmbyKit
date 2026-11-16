@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
+import { attachCoverage } from "./trace-coverage.js";
 import { compareFeatureDirs, assignDisplayRefs, readFeatures } from "./features.js";
 import { applyTasks, parseTasks } from "./dashboard.js";
 import { gitAsync, parseWorktreeList } from "./git.js";
@@ -191,6 +192,7 @@ export async function readProjectFeatures(root: string, given?: ProjectCheckouts
   }
   const features = mergeCheckouts(main.features, worktrees);
   attachLanes(features, checkouts.lanes);
+  attachCoverage(features, checkouts.primary.root);
   return { features, issues, checkouts };
 }
 

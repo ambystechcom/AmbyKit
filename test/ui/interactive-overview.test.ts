@@ -84,7 +84,7 @@ describe("interactive overview rendering", () => {
     expect(out).toContain("┏━ ATTENTION · 2");
     expect(out).toContain("▸ ✗ 002:US-3");
     expect(out).toContain("╭─ UP NEXT");
-    expect(out.trimEnd().split("\n").at(-1)).toBe("tab panel  ↑↓ move  ⏎ open  f filter  s status  ? help  q quit");
+    expect(out.trimEnd().split("\n").at(-1)).toBe("tab panel  ↑↓ move  ⏎ open  f filter  s status  c quality  ? help  q quit");
     expect(out.split("\n")[0]).toMatch(/v1\.2\.0 · interactive$/);
   });
 

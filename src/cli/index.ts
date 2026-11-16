@@ -17,6 +17,7 @@ import { WorktreeCommand } from "./worktree.js";
 import { ActivityCommand } from "./activity.js";
 import { LaneCommand } from "./lane.js";
 import { GraphCommand } from "./graph.js";
+import { TraceCommand } from "./trace.js";
 import { outdatedWarning } from "./ui/callout.js";
 import { packageVersion } from "../core/paths.js";
 
@@ -33,6 +34,7 @@ const COMMANDS: BaseCommand[] = [
   new ActivityCommand(),
   new LaneCommand(),
   new GraphCommand(),
+  new TraceCommand(),
 ];
 
 /** Parse argv (after the command name) into positionals + flags. */

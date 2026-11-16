@@ -50,6 +50,9 @@ async function run(cmd: Cmd, cwd: string, flags: Record<string, string | boolean
   }
 }
 
+/** Feature 024 (FR-019): drop the added ` cov n/m` figure so the rest must match the pre-024 output. */
+const withoutCoverage = (s: string): string => s.replace(/ {2}cov \d+\/\d+/g, "");
+
 const withoutHeader = (out: string): string => out.split("\n").slice(1).join("\n");
 
 describe("existing projects read exactly as before (spec 020, US-5)", () => {
@@ -85,9 +88,9 @@ describe("existing projects read exactly as before (spec 020, US-5)", () => {
   it("FR-011: the one-shot dashboard and its ascii layout are unchanged", async () => {
     const dir = shippedProject();
     const text = await run(new DashboardCommand() as Cmd, dir, {});
-    expect(withoutHeader(text.out)).toBe(recorded["dashboard-text"]?.out);
+    expect(withoutCoverage(withoutHeader(text.out))).toBe(recorded["dashboard-text"]?.out);
     const ascii = await run(new DashboardCommand() as Cmd, dir, { icons: "ascii" });
-    expect(withoutHeader(ascii.out)).toBe(recorded["dashboard-ascii"]?.out);
+    expect(withoutCoverage(withoutHeader(ascii.out))).toBe(recorded["dashboard-ascii"]?.out);
   });
 
   it("FR-011, FR-013: dashboard --json and --json --overview are unchanged, with no new key on any feature row", async () => {
@@ -95,6 +98,9 @@ describe("existing projects read exactly as before (spec 020, US-5)", () => {
     const bare = await run(new DashboardCommand() as Cmd, dir, { json: true });
     expect(JSON.parse(bare.out)).toEqual(JSON.parse(recorded["dashboard-json"]?.out ?? "[]"));
     const overview = await run(new DashboardCommand() as Cmd, dir, { json: true, overview: true });
-    expect(JSON.parse(overview.out)).toEqual(JSON.parse(recorded["dashboard-overview"]?.out ?? "{}"));
+    // Feature 024 (FR-019): the coverage figure is the one allowed addition to a feature row.
+    const now = JSON.parse(overview.out) as { features?: Record<string, unknown>[] };
+    for (const f of now.features ?? []) delete f["coverage"];
+    expect(now).toEqual(JSON.parse(recorded["dashboard-overview"]?.out ?? "{}"));
   });
 });
