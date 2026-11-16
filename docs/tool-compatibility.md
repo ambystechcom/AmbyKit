@@ -40,8 +40,9 @@ Several targets share one emitter's output (why `BaseEmitter` + thin subclasses 
 | Args placeholder | `$ARGUMENTS`, `$N`, `$name` | `$ARGUMENTS`, `$1` | `${input:x}` | — | prompt text | — | none — reworded as prose (as Codex) | none — trailing free text only (AmbyKit reworks `$ARGUMENTS` into prose) |
 | Agents | `.claude/agents/*.md` | `.opencode/agents/*.md` | `.github/agents/*.agent.md` | `.github/agents/*.agent.md` | UI modes (no file) | — | none (SDK only) | none (skills only) |
 | Agent frontmatter | `name`*, `description`*, `tools`, `model` (body = system prompt) | `description`* (+`mode`, `permission`; filename = id) | `description`*, `name`, `tools` | same as Copilot VS Code | — | — | — | — |
-| MCP file | `.mcp.json` | `opencode.json` → `mcp` | `.vscode/mcp.json` | `~/.copilot/mcp-config.json` (user) | `.cursor/mcp.json` | reads `.cursor/mcp.json` | `mcp_config.json` (user) | `.codex/config.toml` (TOML) — **out of scope**, AmbyKit does not write it |
-| MCP top-level key | (per-server `type`) | `mcp` | `servers` | `mcpServers` | `mcpServers` | — | `mcpServers` | `mcp_servers.<id>` (not written) |
+| MCP file | `.mcp.json` | `opencode.json` — **not written** (two incompatible schemas; see `specs/025-mcp-server/research.md`) | `.vscode/mcp.json` | `~/.copilot/mcp-config.json` (user) | `.cursor/mcp.json` | reads `.cursor/mcp.json` | **not written** for the IDE (the CLI uses `.agents/mcp_config.json`, project) | `.codex/config.toml` (TOML) — **out of scope**, AmbyKit does not write it |
+| MCP top-level key | `mcpServers` | `mcp` or `mcp.servers` (by version) | `servers` | `mcpServers` | `mcpServers` | `mcpServers` (shared file) | `mcpServers` | `mcp_servers.<id>` (not written) |
+| MCP entry shape | `{type:"stdio",command,args}` | — | `{type:"stdio",command,args}` | `{type:"local",command,args,tools:["*"]}` (`tools` required) | `{type:"stdio",command,args}` | same as Cursor | `{command,args}` | — |
 | AGENTS.md native | No (bridge) | Yes | Yes (opt-in) | Yes | Yes | Yes | Yes | Yes |
 
 ## Matrix — additional targets (feature 016)
@@ -119,10 +120,14 @@ identical and `.augment/` takes precedence, so Claude plus Augment yields no dup
 - **Rules files are merged, not overwritten.** Every rules file wraps AmbyKit's content in a
   `### AmbyKit usage` section so it can be spliced into a file the user already authored; only that
   section is AmbyKit's. (Command/prompt/skill/workflow files remain fully generated and overwritten.)
-- **MCP top-level key differs**: `servers` (Copilot VS Code) vs `mcpServers` (Cursor, Copilot CLI,
-  Antigravity) vs `mcp` (OpenCode) vs per-server `type` blocks (Claude `.mcp.json`).
-- **MCP scope differs**: Copilot CLI and Antigravity use **user-level** files outside the repo — AmbyKit
-  writes these only with explicit consent and excludes them from the "repo in sync" check.
+- **MCP top-level key differs**: `servers` (Copilot VS Code) vs `mcpServers` (Claude `.mcp.json`, Cursor,
+  Copilot CLI, Antigravity) vs `mcp` / `mcp.servers` (OpenCode, version-dependent, not written). Copilot CLI's
+  entry needs `type: "local"` and `tools`; the others use `type: "stdio"` (Antigravity has none).
+- **MCP scope differs**: Copilot CLI uses a **user-level** file outside the repo, and the Antigravity IDE's
+  documented global file is user-level too. AmbyKit writes the Copilot CLI file only with explicit consent
+  (`--include-user`), never writes the Antigravity IDE's, and excludes user files from the "repo in sync"
+  check. Antigravity CLI has a project file, `.agents/mcp_config.json`. Verified shapes and sources are in
+  `specs/025-mcp-server/research.md`.
 - **Scoped-instruction key differs**: Copilot `applyTo` vs Cursor `globs` (+ `alwaysApply`).
 - **Command surface differs**: Copilot CLI has no `.prompt.md`; phases map to `SKILL.md`. Antigravity
   now uses skills (`.agents/skills/<name>/SKILL.md`); workflows (`.agents/workflows/*.md`, with a

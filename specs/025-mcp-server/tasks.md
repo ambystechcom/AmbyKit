@@ -17,10 +17,10 @@ created: 2026-11-16
 
 ## Phase 1 — Setup
 
-- [ ] [T001] Confirm the MCP protocol revision and stdio framing, and each target's MCP file, key, entry shape and scope from official docs; record sources, mark anything unconfirmed "not written" (specs/025-mcp-server/research.md)
-- [ ] [T002] Record the verified per-server entry shapes, scopes and consent notes in the compatibility matrix (docs/tool-compatibility.md)
+- [x] [T001] Confirm the MCP protocol revision and stdio framing, and each target's MCP file, key, entry shape and scope from official docs; record sources, mark anything unconfirmed "not written" (specs/025-mcp-server/research.md)
+- [x] [T002] Record the verified per-server entry shapes, scopes and consent notes in the compatibility matrix (docs/tool-compatibility.md)
 
-**Verify:** research.md names the protocol revision and, for every built-in target, either its verified file, key, entry shape and source or "not written"; the matrix rows match research.md.
+**Verify:** research.md names the protocol revision and, for every built-in target, either its verified file, key, entry shape and source or "not written"; the matrix rows match research.md. ✓ passed
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
