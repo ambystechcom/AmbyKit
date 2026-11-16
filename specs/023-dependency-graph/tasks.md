@@ -68,12 +68,12 @@ created: 2026-11-16
 
 ## Phase 7 — User story US-5  (priority: P2)
 
-- [ ] [T060] [US5] Implement `buildable(graph)` and `blockersOf(graph, key)` with today's `analyze` rule (src/core/graph-paths.ts)
-- [ ] [T061] [US5] Implement `criticalPath(graph)`: longest not-done chain over the acyclic part, ties by lowest key (src/core/graph-paths.ts)
-- [ ] [T062] [US5] Test against hand-computed graphs: buildable set, critical path, a done story unblocking dependents, equal-length chains stable, cycles excluded (test/core/graph-paths.test.ts)
+- [x] [T060] [US5] Implement `buildable(graph)` and `blockersOf(graph, key)` with today's `analyze` rule (src/core/graph-paths.ts)
+- [x] [T061] [US5] Implement `criticalPath(graph)`: longest not-done chain over the acyclic part, ties by lowest key (src/core/graph-paths.ts)
+- [x] [T062] [US5] Test against hand-computed graphs: buildable set, critical path, a done story unblocking dependents, equal-length chains stable, cycles excluded (test/core/graph-paths.test.ts)
 - **Checkpoint:** US-5 is demoable: buildable stories and the critical path match a hand-computed answer.
 
-**Verify:** `npm test -- graph-paths` passes.
+**Verify:** `npm test -- graph-paths` passes. ✓ passed
 
 ## Phase 8 — User story US-6  (priority: P2)
 

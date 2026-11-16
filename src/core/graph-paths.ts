@@ -62,3 +62,49 @@ export function blockersOf(graph: DependencyGraph, key: string): Blocker[] {
 export function buildable(graph: DependencyGraph): StoryNode[] {
   return graph.nodes.filter((n) => !isDone(n) && blockersOf(graph, n.key).length === 0);
 }
+
+/**
+ * FR-013: the longest chain of not-done stories, in dependency order (a story's prerequisite comes
+ * before it). Only edges between not-done stories on the acyclic part of the graph count: done stories
+ * are no longer in the way, and stories on a cycle have no order. Ties go to the earliest node in graph
+ * order (feature, then declaration), at every step, so the answer is stable across runs.
+ */
+export function criticalPath(graph: DependencyGraph): StoryNode[] {
+  const { byKey, edgesFrom } = indexOf(graph);
+  const onCycle = new Set(graph.cycles.flatMap((c) => c.stories));
+  const order = new Map(graph.nodes.map((n, i) => [n.key, i]));
+  const open = (key: string): boolean => !isDone(byKey.get(key)) && !onCycle.has(key);
+
+  // length[k] = the longest chain that ends at k; via[k] = the prerequisite that chain comes through.
+  const length = new Map<string, number>();
+  const via = new Map<string, string | null>();
+  const visit = (key: string): number => {
+    const known = length.get(key);
+    if (known !== undefined) return known;
+    let best = 0;
+    let from: string | null = null;
+    for (const e of edgesFrom.get(key) ?? []) {
+      if (!open(e.to)) continue;
+      const len = visit(e.to);
+      if (len > best || (len === best && from !== null && (order.get(e.to) ?? 0) < (order.get(from) ?? 0))) {
+        best = len;
+        from = e.to;
+      }
+    }
+    length.set(key, best + 1);
+    via.set(key, from);
+    return best + 1;
+  };
+
+  let end: string | null = null;
+  for (const n of graph.nodes) {
+    if (!open(n.key)) continue;
+    if (end === null || visit(n.key) > (length.get(end) ?? 0)) end = n.key;
+  }
+  const chain: StoryNode[] = [];
+  for (let k: string | null = end; k !== null; k = via.get(k) ?? null) {
+    const node = byKey.get(k);
+    if (node) chain.push(node);
+  }
+  return chain.reverse();
+}

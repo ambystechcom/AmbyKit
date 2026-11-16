@@ -121,7 +121,7 @@ so that I can order work and spot the bottleneck.
   hand-computed answer.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given the graph, When buildable stories are requested, Then they are the not-done stories whose
