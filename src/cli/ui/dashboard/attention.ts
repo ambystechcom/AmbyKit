@@ -14,10 +14,7 @@ export function attentionLines(caps: Capabilities, items: AttentionItem[], curso
   if (items.length === 0) return [paintToken(caps, TOKENS.semantic.color.muted, EMPTY)];
   const keyWidth = Math.max(...items.map((i) => i.key.length));
   return items.map((item, i) => {
-    // Feature 020 kinds (`task-blocked`, `verify-failed`) get their own token entries in the dashboard tokens;
-    // until a kind has one it renders like `blocked`, so an unknown kind never crashes the panel.
-    const kinds = a as unknown as Record<string, { symbol: Parameters<typeof glyph>[1]; fg: Parameters<typeof paintToken>[1] } | undefined>;
-    const kind = kinds[item.kind] ?? a.blocked;
+    const kind = a[item.kind];
     const mark = cursor === undefined ? "" : i === cursor ? `${paintToken(caps, TOKENS.component.row["cursor-fg"], glyph(caps, TOKENS.component.row.cursor))} ` : "  ";
     return (
       mark +
