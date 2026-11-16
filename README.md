@@ -145,6 +145,7 @@ target is a thin `BaseEmitter` subclass.
 | `ambykit sync` | Re-emit all configured tools from the neutral source |
 | `ambykit dashboard [story-id]` | Progress view over the story/task graph |
 | `ambykit analyze` | Validate the dependency graph (cycles, blockers, orphans) and lane file ownership |
+| `ambykit graph [feature]` | Print the story and feature dependency graph (`--json`, `--mermaid`); broken edges and cycles exit 1 |
 | `ambykit check` | Doctor: verify integrations |
 | `ambykit restore [file]` | Restore an agent-doc file from its `.amby/backups/` backup |
 | `ambykit update` | Update the CLI to the latest, then refresh this project's prompts |

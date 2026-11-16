@@ -54,6 +54,18 @@ config load/save, emitter resolution, tool detection, logging, error handling, a
 Subclasses: `InitCommand`, `AddCommand`, `SyncCommand`, `CheckCommand`, `RestoreCommand`,
 `UpgradeCommand`, `DashboardCommand`.
 
+## One dependency graph
+
+Story and feature dependencies are read once and resolved once. `parseStories` reads the `depends-on` and
+`blocked-by` lines; `buildGraph` (`src/core/graph.ts`) turns every feature's stories into one pure,
+deterministic graph of story nodes, story edges (`depends-on` and `blocked-by` kept apart), feature edges
+derived from them, broken edges and cycles. `analyze`, the dashboard's attention list and story detail,
+`ambykit graph`, and later the run scheduler and the MCP server all read dependencies from that graph and
+never parse specs themselves; a guard test keeps it that way. Questions asked of the graph (which stories
+are buildable, what blocks a story, the critical path) live in `graph-paths.ts`, and the text, JSON and
+Mermaid formats in `graph-format.ts`. The interactive graph view loads only on the interactive dashboard,
+through a dynamic import, so one-shot and `--json` output stay inside the 1-second budget.
+
 ## Non-destructive rules merge (brownfield)
 
 Generated **command** files are AmbyKit's alone and are overwritten. **Rules files** (`AGENTS.md`,

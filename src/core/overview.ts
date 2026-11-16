@@ -1,4 +1,6 @@
-import { canonicalStoryId, type StoryProgress, type TaskLine } from "./dashboard.js";
+import type { StoryProgress, TaskLine } from "./dashboard.js";
+import { buildGraph, nodeKey } from "./graph.js";
+import type { StoryEdge } from "./graph-types.js";
 import {
   STATUS_ORDER,
   type AttentionItem,
@@ -165,70 +167,27 @@ export function storyLabel(f: FeatureSnapshot, s: StoryProgress): string {
   return `${f.displayRef}:${s.displayId}`;
 }
 
-interface Node {
-  feature: FeatureSnapshot;
-  story: StoryProgress;
-}
-
-/**
- * Index stories by a collision-safe key (`dir:id`). `StoryProgress.key` uses the feature number,
- * which two `008-*` features share, so the overview keys by directory instead.
- */
-function indexStories(features: FeatureSnapshot[]): Map<string, Node> {
-  const index = new Map<string, Node>();
-  for (const feature of features) {
-    for (const story of feature.stories) index.set(`${feature.dir}:${story.id}`, { feature, story });
-  }
-  return index;
-}
-
-/** Resolve a dependency to a node key: bare ids stay in the story's feature; `NNN:US-1` targets NNN. */
-function resolveDep(features: FeatureSnapshot[], from: FeatureSnapshot, dep: string): string {
-  const qualified = /^(\d+)[:/]?(US\d+)$/.exec(canonicalStoryId(dep));
-  if (qualified) {
-    const target = features.find((f) => f.ref === qualified[1]);
-    return `${target?.dir ?? qualified[1]}:${qualified[2]}`;
-  }
-  return `${from.dir}:${canonicalStoryId(dep)}`;
-}
-
-/** How a dependency target reads from the referencing story: local id, or qualified when cross-feature. */
-function depLabel(from: FeatureSnapshot, target: Node | undefined, dep: string): string {
-  if (!target) return prettyId(dep);
-  return target.feature.dir === from.dir ? target.story.displayId : storyLabel(target.feature, target.story);
-}
-
-/** Keys of every node that sits on a dependency cycle (DFS with coloring). */
-function cycleKeys(index: Map<string, Node>, edges: (n: Node) => string[]): Set<string> {
-  const color = new Map<string, number>();
-  const stack: string[] = [];
-  const onCycle = new Set<string>();
-  const visit = (key: string): void => {
-    color.set(key, 1);
-    stack.push(key);
-    for (const next of edges(index.get(key)!)) {
-      if (!index.has(next)) continue;
-      const c = color.get(next) ?? 0;
-      if (c === 1) for (const k of stack.slice(stack.indexOf(next))) onCycle.add(k);
-      else if (c === 0) visit(next);
-    }
-    stack.pop();
-    color.set(key, 2);
-  };
-  for (const key of index.keys()) if (!color.has(key)) visit(key);
-  return onCycle;
-}
-
 /**
  * Attention items for the scoped stories (FR-007, FR-008, I-4): graph problems first, then blocked
  * (status `blocked` or a `blocked-by` target not done — done blockers are dropped), then waiting (a
  * `depends-on` target not done). Each story appears once, in its highest-ranked kind.
  */
 export function attentionItems(all: FeatureSnapshot[], scoped: FeatureSnapshot[]): AttentionItem[] {
-  const index = indexStories(all);
-  const deps = (n: Node, list: string[]): string[] => list.map((d) => resolveDep(all, n.feature, d));
-  const onCycle = cycleKeys(index, (n) => deps(n, [...n.story.dependsOn, ...n.story.blockedBy]));
-  const isDone = (key: string): boolean => index.get(key)?.story.status === "done";
+  // Dependencies come from the shared graph (feature 023): this function only ranks them.
+  const graph = buildGraph(all);
+  const nodes = new Map(graph.nodes.map((n) => [n.key, n]));
+  const edgesFrom = new Map<string, StoryEdge[]>();
+  for (const e of graph.edges) edgesFrom.set(e.from, [...(edgesFrom.get(e.from) ?? []), e]);
+  const brokenFrom = new Map<string, typeof graph.broken>();
+  for (const b of graph.broken) brokenFrom.set(b.from, [...(brokenFrom.get(b.from) ?? []), b]);
+  const onCycle = new Set(graph.cycles.flatMap((c) => c.stories));
+  const isDone = (key: string): boolean => nodes.get(key)?.status === "done";
+  /** How a dependency target reads from the referencing story: local id, or qualified when cross-feature. */
+  const labelOf = (from: FeatureSnapshot, key: string): string => {
+    const n = nodes.get(key);
+    if (!n) return key;
+    return n.feature === from.dir ? n.story : n.id;
+  };
 
   const problems: AttentionItem[] = [];
   const blocked: AttentionItem[] = [];
@@ -258,32 +217,27 @@ export function attentionItems(all: FeatureSnapshot[], scoped: FeatureSnapshot[]
     for (const story of feature.stories) {
       if (story.status === "done") continue;
       const key = storyLabel(feature, story);
-      const node = { feature, story };
-      const label = (dep: string): string => depLabel(feature, index.get(resolveDep(all, feature, dep)), dep);
+      const self = nodeKey(feature.dir, story.id);
+      const edges = edgesFrom.get(self) ?? [];
 
-      const refs = [
-        ...story.dependsOn.map((dep) => ({ field: "depends-on", dep })),
-        ...story.blockedBy.map((dep) => ({ field: "blocked-by", dep })),
-      ];
-      const unknown = refs.filter((r) => !index.has(resolveDep(all, feature, r.dep)));
+      const unknown = brokenFrom.get(self) ?? [];
       if (unknown.length > 0) {
         problems.push({
           key,
           kind: "graph-problem",
-          refs: unknown.map((r) => prettyId(r.dep)),
-          reason: `${unknown.map((r) => `${r.field} ${prettyId(r.dep)}`).join(", ")} — unknown story`,
+          refs: unknown.map((b) => prettyId(b.to)),
+          reason: `${unknown.map((b) => `${b.kind} ${prettyId(b.to)}`).join(", ")} — unknown story`,
         });
         continue;
       }
-      const selfKey = `${feature.dir}:${story.id}`;
-      if (onCycle.has(selfKey)) {
-        const refs = deps(node, [...story.dependsOn, ...story.blockedBy])
-          .filter((k) => onCycle.has(k))
-          .map((k) => depLabel(feature, index.get(k), k));
+      if (onCycle.has(self)) {
+        const refs = edges.filter((e) => onCycle.has(e.to)).map((e) => labelOf(feature, e.to));
         problems.push({ key, kind: "graph-problem", refs, reason: `dependency cycle with ${refs.join(", ")}` });
         continue;
       }
-      const openBlockers = story.blockedBy.filter((d) => !isDone(resolveDep(all, feature, d))).map(label);
+      const openBlockers = edges
+        .filter((e) => e.kind === "blocked-by" && !isDone(e.to))
+        .map((e) => labelOf(feature, e.to));
       if (story.status === "blocked" || openBlockers.length > 0) {
         blocked.push({
           key,
@@ -293,7 +247,9 @@ export function attentionItems(all: FeatureSnapshot[], scoped: FeatureSnapshot[]
         });
         continue;
       }
-      const openDeps = story.dependsOn.filter((d) => !isDone(resolveDep(all, feature, d))).map(label);
+      const openDeps = edges
+        .filter((e) => e.kind === "depends-on" && !isDone(e.to))
+        .map((e) => labelOf(feature, e.to));
       if (openDeps.length > 0) {
         waiting.push({ key, kind: "waiting", refs: openDeps, reason: `waiting on ${openDeps.join(", ")}` });
       }

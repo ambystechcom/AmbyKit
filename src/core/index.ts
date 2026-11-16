@@ -10,3 +10,8 @@ export * from "./test-design.js";
 export * from "./git.js";
 export * from "./worktree.js";
 export * from "./roles.js";
+export * from "./graph-types.js";
+export * from "./graph.js";
+export * from "./graph-paths.js";
+export * from "./graph-scope.js";
+export * from "./graph-format.js";
