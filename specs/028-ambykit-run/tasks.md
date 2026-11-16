@@ -23,15 +23,15 @@ created: 2026-11-16
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T010] [P] Run bootstrap over spec 025's run store: create `<feature>.<n>` only on explicit request, read and update run.json through `updateRun`, rebuild from `tasks.md` through 025; add only 028's own supervision files (`lanes/`, `events.jsonl`, `prompts/`) through 025's helpers; no local run-id or state-file code (src/cli/run-files.ts, test/cli/run-files.test.ts)
-- [ ] [T011] [P] Runner registry: `RunnerSpec` with claude and codex entries, `verified: false`, invocation fields marked "to verify on a live install" (src/core/runners.ts, test/core/runners.test.ts)
-- [ ] [T012] [P] `buildLanePrompt`: task IDs, `@path` artifact references and file ownership only (src/core/run-prompt.ts, test/core/run-prompt.test.ts)
-- [ ] [T013] [P] Extract the check-off-aware lane merge from `LaneCommand` into core with a structured per-lane result; `lane merge` behaviour unchanged (src/core/lane-merge.ts, src/cli/lane.ts, test/core/lane-merge.test.ts)
-- [ ] [T014] [P] Pure scheduler `nextToStart`: total cap and per-type cap from `fleet.concurrency`, stable order; may use spec 023's `buildGraph` for cross-story `depends-on` (src/core/run-schedule.ts, test/core/run-schedule.test.ts)
-- [ ] [T015] [P] Pure supervision rules: restart limit, reassignment gate, budget decision; stall comes from spec 025's `laneStatus` (waiting/blocked exempt), with no stall logic of its own (src/core/run-supervise.ts, test/core/run-supervise.test.ts)
-- [ ] [T016] [P] Process edge: spawn, signal, wait and liveness behind an injectable interface; Windows executable resolution (src/cli/run-process.ts, test/cli/run-process.test.ts)
-- [ ] [T017] [P] `RunCommand` skeleton: flags, experimental label, project/feature/lane checks; register in the verb list (src/cli/run.ts, src/cli/index.ts, test/cli/run-skeleton.test.ts)
-- **Verify:** `npm run typecheck && npx vitest run test/core test/cli/run-process.test.ts test/cli/run-skeleton.test.ts test/cli/lane.test.ts test/cli/lane-merge.test.ts` — existing lane tests still pass after T013.
+- [x] [T010] [P] Run bootstrap over spec 025's run store: create `<feature>.<n>` only on explicit request, read and update run.json through `updateRun`, rebuild from `tasks.md` through 025; add only 028's own supervision files (`lanes/`, `events.jsonl`, `prompts/`) through 025's helpers; no local run-id or state-file code (src/cli/run-files.ts, test/cli/run-files.test.ts)
+- [x] [T011] [P] Runner registry: `RunnerSpec` with claude and codex entries, `verified: false`, invocation fields marked "to verify on a live install" (src/core/runners.ts, test/core/runners.test.ts)
+- [x] [T012] [P] `buildLanePrompt`: task IDs, `@path` artifact references and file ownership only (src/core/run-prompt.ts, test/core/run-prompt.test.ts)
+- [x] [T013] [P] Extract the check-off-aware lane merge from `LaneCommand` into core with a structured per-lane result; `lane merge` behaviour unchanged (src/core/lane-merge.ts, src/cli/lane.ts, test/core/lane-merge.test.ts)
+- [x] [T014] [P] Pure scheduler `nextToStart`: total cap and per-type cap from `fleet.concurrency`, stable order; may use spec 023's `buildGraph` for cross-story `depends-on` (src/core/run-schedule.ts, test/core/run-schedule.test.ts)
+- [x] [T015] [P] Pure supervision rules: restart limit, reassignment gate, budget decision; stall comes from spec 025's `laneStatus` (waiting/blocked exempt), with no stall logic of its own (src/core/run-supervise.ts, test/core/run-supervise.test.ts)
+- [x] [T016] [P] Process edge: spawn, signal, wait and liveness behind an injectable interface; Windows executable resolution (src/cli/run-process.ts, test/cli/run-process.test.ts)
+- [x] [T017] [P] `RunCommand` skeleton: flags, experimental label, project/feature/lane checks; register in the verb list (src/cli/run.ts, src/cli/index.ts, test/cli/run-skeleton.test.ts)
+- **Verify:** `npm run typecheck && npx vitest run test/core test/cli/run-process.test.ts test/cli/run-skeleton.test.ts test/cli/lane.test.ts test/cli/lane-merge.test.ts` — existing lane tests still pass after T013. ✓ passed
 - **Checkpoint:** foundation compiles, pure rules are unit-tested, `ambykit run --help` shows the experimental label.
 
 ## Phase 3 — User story US-1  (priority: P1)
