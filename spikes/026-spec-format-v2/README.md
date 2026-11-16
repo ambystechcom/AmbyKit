@@ -20,6 +20,10 @@ node spikes/026-spec-format-v2/measure.mjs                   # US-3: token table
 bash spikes/026-spec-format-v2/lanes-merge.sh                # US-3: lane merge experiment
 ```
 
+`run-us2.mjs` builds the scratch copies under `work/` (git-ignored; delete it when done: it holds copies of `specs/`).
+`run-cli-check.mjs` needs those copies and runs in the OS temp directory. Run order: `baseline`, `run-fixtures`,
+`run-real-v1`, `run-us2`, `measure`, `lanes-merge.sh`, `run-cli-check`.
+
 `migrate.mjs` only ever writes inside the directory it is given. The experiments give it a temporary
 copy of `specs/` (the real tree is never modified). Results are written to `results/`.
 

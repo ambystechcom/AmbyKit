@@ -54,14 +54,14 @@ created: 2026-11-16
 
 ## Phase 6 — User story US-4  (priority: P1)
 
-- [ ] [T050] [US4] Write the decision with numbered decision IDs: chosen format and block layout, evidence by reference, risks to dashboard, analyze and the plugin API with how each is covered, and what specs 027 and 030 may assume (specs/026-spec-format-v2-spike/decision.md)
-- [ ] [T051] [US4] Cross-check the decision against spec 020 markers and the data spec 024 reads, and record any gap in the decision (specs/026-spec-format-v2-spike/decision.md)
-- [ ] [T052] [US4] Day-5 gate: if any task above is unfinished, write the partial findings and the unanswered questions into the decision and ask a person whether to extend (specs/026-spec-format-v2-spike/decision.md)
+- [x] [T050] [US4] Write the decision with numbered decision IDs: chosen format and block layout, evidence by reference, risks to dashboard, analyze and the plugin API with how each is covered, and what specs 027 and 030 may assume (specs/026-spec-format-v2-spike/decision.md)
+- [x] [T051] [US4] Cross-check the decision against spec 020 markers and the data spec 024 reads, and record any gap in the decision (specs/026-spec-format-v2-spike/decision.md)
+- [x] [T052] [US4] Day-5 gate: if any task above is unfinished, write the partial findings and the unanswered questions into the decision and ask a person whether to extend (specs/026-spec-format-v2-spike/decision.md)
 - **Checkpoint:** US-4 is demoable: specs 027 and 030 can cite decision IDs and start.
-- **Verify:** decision.md states the format, lists each risk with its coverage, says what 027 and 030 may assume, and every decision ID is unique.
+- **Verify:** decision.md states the format, lists each risk with its coverage, says what 027 and 030 may assume, and every decision ID is unique. ✓ passed
 
 ## Phase 7 — Polish
 
-- [ ] [T090] Confirm no shipped output changed: typecheck and the full test suite pass and the only changed paths are under `spikes/` and this spec directory (spikes/026-spec-format-v2/results/final-check.txt)
-- [ ] [T091] Delete the temporary specs copy and keep only results and scripts (spikes/026-spec-format-v2/work/)
-- **Verify:** `npm run typecheck` and `npm test` pass and `git status` lists nothing outside `spikes/026-spec-format-v2/` and `specs/026-spec-format-v2-spike/`.
+- [x] [T090] Confirm no shipped output changed: typecheck and the full test suite pass and the only changed paths are under `spikes/` and this spec directory (spikes/026-spec-format-v2/results/final-check.txt)
+- [x] [T091] Delete the temporary specs copy and keep only results and scripts (spikes/026-spec-format-v2/work/)
+- **Verify:** `npm run typecheck` and `npm test` pass and `git status` lists nothing outside `spikes/026-spec-format-v2/` and `specs/026-spec-format-v2-spike/`. ✓ passed

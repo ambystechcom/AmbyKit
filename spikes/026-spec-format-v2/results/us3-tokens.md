@@ -33,18 +33,18 @@ Tokens are approximated as characters / 4 (no tokenizer dependency). Words are w
 
 | Format | spec.md tokens | tasks.md tokens | total tokens | vs v1 |
 |---|---:|---:|---:|---:|
-| v1 | 71990 | 40852 | 112842 | — |
-| v2 phase layout | 72130 | 44371 | 116501 | +3.2% |
-| v2 task layout | 72130 | 47250 | 119380 | +5.8% |
-| v2 phase + dual-write | 74184 | 52455 | 126639 | +12.2% |
+| v1 | 71991 | 40857 | 112848 | — |
+| v2 phase layout | 72130 | 44379 | 116509 | +3.2% |
+| v2 task layout | 72130 | 47258 | 119388 | +5.8% |
+| v2 phase + dual-write | 74183 | 52468 | 126651 | +12.2% |
 
 ## Where the tokens go
 
-- Story metadata: v1 stores it as bullets in prose (1962 tokens across all specs); v2 stores it in the frontmatter `stories:` block (2072 tokens). Net change: +5.6%.
-- Machine blocks in tasks.md (phase layout): 11490 tokens of 44371 (25.9% of the v2 tasks files).
+- Story metadata: v1 stores it as bullets in prose (1961 tokens across all specs); v2 stores it in the frontmatter `stories:` block (2071 tokens). Net change: +5.6%.
+- Machine blocks in tasks.md (phase layout): 11498 tokens of 44379 (25.9% of the v2 tasks files).
 
 ## Can an assistant load less in v2?
 
-- **Spec metadata only:** the whole frontmatter is 3222 tokens across all specs, against 71990 for the v1 spec.md files that an assistant must read in full to find the same bullets: 4.5% of the cost. Per spec, frontmatter-only is a bounded read of the first ~26 lines on average.
-- **Tasks:** ownership blocks sit inside their phase, so a reader that wants one phase still reads that phase; a reader that wants only ownership (lane planning) can read the 11490-token blocks rather than 44371, but only with a block-aware reader (a tool, not an assistant with a plain file read).
+- **Spec metadata only:** the whole frontmatter is 3223 tokens across all specs, against 71991 for the v1 spec.md files that an assistant must read in full to find the same bullets: 4.5% of the cost. Per spec, frontmatter-only is a bounded read of the first ~26 lines on average.
+- **Tasks:** ownership blocks sit inside their phase, so a reader that wants one phase still reads that phase; a reader that wants only ownership (lane planning) can read the 11498-token blocks rather than 44379, but only with a block-aware reader (a tool, not an assistant with a plain file read).
 

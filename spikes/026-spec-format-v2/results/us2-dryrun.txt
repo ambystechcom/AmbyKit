@@ -1,4 +1,4 @@
-== dry-run, layout=phase (tree hash before 7d45b353fc203fbe)
+== dry-run, layout=phase (tree hash before 7b30b2d6d0c7a975)
   converted  001-core-and-claude-emitter/spec.md  +12 -9
   converted  001-core-and-claude-emitter/tasks.md  +56 -16
   converted  002-copilot-emitters/spec.md  +8 -6
@@ -50,11 +50,11 @@
   converted  024-trace/spec.md  +26 -21
   converted  024-trace/tasks.md  +142 -53
   converted  026-spec-format-v2-spike/spec.md  +16 -12
-  converted  026-spec-format-v2-spike/tasks.md  +88 -32
+  converted  026-spec-format-v2-spike/tasks.md  +91 -32
   52 converted, 0 unchanged, 0 skipped (left untouched)
-PASS  dry-run wrote nothing: tree hash 7d45b353fc203fbe -> 7d45b353fc203fbe
+PASS  dry-run wrote nothing: tree hash 7b30b2d6d0c7a975 -> 7b30b2d6d0c7a975
 
-== dry-run, layout=task (tree hash before 7d45b353fc203fbe)
+== dry-run, layout=task (tree hash before 7b30b2d6d0c7a975)
   converted  001-core-and-claude-emitter/spec.md  +12 -9
   converted  001-core-and-claude-emitter/tasks.md  +64 -16
   converted  002-copilot-emitters/spec.md  +8 -6
@@ -106,11 +106,11 @@ PASS  dry-run wrote nothing: tree hash 7d45b353fc203fbe -> 7d45b353fc203fbe
   converted  024-trace/spec.md  +26 -21
   converted  024-trace/tasks.md  +221 -53
   converted  026-spec-format-v2-spike/spec.md  +16 -12
-  converted  026-spec-format-v2-spike/tasks.md  +131 -32
+  converted  026-spec-format-v2-spike/tasks.md  +134 -32
   52 converted, 0 unchanged, 0 skipped (left untouched)
-PASS  dry-run wrote nothing: tree hash 7d45b353fc203fbe -> 7d45b353fc203fbe
+PASS  dry-run wrote nothing: tree hash 7b30b2d6d0c7a975 -> 7b30b2d6d0c7a975
 
-== dry-run, layout=phase-dual (tree hash before 7d45b353fc203fbe)
+== dry-run, layout=phase-dual (tree hash before 7b30b2d6d0c7a975)
   converted  001-core-and-claude-emitter/spec.md  +12 -0
   converted  001-core-and-claude-emitter/tasks.md  +40 -0
   converted  002-copilot-emitters/spec.md  +8 -0
@@ -162,8 +162,8 @@ PASS  dry-run wrote nothing: tree hash 7d45b353fc203fbe -> 7d45b353fc203fbe
   converted  024-trace/spec.md  +26 -0
   converted  024-trace/tasks.md  +98 -0
   converted  026-spec-format-v2-spike/spec.md  +16 -0
-  converted  026-spec-format-v2-spike/tasks.md  +63 -0
+  converted  026-spec-format-v2-spike/tasks.md  +66 -0
   52 converted, 0 unchanged, 0 skipped (left untouched)
-PASS  dry-run wrote nothing: tree hash 7d45b353fc203fbe -> 7d45b353fc203fbe
+PASS  dry-run wrote nothing: tree hash 7b30b2d6d0c7a975 -> 7b30b2d6d0c7a975
 
 PASS  the real specs/ tree is unchanged by this whole script (hash identical at start and now)

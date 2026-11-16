@@ -2,7 +2,7 @@
 feature: 026-spec-format-v2-spike          # NNN-slug
 title: Spec format v2 spike
 branch: 026-spec-format-v2-spike
-status: ready                     # draft | ready | in-progress | blocked | done
+status: done                     # draft | ready | in-progress | blocked | done
 created: 2026-11-12
 ---
 
@@ -46,7 +46,7 @@ the same model, so that I know the dashboard and analyzer can read both during t
   identical stories, statuses, dependencies and task ownership.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a 1.x spec and tasks file, When the prototype reads it, Then it produces the model that
@@ -67,7 +67,7 @@ previewed, so that real migration in 2.0 carries little risk.
   summary and no file changes; run it twice for real and confirm the second run changes nothing.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given AmbyKit's own `specs/`, When the prototype runs with `--dry-run`, Then it prints a diff summary
@@ -90,7 +90,7 @@ help machines does not cost assistants or people more to read (Principle 3).
   record a short readability judgment.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a sample of existing specs, When both formats are measured, Then the token difference per file
@@ -110,7 +110,7 @@ spec v2 target the final shape and nothing is frozen too early.
   what 027 and 030 may now assume.
 - **depends-on:** [US-1, US-2, US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given the spike is complete, When the decision is read, Then it states the format to adopt, or a

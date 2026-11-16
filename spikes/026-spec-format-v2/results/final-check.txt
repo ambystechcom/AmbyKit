@@ -1,0 +1,14 @@
+# T090 final check (2026-11-16T22:12Z)
+
+## npm run typecheck
+> @ambystech/ambykit@1.4.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+## npm test
+ Test Files  149 passed (149)
+      Tests  1024 passed (1024)
+
+## git: paths changed vs release/1.4.0
+specs/026-spec-format-v2-spike/*
+spikes/026-spec-format-v2/*

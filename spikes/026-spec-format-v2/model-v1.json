@@ -11754,7 +11754,7 @@
   "meta": {
    "feature": "026-spec-format-v2-spike",
    "title": "Spec format v2 spike",
-   "status": "ready"
+   "status": "in-progress"
   },
   "stories": [
    {
@@ -11762,7 +11762,7 @@
     "displayId": "US-1",
     "title": "Prove both formats can be read side by side",
     "priority": "P1",
-    "status": "draft",
+    "status": "done",
     "dependsOn": [],
     "blockedBy": []
    },
@@ -11771,7 +11771,7 @@
     "displayId": "US-2",
     "title": "Prove migration is safe",
     "priority": "P1",
-    "status": "draft",
+    "status": "done",
     "dependsOn": [
      "US1"
     ],
@@ -11782,7 +11782,7 @@
     "displayId": "US-3",
     "title": "Measure token and readability cost",
     "priority": "P2",
-    "status": "draft",
+    "status": "done",
     "dependsOn": [
      "US1"
     ],
@@ -11793,7 +11793,7 @@
     "displayId": "US-4",
     "title": "Deliver a decision others can build on",
     "priority": "P1",
-    "status": "draft",
+    "status": "done",
     "dependsOn": [
      "US1",
      "US2",
@@ -11805,7 +11805,7 @@
   "tasks": [
    {
     "id": "T001",
-    "done": false,
+    "done": true,
     "story": null,
     "description": "Create the scratch directory with a README stating how to run it and that nothing here ships",
     "phase": 1,
@@ -11816,7 +11816,7 @@
    },
    {
     "id": "T002",
-    "done": false,
+    "done": true,
     "story": null,
     "description": "Build the repo and confirm `dist/core/dashboard.js` imports from a plain `.mjs`; record the Node version",
     "phase": 1,
@@ -11827,7 +11827,7 @@
    },
    {
     "id": "T003",
-    "done": false,
+    "done": true,
     "story": null,
     "description": "Inventory every reader of status, depends-on, blocked-by and trailing file paths in `src/core` and `src/cli`, with file and line",
     "phase": 1,
@@ -11838,7 +11838,7 @@
    },
    {
     "id": "T010",
-    "done": false,
+    "done": true,
     "story": null,
     "description": "Define the one comparable model: feature meta, stories, tasks with paths and phase verify, plus the format used per file",
     "phase": 2,
@@ -11849,7 +11849,7 @@
    },
    {
     "id": "T011",
-    "done": false,
+    "done": true,
     "story": null,
     "description": "Write the baseline script that builds the v1 model for every spec through the built `parseStories` and `parseTasks`",
     "phase": 2,
@@ -11861,7 +11861,7 @@
    },
    {
     "id": "T012",
-    "done": false,
+    "done": true,
     "story": null,
     "description": "Write the compare script: structural model diff that lists every differing field with its location",
     "phase": 2,
@@ -11872,7 +11872,7 @@
    },
    {
     "id": "T013",
-    "done": false,
+    "done": true,
     "story": null,
     "description": "Hand-write v2 fixtures and v1 twins for the spec edge cases: cross-feature story link, clarification marker, CRLF, unusual path characters, malformed block, mixed formats",
     "phase": 2,
@@ -11883,7 +11883,7 @@
    },
    {
     "id": "T020",
-    "done": false,
+    "done": true,
     "story": "US1",
     "description": "Implement the v2 reader: frontmatter through gray-matter, fenced yaml blocks through its yaml engine, errors carrying file and line",
     "phase": 3,
@@ -11894,7 +11894,7 @@
    },
    {
     "id": "T021",
-    "done": false,
+    "done": true,
     "story": "US1",
     "description": "Implement the dispatcher that detects v1 or v2 per file and reports which parts of a mixed feature used which format",
     "phase": 3,
@@ -11905,7 +11905,7 @@
    },
    {
     "id": "T022",
-    "done": false,
+    "done": true,
     "story": "US1",
     "description": "Run the reader over every fixture pair: twins give identical models and malformed inputs report their location",
     "phase": 3,
@@ -11916,7 +11916,7 @@
    },
    {
     "id": "T023",
-    "done": false,
+    "done": true,
     "story": "US1",
     "description": "Run the reader over every real spec as v1 and compare with the baseline model",
     "phase": 3,
@@ -11927,7 +11927,7 @@
    },
    {
     "id": "T030",
-    "done": false,
+    "done": true,
     "story": "US2",
     "description": "Implement migrate v1 to v2 for spec.md and tasks.md with the per-phase block layout, a dry-run diff summary, and skip-and-list for specs it cannot convert safely",
     "phase": 4,
@@ -11938,7 +11938,7 @@
    },
    {
     "id": "T031",
-    "done": false,
+    "done": true,
     "story": "US2",
     "description": "Add the per-task block layout as a second migrate option",
     "phase": 4,
@@ -11949,7 +11949,7 @@
    },
    {
     "id": "T032",
-    "done": false,
+    "done": true,
     "story": "US2",
     "description": "Dry-run over a temporary copy of `specs/` and prove nothing was written by hashing the tree before and after",
     "phase": 4,
@@ -11960,7 +11960,7 @@
    },
    {
     "id": "T033",
-    "done": false,
+    "done": true,
     "story": "US2",
     "description": "Run migrate twice for real on the copy and prove the second run changes nothing and prose lines are unchanged",
     "phase": 4,
@@ -11971,7 +11971,7 @@
    },
    {
     "id": "T034",
-    "done": false,
+    "done": true,
     "story": "US2",
     "description": "Read the converted copy in both layouts and compare with the baseline model",
     "phase": 4,
@@ -11982,7 +11982,7 @@
    },
    {
     "id": "T035",
-    "done": false,
+    "done": true,
     "story": "US2",
     "description": "Run the current built parsers on the converted copy and record, per field, whether 1.x can still read it",
     "phase": 4,
@@ -11993,7 +11993,7 @@
    },
    {
     "id": "T040",
-    "done": false,
+    "done": true,
     "story": "US3",
     "description": "Count characters, words and approximate tokens for at least three specs in v1, per-phase layout and per-task layout, and tabulate",
     "phase": 5,
@@ -12005,7 +12005,7 @@
    },
    {
     "id": "T041",
-    "done": false,
+    "done": true,
     "story": "US3",
     "description": "Lane-merge experiment on a temporary git repo: two branches tick different tasks and edit different blocks, then merge, for each layout",
     "phase": 5,
@@ -12017,7 +12017,7 @@
    },
    {
     "id": "T042",
-    "done": false,
+    "done": true,
     "story": "US3",
     "description": "Read the three converted samples and write the readability note: where prose or data hurt, and whether an assistant can load less than in 1.x",
     "phase": 5,
@@ -12028,7 +12028,7 @@
    },
    {
     "id": "T050",
-    "done": false,
+    "done": true,
     "story": "US4",
     "description": "Write the decision with numbered decision IDs: chosen format and block layout, evidence by reference, risks to dashboard, analyze and the plugin API with how each is covered, and what specs 027 and 030 may assume",
     "phase": 6,
@@ -12039,7 +12039,7 @@
    },
    {
     "id": "T051",
-    "done": false,
+    "done": true,
     "story": "US4",
     "description": "Cross-check the decision against spec 020 markers and the data spec 024 reads, and record any gap in the decision",
     "phase": 6,
@@ -12050,7 +12050,7 @@
    },
    {
     "id": "T052",
-    "done": false,
+    "done": true,
     "story": "US4",
     "description": "Day-5 gate: if any task above is unfinished, write the partial findings and the unanswered questions into the decision and ask a person whether to extend",
     "phase": 6,
@@ -12088,6 +12088,7 @@
     "title": "Phase 1 — Setup  (day 1)",
     "tasks": 3,
     "check": "README states the not-shipped rule, `node -e \"import('./dist/core/dashboard.js')\"` exits 0, and INVENTORY lists each reader with file and line.",
+    "result": "passed",
     "duplicates": 0
    },
    {
@@ -12095,6 +12096,7 @@
     "title": "Phase 2 — Foundational  (day 1–2, blocks all story work)",
     "tasks": 4,
     "check": "model-v1.json has an entry for every `specs/` directory that has a spec.md, and compare reports zero differences for two identical models and names the field for a mutated one.",
+    "result": "passed",
     "duplicates": 0
    },
    {
@@ -12102,6 +12104,7 @@
     "title": "Phase 3 — User story US-1  (priority: P1)",
     "tasks": 4,
     "check": "all fixture twins show zero differences, every malformed fixture prints a file and line, and every real v1 spec compares identical to model-v1.json.",
+    "result": "passed",
     "duplicates": 0
    },
    {
@@ -12109,6 +12112,7 @@
     "title": "Phase 4 — User story US-2  (priority: P1)",
     "tasks": 6,
     "check": "the dry-run tree hash is unchanged, the second real run produces an empty diff, every v2 model equals the baseline or each difference is listed, and every skipped spec is listed untouched.",
+    "result": "passed",
     "duplicates": 0
    },
    {
@@ -12116,6 +12120,7 @@
     "title": "Phase 5 — User story US-3  (priority: P2)",
     "tasks": 3,
     "check": "the token table covers at least three specs in all three formats, the merge note says clean or conflicted for each layout, and the readability note answers whether less can be loaded.",
+    "result": "passed",
     "duplicates": 0
    },
    {
@@ -12123,6 +12128,7 @@
     "title": "Phase 6 — User story US-4  (priority: P1)",
     "tasks": 3,
     "check": "decision.md states the format, lists each risk with its coverage, says what 027 and 030 may assume, and every decision ID is unique.",
+    "result": "passed",
     "duplicates": 0
    },
    {

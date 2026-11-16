@@ -50,9 +50,9 @@
   converted  024-trace/spec.md  +26 -21
   converted  024-trace/tasks.md  +142 -53
   converted  026-spec-format-v2-spike/spec.md  +16 -12
-  converted  026-spec-format-v2-spike/tasks.md  +88 -32
+  converted  026-spec-format-v2-spike/tasks.md  +91 -32
   52 converted, 0 unchanged, 0 skipped (left untouched)
-PASS  second run changed nothing (tree hash 6dcb704a9b28ce21 == 6dcb704a9b28ce21; 52 unchanged, 0 skipped)
+PASS  second run changed nothing (tree hash 61dc961fb4e6aff6 == 61dc961fb4e6aff6; 52 unchanged, 0 skipped)
 PASS  prose preserved: every prose line (4265 checked across converted files) still present, in order; none lost
 PASS  no foreign lines added outside frontmatter, yaml blocks and rewritten task lines (0 found)
 
@@ -108,9 +108,9 @@ PASS  no foreign lines added outside frontmatter, yaml blocks and rewritten task
   converted  024-trace/spec.md  +26 -21
   converted  024-trace/tasks.md  +221 -53
   converted  026-spec-format-v2-spike/spec.md  +16 -12
-  converted  026-spec-format-v2-spike/tasks.md  +131 -32
+  converted  026-spec-format-v2-spike/tasks.md  +134 -32
   52 converted, 0 unchanged, 0 skipped (left untouched)
-PASS  second run changed nothing (tree hash bf48e36e20f739e0 == bf48e36e20f739e0; 52 unchanged, 0 skipped)
+PASS  second run changed nothing (tree hash 7e5c518d77431664 == 7e5c518d77431664; 52 unchanged, 0 skipped)
 PASS  prose preserved: every prose line (4265 checked across converted files) still present, in order; none lost
 PASS  no foreign lines added outside frontmatter, yaml blocks and rewritten task lines (0 found)
 
@@ -166,9 +166,9 @@ PASS  no foreign lines added outside frontmatter, yaml blocks and rewritten task
   converted  024-trace/spec.md  +26 -0
   converted  024-trace/tasks.md  +98 -0
   converted  026-spec-format-v2-spike/spec.md  +16 -0
-  converted  026-spec-format-v2-spike/tasks.md  +63 -0
+  converted  026-spec-format-v2-spike/tasks.md  +66 -0
   52 converted, 0 unchanged, 0 skipped (left untouched)
-PASS  second run changed nothing (tree hash 379042e34aa5b7e6 == 379042e34aa5b7e6; 52 unchanged, 0 skipped)
+PASS  second run changed nothing (tree hash e0c796e114870119 == e0c796e114870119; 52 unchanged, 0 skipped)
 PASS  prose preserved: every prose line (4265 checked across converted files) still present, in order; none lost
 PASS  no foreign lines added outside frontmatter, yaml blocks and rewritten task lines (0 found)
 
