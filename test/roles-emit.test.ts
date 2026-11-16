@@ -29,6 +29,7 @@ describe("role binding on emitted commands (feature 013, US-1)", () => {
       clarify: "pm",
       constitution: undefined,
       converge: "qa",
+      decide: undefined,
       design: "ux",
       implement: "developer",
       plan: "architect",
@@ -102,7 +103,7 @@ describe("native persona files (feature 013, US-5, FR-009)", () => {
     const expectPersonas = (files: { path: string }[], prefix: string, suffix: string) => {
       const personas = files.filter((f) => f.path.startsWith(prefix)).map((f) => f.path).sort();
       expect(personas).toEqual(
-        ["architect", "developer", "pm", "qa", "tech-lead", "ux"].map((id) => `${prefix}amby-${id}${suffix}`),
+        ["architect", "developer", "pm", "qa", "security", "tech-lead", "ux"].map((id) => `${prefix}amby-${id}${suffix}`),
       );
     };
     expectPersonas(new ClaudeEmitter().emit(specs, ctx), ".claude/agents/", ".md");
