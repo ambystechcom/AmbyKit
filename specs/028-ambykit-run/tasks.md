@@ -16,10 +16,10 @@ created: 2026-11-16
 
 ## Phase 1 — Setup
 
-- [ ] [T001] [P] Fake headless runner: scripted exit codes, delays, hangs, task check-offs and activity markers (test/fixtures/fake-runner.mjs)
-- [ ] [T002] [P] Extend spec 025's single `fleet` config object (025 T010 owns the base: stallMinutes 15, restartLimit 2, concurrency 3/2, roundLimit 3, tickSeconds, budgets, workerModel) with 028's own keys only (stopGraceMinutes 10, runner selection); no top-level `run` object (src/core/config.ts, src/core/types.ts, test/core/config.test.ts)
-- [ ] [T003] [P] Plain import of spec 025's fleet-state modules (`src/core/fleet/*`: `updateRun`, `writeDirective`, `laneStatus`, claim and note helpers); contract test fails if an export 028 uses is missing (test/core/run-fleet-contract.test.ts)
-- **Verify:** `npm run typecheck && npx vitest run test/core/config.test.ts test/core/run-fleet-contract.test.ts`; an existing `.amby/config.json` without `fleet` still loads.
+- [x] [T001] [P] Fake headless runner: scripted exit codes, delays, hangs, task check-offs and activity markers (test/fixtures/fake-runner.mjs)
+- [x] [T002] [P] Extend spec 025's single `fleet` config object (025 T010 owns the base: stallMinutes 15, restartLimit 2, concurrency 3/2, roundLimit 3, tickSeconds, budgets, workerModel) with 028's own keys only (stopGraceMinutes 10, runner selection); no top-level `run` object (src/core/config.ts, src/core/types.ts, test/core/config.test.ts)
+- [x] [T003] [P] Plain import of spec 025's fleet-state modules (`src/core/fleet/*`: `updateRun`, `writeDirective`, `laneStatus`, claim and note helpers); contract test fails if an export 028 uses is missing (test/core/run-fleet-contract.test.ts)
+- **Verify:** `npm run typecheck && npx vitest run test/core/config.test.ts test/core/run-fleet-contract.test.ts`; an existing `.amby/config.json` without `fleet` still loads. ✓ passed
 
 ## Phase 2 — Foundational  (blocks all feature work)
 

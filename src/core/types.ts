@@ -158,6 +158,10 @@ export interface FleetConfig {
   budgets?: Record<string, number>;
   /** Model a worker runs with, when the host lets the run choose. */
   workerModel?: string;
+  /** Minutes a lane's process may stay silent after a stop or budget directive before it is terminated (028). Default 10. */
+  stopGraceMinutes?: number;
+  /** Assistants `ambykit run` may assign lanes to, in order (028). Default: the configured tools that have a runner. */
+  runners?: string[];
 }
 
 /** How a tool materializes phase prompts. */
