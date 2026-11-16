@@ -74,6 +74,8 @@ export interface FeatureSnapshot {
   clarifications: Clarification[];
   /** Feature 015: parallel lanes of this feature; absent when it has none. */
   lanes?: LaneView[];
+  /** Feature 024: requirement coverage; absent when the feature has no requirements. `uncovered` feeds the quality view. */
+  coverage?: { covered: number; total: number; uncovered: { id: string; text: string }[] };
 }
 
 export interface Filters {
@@ -110,6 +112,8 @@ export interface FeatureRow {
   blocked?: number;
   /** Feature 020: Verify lines by state; omitted when the feature has none. */
   verify?: { verified: number; failed: number; missing: number };
+  /** Feature 024: covered over total requirements; omitted when the feature has no requirements. */
+  coverage?: { covered: number; total: number };
 }
 
 export interface AttentionItem {

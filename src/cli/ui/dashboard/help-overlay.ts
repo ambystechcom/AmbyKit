@@ -20,6 +20,7 @@ const KEYS: Record<HelpScreen, [string, string, string][]> = {
     ["⏎", "enter", "open"],
     ["f", "f", "filter by feature"],
     ["s", "s", "cycle status filter"],
+    ["c", "c", "quality view (coverage, findings)"],
     ["esc", "esc", "clear filters"],
     ["r", "r", "retry live updates (when paused)"],
     ["q", "q", "quit"],
