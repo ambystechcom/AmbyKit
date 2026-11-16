@@ -67,7 +67,7 @@ created: 2026-11-16
 
 ## Phase 6 — User story US-4  (priority: P2)
 
-- [ ] [T050] [P] [US4] Report phases without a Verify line (features not yet done, grouped per feature in text) and phases whose last Verify failed, in `analyze` text and `--json`, as warnings that never change the exit status (FR-009, FR-011) (src/core/analyze.ts, src/cli/analyze.ts)
+- [x] [T050] [P] [US4] Report phases without a Verify line (features not yet done, grouped per feature in text) and phases whose last Verify failed, in `analyze` text and `--json`, as warnings that never change the exit status (FR-009, FR-011) (src/core/analyze.ts, src/cli/analyze.ts)
 - [ ] [T051] [P] [US4] Add `verify-failed` attention items and `FeatureRow.verify` (verified, failed, missing counts; omitted when the feature has no Verify lines) (FR-010) (src/core/overview.ts)
 - [ ] [T052] [P] [US4] Show verify progress in the feature view's `tasks.md` artifact line and mark a failed phase in text (FR-010, FR-014) (src/cli/ui/dashboard/feature-view.ts)
 - [ ] [T053] [US4] Test the analyze Verify findings: missing, failed, all verified, old feature stays warning-only (FR-009, FR-011) (test/core/analyze-verify.test.ts)
