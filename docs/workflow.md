@@ -71,6 +71,13 @@ Cross-checks spec ↔ plan ↔ tasks for coverage gaps and inconsistencies, and 
 Executes tasks one slice at a time, checking off `tasks.md` checkboxes and updating each story's
 `status:` as it goes — which is what `ambykit dashboard` reports on.
 
+A task that cannot proceed gets a trailing `⚠ BLOCKED: <reason>` marker (and `↪ DEVIATION: <note>` when it
+was done differently than planned); the implementer moves on to another unblocked task. Each phase ends
+with one `**Verify:**` line that is run before the checkpoint, and its result (`✓ passed`,
+`✗ failed: <why>`, `? unverified`) is written back on that line; a failed Verify keeps the checkpoint
+closed. `ambykit dashboard` and `ambykit analyze` surface both at zero model tokens. Syntax:
+[tasks artifact](./artifacts/tasks.md).
+
 ## 10. Converge
 
 Closes the loop after implementation: checks the code against every `FR-###`/`SC-###`, plan

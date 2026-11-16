@@ -10,6 +10,24 @@ Release notes with full detail live on the
 
 ## [Unreleased]
 
+### Added
+
+- Blocked markers and Verify lines (feature 020): a task line can end with `⚠ BLOCKED: <reason>` and an
+  optional `↪ DEVIATION: <note>` (the glyph-less `BLOCKED:` and `DEVIATION:` forms are read the same),
+  and each `tasks.md` phase ends with one `**Verify:**` line that `/amby.implement` runs before the
+  checkpoint and marks with a result suffix: `✓ passed`, `✗ failed: <why>` or `? unverified`. The tasks
+  template and `/amby.tasks` now emit a Verify line per phase.
+- `ambykit dashboard` and `ambykit analyze` surface blocked tasks, deviations, marker problems, and
+  phases that lack a Verify line or whose last Verify failed, at zero model tokens. Blocked tasks leave
+  the dashboard's "Up next" list, the feature chart and feature view show plain-text counts, and
+  `analyze` reports the new findings as warnings that never change its exit status.
+
+### Changed
+
+- The `--json` output of `dashboard --overview` and `analyze` gains new optional keys (`blockedTasks`,
+  `deviations`, `markerIssues`, `verifyIssues`, and per-feature `blocked` and `verify`), present only when
+  they have content. Existing keys are unchanged, and every existing `tasks.md` is read exactly as before.
+
 ## [1.3.1] — 2026-11-04
 
 ### Added

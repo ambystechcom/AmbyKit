@@ -127,7 +127,37 @@ export function featureRow(f: FeatureSnapshot): FeatureRow {
   // Only worktree rows carry their source, so output without worktrees is unchanged (017 FR-007/FR-008).
   if (f.checkout?.kind === "worktree") row.checkout = f.checkout;
   if (f.lanes && f.lanes.length > 0) row.lanes = f.lanes;
+  // Feature 020: undone tasks carrying a BLOCKED marker; omitted when zero so existing output is unchanged.
+  const blockedTasks = openBlockedTasks(f).length;
+  if (blockedTasks > 0) row.blocked = blockedTasks;
+  // Feature 020: Verify lines by state; omitted when the feature has no Verify lines at all.
+  const verify = verifyCounts(f);
+  if (verify) row.verify = verify;
   return row;
+}
+
+/**
+ * Feature 020 (FR-010): count the verifiable phases (at least one task) by Verify state. `verified` has a
+ * last result of passed, `failed` has a last result of failed, `missing` has no Verify line. A phase with a
+ * Verify line but no result yet (or `? unverified`) is in none of the three. Undefined when no phase has a
+ * Verify line, so features without any keep their existing output.
+ */
+function verifyCounts(f: FeatureSnapshot): { verified: number; failed: number; missing: number } | undefined {
+  const phases = (f.verify ?? []).filter((p) => p.tasks > 0);
+  if (!phases.some((p) => p.check !== undefined)) return undefined;
+  return {
+    verified: phases.filter((p) => p.check !== undefined && p.result === "passed").length,
+    failed: phases.filter((p) => p.check !== undefined && p.result === "failed").length,
+    missing: phases.filter((p) => p.check === undefined).length,
+  };
+}
+
+/**
+ * Feature 020: tasks still open that carry a BLOCKED marker. A checked task with a leftover marker is an
+ * inconsistency (FR-004), reported by `analyze`, and never counts as blocked here.
+ */
+function openBlockedTasks(f: FeatureSnapshot): TaskLine[] {
+  return (f.tasks ?? []).filter((t) => !t.done && t.blocked !== undefined);
 }
 
 /** Feature-qualified, unambiguous story key for display, e.g. `014:US-3` or `008-alpha:US-1`. */
@@ -203,7 +233,28 @@ export function attentionItems(all: FeatureSnapshot[], scoped: FeatureSnapshot[]
   const problems: AttentionItem[] = [];
   const blocked: AttentionItem[] = [];
   const waiting: AttentionItem[] = [];
+  const taskBlocked: AttentionItem[] = [];
+  const verifyFailed: AttentionItem[] = [];
   for (const feature of scoped) {
+    // Feature 020 (FR-010): one item per phase whose last recorded Verify failed; a phase is named `phase-N`.
+    for (const phase of feature.verify ?? []) {
+      if (phase.tasks === 0 || phase.check === undefined || phase.result !== "failed") continue;
+      verifyFailed.push({
+        key: `${feature.displayRef}:phase-${phase.phase}`,
+        kind: "verify-failed",
+        refs: [`phase-${phase.phase}`],
+        reason: phase.why ? `verify failed: ${phase.why}` : "verify failed",
+      });
+    }
+    // Feature 020 (FR-010): one item per open task with a BLOCKED marker, keyed by feature and task id.
+    for (const task of openBlockedTasks(feature)) {
+      taskBlocked.push({
+        key: `${feature.displayRef}:${task.id}`,
+        kind: "task-blocked",
+        refs: [task.id],
+        reason: task.blocked ? `BLOCKED: ${task.blocked}` : "BLOCKED (no reason given)",
+      });
+    }
     for (const story of feature.stories) {
       if (story.status === "done") continue;
       const key = storyLabel(feature, story);
@@ -248,7 +299,7 @@ export function attentionItems(all: FeatureSnapshot[], scoped: FeatureSnapshot[]
       }
     }
   }
-  return [...problems, ...blocked, ...waiting];
+  return [...problems, ...blocked, ...waiting, ...taskBlocked, ...verifyFailed];
 }
 
 /**
@@ -269,6 +320,8 @@ export function upNext(
     for (const t of tasks) {
       if (t.done) continue;
       open += 1;
+      // Feature 020: a task marked BLOCKED is not offered as ready work; lane planning is unchanged.
+      if (t.blocked !== undefined) continue;
       const story = t.story ? byId.get(t.story) : undefined;
       const storyKey = story ? storyLabel(feature, story) : null;
       if (storyKey && held.has(storyKey)) continue;

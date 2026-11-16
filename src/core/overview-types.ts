@@ -1,4 +1,7 @@
 import type { StoryProgress, TaskLine } from "./dashboard.js";
+import type { PhaseVerify } from "./markers.js";
+
+export type { PhaseVerify };
 
 /**
  * Value objects for the dashboard overview (feature 014). Plain and IO-free; produced by
@@ -65,6 +68,8 @@ export interface FeatureSnapshot {
   displayRef: string; // ref, or dir when ref collides (unique)
   stories: StoryProgress[]; // tasks applied
   tasks: TaskLine[] | null; // null = no tasks.md
+  /** Feature 020: the Verify line of each phase of tasks.md; absent when there is no tasks.md. */
+  verify?: PhaseVerify[];
   artifacts: { spec: boolean; ui: boolean; uiSignedOff: boolean; plan: boolean; tasks: boolean };
   clarifications: Clarification[];
   /** Feature 015: parallel lanes of this feature; absent when it has none. */
@@ -101,11 +106,15 @@ export interface FeatureRow {
   checkout?: Checkout;
   /** Feature 015: lanes, only when the feature has some. */
   lanes?: LaneView[];
+  /** Feature 020: tasks carrying a BLOCKED marker; omitted when zero. */
+  blocked?: number;
+  /** Feature 020: Verify lines by state; omitted when the feature has none. */
+  verify?: { verified: number; failed: number; missing: number };
 }
 
 export interface AttentionItem {
   key: string;
-  kind: "graph-problem" | "blocked" | "waiting";
+  kind: "graph-problem" | "blocked" | "waiting" | "task-blocked" | "verify-failed";
   refs: string[];
   reason: string;
 }

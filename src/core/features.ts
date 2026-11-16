@@ -3,7 +3,8 @@ import { join } from "node:path";
 import matter from "gray-matter";
 import { findClarifications } from "./clarifications.js";
 import { applyTasks, featureRefOf, parseStories, parseTasks, type TaskLine } from "./dashboard.js";
-import type { FeatureSnapshot, ParseIssue } from "./overview-types.js";
+import { parsePhases } from "./markers.js";
+import type { FeatureSnapshot, ParseIssue, PhaseVerify } from "./overview-types.js";
 
 export interface ReadFeaturesResult {
   features: FeatureSnapshot[];
@@ -43,9 +44,13 @@ export function readFeatures(projectRoot: string, opts: { only?: string } = {}):
     const stories = parseStories(spec, dir);
 
     let tasks: TaskLine[] | null = null;
+    let verify: PhaseVerify[] | undefined;
     if (existsSync(join(specsRoot, dir, "tasks.md"))) {
       const body = read("tasks.md");
-      if (body !== null) tasks = parseTasks(body);
+      if (body !== null) {
+        tasks = parseTasks(body);
+        verify = parsePhases(body);
+      }
     }
     applyTasks(stories, tasks ?? []);
 
@@ -69,6 +74,7 @@ export function readFeatures(projectRoot: string, opts: { only?: string } = {}):
       displayRef: ref,
       stories,
       tasks,
+      ...(verify ? { verify } : {}),
       artifacts: {
         spec: true,
         ui: hasUi,
