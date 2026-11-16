@@ -37,6 +37,10 @@ export interface RunLane {
   tasks: string[];
   /** Optional overlap-decision record (019 FR-019). */
   overlap?: LaneOverlap;
+  /** Automatic restarts used after a stall (019 FR-026); the lead pauses the lane when `fleet.restartLimit` is reached. */
+  restarts?: number;
+  /** The worker finished this lane's tasks (019 `fleet update --worker-done`). */
+  done?: boolean;
 }
 
 /** `.amby/fleet/<run>/run.json`. 019 writes phase/stage/round/limit/needsDecision; 028 gates/approvals/escalations/lanes. */

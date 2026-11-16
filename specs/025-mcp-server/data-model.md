@@ -34,13 +34,14 @@ its own run-id or state logic. This is the single contract the other fleet specs
   status: active | paused | waiting-person | done,
   phase, stage: working | qa | architect, round, limit, needsDecision,
   gates: [{ id, after, state: pending | approved }],
-  lanes: [{ lane, assistant, tasks[], overlap?: { mode: serialized | squad, with[], writers?{path: lane}, mergeOrder?[] } }],
+  lanes: [{ lane, assistant, tasks[], overlap?: { mode: serialized | squad, with[], writers?{path: lane}, mergeOrder?[] },
+            restarts?: number, done?: boolean }],
   approvals[], escalations[], createdAt }
 ```
 
 Unfinished = `active | paused | waiting-person`. `<run>` is `<feature>.<n>` and a run is created only on
 explicit request (spec 019 FR-014); there is no implicit run. Writers go through this module's
-`createRun` and `updateRun`: 019 writes `phase`, `stage`, `round`, `limit`, `needsDecision`; 028 writes
+`createRun` and `updateRun`: 019 writes `phase`, `stage`, `round`, `limit`, `needsDecision` and, per lane, `restarts` and `done`; 028 writes
 `gates`, `approvals`, `escalations` and `lanes`; 029 only reads.
 
 ## Review verdicts (owned by spec 019)

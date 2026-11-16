@@ -148,3 +148,35 @@ export function resolveRun(root: string, feature: string, requested?: string): R
     return { ok: false, warning: `could not resolve a run: ${(err as Error).message}` };
   }
 }
+
+/**
+ * Run directories of a feature whose `run.json` is missing or unreadable (019 FR-015). `readRun` and `listRuns`
+ * skip them, so this is how a damaged run is found. Ids come from the directory name.
+ */
+export function damagedRuns(root: string, feature: string): string[] {
+  const dir = fleetRoot(root);
+  if (!existsSync(dir)) return [];
+  const out: string[] = [];
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (!e.isDirectory() || !isRunId(e.name) || e.name.slice(0, e.name.lastIndexOf(".")) !== feature) continue;
+    if (!readRun(root, e.name)) out.push(e.name);
+  }
+  return out.sort();
+}
+
+/**
+ * Write a rebuilt record over a damaged run (019 FR-015). Refuses when the run is readable, so a healthy run is
+ * never overwritten; `updateRun` is the only way to change one. The record's run id must be a run id.
+ */
+export function restoreRun(root: string, record: RunRecord): RunResult {
+  if (!isRunId(record.run)) return { ok: false, warning: `'${record.run}' is not a run id` };
+  const locked = withLock(primaryRoot(root), "fleet-runs", () => {
+    if (readRun(root, record.run)) return false;
+    ensureFleetRoot(root);
+    writeFileAtomic(join(runDir(root, record.run), "run.json"), JSON.stringify(record, null, 2) + "\n");
+    return true;
+  });
+  if (!locked.ok) return { ok: false, warning: locked.warning };
+  if (!locked.value) return { ok: false, warning: `run '${record.run}' is readable; nothing to restore` };
+  return { ok: true, run: record };
+}
