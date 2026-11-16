@@ -58,7 +58,7 @@ can spot stuck work without opening files or spending model tokens.
   both name the task and its reason, with no model call.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a feature with a blocked task, When the dashboard is shown, Then the feature's row and task
