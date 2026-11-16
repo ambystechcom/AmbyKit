@@ -10,6 +10,24 @@ Release notes with full detail live on the
 
 ## [Unreleased]
 
+### Added
+
+- AmbyKit as an MCP server (feature 025): `ambykit mcp` serves state tools over stdio so an assistant asks for
+  state instead of reading files: `next_task`, `story_status`, `lane_tasks`, `lane_status`, `analyze_report`,
+  validated one-line writes `tick_task` and `set_story_status`, and `report_activity`, `claim_file` and
+  `post_note` for fleets. Opt-in with `"mcp": { "enabled": true }`; `ambykit sync` then adds an `ambykit` entry
+  to Claude Code (`.mcp.json`), Copilot (`.vscode/mcp.json`), Cursor and Cursor CLI (`.cursor/mcp.json`) and
+  Antigravity CLI (`.agents/mcp_config.json`), and, only with `--include-user`, the Copilot CLI's user-level file.
+  Existing keys are preserved and a file with comments is left alone. OpenCode, the Antigravity IDE and the other
+  targets are not written (their MCP format is unconfirmed); `sync` says which and why. Every phase still works from
+  files when the server is absent.
+- Fleet state foundation (feature 025): a `fleet` config object (`stallMinutes` 15, `restartLimit` 2,
+  `concurrency`, `roundLimit`), the run record `.amby/fleet/<run>/run.json`, per-lane directives, file claims and a
+  notes board in the primary checkout, and a single stall check for lanes. `ambykit directive <feature> <lane>
+  pause|resume|stop` steers a lane from any host; the worker obeys at its next report.
+- `ambykit activity` gains `--lane`, `--state` and `--run`: a lane's marker is `<feature>.<agent>~lane-p-k.json`, so
+  two lanes of one assistant no longer overwrite each other. Without the flags the marker is unchanged.
+
 ## [1.4.0] — 2026-11-16
 
 ### Added

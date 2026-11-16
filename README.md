@@ -153,6 +153,8 @@ target is a thin `BaseEmitter` subclass.
 | `ambykit lane <feature>` | Split a phase's `[P]` tasks into conflict-free parallel lanes (`list`, `merge`, `remove`) |
 | `ambykit activity <feature>` | Record which assistant works on a feature (run by the phase prompts) |
 | `ambykit trace [feature]` | Show which requirements have tests (tests cite `NNN:FR-###`); `--json`, `--gate` |
+| `ambykit mcp` | Serve state tools (next task, story status, tick, report, claim) to an assistant over MCP; opt-in with `mcp.enabled` |
+| `ambykit directive <feature> <lane>` | Tell a fleet lane to `pause`, `resume` or `stop` (obeyed at its next report) |
 
 See [`docs/cli-reference.md`](./docs/cli-reference.md).
 

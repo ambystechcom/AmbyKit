@@ -247,6 +247,27 @@ missing flag is a warning, and the exit code is always 0.
 ambykit activity 017 --agent=claude --phase=implement --task=T014
 ```
 
+For a fleet lane (feature 025) add `--lane=<lane>` (`lane-1-2`, `1-2` or the full name), `--state=working|waiting|blocked|paused|done`
+and `--run=<id>`. A lane puts its short name in the marker's file name, `<feature>.<agent>~lane-1-2.json`, so two lanes of one
+assistant never overwrite each other; the marker body gains `lane`, `state` and `run`. Without these flags the marker is
+byte-for-byte what it was. It is the same core writer the `report_activity` MCP tool calls.
+
+## `ambykit mcp`
+
+Serves AmbyKit's state tools to an assistant over MCP on stdio (see [the MCP server](./concepts/mcp-server.md)). The assistant
+starts it from the project root or a lane worktree; you do not run it by hand. stdout carries protocol messages only. Set
+`"mcp": { "enabled": true }` in `.amby/config.json` and run `ambykit sync` to write each verified assistant's MCP config.
+
+## `ambykit directive <feature> <lane> pause|resume|stop`
+
+Tells a fleet lane to pause, resume (writes `continue`) or stop. The worker finishes its current task and obeys at its next
+report. `--run=<id>` picks the run when several are unfinished. An unknown lane is refused by name. This is the one writer that
+the prompts, the terminal and the dashboard all call.
+
+```bash
+ambykit directive 025 lane-1-1 pause
+```
+
 ## `ambykit analyze`
 
 Validate the story dependency graph, computed locally from `specs/` (no model tokens): detects

@@ -95,3 +95,24 @@ describe("fleet runs", () => {
     expect(readFileSync(join(fleetRoot(r), ".gitignore"), "utf8")).toContain("*");
   });
 });
+
+describe("run record: what spec 019 relies on", () => {
+  it("025:FR-024: lanes[] carries 019's overlap-decision record and it round-trips through updateRun and readRun", () => {
+    const r = root();
+    const id = created(r, "a-one");
+    const lanes = [
+      { lane: "a-one.lane-1-1", assistant: "claude", tasks: ["T001"], overlap: { mode: "squad" as const, with: ["lane-1-2"], writers: { "src/a.ts": "lane-1-1" }, mergeOrder: ["lane-1-1", "lane-1-2"] } },
+      { lane: "a-one.lane-1-2", assistant: "codex", tasks: ["T002"] },
+    ];
+    updateRun(r, id, { lanes });
+    expect(readRun(r, id)?.lanes).toEqual(lanes);
+  });
+
+  it("025:FR-024: a run is completed by updateRun status done, and then no longer resolves as unfinished", () => {
+    const r = root();
+    const id = created(r, "a-one");
+    expect(updateRun(r, id, { status: "done" })).toMatchObject({ ok: true, run: { status: "done" } });
+    expect(resolveRun(r, "a-one")).toMatchObject({ ok: false });
+    expect(resolveRun(r, "a-one", id)).toMatchObject({ ok: true, run: { status: "done" } });
+  });
+});

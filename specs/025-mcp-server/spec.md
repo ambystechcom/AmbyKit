@@ -2,7 +2,7 @@
 feature: 025-mcp-server          # NNN-slug
 title: AmbyKit as an MCP server
 branch: 025-mcp-server
-status: ready                     # draft | ready | in-progress | blocked | done
+status: in-progress                     # draft | ready | in-progress | blocked | done
 created: 2026-11-12
 ---
 
@@ -34,7 +34,7 @@ task list and the analyze report, so that I read a few lines instead of whole ar
   one task with its ID, text and file ownership, with no full-file read.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a feature with unchecked tasks, When the next-task tool is asked, Then it returns the first
@@ -59,7 +59,7 @@ change, so that state cannot be corrupted by a free-form edit.
   invalid status and confirm it is refused.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given an unchecked task, When it is ticked through the tool, Then only that task's checked state
@@ -81,7 +81,7 @@ pause or stop, so that the dashboard shows me and a person can steer me at no ex
   a pause directive and confirm the next report returns it.
 - **depends-on:** [US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a report with feature, agent, phase, state and optional task and lane, When it is made, Then an
@@ -116,7 +116,7 @@ avoid each other and share what matters, as the team protocol of spec 019 descri
   name; check off the task and confirm the claim is released.
 - **depends-on:** [US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given an unclaimed file, When a worker claims it, Then the claim records worker, task ID and file.
@@ -138,7 +138,7 @@ without constant polling.
   and confirm it reads as stalled.
 - **depends-on:** [US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a lane in state working with no report and no `tasks.md` change for 15 minutes, When it is
@@ -157,7 +157,7 @@ people who do not use it.
   enable the server for one target and confirm only that project config changes.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given the server is not configured, When any phase prompt runs, Then it works from files as today.
@@ -179,7 +179,7 @@ or the dashboard, so that every host controls workers the same way and the resul
   then shows paused; resume it and confirm the next report returns continue.
 - **depends-on:** [US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a lane, When a person pauses it from any host, Then a pause directive is written through the one

@@ -33,13 +33,16 @@ templates and can customize them.
 An abstract class holding all shared state and behavior; each tool is a thin subclass.
 
 - **Properties:** `toolId`, `displayName`, `commandDir`, `rulesFile`, `commandSurface`
-  (`'commands' | 'skills' | 'workflows' | 'none'`), `supportsAgents`, `mcpConfigPath`,
-  `mcpConfigScope` (`'project' | 'user'`), `mcpTopLevelKey`.
+  (`'commands' | 'skills' | 'workflows' | 'none'`), `supportsAgents`.
 - **Template method** `emit(specs, ctx): EmittedFile[]` — orchestrates: resolve target dir → render
-  rules file → render each phase prompt **via `commandSurface`** → render MCP config → collect files.
-  Subclasses don't re-implement orchestration.
+  rules file → render each phase prompt **via `commandSurface`** → collect files. Subclasses don't
+  re-implement orchestration. MCP setup is a separate, opt-in hook (below), so `emit` is unchanged.
 - **Overridable hooks:** `commandFrontmatter(spec)`, `commandPath(spec)`, `rulesContent(ctx)`,
-  `mcpConfig(servers)`. Defaults live in the base; a subclass overrides only its differences.
+  `mcpFiles(ctx)` and `mcpSkipReason()`. Defaults live in the base; a subclass overrides only its
+  differences. `buildEmittedFiles` calls `mcpFiles` only when `config.mcp.enabled`; a target whose per-server
+  entry shape is not verified in the compatibility matrix returns no files and a reason, which `sync`
+  prints. The files use `merge: "json"`, which splices the single `ambykit` server entry into the tool's JSON
+  config and leaves every other key as written (`src/core/merge-json.ts`).
 - **Reuse subclasses:** `CursorCliEmitter` (`commandSurface: 'none'`) and `AntigravityCliEmitter`
   reuse a sibling's output; VS Code extension targets resolve to their base tool's emitter unchanged
   via the **target→emitter map** in the registry.

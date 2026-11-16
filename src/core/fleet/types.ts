@@ -19,11 +19,24 @@ export interface RunGate {
   state: "pending" | "approved";
 }
 
+/** Spec 019 US-7: how overlapping lanes are handled, recorded before work starts. */
+export interface LaneOverlap {
+  mode: "serialized" | "squad";
+  /** Short names of the lanes this lane overlaps with. */
+  with: string[];
+  /** For a squad: which lane is the single writer of each shared path. */
+  writers?: Record<string, string>;
+  /** Merge order, short lane names. */
+  mergeOrder?: string[];
+}
+
 export interface RunLane {
   /** Full lane name `NNN-slug.lane-p-k`. */
   lane: string;
   assistant: string;
   tasks: string[];
+  /** Optional overlap-decision record (019 FR-019). */
+  overlap?: LaneOverlap;
 }
 
 /** `.amby/fleet/<run>/run.json`. 019 writes phase/stage/round/limit/needsDecision; 028 gates/approvals/escalations/lanes. */

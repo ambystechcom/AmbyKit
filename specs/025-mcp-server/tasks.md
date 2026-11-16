@@ -107,12 +107,12 @@ created: 2026-11-16
 
 ## Phase 10 — Polish
 
-- [ ] [T100] [P] Document `mcp`, `directive` and the new `activity` flags (docs/cli-reference.md)
-- [ ] [T101] [P] Concept page: tools, directives, claims, fallback and the opt-in setup (docs/concepts/mcp-server.md)
-- [ ] [T102] [P] Update the architecture page so its MCP hooks match what shipped (docs/architecture.md)
-- [ ] [T103] [P] Changelog entry under the next release (CHANGELOG.md)
-- [ ] [T104] Performance and size checks: a report and a directive read inside one second (SC-003), query answers under 1 KB (SC-001) (test/mcp/perf.test.ts)
+- [x] [T100] [P] Document `mcp`, `directive` and the new `activity` flags (docs/cli-reference.md)
+- [x] [T101] [P] Concept page: tools, directives, claims, fallback and the opt-in setup (docs/concepts/mcp-server.md)
+- [x] [T102] [P] Update the architecture page so its MCP hooks match what shipped (docs/architecture.md)
+- [x] [T103] [P] Changelog entry under the next release (CHANGELOG.md)
+- [x] [T104] Performance and size checks: a report and a directive read inside one second (SC-003), query answers under 1 KB (SC-001) (test/mcp/perf.test.ts)
 - [ ] [T105] INTEGRATION step, run once after merging the batch, never inside a lane branch. Dogfood (SC-007): enable the server on this repo, run `ambykit sync`, and use the tools from a lane on a later task (.amby/config.json, .mcp.json)
 - **Checkpoint:** 025 is releasable in 1.5.
 
-**Verify:** `npm run typecheck` and `npm test` pass, `ambykit sync --check` is clean, and `ambykit analyze` shows no new findings for 025.
+**Verify:** `npm run typecheck` and `npm test` pass, `ambykit sync --check` is clean, and `ambykit analyze` shows no new findings for 025. ✓ passed

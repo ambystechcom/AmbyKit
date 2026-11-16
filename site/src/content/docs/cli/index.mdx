@@ -174,12 +174,35 @@ requirement left untested on purpose is recorded as `uncovered: FR-### — reaso
 ## `ambykit activity`
 
 ```text
-ambykit activity <feature> --agent=<tool-id> --phase=<phase> [--task=T###]
+ambykit activity <feature> --agent=<tool-id> --phase=<phase> [--task=T###] [--lane=<lane>] [--state=<state>] [--run=<id>]
 ```
 
 Records that an assistant started a phase on a feature, for the dashboard's agent presence. The
 phase prompts run it for you; it writes `.amby/activity/<feature>.<agent>.json` (git-ignored) and
-never fails: problems are warnings and it always exits 0.
+never fails: problems are warnings and it always exits 0. For a fleet lane, `--lane`, `--state`
+(`working`, `waiting`, `blocked`, `paused` or `done`) and `--run` add the lane to the file name and
+the fleet fields to the marker; without them the marker is unchanged.
+
+## `ambykit mcp`
+
+```text
+ambykit mcp
+```
+
+Serves AmbyKit's state tools to an assistant over MCP on stdio: the next unblocked task, a story's
+blockers, a validated tick, a report that returns a pause or stop directive, file claims and notes.
+The assistant starts it; you do not run it by hand. It is opt-in: set `"mcp": { "enabled": true }` in
+`.amby/config.json`, then `ambykit sync` writes the verified assistants' MCP config. Every phase still
+works from files when the server is absent.
+
+## `ambykit directive`
+
+```text
+ambykit directive <feature> <lane> pause|resume|stop [--run=<id>]
+```
+
+Tells a fleet lane to pause, resume or stop. The worker finishes its current task and obeys at its next
+report. An unknown lane is refused by name.
 
 ## `ambykit update`
 

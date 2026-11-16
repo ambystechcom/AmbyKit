@@ -34,7 +34,7 @@ its own run-id or state logic. This is the single contract the other fleet specs
   status: active | paused | waiting-person | done,
   phase, stage: working | qa | architect, round, limit, needsDecision,
   gates: [{ id, after, state: pending | approved }],
-  lanes: [{ lane, assistant, tasks[] }],
+  lanes: [{ lane, assistant, tasks[], overlap?: { mode: serialized | squad, with[], writers?{path: lane}, mergeOrder?[] } }],
   approvals[], escalations[], createdAt }
 ```
 
