@@ -64,11 +64,11 @@ created: 2026-11-16
 
 ## Phase 6 — User story US-7: steer a lane from any host  (priority: P1)
 
-- [ ] [T050] [US7] `writeDirective` with lane validation against the run and last-write-wins; resume writes `continue`; the single writer that 019's wrapper, 028 and 029 call (batch B step 1), with tests (src/core/fleet/directives.ts, test/core/fleet-directives.test.ts)
-- [ ] [T051] [US7] `ambykit directive <feature> <lane> pause|resume|stop` command, registered, naming an unknown lane, with tests (src/cli/directive.ts, src/cli/index.ts, test/cli/directive.test.ts)
+- [x] [T050] [US7] `writeDirective` with lane validation against the run and last-write-wins; resume writes `continue`; the single writer that 019's wrapper, 028 and 029 call (batch B step 1), with tests (src/core/fleet/directives.ts, test/core/fleet-directives.test.ts)
+- [x] [T051] [US7] `ambykit directive <feature> <lane> pause|resume|stop` command, registered, naming an unknown lane, with tests (src/cli/directive.ts, src/cli/index.ts, test/cli/directive.test.ts)
 - **Checkpoint:** US-7 is demoable: pause from the terminal, the next report returns pause and then shows paused; resume returns continue.
 
-**Verify:** `npx vitest run test/core/fleet-directives.test.ts test/cli/directive.test.ts` passes, including two writers racing and a lane that does not exist.
+**Verify:** `npx vitest run test/core/fleet-directives.test.ts test/cli/directive.test.ts` passes, including two writers racing and a lane that does not exist. ✓ passed
 
 ## Phase 7 — User story US-6: set up and fall back safely  (priority: P1)
 

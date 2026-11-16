@@ -19,6 +19,7 @@ import { LaneCommand } from "./lane.js";
 import { GraphCommand } from "./graph.js";
 import { TraceCommand } from "./trace.js";
 import { McpCommand } from "./mcp.js";
+import { DirectiveCommand } from "./directive.js";
 import { outdatedWarning } from "./ui/callout.js";
 import { packageVersion } from "../core/paths.js";
 
@@ -37,6 +38,7 @@ const COMMANDS: BaseCommand[] = [
   new GraphCommand(),
   new TraceCommand(),
   new McpCommand(),
+  new DirectiveCommand(),
 ];
 
 /** Parse argv (after the command name) into positionals + flags. */

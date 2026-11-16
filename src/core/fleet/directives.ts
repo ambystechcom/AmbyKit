@@ -1,14 +1,17 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { shortLane, type ActivityMarker } from "../activity.js";
-import { runDir } from "./runs.js";
-import { DIRECTIVE_ACTIONS, type Directive, type DirectiveStatus } from "./types.js";
+import { laneRefs } from "../query.js";
+import { withLock, writeFileAtomic } from "./lock.js";
+import { resolveRun, runDir } from "./runs.js";
+import { DIRECTIVE_ACTIONS, type Directive, type DirectiveAction, type DirectiveStatus } from "./types.js";
 
 /**
  * Directives (feature 025, US-3 and US-7): one per lane at `.amby/fleet/<run>/directives/<lane>.json`
  * in the primary checkout, `{ action, at }`. The last write wins and a missing file means continue
- * (FR-010, FR-011). The file name uses the short lane form `lane-<p>-<k>`. The reader and the derived
- * status live here; the single writer, `writeDirective`, is added by T050 in this same module.
+ * (FR-010, FR-011). The file name uses the short lane form `lane-<p>-<k>`. This module holds the reader, the
+ * derived status and the single writer, `writeDirective`, that 019's wrapper, 028, 029 and `ambykit directive`
+ * all call (FR-023).
  */
 
 export function directivesDir(root: string, run: string): string {
@@ -57,4 +60,45 @@ export function directiveStatus(directive: Directive | null, latest: Pick<Activi
     return latest?.state === "paused" ? "paused" : "pause requested";
   }
   return reportedAfter ? "obeyed" : "pending";
+}
+
+export type WriteDirectiveResult =
+  | { ok: true; run: string; lane: string; directive: Directive }
+  | { ok: false; error: string };
+
+/**
+ * The lanes a directive may name: the run's recorded lanes plus the lane checkouts that exist for the
+ * feature. A lane in neither does not exist (FR-023).
+ */
+export function knownLanes(root: string, feature: string, runLanes: { lane: string }[]): string[] {
+  const names = new Set<string>();
+  for (const l of runLanes) names.add(shortLane(l.lane));
+  for (const l of laneRefs(root, feature)) names.add(l.short);
+  return [...names].sort();
+}
+
+/**
+ * Write a lane's directive, the single writer (FR-023). Validates the lane against the run, writes
+ * `{ action, at }` atomically under a lock, and the last write wins (FR-011). `resume` is not an action:
+ * callers write `continue`.
+ */
+export function writeDirective(
+  root: string,
+  input: { feature: string; lane: string; action: DirectiveAction; run?: string; now?: Date },
+): WriteDirectiveResult {
+  if (!(DIRECTIVE_ACTIONS as readonly string[]).includes(input.action)) {
+    return { ok: false, error: `invalid action '${input.action}'; allowed: ${DIRECTIVE_ACTIONS.join(", ")}` };
+  }
+  const resolved = resolveRun(root, input.feature, input.run);
+  if (!resolved.ok) return { ok: false, error: resolved.warning };
+  const run = resolved.run.run;
+  const short = shortLane(input.lane.includes(".lane-") || input.lane.startsWith("lane-") ? input.lane : `lane-${input.lane}`);
+  const known = knownLanes(root, input.feature, resolved.run.lanes);
+  if (!known.includes(short)) {
+    return { ok: false, error: `lane '${input.lane}' not found in run ${run}${known.length ? `; lanes: ${known.join(", ")}` : "; the run has no lanes"}` };
+  }
+  const directive: Directive = { action: input.action, at: (input.now ?? new Date()).toISOString() };
+  const locked = withLock(root, `directive-${run}-${short}`, () => writeFileAtomic(directivePath(root, run, short), JSON.stringify(directive) + "\n"));
+  if (!locked.ok) return { ok: false, error: locked.warning };
+  return { ok: true, run, lane: short, directive };
 }
