@@ -78,6 +78,7 @@ const PHASE_SEQUENCE = [
   "converge",
   "review",
   "decide",
+  "run",
 ];
 
 function phaseOrder(phase: string): number {

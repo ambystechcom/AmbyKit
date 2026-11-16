@@ -3,6 +3,7 @@ import type { AmbyConfig, EmittedFile } from "./types.js";
 import { loadCommandSpecs } from "./command-spec.js";
 import { buildAgentsMd } from "./rules.js";
 import { loadRoles } from "./roles.js";
+import { loadWorkerAgent } from "./subagents.js";
 import { emittersForTargets } from "../emitters/index.js";
 
 /**
@@ -14,7 +15,15 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
   const specs = loadCommandSpecs();
   const manageRules = config.manageRules !== false;
   const projectName = basename(projectRoot);
-  const ctx = { projectName, specs, manageRules, roles: loadRoles(projectRoot) };
+  const worker = loadWorkerAgent();
+  const ctx = {
+    projectName,
+    specs,
+    manageRules,
+    roles: loadRoles(projectRoot),
+    worker,
+    ...(config.fleet?.workerModel ? { workerModel: config.fleet.workerModel } : {}),
+  };
 
   const files: EmittedFile[] = [];
   if (manageRules) {

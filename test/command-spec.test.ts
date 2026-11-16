@@ -34,7 +34,7 @@ describe("parseCommandSpec", () => {
 });
 
 describe("loadCommandSpecs", () => {
-  it("loads all twelve phase prompts, sorted by id", () => {
+  it("loads all thirteen phase prompts, sorted by id", () => {
     const specs = loadCommandSpecs();
     const ids = specs.map((s) => s.id);
     expect(ids).toEqual([
@@ -48,6 +48,7 @@ describe("loadCommandSpecs", () => {
       "plan",
       "review",
       "revise",
+      "run",
       "specify",
       "tasks",
     ]);

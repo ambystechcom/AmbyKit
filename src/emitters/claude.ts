@@ -71,6 +71,24 @@ export class ClaudeEmitter extends BaseEmitter {
     }));
   }
 
+  /**
+   * The write-capable worker at `.claude/agents/amby-worker.md` (feature 019). Same verified frontmatter as the
+   * review roles, but with write tools; `model` is emitted only when `fleet.workerModel` is set (FR-005).
+   */
+  protected override workerFiles(worker: NonNullable<RulesContext["worker"]>, ctx: RulesContext): EmittedFile[] {
+    const pairs: Array<[string, string]> = [
+      ["name", `amby-${worker.id}`],
+      ["description", this.yamlQuote(worker.description)],
+      ["tools", "Read, Write, Edit, Bash, Grep, Glob"],
+    ];
+    if (ctx.workerModel) pairs.push(["model", this.yamlQuote(ctx.workerModel)]);
+    return [
+      { path: `.claude/agents/amby-${worker.id}.md`, contents: `${this.renderFrontmatter(pairs)}
+${this.workerBody(worker)}
+`, scope: "project" },
+    ];
+  }
+
   protected override rulesFiles(_ctx: RulesContext): EmittedFile[] {
     // The `@AGENTS.md` import must stay on line 1 (Claude does not read AGENTS.md natively). It is
     // the `requiredPrefix` so a brownfield merge re-adds it if missing (FR-011); the AmbyKit body is

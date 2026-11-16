@@ -45,6 +45,22 @@ export class CopilotEmitter extends BaseEmitter {
     }));
   }
 
+  /** The worker at `.github/agents/amby-worker.agent.md` (no `tools` key: the agent keeps the default tools; inherited by Copilot CLI). */
+  protected override workerFiles(worker: NonNullable<RulesContext["worker"]>, _ctx: RulesContext): EmittedFile[] {
+    return [
+      {
+        path: join(".github", "agents", `amby-${worker.id}.agent.md`),
+        contents: `${this.renderFrontmatter([
+          ["name", `amby-${worker.id}`],
+          ["description", this.yamlQuote(worker.description)],
+        ])}
+${this.workerBody(worker)}
+`,
+        scope: "project",
+      },
+    ];
+  }
+
   /** Workspace `.vscode/mcp.json`, `servers.ambykit` (verified in `specs/025-mcp-server/research.md`). */
   override mcpFiles(_ctx: RulesContext): EmittedFile[] {
     return [this.mcpFile(join(".vscode", "mcp.json"), "servers", { type: "stdio", ...MCP_COMMAND })];

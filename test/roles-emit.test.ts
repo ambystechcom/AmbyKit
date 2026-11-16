@@ -44,7 +44,9 @@ describe("role binding on emitted commands (feature 013, US-1)", () => {
     mkdirSync(join(root, ".amby"), { recursive: true });
     const files = buildEmittedFiles(root, { version: "0.0.0", tools: ["claude"], manageRules: false });
     const direct = new ClaudeEmitter().emit(specs, noRoles);
-    expect(files.map((f) => f.contents)).toEqual(direct.map((f) => f.contents));
+    // The worker persona (feature 019) is not a command: compare the commands and rules files only.
+    const commands = files.filter((f) => f.path !== ".claude/agents/amby-worker.md");
+    expect(commands.map((f) => f.contents)).toEqual(direct.map((f) => f.contents));
     for (const f of files) expect(f.contents).not.toContain("say so in your first line");
   });
 

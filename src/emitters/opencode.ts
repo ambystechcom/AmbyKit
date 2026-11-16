@@ -30,6 +30,22 @@ export class OpenCodeEmitter extends BaseEmitter {
     }));
   }
 
+  /** The worker at `.opencode/agents/amby-worker.md`; no `model` (not verified for OpenCode agents, Principle 4). */
+  protected override workerFiles(worker: NonNullable<RulesContext["worker"]>, _ctx: RulesContext): EmittedFile[] {
+    return [
+      {
+        path: join(".opencode", "agents", `amby-${worker.id}.md`),
+        contents: `${this.renderFrontmatter([
+          ["description", this.yamlQuote(worker.description)],
+          ["mode", "subagent"],
+        ])}
+${this.workerBody(worker)}
+`,
+        scope: "project",
+      },
+    ];
+  }
+
   /**
    * Not written. OpenCode documents two incompatible shapes (`mcp.<name>` with `enabled`, and `mcp.servers.<name>`
    * with `disabled`) and nothing says which one an installed version reads, so a guess could break the user's
