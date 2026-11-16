@@ -31,7 +31,7 @@ if a field must break.
 | `nodes[].title`, `status`, `priority` | From the spec; empty string when absent. |
 | `edges[]` | Story edge: `from` depends on / is blocked by `to`. `kind` is `depends-on` or `blocked-by` (a dependency written in both yields one edge per kind). Only resolvable edges appear here. |
 | `featureEdges[]` | Derived: feature `from` depends on feature `to` when a story in `from` has an edge to a story in `to`. `via` lists the causing story edges. Both kinds count. |
-| `broken[]` | A dependency that does not resolve: `from` story, `to` as written in the spec, `kind`, and `reason`: `unknown-story` (the feature exists, or the target is a bare id) or `unknown-feature` (a `NNN:US-#` reference to a feature number that does not exist). |
+| `broken[]` | A dependency that does not resolve: `from` story, `to` in `US-#` or `NNN:US-#` form, `kind`, and `reason`: `unknown-story` (the feature exists, or the target is a bare id) or `unknown-feature` (a `NNN:US-#` reference to a feature number that does not exist). |
 | `cycles[]` | Each cycle as an ordered list of node IDs; a self-dependency is a cycle of one. |
 
 ## Guarantees

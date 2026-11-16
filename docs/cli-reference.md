@@ -280,6 +280,40 @@ ambykit analyze --json   # includes lanes.conflicts and lanes.declarations
                          # plus blockedTasks, deviations, markerIssues, verifyIssues when present
 ```
 
+## `ambykit graph [feature]`
+
+Print the story and feature dependency graph, built once from `specs/` by the same code that `analyze`
+and the dashboard use (no model tokens). A story's `depends-on`, `blocked-by` and `NNN:US-#`
+references become **story edges** (kept as separate kinds); a story in feature A that depends on a story
+in feature B gives a **feature edge** from A to B that records the story edges causing it. Dependencies
+that name something that does not exist are **broken edges**; a dependency loop is a **cycle**. Both are
+listed first and make the command exit **1**; otherwise it exits 0. With a feature (its number or
+directory name) it shows only that feature and its direct neighbours, in both directions.
+
+```bash
+ambykit graph                # readable text
+ambykit graph 023            # one feature and its direct neighbours
+ambykit graph --json         # versioned machine shape (below)
+ambykit graph --mermaid      # Mermaid flowchart: one subgraph per feature
+```
+
+`--mermaid`: `A --> B` means A depends on B, a dashed `A -.-> B` means A is blocked by B, and a thick
+arrow joins two feature subgraphs for each feature edge. The syntax is checked structurally; paste it
+into a Mermaid renderer to view it.
+
+`--json` has `version` (`1`) and the keys below. Fields are only ever added, never removed or renamed
+(see `specs/023-dependency-graph/contracts/graph-json.md`).
+
+| Key | Contents |
+| --- | --- |
+| `nodes[]` | `id` (`NNN:US-#`), `feature` (directory), `story`, `title`, `status`, `priority` |
+| `edges[]` | `from`, `to` (node ids), `kind` (`depends-on` or `blocked-by`) |
+| `featureEdges[]` | `from`, `to` (feature directories), `via[]` (the causing story edges) |
+| `broken[]` | `from`, `to` (as written), `kind`, `reason` (`unknown-story` or `unknown-feature`) |
+| `cycles[]` | each cycle as an ordered list of node ids; a self-dependency is a cycle of one |
+
+Output is the same for the same files whatever the directory order.
+
 ## `ambykit check`
 
 Doctor: verify integrations are present and well-formed and that expected assistant CLIs are

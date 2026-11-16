@@ -45,16 +45,16 @@ created: 2026-11-16
 
 ## Phase 5 — User story US-3  (priority: P1)
 
-- [ ] [T040] [P] [US3] Implement `toText`, `toJson` (with `version: 1`) and `toMermaid` (one subgraph per feature, dashed blocked-by, arrows between subgraphs for feature edges) (src/core/graph-format.ts)
-- [ ] [T041] [P] [US3] Implement `scopeToFeature(graph, ref)`: the feature plus direct neighbors in both directions (src/core/graph-scope.ts)
-- [ ] [T042] [US3] Add `GraphCommand` (`ambykit graph [feature] [--json] [--mermaid]`): no-specs message, broken/cycle listing first, exit 1 when any (src/cli/graph.ts)
-- [ ] [T043] [US3] Register the command in the CLI registry and help (src/cli/index.ts)
-- [ ] [T044] [P] [US3] Test formatters: text readable, JSON shape and stability, Mermaid structure and edge parity, feature scoping (test/core/graph-format.test.ts)
-- [ ] [T045] [US3] E2E test of the command: all three formats, a feature argument, broken and cyclic fixtures set a non-zero exit, empty project exits 0 (test/cli/graph.test.ts)
-- [ ] [T046] [P] [US3] Document `ambykit graph`, flags, exit codes and the JSON shape (docs/cli-reference.md)
+- [x] [T040] [P] [US3] Implement `toText`, `toJson` (with `version: 1`) and `toMermaid` (one subgraph per feature, dashed blocked-by, arrows between subgraphs for feature edges) (src/core/graph-format.ts)
+- [x] [T041] [P] [US3] Implement `scopeToFeature(graph, ref)`: the feature plus direct neighbors in both directions (src/core/graph-scope.ts)
+- [x] [T042] [US3] Add `GraphCommand` (`ambykit graph [feature] [--json] [--mermaid]`): no-specs message, broken/cycle listing first, exit 1 when any (src/cli/graph.ts)
+- [x] [T043] [US3] Register the command in the CLI registry and help (src/cli/index.ts)
+- [x] [T044] [P] [US3] Test formatters: text readable, JSON shape and stability, Mermaid structure and edge parity, feature scoping (test/core/graph-format.test.ts)
+- [x] [T045] [US3] E2E test of the command: all three formats, a feature argument, broken and cyclic fixtures set a non-zero exit, empty project exits 0 (test/cli/graph.test.ts)
+- [x] [T046] [P] [US3] Document `ambykit graph`, flags, exit codes and the JSON shape (docs/cli-reference.md)
 - **Checkpoint:** US-3 is demoable: `ambykit graph`, `--json` and `--mermaid` work on this repo.
 
-**Verify:** `npm test -- graph-format cli/graph` passes; paste the `--mermaid` output into a Mermaid renderer and confirm it draws the same edges (manual step: report as unverified if not done).
+**Verify:** `npm test -- graph-format cli/graph` passes; paste the `--mermaid` output into a Mermaid renderer and confirm it draws the same edges (manual step: report as unverified if not done). ? unverified: the tests pass; the manual Mermaid render was not done.
 
 ## Phase 6 — User story US-4  (priority: P1)
 

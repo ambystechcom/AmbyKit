@@ -78,7 +78,7 @@ without opening files or spending tokens.
   `--mermaid` and confirm each is well-formed.
 - **depends-on:** [US-1, US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** in-progress
 
 **Acceptance criteria**
 - Given a project, When `ambykit graph` runs, Then it prints the graph as readable text with no model
