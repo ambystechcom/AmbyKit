@@ -69,7 +69,10 @@ function taskLines(caps: Capabilities, view: StoryDetailView): string[] {
     const mark = t.done ? paintToken(caps, a.present.fg, glyph(caps, a.present.symbol)) : paintToken(caps, a.pending.fg, glyph(caps, a.pending.symbol));
     const changed = view.changedTasks?.has(t.id);
     const id = changed ? paintToken(caps, LIVE_TOKENS.component.live.changed.fg, t.id, true) : t.id;
-    return `${mark} ${id}  ${t.description}`;
+    // Feature 020: BLOCKED reason and DEVIATION note as plain text (no glyph, readable without color).
+    const blocked = t.blocked !== undefined ? `  BLOCKED: ${t.blocked || "(no reason)"}` : "";
+    const deviation = t.deviation !== undefined && t.deviation !== "" ? `  DEVIATION: ${t.deviation}` : "";
+    return `${mark} ${id}  ${t.description}${blocked}${deviation}`;
   };
   const max = Math.max(2, view.maxTasks);
   if (tasks.length <= max) return tasks.map(line);

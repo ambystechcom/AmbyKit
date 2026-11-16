@@ -25,5 +25,7 @@ Run `ambykit activity <feature> --agent=$AGENT --phase=tasks` first, with that f
 4. Give every task a stable `T###` id and its file paths as the line's last parenthesized group:
    comma-separated, repo-relative, dirs end `/`, no globs. Mark `[P]` only when no other task in the
    same phase shares or nests a path.
+5. End every phase with exactly ONE `**Verify:**` line, plain text after its tasks: a runnable check
+   or observable condition that proves the phase works (e.g. a test command). Never more than one.
 
 Do not start implementing. Keep descriptions to one line each.

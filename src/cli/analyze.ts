@@ -47,6 +47,49 @@ export class AnalyzeCommand extends BaseCommand {
       this.info("");
     }
 
+    // Feature 020: BLOCKED markers and DEVIATION notes on task lines. Warnings only: they never
+    // change the exit status. Plain words, so the lines read the same without color or glyphs.
+    if (report.blockedTasks && report.blockedTasks.length > 0) {
+      this.info("Blocked tasks (BLOCKED markers):");
+      for (const b of report.blockedTasks) {
+        this.info(`  ${b.feature}:${b.task} — BLOCKED: ${b.reason === "" ? "(no reason given)" : b.reason}`);
+      }
+      this.info("");
+    }
+    if (report.deviations && report.deviations.length > 0) {
+      this.info("Deviations (DEVIATION notes):");
+      for (const d of report.deviations) this.info(`  ${d.feature}:${d.task} — DEVIATION: ${d.note}`);
+      this.info("");
+    }
+    if (report.markerIssues && report.markerIssues.length > 0) {
+      for (const m of report.markerIssues) this.warn(`Marker issue: ${m.message}`);
+      this.info("");
+    }
+
+    // Feature 020 (FR-009): Verify findings. Warnings only (exit status unchanged). Missing Verify
+    // lines are grouped per feature in text (one line each), listed per phase in --json.
+    if (report.verifyIssues && report.verifyIssues.length > 0) {
+      const failed = report.verifyIssues.filter((v) => v.kind === "failed");
+      const missing = report.verifyIssues.filter((v) => v.kind === "missing");
+      if (failed.length > 0) {
+        this.info("Verify failed (last recorded result):");
+        for (const v of failed) this.warn(`  ${v.phase} — Verify FAILED${v.why ? `: ${v.why}` : ""}`);
+        this.info("");
+      }
+      if (missing.length > 0) {
+        this.info("Phases with no Verify line:");
+        const byFeature = new Map<string, number[]>();
+        for (const v of missing) {
+          const n = Number(v.phase.slice(v.phase.lastIndexOf("-") + 1));
+          byFeature.set(v.feature, [...(byFeature.get(v.feature) ?? []), n]);
+        }
+        for (const [feature, phases] of byFeature) {
+          this.warn(`  ${feature} — phase ${phases.join(", ")} (add a **Verify:** line per phase)`);
+        }
+        this.info("");
+      }
+    }
+
     this.info(
       report.buildable.length > 0
         ? `Buildable now: ${report.buildable.join(", ")}`

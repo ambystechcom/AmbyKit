@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ParseIssue } from "./overview-types.js";
 import { normalizePath } from "./lanes.js";
+import { parseMarkers, phaseNumber } from "./markers.js";
 
 export interface StoryProgress {
   id: string; // feature-local canonical, e.g. "US1" (NOT globally unique — restarts per feature)
@@ -48,6 +49,10 @@ export interface TaskLine {
   paths: string[];
   /** Why `paths` is empty (feature 015): no usable path, or a glob was declared. */
   pathIssue?: "missing" | "glob";
+  /** Feature 020: BLOCKED reason(s); `""` = marked blocked with no reason; absent = not blocked. */
+  blocked?: string;
+  /** Feature 020: DEVIATION note(s); absent = none. */
+  deviation?: string;
 }
 
 
@@ -145,15 +150,14 @@ export function parseTasks(content: string): TaskLine[] {
     const h = /^##\s+(.*)$/.exec(line);
     if (h) {
       headings += 1;
-      const n = /^Phase\s+(\d+)/i.exec(h[1] ?? "");
-      phase = n ? Number(n[1]) : headings;
+      phase = phaseNumber(h[1] ?? "", headings);
       continue;
     }
     const m = taskRe.exec(line);
     if (!m) continue;
     const done = (m[1] ?? "").toLowerCase() === "x";
     const id = m[2] ?? "";
-    const rest = m[3] ?? "";
+    const { body: rest, blocked, deviation } = parseMarkers(m[3] ?? "");
     const storyTag = /\[(US-?\d+)\]/i.exec(rest);
     tasks.push({
       id,
@@ -163,6 +167,8 @@ export function parseTasks(content: string): TaskLine[] {
       phase,
       parallel: /^\s*\[P\]|\]\s*\[P\]/i.test(rest),
       ...parseDeclaredPaths(rest),
+      ...(blocked !== undefined ? { blocked } : {}),
+      ...(deviation !== undefined ? { deviation } : {}),
     });
   }
   return tasks;
