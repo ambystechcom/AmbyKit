@@ -108,7 +108,7 @@ created: 2026-11-16
 
 ## Phase 10 — Polish
 
-- [ ] [T100] [P] Document the `plugins` config key and the testkit entry (docs/cli-reference.md)
-- [ ] [T101] [P] Add the plugin loader to the architecture overview (docs/architecture.md)
+- [x] [T100] [P] Document the `plugins` config key and the testkit entry (docs/cli-reference.md)
+- [x] [T101] [P] Add the plugin loader to the architecture overview (docs/architecture.md)
 
-**Verify:** `npm run typecheck` and `npm test` pass, and the docs link to `docs/plugin-api.md` and `docs/plugin-trust.md`.
+**Verify:** `npm run typecheck` and `npm test` pass, and the docs link to `docs/plugin-api.md` and `docs/plugin-trust.md`. ? unverified: typecheck passes and the docs link plugin-api.md and plugin-trust.md; npm test fails only on the 10 emitters-golden tests (019's pending re-record), rerun in the integration batch

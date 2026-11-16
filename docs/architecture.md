@@ -49,6 +49,19 @@ An abstract class holding all shared state and behavior; each tool is a thin sub
 
 Adding a tool = one subclass + a compatibility-matrix row + a snapshot test.
 
+## Plugins
+
+`src/plugins/` lets a project add targets without changing the core (feature 027, experimental). Config lists
+`plugins: { "<package>": "<exact version>" }`; `sync`, `check` and `add` call `loadPluginSession`, which returns
+`undefined` without importing anything when no plugin is listed. With plugins, `loader.ts` (the only side-effecting
+module) reads `<project>/node_modules/<package>/package.json`, requires the installed version to equal the pin
+and the declared `ambykit.pluginApi` range (`semver.ts`) to contain `PLUGIN_API_VERSION`, imports the entry, calls
+it with the extension points if it is a factory, and validates the shape (never `instanceof`). `registry.ts` merges
+the plugin targets after the built-in `TARGETS`; a clashing id is reported, never overridden. The registry is passed
+to `getTarget`, `emittersForTargets`, `sharedOutputs` and `buildEmittedFiles`, which also refuses any project-scope
+path that leaves the project. `src/testkit/` is the published contract kit (`@ambystech/ambykit/testkit`).
+See [`plugin-api.md`](./plugin-api.md) and [`plugin-trust.md`](./plugin-trust.md).
+
 ## `BaseCommand`
 
 The CLI verbs mirror the same pattern. An abstract `BaseCommand` holds project/`.amby/` discovery,

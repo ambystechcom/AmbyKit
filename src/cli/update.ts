@@ -6,6 +6,8 @@ import { loadConfig } from "../core/config.js";
 import { isOutdated } from "../core/version.js";
 import { packageVersion, projectAtCwd } from "../core/paths.js";
 import { refreshLatest } from "./io/version-check.js";
+import { loadPluginSession } from "../plugins/session.js";
+import { reportPlugins } from "../plugins/report.js";
 
 const PACKAGE = "@ambystech/ambykit";
 
@@ -29,7 +31,7 @@ export class UpdateCommand extends BaseCommand {
       return this.updateCli(installed, latest);
     }
     // CLI is current (or latest unknown) → refresh the project's prompts (US-3) and report (US-4).
-    return this.refreshProject(opts, installed);
+    return await this.refreshProject(opts, installed);
   }
 
   /** Attempt a global install of the latest; on success, stop and ask the user to re-run (R-5). */
@@ -53,14 +55,16 @@ export class UpdateCommand extends BaseCommand {
    * invocation dir (`.amby/` AND `specs/`), reusing the `sync` pipeline (US-3, Principle 1/2). Skips
    * cleanly outside a project (FR-010). Reports the outcome, incl. the exact up-to-date message (US-4).
    */
-  protected refreshProject(opts: CliOptions, installed: string): number {
+  protected async refreshProject(opts: CliOptions, installed: string): Promise<number> {
     const root = opts.cwd;
     if (!projectAtCwd(root)) {
       this.info(`AmbyKit ${installed} is current. Not in an AmbyKit project — no prompts to refresh.`);
       return 0;
     }
     const config = loadConfig(root);
-    const files = buildEmittedFiles(root, config);
+    const session = await loadPluginSession(root, config); // plugin targets refresh with the rest (feature 027)
+    for (const line of reportPlugins(session).errors) this.warn(line);
+    const files = buildEmittedFiles(root, config, session?.registry);
     const result = applyFiles(root, files, { dryRun: this.dryRun, includeUser: false });
     const changed = this.dryRun ? result.wouldChange.length : result.written.length;
     if (changed === 0) {

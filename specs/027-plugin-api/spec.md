@@ -2,7 +2,7 @@
 feature: 027-plugin-api          # NNN-slug
 title: Plugin API for emitters and extensions
 branch: 027-plugin-api
-status: ready                     # draft | ready | in-progress | blocked | done
+status: in-progress                     # draft | ready | in-progress | blocked | done
 created: 2026-11-12
 ---
 
@@ -37,7 +37,7 @@ can add it without forking or waiting for a core release.
   confirm `sync` writes its files.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given the documented API, When an author extends the base emitter and sets only the paths and
@@ -60,7 +60,7 @@ adding an assistant is a config line, not a code change.
   and a second run produces no diff.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a config entry naming an `ambykit-emitter-*` package, When `sync` runs, Then the plugin's
@@ -84,7 +84,7 @@ match what the assistant actually expects.
   fails with a wrong path or key.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a plugin and its row of the compatibility matrix, When the test kit runs, Then it checks the
@@ -106,7 +106,7 @@ As a plugin author, I want clear stability promises, so that I know when my plug
   incompatible one with a clear message.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given the API in 1.6, When it is documented, Then it is labelled experimental and may change in minor
@@ -128,7 +128,7 @@ format churn no longer forces core releases.
   projects keep working.
 - **depends-on:** [US-2, US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given the set of targets, When the split is decided, Then each target is recorded as built in or
@@ -174,7 +174,7 @@ installing a plugin cannot silently change my machine or repo.
   writes outside the project need consent.
 - **depends-on:** [US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a package that is installed but not listed in config, When `sync` runs, Then it is not loaded.
@@ -197,7 +197,7 @@ that adopting the plugin API requires no migration.
 - **Independent test:** run `sync` on an existing project before and after and confirm identical output.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** in-progress
 
 **Acceptance criteria**
 - Given a project with no plugins listed, When `sync` runs, Then output is identical to before.
@@ -239,6 +239,7 @@ that adopting the plugin API requires no migration.
 - FR-015  WHERE a plugin provides roles, phases or templates (in a later 1.x release, not 1.6), THE
   SYSTEM SHALL emit them like built-in ones and SHALL NOT let them replace a built-in one without explicit configuration.
   DEFERRED to a later 1.x release.
+  uncovered: FR-015 — deferred to a later 1.x release (US-6); no 1.6 behavior to test.
 - FR-016  WHERE no plugins are listed, THE SYSTEM SHALL produce `sync` output identical to the previous
   release.
 - FR-017  WHEN `sync` runs twice with the same plugins, THE SYSTEM SHALL produce no diff on the second

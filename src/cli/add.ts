@@ -30,7 +30,7 @@ export class AddCommand extends BaseCommand {
       }
       const picked = await multiSelect(this.caps, {
         message: "Select tools to add",
-        options: toolOptions(),
+        options: toolOptions(registry),
       });
       if (picked === null || picked.length === 0) {
         this.warn("Nothing selected.");
