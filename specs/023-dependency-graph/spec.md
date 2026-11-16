@@ -33,7 +33,7 @@ stories and features, so that every consumer sees the same dependencies instead 
   and the derived feature edge are all present and correct.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given features with stories, When the graph is built, Then each story is a node identified by

@@ -21,19 +21,19 @@ created: 2026-11-16
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T010] Define `DependencyGraph`, `StoryNode`, `StoryEdge`, `FeatureEdge`, `BrokenEdge`, `GraphCycle` types (src/core/graph-types.ts)
-- [ ] [T011] Export the graph types and API surface from the core barrel (src/core/index.ts)
+- [x] [T010] Define `DependencyGraph`, `StoryNode`, `StoryEdge`, `FeatureEdge`, `BrokenEdge`, `GraphCycle` types (src/core/graph-types.ts)
+- [x] [T011] Export the graph types and API surface from the core barrel (src/core/index.ts)
 
-**Verify:** `npm run typecheck` passes and T001's goldens are still green.
+**Verify:** `npm run typecheck` passes and T001's goldens are still green. ✓ passed
 
 ## Phase 3 — User story US-1  (priority: P1)
 
-- [ ] [T020] [US1] Implement `buildGraph(features)`: story nodes, story edges with kind, derived feature edges, sorted output (src/core/graph.ts)
-- [ ] [T021] [US1] Add broken-edge reporting (unknown story or feature, both ends named) and cycle reporting by ID, including self-dependency (src/core/graph.ts)
-- [ ] [T022] [US1] Test build, feature-edge derivation, determinism under shuffled input, no mutation, broken edges, cycles, the spec's edge cases, and the SC-001 timing on a 200-feature fixture (test/core/graph.test.ts)
+- [x] [T020] [US1] Implement `buildGraph(features)`: story nodes, story edges with kind, derived feature edges, sorted output (src/core/graph.ts)
+- [x] [T021] [US1] Add broken-edge reporting (unknown story or feature, both ends named) and cycle reporting by ID, including self-dependency (src/core/graph.ts)
+- [x] [T022] [US1] Test build, feature-edge derivation, determinism under shuffled input, no mutation, broken edges, cycles, the spec's edge cases, and the SC-001 timing on a 200-feature fixture (test/core/graph.test.ts)
 - **Checkpoint:** US-1 is demoable: `buildGraph` over two sample features returns nodes, edges and a derived feature edge.
 
-**Verify:** `npm test -- core/graph.test` passes, including the determinism and 200-feature timing tests.
+**Verify:** `npm test -- core/graph.test` passes, including the determinism and 200-feature timing tests. ✓ passed
 
 ## Phase 4 — User story US-2  (priority: P1)
 

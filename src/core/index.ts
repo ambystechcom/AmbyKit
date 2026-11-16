@@ -9,3 +9,5 @@ export * from "./analyze.js";
 export * from "./git.js";
 export * from "./worktree.js";
 export * from "./roles.js";
+export * from "./graph-types.js";
+export * from "./graph.js";
