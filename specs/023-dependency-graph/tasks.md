@@ -58,13 +58,13 @@ created: 2026-11-16
 
 ## Phase 6 — User story US-4  (priority: P1)
 
-- [ ] [T050] [P] [US4] Rebuild `analyzeGraph` on `buildGraph`; keep `resolveDepKey` as a re-export if other modules import it (src/core/analyze.ts)
-- [ ] [T051] [P] [US4] Rebuild `attentionItems` and drop private `resolveDep`/`cycleKeys` in favor of the graph, preserving 020's behavior (`task-blocked` items, blocked tasks dropped from 'Up next') (src/core/overview.ts)
-- [ ] [T052] [P] [US4] Story-detail reverse edges read from the graph instead of re-filtering `dependsOn` (src/cli/ui/dashboard/story-detail.ts)
-- [ ] [T053] [US4] Guard and agreement tests: the dependency regex exists only in `parseStories`; `analyze`, dashboard attention and `ambykit graph` name the same blockers for every story (test/core/graph-consumers.test.ts)
+- [x] [T050] [P] [US4] Rebuild `analyzeGraph` on `buildGraph`; keep `resolveDepKey` as a re-export if other modules import it (src/core/analyze.ts)
+- [x] [T051] [P] [US4] Rebuild `attentionItems` and drop private `resolveDep`/`cycleKeys` in favor of the graph, preserving 020's behavior (`task-blocked` items, blocked tasks dropped from 'Up next') (src/core/overview.ts)
+- [x] [T052] [P] [US4] Story-detail reverse edges read from the graph instead of re-filtering `dependsOn` (src/cli/ui/dashboard/story-detail.ts)
+- [x] [T053] [US4] Guard and agreement tests: the dependency regex exists only in `parseStories`; `analyze`, dashboard attention and `ambykit graph` name the same blockers for every story (test/core/graph-consumers.test.ts)
 - **Checkpoint:** US-4 is demoable: change one dependency in a spec and `analyze` and the dashboard both reflect it.
 
-**Verify:** the T001 goldens pass unchanged, `npm test -- graph-consumers` passes, and the full `npm test` shows no other regression.
+**Verify:** the T001 goldens pass unchanged, `npm test -- graph-consumers` passes, and the full `npm test` shows no other regression. ✓ passed
 
 ## Phase 7 — User story US-5  (priority: P2)
 

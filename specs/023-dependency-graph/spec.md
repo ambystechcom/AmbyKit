@@ -100,7 +100,7 @@ graph instead of parsing dependencies themselves, so that they cannot disagree.
   reflect it with no other change.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given `analyze` runs, When it checks dependencies, Then it uses the shared graph and its findings are

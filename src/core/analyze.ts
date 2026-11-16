@@ -8,7 +8,10 @@ import {
 } from "./dashboard.js";
 import { readFeatures } from "./features.js";
 import type { PhaseVerify } from "./markers.js";
+import { buildGraph, nodeKey, parseDependencyRef } from "./graph.js";
+import { blockersOf } from "./graph-paths.js";
 import { declarations, laneConflicts, type Declaration, type LaneConflict } from "./lanes.js";
+import type { FeatureSnapshot } from "./overview-types.js";
 
 export interface GraphIssue {
   kind: "cycle" | "dangling-reference";
@@ -83,92 +86,103 @@ export function storyDeps(s: StoryProgress): string[] {
 /**
  * Resolve a story's dependency to a globally-unique key. Story ids restart per feature, so a bare
  * dependency (e.g. `US-1`) resolves within the story's own feature. A dependency written as
- * `NNN:US-1` / `NNN/US-1` targets another feature explicitly.
+ * `NNN:US-1` / `NNN/US-1` targets another feature explicitly. The syntax is read by `parseDependencyRef`
+ * (feature 023); this wrapper only keeps the public name.
  */
 export function resolveDepKey(s: StoryProgress, dep: string): string {
-  const qualified = /^(\d+)[:/]?(US\d+)$/.exec(dep);
-  if (qualified) return storyKey(qualified[1] ?? s.featureRef, qualified[2] ?? dep);
-  return storyKey(s.featureRef, dep);
+  const { ref, local } = parseDependencyRef(dep);
+  return storyKey(ref ?? s.featureRef, local);
 }
 
-const displayFor = (byKey: Map<string, StoryProgress>, key: string): string =>
-  byKey.has(key) ? displayKey(byKey.get(key)!) : key;
+/** The minimal feature snapshots `buildGraph` needs, from a flat story list grouped by feature. */
+function snapshotsOf(stories: StoryProgress[]): FeatureSnapshot[] {
+  const byFeature = new Map<string, FeatureSnapshot>();
+  for (const s of stories) {
+    let f = byFeature.get(s.feature);
+    if (!f) {
+      f = {
+        dir: s.feature,
+        ref: s.featureRef,
+        displayRef: s.featureRef,
+        stories: [],
+        tasks: null,
+        artifacts: { spec: true, ui: false, uiSignedOff: false, plan: false, tasks: false },
+        clarifications: [],
+      };
+      byFeature.set(s.feature, f);
+    }
+    f.stories.push(s);
+  }
+  return [...byFeature.values()];
+}
 
-/** Validate the story dependency graph. Pure — no filesystem, no model tokens. */
+/**
+ * Validate the story dependency graph. Pure — no filesystem, no model tokens. Dependencies come from
+ * the shared graph (feature 023): this function only turns the graph into the findings `analyze` has
+ * always reported, so those findings do not change (FR-017).
+ */
 export function analyzeGraph(stories: StoryProgress[]): AnalysisReport {
-  const byKey = new Map(stories.map((s) => [s.key, s]));
+  const graph = buildGraph(snapshotsOf(stories));
+  const storyOfNode = new Map<string, StoryProgress>();
+  for (const s of stories) {
+    const key = nodeKey(s.feature, s.id);
+    if (!storyOfNode.has(key)) storyOfNode.set(key, s);
+  }
+  const display = (key: string): string => {
+    const s = storyOfNode.get(key);
+    return s ? displayKey(s) : key;
+  };
   const issues: GraphIssue[] = [];
 
-  // Dangling references (resolved within the referencing story's feature).
+  // Dangling references: a dependency that names a story that does not exist.
+  const brokenFrom = new Map<string, typeof graph.broken>();
+  for (const b of graph.broken) brokenFrom.set(b.from, [...(brokenFrom.get(b.from) ?? []), b]);
   for (const s of stories) {
-    for (const dep of storyDeps(s)) {
-      const depKey = resolveDepKey(s, dep);
-      if (!byKey.has(depKey)) {
-        issues.push({
-          kind: "dangling-reference",
-          message: `${displayKey(s)} references unknown story ${dep}`,
-          stories: [s.key, depKey],
-        });
-      }
+    const key = nodeKey(s.feature, s.id);
+    if (storyOfNode.get(key) !== s) continue;
+    const seen = new Set<string>();
+    for (const b of brokenFrom.get(key) ?? []) {
+      if (seen.has(b.to)) continue;
+      seen.add(b.to);
+      issues.push({
+        kind: "dangling-reference",
+        message: `${displayKey(s)} references unknown story ${b.to}`,
+        stories: [s.key, resolveDepKey(s, b.to)],
+      });
     }
   }
 
-  // Cycle detection (DFS with coloring), over qualified keys.
-  const WHITE = 0;
-  const GRAY = 1;
-  const BLACK = 2;
-  const color = new Map<string, number>(stories.map((s) => [s.key, WHITE]));
-  const stack: string[] = [];
-  const cycleNodes = new Set<string>();
-
-  const visit = (key: string): void => {
-    color.set(key, GRAY);
-    stack.push(key);
-    const s = byKey.get(key);
-    if (s) {
-      for (const dep of storyDeps(s)) {
-        const depKey = resolveDepKey(s, dep);
-        if (!byKey.has(depKey)) continue;
-        const c = color.get(depKey);
-        if (c === GRAY) {
-          const idx = stack.indexOf(depKey);
-          for (const n of stack.slice(idx)) cycleNodes.add(n);
-        } else if (c === WHITE) {
-          visit(depKey);
-        }
+  // Cycles: one finding naming every story on any cycle.
+  const members: string[] = [];
+  const inCycle = new Set<string>();
+  for (const c of graph.cycles) {
+    for (const k of c.stories) {
+      if (!inCycle.has(k)) {
+        inCycle.add(k);
+        members.push(k);
       }
     }
-    stack.pop();
-    color.set(key, BLACK);
-  };
-  for (const s of stories) {
-    if (color.get(s.key) === WHITE) visit(s.key);
   }
-  if (cycleNodes.size > 0) {
-    const keys = [...cycleNodes];
+  if (members.length > 0) {
     issues.push({
       kind: "cycle",
-      message: `Dependency cycle among ${keys.map((k) => displayFor(byKey, k)).join(", ")}`,
-      stories: keys,
+      message: `Dependency cycle among ${members.map(display).join(", ")}`,
+      stories: members.map((k) => storyOfNode.get(k)?.key ?? k),
     });
   }
 
   // Blocked vs buildable.
-  const isDone = (s: StoryProgress): boolean => s.status === "done";
   const blocked: BlockedStory[] = [];
   const buildable: string[] = [];
   for (const s of stories) {
-    if (isDone(s)) continue;
-    const unmet = storyDeps(s).filter((d) => {
-      const t = byKey.get(resolveDepKey(s, d));
-      return !t || !isDone(t);
-    });
+    if (s.status === "done") continue;
+    const unmet = blockersOf(graph, nodeKey(s.feature, s.id));
     if (unmet.length > 0) {
       blocked.push({
         key: s.key,
         displayId: displayKey(s),
         feature: s.feature,
-        on: unmet.map((d) => displayFor(byKey, resolveDepKey(s, d))),
+        on: unmet.map((b) => (b.broken ? resolveDepKey(s, b.key) : display(b.key))),
       });
     } else {
       buildable.push(displayKey(s));

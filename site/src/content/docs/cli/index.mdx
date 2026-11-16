@@ -100,6 +100,17 @@ ambykit analyze [--json]
 
 Cross-check spec ↔ plan ↔ tasks for coverage, consistency, and dependency-graph health. Read-only.
 
+## `ambykit graph`
+
+```text
+ambykit graph [feature] [--json | --mermaid]
+```
+
+Print the story and feature dependency graph, built locally from `specs/` (no model tokens). Shows
+what depends on or is blocked by what, the feature dependencies that follow from it, and any broken
+references or cycles, which are listed first and make the command exit non-zero. Give a feature to see
+it and its direct neighbours. `--json` is a versioned machine shape; `--mermaid` prints a flowchart.
+
 ## `ambykit check`
 
 ```text
