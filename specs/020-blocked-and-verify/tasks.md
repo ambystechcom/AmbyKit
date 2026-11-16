@@ -90,7 +90,7 @@ created: 2026-11-16
 
 - [x] [T090] Record the SC-005 evidence: lanes used per phase, merges done by `ambykit lane merge`, and whether any marker or check-off conflict needed manual resolution (specs/020-blocked-and-verify/lane-notes.md)
 - [x] [T091] Run `/amby.converge` and append any gap tasks; confirm every FR maps to a test (P5) (specs/020-blocked-and-verify/tasks.md)
-- **Verify:** `npm run typecheck && npm test`
+- **Verify:** `npm run typecheck && npm test` ✓ passed
 
 ## Convergence gaps
 
@@ -102,5 +102,5 @@ created: 2026-11-16
 - [x] [T103] [US1] Test the new marker issue: marker before a path group is reported, marker after it is not, exit status unchanged (closes FR-002, FR-012) (test/core/analyze-markers.test.ts)
 - [x] [T104] [US2] [VERIFY] Add a narrow-terminal case: the blocked count and the failed-phase text are asserted only in the wide and `--icons=ascii` layouts, never at a narrow width (closes FR-014) (test/cli/markers-surface.test.ts, test/cli/verify-surface.test.ts)
 - [x] [T105] [US5] [VERIFY] SC-005 was only partly met (2 of 14 lane merges needed a manual step, see lane-notes.md): decide between writing the rule down (record Verify results after the phase's lanes are merged) in the prompt and the artifact page, or teaching `mergeCheckoffs` to take a lane's check-off next to other edits; then apply the choice (closes SC-005) (src/prompts/implement.md, docs/artifacts/tasks.md)
-- [ ] [T106] [US5] INTEGRATION STEP (once, after T100 and T105 are merged): re-record the emitter goldens with `UPDATE_GOLDEN=1`, run `ambykit sync` with this checkout's build, confirm a second sync produces no diff (test/fixtures/emitters-golden/, .claude/commands/, .agents/skills/)
-- **Verify:** `npm run typecheck && npx vitest run test/prompts-020.test.ts test/core/analyze-markers.test.ts test/cli/markers-surface.test.ts test/cli/verify-surface.test.ts && ambykit sync --check`
+- [x] [T106] [US5] INTEGRATION STEP (once, after T100 and T105 are merged): re-record the emitter goldens with `UPDATE_GOLDEN=1`, run `ambykit sync` with this checkout's build, confirm a second sync produces no diff (test/fixtures/emitters-golden/, .claude/commands/, .agents/skills/)
+- **Verify:** `npm run typecheck && npx vitest run test/prompts-020.test.ts test/core/analyze-markers.test.ts test/cli/markers-surface.test.ts test/cli/verify-surface.test.ts && ambykit sync --check` ✓ passed

@@ -2,7 +2,7 @@
 feature: 020-blocked-and-verify          # NNN-slug
 title: Blocked markers and Verify lines
 branch: 020-blocked-and-verify
-status: ready                     # draft | ready | in-progress | blocked | done
+status: done                     # draft | ready | in-progress | blocked | done
 created: 2026-11-12
 ---
 
@@ -80,7 +80,7 @@ checkpoint, so that "phase done" means the phase actually works, not only that i
   confirm the check runs before the checkpoint and its result is recorded.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a phase with a Verify line and all its tasks checked, When the implementer reaches the
@@ -104,7 +104,7 @@ Verify failed, so that unverified phases are caught early at zero tokens.
   both are reported by `analyze` and shown on the dashboard.
 - **depends-on:** [US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a phase with no Verify line, When `analyze` runs, Then it reports a finding naming the phase.
@@ -124,7 +124,7 @@ keep working unchanged, so that upgrading to 1.4 needs no migration.
   after the feature, and confirm identical results apart from the new warnings.
 - **depends-on:** [US-1, US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given any `tasks.md` that predates this feature, When read, Then task IDs, checked state, `[P]`
