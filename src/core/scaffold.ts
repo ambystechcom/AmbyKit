@@ -11,6 +11,7 @@ export const ARTIFACT_TEMPLATES = [
   "plan.md",
   "tasks.md",
   "tests.md",
+  "adr.md",
 ] as const;
 
 /** On-demand reference docs installed into a consumer's `.amby/reference/`. */
