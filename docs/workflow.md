@@ -1,8 +1,8 @@
 # The AmbyKit workflow
 
-Twelve phases, each a slash command in your assistant, each producing or updating one artifact. The
+Thirteen phases, each a slash command in your assistant, each producing or updating one artifact. The
 happy path is **specify → design → plan → tasks → implement**, with `constitution` once up front and
-`clarify`/`revise`/`analyze`/`converge`/`review`/`decide` when you need them.
+`clarify`/`revise`/`analyze`/`converge`/`review`/`decide`/`run` when you need them.
 
 | Phase | Command | Reads | Writes |
 |---|---|---|---|
@@ -18,6 +18,7 @@ happy path is **specify → design → plan → tasks → implement**, with `con
 | Converge | `/amby.converge` | spec, plan, tasks + code | `tasks.md` (appends gap tasks), story status |
 | Review | `/amby.review` | any artifact + a role | findings (advisory); the artifact only with `--apply` |
 | Decide | `/amby.decide` | decision index | `.amby/decisions/ADR-###.md` + the index |
+| Run | `/amby.run` | spec, plan, tasks, `tests.md` | `tasks.md` check-offs + `.amby/fleet/<run>/` |
 
 ## 1. Constitution
 
@@ -103,6 +104,18 @@ and patches the index. Callable from any phase; it has no role. It points to an 
 duplicating one, keeps a decision that conflicts with a constitution principle `proposed` for a person to
 settle, and `--supersede ADR-###` marks the old record superseded on both sides. Cite records elsewhere as
 `ADR-###`; `ambykit analyze` flags a citation with no record. See `docs/artifacts/decision-record.md`.
+
+## 13. Run
+
+`/amby.run <feature>` works a feature through its tasks as a team. The assistant you call it from is the
+**lead**: it gives worker subagents only their task IDs, file ownership and artifact references, then runs a
+QA step (the phase's `**Verify:**` line and acceptance criteria, with the `tests.md` cases when present) and an
+architect review before a phase passes. A failing Verify never passes a checkpoint; a failed review returns only
+finding IDs to the same worker, and at the round limit (default 3) the lead stops and asks you. State lives in
+`.amby/fleet/<feature>.<n>/`, so a run resumes in a new session; pause, resume and stop are directives that
+workers obey at their next report. Defaults (`stallMinutes`, `restartLimit`, `concurrency`, `roundLimit`,
+`workerModel`) are the `fleet` object in `.amby/config.json`. Without verified subagent support the lead does
+every step itself, in sequence. `ambykit fleet` is the helper the prompt calls; see `docs/cli-reference.md`.
 
 ## Roles
 

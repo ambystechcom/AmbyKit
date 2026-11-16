@@ -12,6 +12,15 @@ Release notes with full detail live on the
 
 ### Added
 
+- `/amby.run` (feature 019): the 13th phase. The assistant you call it from is the lead: it starts worker
+  subagents (`amby-worker`, write-capable; the review roles stay read-only), gives each only its task IDs, file
+  ownership and artifacts by reference, then runs QA (the phase's Verify line, acceptance criteria and the
+  `tests.md` cases) and an architect review before a phase passes. A failed review returns only finding IDs to
+  the same worker; at the round limit (default 3) the lead stops and asks. State is plain files under
+  `.amby/fleet/<feature>.<n>/`, so a run resumes in a new session, and pause, resume and stop are directives
+  workers obey at their next report. Assistants without verified subagent support get the same prompt and the
+  lead does every step in sequence. `ambykit fleet start|status|update|claim|release|note|directive` is the thin
+  helper the prompt calls. Worker files are emitted for Claude Code, OpenCode and Copilot.
 - AmbyKit as an MCP server (feature 025): `ambykit mcp` serves state tools over stdio so an assistant asks for
   state instead of reading files: `next_task`, `story_status`, `lane_tasks`, `lane_status`, `analyze_report`,
   validated one-line writes `tick_task` and `set_story_status`, and `report_activity`, `claim_file` and

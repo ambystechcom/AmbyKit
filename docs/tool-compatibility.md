@@ -40,6 +40,7 @@ Several targets share one emitter's output (why `BaseEmitter` + thin subclasses 
 | Args placeholder | `$ARGUMENTS`, `$N`, `$name` | `$ARGUMENTS`, `$1` | `${input:x}` | — | prompt text | — | none — reworded as prose (as Codex) | none — trailing free text only (AmbyKit reworks `$ARGUMENTS` into prose) |
 | Agents | `.claude/agents/*.md` | `.opencode/agents/*.md` | `.github/agents/*.agent.md` | `.github/agents/*.agent.md` | UI modes (no file) | — | none (SDK only) | none (skills only) |
 | Agent frontmatter | `name`*, `description`*, `tools`, `model` (body = system prompt) | `description`* (+`mode`, `permission`; filename = id) | `description`*, `name`, `tools` | same as Copilot VS Code | — | — | — | — |
+| Subagents for `/amby.run` (019) | **confirmed**: the emitted `amby-*` agents are spawnable in a live Claude Code session (checked 2026-11-16); `amby-worker` is emitted at `.claude/agents/amby-worker.md` with `tools` incl. Write/Edit/Bash and `model` from `fleet.workerModel` | unconfirmed: format documented, `amby-worker` emitted at `.opencode/agents/` (no `model`), not run live | unconfirmed: `amby-worker` emitted at `.github/agents/amby-worker.agent.md`, not run live | unconfirmed (shares the Copilot file) | none (UI modes only) | none | none (SDK only) | none (skills only) |
 | MCP file | `.mcp.json` | `opencode.json` — **not written** (two incompatible schemas; see `specs/025-mcp-server/research.md`) | `.vscode/mcp.json` | `~/.copilot/mcp-config.json` (user) | `.cursor/mcp.json` | reads `.cursor/mcp.json` | **not written** for the IDE (the CLI uses `.agents/mcp_config.json`, project) | `.codex/config.toml` (TOML) — **out of scope**, AmbyKit does not write it |
 | MCP top-level key | `mcpServers` | `mcp` or `mcp.servers` (by version) | `servers` | `mcpServers` | `mcpServers` | `mcpServers` (shared file) | `mcpServers` | `mcp_servers.<id>` (not written) |
 | MCP entry shape | `{type:"stdio",command,args}` | — | `{type:"stdio",command,args}` | `{type:"local",command,args,tools:["*"]}` (`tools` required) | `{type:"stdio",command,args}` | same as Cursor | `{command,args}` | — |
@@ -59,6 +60,7 @@ documented surfaces are emitted (Principle 4).
 | Command name | path under the dir, `/` ⇒ `:`; dots kept | as Gemini | as Gemini; dots kept | filename | filename; subdir ⇒ `:` | filename | directory name | invoked `/skill:<name>` |
 | AGENTS.md native | No (opt-in via `context.fileName`) | No (`contextFileName`) | Yes per source; the docs page still says `QWEN.md` only | Yes | Yes | Yes | Yes | Yes (also `CLAUDE.md`) |
 | Agents/personas | not emitted | not emitted | not emitted | not emitted | not emitted | not emitted | not emitted | not emitted |
+| Subagents for `/amby.run` (019) | none (no documented file format) | none (`/subagent save` only) | none | none | none | none | none | none (shares the Codex output) |
 | Sources | github.com/google-gemini/gemini-cli (docs/cli/custom-commands.md, gemini-md.md) | github.com/vybestack/llxprt-code (docs/cli/commands.md, configuration.md) | qwenlm.github.io/qwen-code-docs (features/commands); github.com/QwenLM/qwen-code | kilo.ai/docs (customize/workflows, agents-md) | docs.augmentcode.com/cli (custom-commands, rules) | docs.devin.ai/desktop/cascade (workflows, memories) | kiro.dev/docs (skills, steering) | github.com/earendil-works/pi (packages/coding-agent/docs/skills.md) |
 
 **Gemini and LLxprt (TOML).** The prompt is a TOML literal multi-line string (`'''…'''`), so
@@ -78,6 +80,15 @@ identical and written once. Its activity self-report says `codex`.
 `.agents/skills/`. With Codex selected they can see each phase twice (once as a command, once as a
 skill). This is documented, not suppressed. Augment also reads `.claude/commands/`; the names are
 identical and `.augment/` takes precedence, so Claude plus Augment yields no duplicates.
+
+**Subagents (feature 019).** `/amby.run` delegates to a write-capable `amby-worker` and to the read-only
+`amby-qa` and `amby-architect` personas. The per-target table is `src/core/subagents.ts`; only a target
+confirmed on a live install counts as supported (Principle 4), every other target gets the same prompt with
+`$SUBAGENTS` = `no`, so the lead does the worker, QA and review steps itself in sequence from the same state
+files. Claude Code is confirmed (the `amby-*` agents from feature 013 are spawnable in a live session, and the
+worker uses the same documented frontmatter plus write tools); the first live run of `amby-worker` from
+`/amby.run` is the 019 dogfood gate. Only Claude documents a `model` key for agent files, so
+`fleet.workerModel` is applied there and ignored elsewhere.
 
 ### Status notes (checked 2026-11-04)
 

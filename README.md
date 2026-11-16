@@ -50,6 +50,7 @@ Then, inside your AI assistant, walk the workflow:
 /amby.converge       # verify the code against the spec; append gap tasks, repeat until converged
 /amby.review         # have another role (QA, Architect, PM…) critique an artifact, findings by ID
 /amby.decide         # record a decision as ADR-###, cited by ID, checked by analyze
+/amby.run            # build a feature as a team: workers, QA and architect review, resumable
 ```
 
 Track progress from the terminal:
@@ -119,6 +120,7 @@ install that's one `npx` away instead of a Python toolchain.
 | Converge | `/amby.converge` | checks code vs spec/plan/tasks; appends gap tasks to `tasks.md` |
 | Review | `/amby.review` | cross-role critique of any artifact; `--apply` patches in place |
 | Decide | `/amby.decide` | numbered decision records in `.amby/decisions/`, cited as `ADR-###` |
+| Run | `/amby.run` | worker subagents, QA and architect review; run state in `.amby/fleet/` (helper: `ambykit fleet`) |
 
 Requirements use **user stories** (`US-#`) + **EARS** functional requirements (`FR-###`) +
 **Given/When/Then** acceptance criteria. Stories carry `priority` and `depends-on`/`blocked-by` so

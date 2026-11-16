@@ -204,6 +204,33 @@ ambykit directive <feature> <lane> pause|resume|stop [--run=<id>]
 Tells a fleet lane to pause, resume or stop. The worker finishes its current task and obeys at its next
 report. An unknown lane is refused by name.
 
+## `ambykit fleet`
+
+The helper `/amby.run` and its workers call, so every change to a run goes through one validated path. It
+keeps no state of its own: runs, claims, notes and directives are the fleet state under `.amby/fleet/<run>/`,
+and stall detection is the same one the dashboard uses.
+
+```text
+ambykit fleet start 019 [--new]          # create run 019-...N; refuses when one is unfinished unless --new
+ambykit fleet status 019 [--run=<id>] [--json] [--rebuild]
+ambykit fleet update 019 --worker-start=lane-1-1 --assistant=claude --tasks=T001,T002
+ambykit fleet update 019 --stage=qa | --phase=2 | --round=2 | --decision="<text>" | --done
+ambykit fleet update 019 --pause[=<lane>] | --resume[=<lane>] | --stop[=<lane>]
+ambykit fleet update 019 --overlap=squad --lanes=a,b --shared=<path> --writer=<path>:<lane> --order=a,b
+ambykit fleet claim 019 T012 src/a.ts [--worker=<id>]   # refused, naming the owner, when held
+ambykit fleet release 019 T012
+ambykit fleet note 019 T012 --files=src/a.ts "one-line note"
+ambykit fleet directive 019 lane-1-1     # prints continue, pause or stop
+```
+
+`start` creates nothing for a feature that is already done or whose spec, plan or tasks are missing or draft.
+`status` prints the run, the next phase, each lane (state, idle time, directive, restarts left), free slots
+under `fleet.concurrency`, and warnings: damaged state, a checked task that still holds claims, a lane edit
+with no claim. `--rebuild` rewrites a missing or corrupt `run.json` from `tasks.md` and never touches checked
+tasks. `--worker-start` is refused when no slot is free; `--restart` is refused after `fleet.restartLimit`
+restarts, pausing the lane and asking a person. `--round` prints `retry` or `escalate` and, on `escalate`,
+waits for a decision. Pause, resume and stop go through the same writer as `ambykit directive`.
+
 ## `ambykit update`
 
 ```text
