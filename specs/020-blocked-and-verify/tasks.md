@@ -45,7 +45,7 @@ created: 2026-11-16
 ## Phase 4 — User story US-2  (priority: P1)
 
 - [x] [T030] [P] [US2] Report blocked tasks, deviations and marker issues in `AnalysisReport` (new keys only, exit status unchanged) and print them in `ambykit analyze` text and `--json` (FR-009, FR-013) (src/core/analyze.ts, src/cli/analyze.ts)
-- [ ] [T031] [P] [US2] Add `task-blocked` attention items, exclude blocked tasks from *Up next*, and fill `FeatureRow.blocked` (omitted when zero) (FR-010, FR-011) (src/core/overview.ts)
+- [x] [T031] [P] [US2] Add `task-blocked` attention items, exclude blocked tasks from *Up next*, and fill `FeatureRow.blocked` (omitted when zero) (FR-010, FR-011) (src/core/overview.ts)
 - [ ] [T032] [P] [US2] Add token entries for the `task-blocked` and `verify-failed` attention kinds in both theme tables, with ASCII symbols (FR-014) (src/cli/ui/dashboard/tokens.ts)
 - [ ] [T033] [P] [US2] Show the blocked count as text in the feature chart row, only when greater than zero (FR-010, FR-014) (src/cli/ui/dashboard/feature-chart.ts)
 - [ ] [T034] [P] [US2] Show a task's BLOCKED reason and DEVIATION note as text in the story detail, no glyph needed (FR-010, FR-014) (src/cli/ui/dashboard/story-detail.ts)
