@@ -31,3 +31,17 @@ export function traceFixture(def: TraceFixtureDef): string {
   for (const [rel, body] of Object.entries(def.files ?? {})) put(rel, body);
   return root;
 }
+
+/** Run `ambykit trace` in-process; returns its exit code and printed lines. */
+export async function runTrace(cwd: string, positionals: string[] = [], flags: Record<string, string | boolean> = {}) {
+  const { TraceCommand } = await import("../../src/cli/trace.js");
+  const lines: string[] = [];
+  const orig = console.log;
+  console.log = (...a: unknown[]) => void lines.push(a.join(" "));
+  try {
+    const code = await new TraceCommand().run({ cwd, positionals, flags });
+    return { code, out: lines.join("\n") };
+  } finally {
+    console.log = orig;
+  }
+}
