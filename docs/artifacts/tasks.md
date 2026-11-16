@@ -31,6 +31,20 @@ still blocked and is reported as missing one; a checked task that still has `⚠
 inconsistent. Remove the marker when the block is resolved. Text inside backticks is never read as a marker,
 so documentation can show the syntax.
 
+### Verify lines
+
+Each phase ends with one plain-text `**Verify:**` line: the check the implementer runs before passing the
+phase checkpoint. After a run the result is written on that same line as a suffix: `✓ passed`,
+`✗ failed: <why>` or `? unverified` (for a check that needs a person or an external step). The glyphs are
+optional, so `passed`, `failed: <why>` and `unverified` read the same. A Verify line holds one result; a
+later run overwrites it, so an old failure is never shown as current. A phase checkpoint is not passed
+while its Verify line is `failed`.
+
+```
+**Verify:** `npm run typecheck && npx vitest run test/core/markers.test.ts` ✓ passed
+**Verify:** `npm test` ✗ failed: 3 tests in test/cli
+```
+
 ## Phase grouping
 
 Tasks are grouped so structure precedes features:
