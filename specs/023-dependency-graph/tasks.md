@@ -14,10 +14,10 @@ created: 2026-11-16
 
 ## Phase 1 — Setup
 
-- [ ] [T001] Record characterization goldens of today's `analyzeGraph` and `attentionItems` over this repo's specs and the cycle/dangling fixtures, from the 020 tip (build after 020) and BEFORE any refactor (test/core/graph-golden.test.ts, test/fixtures/graph/)
-- [ ] [T002] [P] Write the `--json` contract: `version`, nodes, story edges with kind, feature edges with causing edges, broken, cycles (specs/023-dependency-graph/contracts/graph-json.md)
+- [x] [T001] Record characterization goldens of today's `analyzeGraph` and `attentionItems` over this repo's specs and the cycle/dangling fixtures, from the 020 tip (build after 020) and BEFORE any refactor (test/core/graph-golden.test.ts, test/fixtures/graph/)
+- [x] [T002] [P] Write the `--json` contract: `version`, nodes, story edges with kind, feature edges with causing edges, broken, cycles (specs/023-dependency-graph/contracts/graph-json.md)
 
-**Verify:** `npm test -- graph-golden` passes against the unmodified analyzer and overview code, and `contracts/graph-json.md` lists every field FR-008 requires.
+**Verify:** `npm test -- graph-golden` passes against the unmodified analyzer and overview code, and `contracts/graph-json.md` lists every field FR-008 requires. ✓ passed
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
