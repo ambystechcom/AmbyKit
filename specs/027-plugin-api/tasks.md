@@ -44,12 +44,12 @@ created: 2026-11-16
 
 ## Phase 3 — User story US-1  Write a plugin emitter (priority: P1)
 
-- [ ] [T030] [P] [US1] Worked example plugin `ambykit-emitter-example` extending each of the three extension points (examples/ambykit-emitter-example/)
-- [ ] [T031] [P] [US1] Author `docs/plugin-api.md`: every extension point, option and guarantee, the factory form and the experimental label (docs/plugin-api.md)
-- [ ] [T032] [US1] Test that a plugin built only from the documented API emits files via `BaseEmitter`, `SkillsEmitter` and `TomlCommandEmitter` with no core change (test/plugins/extension-points.test.ts)
+- [x] [T030] [P] [US1] Worked example plugin `ambykit-emitter-example` extending each of the three extension points (examples/ambykit-emitter-example/)
+- [x] [T031] [P] [US1] Author `docs/plugin-api.md`: every extension point, option and guarantee, the factory form and the experimental label (docs/plugin-api.md)
+- [x] [T032] [US1] Test that a plugin built only from the documented API emits files via `BaseEmitter`, `SkillsEmitter` and `TomlCommandEmitter` with no core change (test/plugins/extension-points.test.ts)
 - **Checkpoint:** US-1 is demoable: the example plugin emits files in code.
 
-**Verify:** `npx vitest run test/plugins/extension-points.test.ts` passes, and every extension point in `docs/plugin-api.md` appears in the barrel exports.
+**Verify:** `npx vitest run test/plugins/extension-points.test.ts` passes, and every extension point in `docs/plugin-api.md` appears in the barrel exports. ✓ passed
 
 ## Phase 4 — User story US-2  Discover and load plugins at sync (priority: P1)
 
