@@ -23,11 +23,11 @@ created: 2026-11-16
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T010] [P] Write pure `parseTestDesign`/`checkTestDesign` (cases, uncovered in BOTH the section line and the one-line `uncovered: FR-### — reason` form, flags, skip form, findings) and export them; this is the single grammar spec 024 reuses (src/core/test-design.ts, src/core/index.ts)
-- [ ] [T011] [P] Register `tests.md` in `ARTIFACT_TEMPLATES` so `sync` installs it (src/core/scaffold.ts)
-- [ ] [T012] Update the scaffold test for the new template count; spec 022 later rebases its count on this one (same lane) (test/scaffold.test.ts)
-- [ ] [T013] Unit-test the parser and checker: format, fixed manual reasons, duplicate IDs, unknown IDs, skip form, both uncovered forms parse identically (test/core/test-design.test.ts)
-- **Verify:** `npm run typecheck` and `npx vitest run test/core/test-design.test.ts test/scaffold.test.ts` pass.
+- [x] [T010] [P] Write pure `parseTestDesign`/`checkTestDesign` (cases, uncovered in BOTH the section line and the one-line `uncovered: FR-### — reason` form, flags, skip form, findings) and export them; this is the single grammar spec 024 reuses (src/core/test-design.ts, src/core/index.ts)
+- [x] [T011] [P] Register `tests.md` in `ARTIFACT_TEMPLATES` so `sync` installs it (src/core/scaffold.ts)
+- [x] [T012] Update the scaffold test for the new template count; spec 022 later rebases its count on this one (same lane) (test/scaffold.test.ts)
+- [x] [T013] Unit-test the parser and checker: format, fixed manual reasons, duplicate IDs, unknown IDs, skip form, both uncovered forms parse identically (test/core/test-design.test.ts)
+- **Verify:** `npm run typecheck` and `npx vitest run test/core/test-design.test.ts test/scaffold.test.ts` pass. ✓ passed
 
 ## Phase 3 — User stories US-1, US-2, US-3  (priority: P1)
 

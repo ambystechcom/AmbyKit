@@ -10,6 +10,7 @@ export const ARTIFACT_TEMPLATES = [
   "design-tokens.json",
   "plan.md",
   "tasks.md",
+  "tests.md",
 ] as const;
 
 /** On-demand reference docs installed into a consumer's `.amby/reference/`. */

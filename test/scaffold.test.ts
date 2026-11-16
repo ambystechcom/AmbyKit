@@ -33,6 +33,14 @@ describe("installArtifactTemplates", () => {
     expect(result.present).toHaveLength(0);
   });
 
+  it("021:FR-012: installs the tests.md template next to the other artifact templates", () => {
+    const root = tempRoot();
+    const result = installArtifactTemplates(root);
+    expect(ARTIFACT_TEMPLATES).toContain("tests.md");
+    expect(existsSync(join(root, ".amby", "templates", "tests.md"))).toBe(true);
+    expect(result.created).toContain(".amby/templates/tests.md");
+  });
+
   it("never overwrites an existing (customized) template", () => {
     const root = tempRoot();
     const specPath = join(root, ".amby", "templates", "spec.md");

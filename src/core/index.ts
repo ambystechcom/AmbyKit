@@ -6,6 +6,7 @@ export * from "./dashboard.js";
 export * from "./rules.js";
 export * from "./scaffold.js";
 export * from "./analyze.js";
+export * from "./test-design.js";
 export * from "./git.js";
 export * from "./worktree.js";
 export * from "./roles.js";
