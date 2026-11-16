@@ -1,4 +1,4 @@
-import { computeDashboard, displayKey, storyKey, type StoryProgress } from "./dashboard.js";
+import { computeDashboard, displayKey, storyKey, type StoryProgress, type TaskLine } from "./dashboard.js";
 import { readFeatures } from "./features.js";
 import { declarations, laneConflicts, type Declaration, type LaneConflict } from "./lanes.js";
 
@@ -15,6 +15,29 @@ export interface BlockedStory {
   on: string[]; // qualified display ids of unmet blockers
 }
 
+/** Feature 020: a task carrying a BLOCKED marker (not the same as a story blocked by dependencies). */
+export interface BlockedTask {
+  feature: string; // display ref of the feature
+  task: string; // T###
+  story: string | null;
+  reason: string; // "" = marked blocked with no reason
+}
+
+/** Feature 020: a task carrying a DEVIATION note. */
+export interface DeviationNote {
+  feature: string;
+  task: string;
+  note: string;
+}
+
+/** Feature 020: a marker that is present but malformed or contradictory. */
+export interface MarkerIssue {
+  feature: string;
+  task: string;
+  kind: "missing-reason" | "checked-but-blocked";
+  message: string;
+}
+
 export interface AnalysisReport {
   total: number;
   issues: GraphIssue[]; // structural errors (cycles, dangling refs)
@@ -23,6 +46,12 @@ export interface AnalysisReport {
   orphans: string[]; // qualified display ids: no tasks
   /** Feature 015: parallel-lane ownership check over every feature's open tasks. */
   lanes: { conflicts: LaneConflict[]; declarations: Declaration[] };
+  /** Feature 020: BLOCKED-marked tasks. Present only when there is at least one (warnings only). */
+  blockedTasks?: BlockedTask[];
+  /** Feature 020: DEVIATION notes. Present only when there is at least one. */
+  deviations?: DeviationNote[];
+  /** Feature 020: marker problems (empty reason, checked-but-blocked). Present only when any. */
+  markerIssues?: MarkerIssue[];
 }
 
 /** Combined hard dependencies of a story (depends-on ∪ blocked-by), deduped, as local ids. */
@@ -130,13 +159,57 @@ export function analyzeGraph(stories: StoryProgress[]): AnalysisReport {
   return { total: stories.length, issues, blocked, buildable, orphans, lanes: { conflicts: [], declarations: [] } };
 }
 
+/**
+ * Feature 020 (FR-009): collect BLOCKED markers, DEVIATION notes and marker problems from one
+ * feature's task lines. A checked task that still carries BLOCKED is an inconsistency, not a block.
+ */
+function collectMarkers(
+  feature: string,
+  tasks: TaskLine[],
+  blockedTasks: BlockedTask[],
+  deviations: DeviationNote[],
+  markerIssues: MarkerIssue[],
+): void {
+  for (const t of tasks) {
+    if (t.blocked !== undefined) {
+      if (t.done) {
+        markerIssues.push({
+          feature,
+          task: t.id,
+          kind: "checked-but-blocked",
+          message: `${feature}:${t.id} is checked but still carries a BLOCKED marker`,
+        });
+      } else {
+        blockedTasks.push({ feature, task: t.id, story: t.story, reason: t.blocked });
+        if (t.blocked === "") {
+          markerIssues.push({
+            feature,
+            task: t.id,
+            kind: "missing-reason",
+            message: `${feature}:${t.id} is BLOCKED with no reason`,
+          });
+        }
+      }
+    }
+    if (t.deviation !== undefined) deviations.push({ feature, task: t.id, note: t.deviation });
+  }
+}
+
 /** Convenience: analyze a project by reading its specs/. */
 export function analyzeProject(projectRoot: string): AnalysisReport {
   const report = analyzeGraph(computeDashboard(projectRoot));
+  const blockedTasks: BlockedTask[] = [];
+  const deviations: DeviationNote[] = [];
+  const markerIssues: MarkerIssue[] = [];
   for (const f of readFeatures(projectRoot).features) {
     if (f.tasks === null) continue;
     report.lanes.conflicts.push(...laneConflicts(f.dir, f.tasks));
     report.lanes.declarations.push(...declarations(f.dir, f.tasks));
+    collectMarkers(f.displayRef, f.tasks, blockedTasks, deviations, markerIssues);
   }
+  // New keys appear only when there is something to say, so output without markers is unchanged.
+  if (blockedTasks.length > 0) report.blockedTasks = blockedTasks;
+  if (deviations.length > 0) report.deviations = deviations;
+  if (markerIssues.length > 0) report.markerIssues = markerIssues;
   return report;
 }
