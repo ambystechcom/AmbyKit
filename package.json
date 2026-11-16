@@ -39,7 +39,9 @@
     "ambykit": "dist/cli/index.js"
   },
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./plugin": "./dist/plugins/index.js",
+    "./testkit": "./dist/testkit/index.js"
   },
   "files": [
     "dist",

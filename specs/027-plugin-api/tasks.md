@@ -17,30 +17,30 @@ created: 2026-11-16
 
 ## Phase 1 — Setup
 
-- [ ] [T001] [P] Add optional `plugins` map (package → exact version) to the config schema and `AmbyConfig`; rebase on 025's changes to the same files (src/core/config.ts, src/core/types.ts)
-- [ ] [T002] [P] Add a fixture plugin package `ambykit-emitter-fake` (valid), plus broken variants: no pin match, wrong API range, bad shape (test/fixtures/plugins/)
-- [ ] [T003] [P] Add `./plugin` and `./testkit` subpath exports (package.json)
+- [x] [T001] [P] Add optional `plugins` map (package → exact version) to the config schema and `AmbyConfig`; rebase on 025's changes to the same files (src/core/config.ts, src/core/types.ts)
+- [x] [T002] [P] Add a fixture plugin package `ambykit-emitter-fake` (valid), plus broken variants: no pin match, wrong API range, bad shape (test/fixtures/plugins/)
+- [x] [T003] [P] Add `./plugin` and `./testkit` subpath exports (package.json)
 
-**Verify:** `npm run typecheck` passes, and `loadConfig` still parses an existing `.amby/config.json` with no `plugins` key.
+**Verify:** `npm run typecheck` passes, and `loadConfig` still parses an existing `.amby/config.json` with no `plugins` key. ✓ passed
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T010] [P] Pure semver range check: exact, `^`, `~`, `>=`, `<`, AND by space, `||`; unsupported grammar returns a reason (src/plugins/semver.ts)
-- [ ] [T011] [P] Test `semver.ts` incl. `^1` vs `1.0.0`/`2.0.0` and an unsupported range (test/plugins/semver.test.ts)
-- [ ] [T012] [P] Plugin API surface: `PLUGIN_API_VERSION` = 1.0.0, `PLUGIN_API_EXPERIMENTAL`, `PluginModule`, `PluginFactory`, `PluginApi` types (src/plugins/api.ts)
-- [ ] [T013] [P] Manifest reader: package-name rule (`ambykit-emitter-*`, scoped ok), installed version, declared `ambykit.pluginApi` range (src/plugins/manifest.ts)
-- [ ] [T014] [P] Test `manifest.ts` for good, badly named, no-range and malformed package.json (test/plugins/manifest.test.ts)
-- [ ] [T015] [P] Target registry: built-ins + plugin targets, reports id collisions with built-ins and other plugins, never overrides (src/plugins/registry.ts)
-- [ ] [T016] [P] Test registry collisions: plugin vs built-in, plugin vs plugin, ordering and no silent override (test/plugins/registry.test.ts)
-- [ ] [T017] Async loader: resolve only `<root>/node_modules/<pkg>`, require exact pin = installed version, check API range, `import()`, validate shape, accept object or factory, return `{loaded, failures}` (src/plugins/loader.ts)
-- [ ] [T018] Test loader against the fixture plugins: loaded, missing, pin mismatch, wrong range, bad shape, throws on load (test/plugins/loader.test.ts)
-- [ ] [T019] Public barrel for plugin authors and re-export from the library entry (src/plugins/index.ts, src/index.ts)
-- [ ] [T020] Make `getTarget`, `emittersForTargets` and `sharedOutputs` accept an optional registry, defaulting to the built-in `TARGETS` (src/emitters/index.ts)
-- [ ] [T021] `buildEmittedFiles` takes a registry; guard every project-scope path against escaping the root; collision error names the plugin; rebase on 025 T062 (src/core/emit.ts)
-- [ ] [T022] Test the path guard and the plugin-naming collision error (test/plugins/emit-guard.test.ts)
+- [x] [T010] [P] Pure semver range check: exact, `^`, `~`, `>=`, `<`, AND by space, `||`; unsupported grammar returns a reason (src/plugins/semver.ts)
+- [x] [T011] [P] Test `semver.ts` incl. `^1` vs `1.0.0`/`2.0.0` and an unsupported range (test/plugins/semver.test.ts)
+- [x] [T012] [P] Plugin API surface: `PLUGIN_API_VERSION` = 1.0.0, `PLUGIN_API_EXPERIMENTAL`, `PluginModule`, `PluginFactory`, `PluginApi` types (src/plugins/api.ts)
+- [x] [T013] [P] Manifest reader: package-name rule (`ambykit-emitter-*`, scoped ok), installed version, declared `ambykit.pluginApi` range (src/plugins/manifest.ts)
+- [x] [T014] [P] Test `manifest.ts` for good, badly named, no-range and malformed package.json (test/plugins/manifest.test.ts)
+- [x] [T015] [P] Target registry: built-ins + plugin targets, reports id collisions with built-ins and other plugins, never overrides (src/plugins/registry.ts)
+- [x] [T016] [P] Test registry collisions: plugin vs built-in, plugin vs plugin, ordering and no silent override (test/plugins/registry.test.ts)
+- [x] [T017] Async loader: resolve only `<root>/node_modules/<pkg>`, require exact pin = installed version, check API range, `import()`, validate shape, accept object or factory, return `{loaded, failures}` (src/plugins/loader.ts)
+- [x] [T018] Test loader against the fixture plugins: loaded, missing, pin mismatch, wrong range, bad shape, throws on load (test/plugins/loader.test.ts)
+- [x] [T019] Public barrel for plugin authors and re-export from the library entry (src/plugins/index.ts, src/index.ts)
+- [x] [T020] Make `getTarget`, `emittersForTargets` and `sharedOutputs` accept an optional registry, defaulting to the built-in `TARGETS` (src/emitters/index.ts)
+- [x] [T021] `buildEmittedFiles` takes a registry; guard every project-scope path against escaping the root; collision error names the plugin; rebase on 025 T062 (src/core/emit.ts)
+- [x] [T022] Test the path guard and the plugin-naming collision error (test/plugins/emit-guard.test.ts)
 - **Checkpoint:** Foundational complete: a plugin can be loaded and registered in code, and no caller is changed yet.
 
-**Verify:** `npm run typecheck` and `npx vitest run test/plugins test/emitters-golden.test.ts` pass (built-in output unchanged).
+**Verify:** `npm run typecheck` and `npx vitest run test/plugins test/emitters-golden.test.ts` pass (built-in output unchanged). ? unverified: test/plugins passes and typecheck is clean; test/emitters-golden.test.ts still fails on 019's pending re-record only (amby.run and amby-worker files, checked by diff), so it is rerun in the integration batch
 
 ## Phase 3 — User story US-1  Write a plugin emitter (priority: P1)
 

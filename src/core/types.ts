@@ -141,6 +141,8 @@ export interface AmbyConfig {
   mcp?: { enabled: boolean };
   /** Fleet settings (features 019, 025, 028): one object for the whole family; defaults in `fleetSettings`. */
   fleet?: FleetConfig;
+  /** Emitter plugins (feature 027): package name → exact version. Only these are ever loaded; absent means none. */
+  plugins?: Record<string, string>;
 }
 
 /** Every key optional; `fleetSettings` fills the defaults. 025 owns the schema, 028 extends it. */
