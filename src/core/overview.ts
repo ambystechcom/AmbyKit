@@ -130,7 +130,26 @@ export function featureRow(f: FeatureSnapshot): FeatureRow {
   // Feature 020: undone tasks carrying a BLOCKED marker; omitted when zero so existing output is unchanged.
   const blockedTasks = openBlockedTasks(f).length;
   if (blockedTasks > 0) row.blocked = blockedTasks;
+  // Feature 020: Verify lines by state; omitted when the feature has no Verify lines at all.
+  const verify = verifyCounts(f);
+  if (verify) row.verify = verify;
   return row;
+}
+
+/**
+ * Feature 020 (FR-010): count the verifiable phases (at least one task) by Verify state. `verified` has a
+ * last result of passed, `failed` has a last result of failed, `missing` has no Verify line. A phase with a
+ * Verify line but no result yet (or `? unverified`) is in none of the three. Undefined when no phase has a
+ * Verify line, so features without any keep their existing output.
+ */
+function verifyCounts(f: FeatureSnapshot): { verified: number; failed: number; missing: number } | undefined {
+  const phases = (f.verify ?? []).filter((p) => p.tasks > 0);
+  if (!phases.some((p) => p.check !== undefined)) return undefined;
+  return {
+    verified: phases.filter((p) => p.check !== undefined && p.result === "passed").length,
+    failed: phases.filter((p) => p.check !== undefined && p.result === "failed").length,
+    missing: phases.filter((p) => p.check === undefined).length,
+  };
 }
 
 /**
@@ -215,7 +234,18 @@ export function attentionItems(all: FeatureSnapshot[], scoped: FeatureSnapshot[]
   const blocked: AttentionItem[] = [];
   const waiting: AttentionItem[] = [];
   const taskBlocked: AttentionItem[] = [];
+  const verifyFailed: AttentionItem[] = [];
   for (const feature of scoped) {
+    // Feature 020 (FR-010): one item per phase whose last recorded Verify failed; a phase is named `phase-N`.
+    for (const phase of feature.verify ?? []) {
+      if (phase.tasks === 0 || phase.check === undefined || phase.result !== "failed") continue;
+      verifyFailed.push({
+        key: `${feature.displayRef}:phase-${phase.phase}`,
+        kind: "verify-failed",
+        refs: [`phase-${phase.phase}`],
+        reason: phase.why ? `verify failed: ${phase.why}` : "verify failed",
+      });
+    }
     // Feature 020 (FR-010): one item per open task with a BLOCKED marker, keyed by feature and task id.
     for (const task of openBlockedTasks(feature)) {
       taskBlocked.push({
@@ -269,7 +299,7 @@ export function attentionItems(all: FeatureSnapshot[], scoped: FeatureSnapshot[]
       }
     }
   }
-  return [...problems, ...blocked, ...waiting, ...taskBlocked];
+  return [...problems, ...blocked, ...waiting, ...taskBlocked, ...verifyFailed];
 }
 
 /**
