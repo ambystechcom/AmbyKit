@@ -47,10 +47,10 @@ created: 2026-11-16
 
 ## Phase 5 — User story US-3  (priority: P2)
 
-- [ ] [T040] [P] [US3] Count characters, words and approximate tokens for at least three specs in v1, per-phase layout and per-task layout, and tabulate (spikes/026-spec-format-v2/measure.mjs, spikes/026-spec-format-v2/results/us3-tokens.md)
-- [ ] [T041] [P] [US3] Lane-merge experiment on a temporary git repo: two branches tick different tasks and edit different blocks, then merge, for each layout (spikes/026-spec-format-v2/lanes-merge.sh, spikes/026-spec-format-v2/results/us3-merge.md)
-- [ ] [T042] [US3] Read the three converted samples and write the readability note: where prose or data hurt, and whether an assistant can load less than in 1.x (spikes/026-spec-format-v2/results/us3-readability.md)
-- **Verify:** the token table covers at least three specs in all three formats, the merge note says clean or conflicted for each layout, and the readability note answers whether less can be loaded.
+- [x] [T040] [P] [US3] Count characters, words and approximate tokens for at least three specs in v1, per-phase layout and per-task layout, and tabulate (spikes/026-spec-format-v2/measure.mjs, spikes/026-spec-format-v2/results/us3-tokens.md)
+- [x] [T041] [P] [US3] Lane-merge experiment on a temporary git repo: two branches tick different tasks and edit different blocks, then merge, for each layout (spikes/026-spec-format-v2/lanes-merge.sh, spikes/026-spec-format-v2/results/us3-merge.md)
+- [x] [T042] [US3] Read the three converted samples and write the readability note: where prose or data hurt, and whether an assistant can load less than in 1.x (spikes/026-spec-format-v2/results/us3-readability.md)
+- **Verify:** the token table covers at least three specs in all three formats, the merge note says clean or conflicted for each layout, and the readability note answers whether less can be loaded. ✓ passed
 
 ## Phase 6 — User story US-4  (priority: P1)
 
