@@ -81,13 +81,13 @@ created: 2026-11-16
 
 ## Phase 7 — User story US-3  Prove a plugin against its compatibility row (priority: P1)
 
-- [ ] [T070] [P] [US3] `MatrixRow` type and `checkEmitterContract` comparing emitted paths and leading YAML/TOML frontmatter keys with the row; missing row fails (src/testkit/contract.ts)
-- [ ] [T071] [US3] Testkit entry exporting `checkEmitterContract` and a throwing `assertEmitterContract` that lists all differences (src/testkit/index.ts)
-- [ ] [T072] [US3] Test the kit: a correct row passes; a wrong path, an unknown key and a missing row each fail and name the difference (test/plugins/testkit.test.ts)
-- [ ] [T073] [P] [US3] Document the machine-readable row format next to the matrix (docs/tool-compatibility.md)
+- [x] [T070] [P] [US3] `MatrixRow` type and `checkEmitterContract` comparing emitted paths and leading YAML/TOML frontmatter keys with the row; missing row fails (src/testkit/contract.ts)
+- [x] [T071] [US3] Testkit entry exporting `checkEmitterContract` and a throwing `assertEmitterContract` that lists all differences (src/testkit/index.ts)
+- [x] [T072] [US3] Test the kit: a correct row passes; a wrong path, an unknown key and a missing row each fail and name the difference (test/plugins/testkit.test.ts)
+- [x] [T073] [P] [US3] Document the machine-readable row format next to the matrix (docs/tool-compatibility.md)
 - **Checkpoint:** US-3 is demoable: the example plugin passes the kit; a deliberately wrong row fails.
 
-**Verify:** `npx vitest run test/plugins/testkit.test.ts` passes, and the kit runs from a directory with no AmbyKit checkout using only the package exports.
+**Verify:** `npx vitest run test/plugins/testkit.test.ts` passes, and the kit runs from a directory with no AmbyKit checkout using only the package exports. ✓ passed
 
 ## Phase 8 — User story US-8  Existing projects keep working (priority: P1)
 

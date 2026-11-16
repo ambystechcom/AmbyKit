@@ -7,7 +7,7 @@ A worked AmbyKit emitter plugin. It is documentation, not a published package. T
   `TomlCommandEmitter`).
 - `package.json` — the metadata AmbyKit reads: the name (`ambykit-emitter-*`), the exact version and
   `ambykit.pluginApi`, the plugin-API range the plugin supports.
-- `matrix-row.json` — the plugin's compatibility row, which the test kit checks the emitter against.
+- `matrix-rows.json` — one compatibility row per target, which the test kit checks each emitter against.
 
 To try it in a project, copy this folder to `node_modules/ambykit-emitter-example`, then add to
 `.amby/config.json`:

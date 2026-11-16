@@ -9,7 +9,7 @@
 //   example-toml   TomlCommandEmitter  TOML commands with a `prompt` string
 //
 // The paths and frontmatter keys here are INVENTED for the example. A real plugin takes them from the
-// host's own documentation and records them as a matrix row (see matrix-row.json and docs/plugin-api.md).
+// host's own documentation and records them as a matrix row (see matrix-rows.json and docs/plugin-api.md).
 
 export default function (api) {
   class ExampleEmitter extends api.BaseEmitter {

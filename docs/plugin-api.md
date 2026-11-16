@@ -109,12 +109,12 @@ import { readFileSync } from "node:fs";
 import { assertEmitterContract, createPluginApi } from "@ambystech/ambykit/testkit";
 import factory from "./index.js";
 
-const row = JSON.parse(readFileSync(new URL("./matrix-row.json", import.meta.url), "utf8"));
+const rows = JSON.parse(readFileSync(new URL("./matrix-rows.json", import.meta.url), "utf8"));
 const { targets } = factory(createPluginApi());
-assertEmitterContract(targets[0], row);   // throws, listing every difference
+for (const target of targets) assertEmitterContract(target, rows.find((r) => r.target === target.id));
 ```
 
-`assertEmitterContract(target, row)` throws one error listing every difference, so it works under any
+`assertEmitterContract(target, row)` (a row is a plain object, see below) throws one error listing every difference, so it works under any
 test runner; `checkEmitterContract` returns them as a list. With no row, the check fails: a plugin
 without a documented row for its host cannot pass.
 

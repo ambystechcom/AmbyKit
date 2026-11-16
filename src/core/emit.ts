@@ -6,6 +6,7 @@ import { loadRoles } from "./roles.js";
 import { loadWorkerAgent } from "./subagents.js";
 import { emittersForTargets, type TargetSource } from "../emitters/index.js";
 import type { TargetRegistry } from "../plugins/registry.js";
+import { escapesProject } from "./path-guard.js";
 
 /**
  * Build the full set of files to emit for a project's configured tools. The shared AGENTS.md is
@@ -117,9 +118,7 @@ function label(toolId: string, registry?: TargetRegistry): string {
  */
 export function assertInsideProject(file: EmittedFile, toolId: string, registry?: TargetRegistry): void {
   if (file.scope !== "project") return;
-  const p = file.path.replaceAll("\\", "/");
-  const escapes = p === "" || p.startsWith("/") || /^[A-Za-z]:/.test(p) || p.split("/").includes("..");
-  if (escapes) {
+  if (escapesProject(file.path)) {
     throw new Error(`${label(toolId, registry)} tried to write outside the project: ${file.path}. Project-scope paths must be relative and stay inside the project.`);
   }
 }

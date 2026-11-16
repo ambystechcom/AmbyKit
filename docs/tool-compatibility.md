@@ -214,3 +214,35 @@ and docs.github.com/copilot · Cursor: cursor.com/docs · Antigravity: antigravi
 Google Cloud blog. Codex CLI: developers.openai.com/codex (skills, custom prompts, config reference,
 AGENTS.md guide). Gemini CLI, LLxprt, Qwen Code, Kilo, Augment, Windsurf, Kiro and Pi: see the
 "Sources" row of the additional-targets matrix. AGENTS.md standard: agents.md.
+
+## Matrix rows for plugins
+
+The matrix above is prose for people. A plugin (feature 027, experimental) records the same facts as
+**data**, so the test kit in `@ambystech/ambykit/testkit` can check an emitter against them. One row
+describes one target:
+
+```json
+{
+  "target": "mytool",
+  "commandSurface": "commands",
+  "commandDir": ".mytool/commands",
+  "fileTemplate": "amby.<phase>.md",
+  "frontmatterKeys": ["description"],
+  "sourceUrl": "https://example.com/docs/custom-commands"
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `target` | The target id the row describes. |
+| `commandSurface` | `commands`, `skills`, `workflows` or `none` (rules-only: no command files). |
+| `commandDir` | Directory holding the command files, relative to the project root. |
+| `fileTemplate` | One command file's path under `commandDir`. `<phase>` is replaced by each phase id (`specify`, `plan`, …); a skills layout is `amby-<phase>/SKILL.md`. |
+| `frontmatterKeys` | The exact, ordered keys the host documents: YAML `key:` lines, or TOML `key =` lines for `.toml` files. |
+| `sourceUrl` | Where the row was verified. Principle 4: no row, no emit; a row without a source is a guess. |
+
+`checkEmitterContract(target, row)` emits every phase and lists each difference: a wrong `commandSurface`
+or `commandDir`, a missing or unexpected file, frontmatter keys that differ (grouped when many files
+share the difference), a path outside the project, or `emit()` throwing. **A missing row fails.** An
+official plugin ships its row as `matrix-rows.json` in its own repository; this document keeps only the
+human-readable summary.
