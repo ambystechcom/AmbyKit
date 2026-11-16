@@ -25,13 +25,13 @@ created: 2026-11-16
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T010] Add the pure `src/core/markers.ts`: `parseMarkers(rest)` (trailing BLOCKED / DEVIATION, glyph optional, reason up to the next marker, empty reason flagged, several BLOCKED joined with ` | `), `phaseNumber(heading, ordinal)` shared numbering, `parsePhases(content)` returning per-phase Verify check and result (`✓ passed`, `✗ failed: why`, `? unverified`, glyph-less words accepted) (FR-001, FR-002, FR-003, FR-005, FR-006) (src/core/markers.ts)
-- [ ] [T011] Extend `TaskLine` with optional `blocked`/`deviation` and make `parseTasks` call `parseMarkers` first and `phaseNumber`, so `parseDeclaredPaths` sees the body only (FR-012) (src/core/dashboard.ts)
-- [ ] [T012] Add the types: `FeatureSnapshot.verify`, `FeatureRow.blocked`/`verify`, attention kinds `task-blocked` and `verify-failed`, and `PhaseVerify` re-export (FR-010, FR-013) (src/core/overview-types.ts)
-- [ ] [T013] Populate `FeatureSnapshot.verify` in `readFeatures` from `parsePhases` on the same `tasks.md` read (src/core/features.ts)
-- [ ] [T014] Unit-test `markers.ts`: every syntax form, ASCII forms, empty reason, multiple markers, reasons with `()`/backticks, CRLF, path group recovered, `parsePhases` numbering equals `parseTasks` phases (FR-001, FR-002, FR-003, FR-005) (test/core/markers.test.ts)
+- [x] [T010] Add the pure `src/core/markers.ts`: `parseMarkers(rest)` (trailing BLOCKED / DEVIATION, glyph optional, reason up to the next marker, empty reason flagged, several BLOCKED joined with ` | `), `phaseNumber(heading, ordinal)` shared numbering, `parsePhases(content)` returning per-phase Verify check and result (`✓ passed`, `✗ failed: why`, `? unverified`, glyph-less words accepted) (FR-001, FR-002, FR-003, FR-005, FR-006) (src/core/markers.ts)
+- [x] [T011] Extend `TaskLine` with optional `blocked`/`deviation` and make `parseTasks` call `parseMarkers` first and `phaseNumber`, so `parseDeclaredPaths` sees the body only (FR-012) (src/core/dashboard.ts)
+- [x] [T012] Add the types: `FeatureSnapshot.verify`, `FeatureRow.blocked`/`verify`, attention kinds `task-blocked` and `verify-failed`, and `PhaseVerify` re-export; the attention panel falls back to the `blocked` token for a kind without its own entry until T032 adds them, which keeps typecheck green (FR-010, FR-013) (src/core/overview-types.ts, src/cli/ui/dashboard/attention.ts)
+- [x] [T013] Populate `FeatureSnapshot.verify` in `readFeatures` from `parsePhases` on the same `tasks.md` read (src/core/features.ts)
+- [x] [T014] Unit-test `markers.ts`: every syntax form, ASCII forms, empty reason, multiple markers, reasons with `()`/backticks, CRLF, path group recovered, `parsePhases` numbering equals `parseTasks` phases (FR-001, FR-002, FR-003, FR-005) (test/core/markers.test.ts)
 - **Checkpoint:** foundations are covered by tests, the baseline test still passes, `npm run typecheck` passes.
-- **Verify:** `npm run typecheck && npx vitest run test/core/markers.test.ts test/tasks-baseline-020.test.ts test/dashboard.test.ts test/core/features.test.ts`
+- **Verify:** `npm run typecheck && npx vitest run test/core/markers.test.ts test/tasks-baseline-020.test.ts test/dashboard.test.ts test/core/features.test.ts` ✓ passed
 
 ## Phase 3 — User story US-1  (priority: P1)
 
