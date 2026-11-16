@@ -1,5 +1,6 @@
 import { computeDashboard, displayKey, storyKey, type StoryProgress, type TaskLine } from "./dashboard.js";
 import { readFeatures } from "./features.js";
+import type { PhaseVerify } from "./markers.js";
 import { declarations, laneConflicts, type Declaration, type LaneConflict } from "./lanes.js";
 
 export interface GraphIssue {
@@ -38,6 +39,17 @@ export interface MarkerIssue {
   message: string;
 }
 
+/** Feature 020 (FR-009): a phase whose Verify line is missing or whose last recorded result failed. */
+export interface VerifyIssue {
+  feature: string;
+  /** Stable phase id: `<feature>:phase-N` (phases have no other id). */
+  phase: string;
+  title: string;
+  kind: "missing" | "failed";
+  /** Reason after `✗ failed:`; only for kind "failed", may be empty. */
+  why?: string;
+}
+
 export interface AnalysisReport {
   total: number;
   issues: GraphIssue[]; // structural errors (cycles, dangling refs)
@@ -52,6 +64,8 @@ export interface AnalysisReport {
   deviations?: DeviationNote[];
   /** Feature 020: marker problems (empty reason, checked-but-blocked). Present only when any. */
   markerIssues?: MarkerIssue[];
+  /** Feature 020: phases with no Verify line (features not yet done) or a failed last Verify. Present only when any (warnings only). */
+  verifyIssues?: VerifyIssue[];
 }
 
 /** Combined hard dependencies of a story (depends-on ∪ blocked-by), deduped, as local ids. */
@@ -195,21 +209,42 @@ function collectMarkers(
   }
 }
 
+/**
+ * Feature 020 (FR-009, FR-011): phases without a Verify line and phases whose last Verify failed.
+ * Missing-Verify findings apply only to features that are not yet done (some task still open), so a
+ * finished feature that predates the convention stays quiet. Both are warnings, never errors.
+ */
+function collectVerifyIssues(feature: string, tasks: TaskLine[], verify: PhaseVerify[], out: VerifyIssue[]): void {
+  const featureDone = tasks.length > 0 && tasks.every((t) => t.done);
+  for (const v of verify) {
+    if (v.tasks === 0) continue; // a heading with no tasks is not a verifiable phase
+    const phase = `${feature}:phase-${v.phase}`;
+    if (v.check === undefined) {
+      if (!featureDone) out.push({ feature, phase, title: v.title, kind: "missing" });
+    } else if (v.result === "failed") {
+      out.push({ feature, phase, title: v.title, kind: "failed", why: v.why ?? "" });
+    }
+  }
+}
+
 /** Convenience: analyze a project by reading its specs/. */
 export function analyzeProject(projectRoot: string): AnalysisReport {
   const report = analyzeGraph(computeDashboard(projectRoot));
   const blockedTasks: BlockedTask[] = [];
   const deviations: DeviationNote[] = [];
   const markerIssues: MarkerIssue[] = [];
+  const verifyIssues: VerifyIssue[] = [];
   for (const f of readFeatures(projectRoot).features) {
     if (f.tasks === null) continue;
     report.lanes.conflicts.push(...laneConflicts(f.dir, f.tasks));
     report.lanes.declarations.push(...declarations(f.dir, f.tasks));
     collectMarkers(f.displayRef, f.tasks, blockedTasks, deviations, markerIssues);
+    if (f.verify) collectVerifyIssues(f.displayRef, f.tasks, f.verify, verifyIssues);
   }
   // New keys appear only when there is something to say, so output without markers is unchanged.
   if (blockedTasks.length > 0) report.blockedTasks = blockedTasks;
   if (deviations.length > 0) report.deviations = deviations;
   if (markerIssues.length > 0) report.markerIssues = markerIssues;
+  if (verifyIssues.length > 0) report.verifyIssues = verifyIssues;
   return report;
 }
