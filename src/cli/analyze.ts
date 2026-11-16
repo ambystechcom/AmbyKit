@@ -47,6 +47,25 @@ export class AnalyzeCommand extends BaseCommand {
       this.info("");
     }
 
+    // Feature 020: BLOCKED markers and DEVIATION notes on task lines. Warnings only: they never
+    // change the exit status. Plain words, so the lines read the same without color or glyphs.
+    if (report.blockedTasks && report.blockedTasks.length > 0) {
+      this.info("Blocked tasks (BLOCKED markers):");
+      for (const b of report.blockedTasks) {
+        this.info(`  ${b.feature}:${b.task} — BLOCKED: ${b.reason === "" ? "(no reason given)" : b.reason}`);
+      }
+      this.info("");
+    }
+    if (report.deviations && report.deviations.length > 0) {
+      this.info("Deviations (DEVIATION notes):");
+      for (const d of report.deviations) this.info(`  ${d.feature}:${d.task} — DEVIATION: ${d.note}`);
+      this.info("");
+    }
+    if (report.markerIssues && report.markerIssues.length > 0) {
+      for (const m of report.markerIssues) this.warn(`Marker issue: ${m.message}`);
+      this.info("");
+    }
+
     this.info(
       report.buildable.length > 0
         ? `Buildable now: ${report.buildable.join(", ")}`
