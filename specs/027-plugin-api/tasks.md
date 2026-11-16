@@ -53,13 +53,13 @@ created: 2026-11-16
 
 ## Phase 4 — User story US-2  Discover and load plugins at sync (priority: P1)
 
-- [ ] [T040] [P] [US2] `sync` loads plugins from config, prints `name@version` and the experimental note, reports each failure, syncs the other targets, exits 1 on any failure; rebase on 025 T069 and merge the sync output message by hand (src/cli/sync.ts)
-- [ ] [T041] [P] [US2] `check` validates plugin-provided targets and shared outputs through the registry (src/cli/check.ts)
-- [ ] [T042] [P] [US2] `add` accepts a plugin target id only when its plugin loads (src/cli/add.ts)
-- [ ] [T043] [US2] E2E: list the fixture plugin, `sync`, assert files, a missing package, a collision, and an empty second-run diff (test/cli/sync-plugins.test.ts)
+- [x] [T040] [P] [US2] `sync` loads plugins from config, prints `name@version` and the experimental note, reports each failure, syncs the other targets, exits 1 on any failure; rebase on 025 T069 and merge the sync output message by hand (src/cli/sync.ts)
+- [x] [T041] [P] [US2] `check` validates plugin-provided targets and shared outputs through the registry (src/cli/check.ts)
+- [x] [T042] [P] [US2] `add` accepts a plugin target id only when its plugin loads (src/cli/add.ts)
+- [x] [T043] [US2] E2E: list the fixture plugin, `sync`, assert files, a missing package, a collision, and an empty second-run diff (test/cli/sync-plugins.test.ts)
 - **Checkpoint:** US-2 is demoable: `sync` emits a plugin's target from a config line.
 
-**Verify:** `npx vitest run test/cli/sync-plugins.test.ts` passes, and `ambykit sync --check` is clean on a project with the fixture plugin after one `sync`.
+**Verify:** `npx vitest run test/cli/sync-plugins.test.ts` passes, and `ambykit sync --check` is clean on a project with the fixture plugin after one `sync`. ✓ passed
 
 ## Phase 5 — User story US-7  Load third-party code safely (priority: P1)
 

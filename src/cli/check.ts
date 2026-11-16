@@ -10,6 +10,8 @@ import { featureWorktrees } from "../core/worktree.js";
 import { ROLES_DIR, loadRoles, validateRoles } from "../core/roles.js";
 import { SHIPPED_ROLES } from "../core/scaffold.js";
 import { legacyWorkflowFiles } from "../core/legacy.js";
+import { loadPluginSession } from "../plugins/session.js";
+import { reportPlugins } from "../plugins/report.js";
 
 export class CheckCommand extends BaseCommand {
   readonly name = "check";
@@ -30,8 +32,17 @@ export class CheckCommand extends BaseCommand {
       this.warn("No tools configured.");
       ok = false;
     }
+    // Plugins (feature 027): a plugin that fails to load, or a target it cannot register, is drift.
+    const session = await loadPluginSession(root, config);
+    const plugins = reportPlugins(session);
+    for (const line of plugins.info) this.info(`  ${line}`);
+    for (const line of plugins.errors) {
+      this.warn(line);
+      ok = false;
+    }
+    const registry = session?.registry;
     for (const t of config.tools) {
-      if (!getTarget(t)) {
+      if (!getTarget(t, registry)) {
         this.warn(`Configured tool '${t}' is not a known target.`);
         ok = false;
       }
@@ -52,7 +63,7 @@ export class CheckCommand extends BaseCommand {
       }
     }
 
-    const files = buildEmittedFiles(root, config);
+    const files = buildEmittedFiles(root, config, registry);
     const result = applyFiles(root, files, { dryRun: true, includeUser: false });
     if (result.skippedForeign.length > 0) {
       this.warn(`${result.skippedForeign.length} file(s) AmbyKit did not generate block its own output:`);
@@ -66,7 +77,7 @@ export class CheckCommand extends BaseCommand {
     }
 
     // Targets that share one emitter write the same files once (feature 016, FR-007); name the owners.
-    for (const s of sharedOutputs(config.tools)) {
+    for (const s of sharedOutputs(config.tools, registry)) {
       this.info(`  Shared output ${s.dir}/ is owned by: ${s.owners.join(", ")}.`);
     }
 
