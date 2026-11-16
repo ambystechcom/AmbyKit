@@ -1,8 +1,8 @@
 # The AmbyKit workflow
 
-Eleven phases, each a slash command in your assistant, each producing or updating one artifact. The
+Twelve phases, each a slash command in your assistant, each producing or updating one artifact. The
 happy path is **specify → design → plan → tasks → implement**, with `constitution` once up front and
-`clarify`/`revise`/`analyze`/`converge`/`review` when you need them.
+`clarify`/`revise`/`analyze`/`converge`/`review`/`decide` when you need them.
 
 | Phase | Command | Reads | Writes |
 |---|---|---|---|
@@ -17,6 +17,7 @@ happy path is **specify → design → plan → tasks → implement**, with `con
 | Implement | `/amby.implement` | tasks (one slice) | code + task/status updates |
 | Converge | `/amby.converge` | spec, plan, tasks + code | `tasks.md` (appends gap tasks), story status |
 | Review | `/amby.review` | any artifact + a role | findings (advisory); the artifact only with `--apply` |
+| Decide | `/amby.decide` | decision index | `.amby/decisions/ADR-###.md` + the index |
 
 ## 1. Constitution
 
@@ -93,6 +94,14 @@ Asks a *different* role to critique an artifact — QA on a spec or task list, t
 plan, the PM on a UI design, or any role via `--as <id>`. Findings are one per line, each tied to a
 stable ID with severity and a suggested fix; nothing is modified. `--apply` patches the artifact in
 place (IDs are never renumbered) and appends a `## Reviews` record. Advisory, like `analyze`.
+
+## 12. Decide
+
+Records a durable decision as `.amby/decisions/ADR-###.md` (context, decision, alternatives, consequences)
+and patches the index. Callable from any phase; it has no role. It points to an existing record instead of
+duplicating one, keeps a decision that conflicts with a constitution principle `proposed` for a person to
+settle, and `--supersede ADR-###` marks the old record superseded on both sides. Cite records elsewhere as
+`ADR-###`; `ambykit analyze` flags a citation with no record. See `docs/artifacts/decision-record.md`.
 
 ## Roles
 

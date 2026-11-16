@@ -28,8 +28,17 @@ Release notes with full detail live on the
   `/amby.implement` builds to the cases and names tests `NNN:FR-###`, `/amby.converge` treats them as the
   expected tests, and `/amby.revise` marks cases `[stale]` or `[obsolete]`. `ambykit analyze` checks each
   feature's `tests.md` at zero model tokens (warnings only).
+- Decision records (feature 022): `/amby.decide` writes a numbered record `.amby/decisions/ADR-###.md`
+  (context, decision, alternatives, consequences) and patches the index, from any phase. It points to an
+  existing record instead of duplicating one, keeps a decision that conflicts with a constitution principle
+  `proposed`, and `--supersede ADR-###` marks the old record superseded on both sides. Cite decisions as
+  `ADR-###`. A seventh read-only role, `security`, is installed for `/amby.review --as security`.
 
 ### Changed
+
+- `ambykit analyze` checks decision records at zero model tokens and adds a `decisions` key to `--json`, only
+  when records or `ADR-###` citations exist. A citation with no record, a supersede mismatch or loop, and an
+  accepted record with a conflict are errors (exit status 1); a record missing from the index is a warning.
 
 - `ambykit analyze --json` gains `testDesign` (`findings` and `missing`), present only when a feature has a
   `tests.md`. The `tests.md` template is installed into `.amby/templates/` by `ambykit sync`.
