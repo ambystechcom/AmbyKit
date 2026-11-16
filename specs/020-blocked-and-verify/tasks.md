@@ -81,13 +81,13 @@ created: 2026-11-16
 - [x] [T061] [P] [US5] Document the new `analyze` and `dashboard` output and every new `--json` key in the CLI reference (FR-013) (docs/cli-reference.md)
 - [x] [T062] [P] [US5] Mention blocked markers and phase Verify lines in the workflow guide (FR-015) (docs/workflow.md)
 - [x] [T063] [P] [US5] Add the unreleased 1.4 changelog entry (CHANGELOG.md)
-- [ ] [T064] [US5] INTEGRATION STEP (once per batch, after merging, not in a lane branch): re-record the emitter goldens with `UPDATE_GOLDEN=1`, review that only the prompt text changed (test/fixtures/emitters-golden/)
-- [ ] [T065] [US5] INTEGRATION STEP (once per batch, after merging, not in a lane branch): run `ambykit sync` so the repo's own tool files follow the new prompts and template, then confirm a second sync produces no diff (P6) (.claude/commands/, .amby/templates/, .agents/skills/)
+- [x] [T064] [US5] INTEGRATION STEP (once per batch, after merging, not in a lane branch): re-record the emitter goldens with `UPDATE_GOLDEN=1`, review that only the prompt text changed (test/fixtures/emitters-golden/)
+- [x] [T065] [US5] INTEGRATION STEP (once per batch, after merging, not in a lane branch): run `ambykit sync` so the repo's own tool files follow the new prompts and template, then confirm a second sync produces no diff (P6) (.claude/commands/, .amby/templates/, .agents/skills/)
 - **Checkpoint:** US-5 holds: existing projects see no change; the repo is in sync.
-- **Verify:** `npm run typecheck && npm test && ambykit sync --check`
+- **Verify:** `npm run typecheck && npm test && ambykit sync --check` ✓ passed
 
 ## Phase 8 — Polish
 
-- [ ] [T090] Record the SC-005 evidence: lanes used per phase, merges done by `ambykit lane merge`, and whether any marker or check-off conflict needed manual resolution (specs/020-blocked-and-verify/lane-notes.md)
+- [x] [T090] Record the SC-005 evidence: lanes used per phase, merges done by `ambykit lane merge`, and whether any marker or check-off conflict needed manual resolution (specs/020-blocked-and-verify/lane-notes.md)
 - [ ] [T091] Run `/amby.converge` and append any gap tasks; confirm every FR maps to a test (P5) (specs/020-blocked-and-verify/tasks.md)
 - **Verify:** `npm run typecheck && npm test`
