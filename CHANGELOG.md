@@ -10,6 +10,8 @@ Release notes with full detail live on the
 
 ## [Unreleased]
 
+## [1.4.0] — 2026-11-16
+
 ### Added
 
 - `ambykit trace [feature] [--json] [--gate]` (feature 024): a local, read-only matrix from each `FR-###` to
@@ -34,6 +36,9 @@ Release notes with full detail live on the
   `/amby.implement` builds to the cases and names tests `NNN:FR-###`, `/amby.converge` treats them as the
   expected tests, and `/amby.revise` marks cases `[stale]` or `[obsolete]`. `ambykit analyze` checks each
   feature's `tests.md` at zero model tokens (warnings only).
+- `ambykit graph [feature] [--json] [--mermaid]` (feature 023): one story and feature dependency graph built from
+  `specs/`, shared by `analyze` and the dashboard so all three name the same blockers. Broken references and
+  cycles are listed first and exit 1. The interactive dashboard opens a graph view with `g`.
 - Decision records (feature 022): `/amby.decide` writes a numbered record `.amby/decisions/ADR-###.md`
   (context, decision, alternatives, consequences) and patches the index, from any phase. It points to an
   existing record instead of duplicating one, keeps a decision that conflicts with a constitution principle
