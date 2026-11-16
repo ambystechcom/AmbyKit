@@ -1,7 +1,7 @@
 import { join } from "node:path/posix";
 import type { CommandSpec, CommandSurface, EmittedFile, RulesContext } from "../core/types.js";
 import { buildPointerRegion } from "../core/rules.js";
-import { BaseEmitter } from "./base-emitter.js";
+import { BaseEmitter, MCP_COMMAND } from "./base-emitter.js";
 
 /**
  * Cursor emitter. Commands go to `.cursor/commands/*.md` as plain prompt bodies (Cursor documents no
@@ -17,6 +17,15 @@ export class CursorEmitter extends BaseEmitter {
   /** Cursor commands are plain markdown — no frontmatter. */
   protected override commandFrontmatter(_spec: CommandSpec): Array<[string, string]> {
     return [];
+  }
+
+  /** Project `.cursor/mcp.json`, `mcpServers.ambykit`; the Cursor CLI reads the same file (verified in `specs/025-mcp-server/research.md`). */
+  override mcpFiles(_ctx: RulesContext): EmittedFile[] {
+    return [this.mcpFile(join(".cursor", "mcp.json"), "mcpServers", { type: "stdio", ...MCP_COMMAND })];
+  }
+
+  override mcpSkipReason(): string | null {
+    return null;
   }
 
   protected override rulesFiles(_ctx: RulesContext): EmittedFile[] {

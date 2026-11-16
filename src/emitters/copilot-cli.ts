@@ -1,5 +1,6 @@
 import { join } from "node:path/posix";
-import type { CommandSpec, CommandSurface } from "../core/types.js";
+import type { CommandSpec, CommandSurface, EmittedFile, RulesContext } from "../core/types.js";
+import { MCP_COMMAND } from "./base-emitter.js";
 import { CopilotEmitter } from "./copilot.js";
 import { skillFrontmatter, skillPath } from "./skills-emitter.js";
 
@@ -14,6 +15,15 @@ export class CopilotCliEmitter extends CopilotEmitter {
   override readonly displayName = "GitHub Copilot CLI";
   override readonly commandSurface: CommandSurface = "skills";
   override readonly commandDir = join(".github", "skills");
+
+  /**
+   * User-level `~/.copilot/mcp-config.json`, `mcpServers.ambykit` with `type: "local"` and the required
+   * `tools` list. Written only with `sync --include-user`, and never part of the in-sync check. The CLI does
+   * not read the VS Code `.vscode/mcp.json` Copilot writes, so that file is not inherited.
+   */
+  override mcpFiles(_ctx: RulesContext): EmittedFile[] {
+    return [this.mcpFile(join(".copilot", "mcp-config.json"), "mcpServers", { type: "local", ...MCP_COMMAND, tools: ["*"] }, "user")];
+  }
 
   // Inherits Copilot (rules, personas, `${input:args}`), so it reuses the skills helpers, not the class.
   protected override commandFilePath(spec: CommandSpec): string {

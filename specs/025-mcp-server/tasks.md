@@ -72,20 +72,20 @@ created: 2026-11-16
 
 ## Phase 7 — User story US-6: set up and fall back safely  (priority: P1)
 
-- [ ] [T060] [P] [US6] Pure JSON key merge that adds `<key>.ambykit` and preserves every other key and its order, with tests (src/core/merge-json.ts, test/core/merge-json.test.ts)
-- [ ] [T061] [US6] `merge: "json"` on `EmittedFile` and in `applyFiles`: idempotent, backs up, skips files that do not parse as plain JSON, with tests (src/core/types.ts, src/cli/io/fsops.ts, test/fsops.test.ts)
-- [ ] [T062] [US6] `BaseEmitter` MCP hook and `buildEmittedFiles` collection, only when `mcp.enabled`, with tests (src/emitters/base-emitter.ts, src/core/emit.ts, test/emit-mcp.test.ts)
-- [ ] [T063] [P] [US6] Claude Code project config `.mcp.json`, snapshot test (src/emitters/claude.ts, test/mcp-emit-claude.test.ts)
-- [ ] [T064] [P] [US6] OpenCode `opencode.json` `mcp` key, skip and report if the file has comments, snapshot test (src/emitters/opencode.ts, test/mcp-emit-opencode.test.ts)
-- [ ] [T065] [P] [US6] Copilot (VS Code) `.vscode/mcp.json` `servers` key, snapshot test (src/emitters/copilot.ts, test/mcp-emit-copilot.test.ts)
-- [ ] [T066] [P] [US6] Cursor `.cursor/mcp.json` `mcpServers` key (Cursor CLI reads the same file), snapshot test (src/emitters/cursor.ts, test/mcp-emit-cursor.test.ts)
-- [ ] [T067] [P] [US6] Copilot CLI user-level `~/.copilot/mcp-config.json`, scope `user`, written only with `--include-user`, snapshot test (src/emitters/copilot-cli.ts, test/mcp-emit-copilot-cli.test.ts)
-- [ ] [T068] [P] [US6] Antigravity user-level config only if T001 verified its path, else "not written"; snapshot test (src/emitters/antigravity.ts, test/mcp-emit-antigravity.test.ts)
-- [ ] [T069] [US6] `sync` states which enabled targets have no verified MCP format and writes nothing for them; user-level files stay out of `--check`, with tests (src/cli/sync.ts, test/cli/sync-mcp.test.ts)
-- [ ] [T070] [US6] Fallback test: every phase prompt still completes from files with the server absent (test/mcp-fallback.test.ts)
+- [x] [T060] [P] [US6] Pure JSON key merge that adds `<key>.ambykit` and preserves every other key and its order, with tests (src/core/merge-json.ts, test/core/merge-json.test.ts)
+- [x] [T061] [US6] `merge: "json"` on `EmittedFile` and in `applyFiles`: idempotent, backs up, skips files that do not parse as plain JSON, with tests (src/core/types.ts, src/cli/io/fsops.ts, test/fsops.test.ts) ↪ DEVIATION: applyFiles also gains a skippedJson list on WriteResult, printed by printRegionOutcomes, so a skipped file is reported
+- [x] [T062] [US6] `BaseEmitter` MCP hook and `buildEmittedFiles` collection, only when `mcp.enabled`, with tests (src/emitters/base-emitter.ts, src/core/emit.ts, test/emit-mcp.test.ts)
+- [x] [T063] [P] [US6] Claude Code project config `.mcp.json`, snapshot test (src/emitters/claude.ts, test/mcp-emit-claude.test.ts)
+- [x] [T064] [P] [US6] OpenCode `opencode.json` `mcp` key, skip and report if the file has comments, snapshot test (src/emitters/opencode.ts, test/mcp-emit-opencode.test.ts) ↪ DEVIATION: OpenCode is "not written": it documents two incompatible MCP schemas (mcp.<name> with enabled, mcp.servers.<name> with disabled) and none is confirmed for installed versions (research.md); the test asserts nothing is written and sync names why
+- [x] [T065] [P] [US6] Copilot (VS Code) `.vscode/mcp.json` `servers` key, snapshot test (src/emitters/copilot.ts, test/mcp-emit-copilot.test.ts)
+- [x] [T066] [P] [US6] Cursor `.cursor/mcp.json` `mcpServers` key (Cursor CLI reads the same file), snapshot test (src/emitters/cursor.ts, test/mcp-emit-cursor.test.ts)
+- [x] [T067] [P] [US6] Copilot CLI user-level `~/.copilot/mcp-config.json`, scope `user`, written only with `--include-user`, snapshot test (src/emitters/copilot-cli.ts, test/mcp-emit-copilot-cli.test.ts)
+- [x] [T068] [P] [US6] Antigravity user-level config only if T001 verified its path, else "not written"; snapshot test (src/emitters/antigravity.ts, test/mcp-emit-antigravity.test.ts) ↪ DEVIATION: Antigravity CLI has a verified project file (.agents/mcp_config.json, mcpServers), so it is written for the CLI only, not user-level; the IDE stays "not written"
+- [x] [T069] [US6] `sync` states which enabled targets have no verified MCP format and writes nothing for them; user-level files stay out of `--check`, with tests (src/cli/sync.ts, test/cli/sync-mcp.test.ts)
+- [x] [T070] [US6] Fallback test: every phase prompt still completes from files with the server absent (test/mcp-fallback.test.ts)
 - **Checkpoint:** US-6 is demoable: enabling the server writes only verified project files; a second `sync` produces no diff.
 
-**Verify:** `npx vitest run test/core/merge-json.test.ts test/fsops.test.ts test/emit-mcp.test.ts test/mcp-emit-claude.test.ts test/mcp-emit-opencode.test.ts test/mcp-emit-copilot.test.ts test/mcp-emit-cursor.test.ts test/mcp-emit-copilot-cli.test.ts test/mcp-emit-antigravity.test.ts test/cli/sync-mcp.test.ts test/mcp-fallback.test.ts` passes, and `ambykit sync --check` reports no drift after a sync.
+**Verify:** `npx vitest run test/core/merge-json.test.ts test/fsops.test.ts test/emit-mcp.test.ts test/mcp-emit-claude.test.ts test/mcp-emit-opencode.test.ts test/mcp-emit-copilot.test.ts test/mcp-emit-cursor.test.ts test/mcp-emit-copilot-cli.test.ts test/mcp-emit-antigravity.test.ts test/cli/sync-mcp.test.ts test/mcp-fallback.test.ts` passes, and `ambykit sync --check` reports no drift after a sync. ✓ passed
 
 ## Phase 8 — User story US-4: claim files and share notes  (priority: P2)
 

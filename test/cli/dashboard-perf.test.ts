@@ -65,7 +65,8 @@ describe("the graph view is loaded only by the interactive dashboard (feature 02
       .filter((f) => /from "[^"]*graph-paths\.js"/.test(text(f)))
       .map(rel)
       .sort();
-    // analyze (its own command), the graph view (interactive only) and the public barrel; never the dashboard.
-    expect(importers).toEqual(["cli/ui/dashboard/graph-view.ts", "core/analyze.ts", "core/index.ts"]);
+    // analyze (its own command), the graph view (interactive only), the MCP read queries (feature 025,
+    // reached only from the `mcp` server and `directive`) and the public barrel; never the dashboard.
+    expect(importers).toEqual(["cli/ui/dashboard/graph-view.ts", "core/analyze.ts", "core/index.ts", "core/query.ts"]);
   });
 });

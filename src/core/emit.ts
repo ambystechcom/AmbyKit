@@ -32,7 +32,9 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
   const owners = new Map<string, { owner: string; index: number }>();
   files.forEach((f, index) => owners.set(f.path, { owner: "rules", index }));
   for (const emitter of emittersForTargets(config.tools)) {
-    for (const file of emitter.emit(specs, ctx)) {
+    // MCP setup is opt-in (feature 025): without `mcp.enabled` nothing is asked of the emitter, so output is unchanged.
+    const emitted = config.mcp?.enabled ? [...emitter.emit(specs, ctx), ...emitter.mcpFiles(ctx)] : emitter.emit(specs, ctx);
+    for (const file of emitted) {
       const seen = owners.get(file.path);
       if (!seen) {
         owners.set(file.path, { owner: emitter.toolId, index: files.length });
@@ -56,6 +58,20 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
     }
   }
   return files;
+}
+
+/**
+ * Enabled targets that get no MCP config, and why (feature 025, FR-018). Empty unless `mcp.enabled`.
+ * `sync` prints these so a missing config is never silent.
+ */
+export function mcpUnwritten(config: AmbyConfig): { tool: string; reason: string }[] {
+  if (!config.mcp?.enabled) return [];
+  const out: { tool: string; reason: string }[] = [];
+  for (const emitter of emittersForTargets(config.tools)) {
+    const reason = emitter.mcpSkipReason();
+    if (reason) out.push({ tool: emitter.toolId, reason });
+  }
+  return out;
 }
 
 /**

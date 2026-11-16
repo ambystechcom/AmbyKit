@@ -29,4 +29,13 @@ export class OpenCodeEmitter extends BaseEmitter {
       scope: "project",
     }));
   }
+
+  /**
+   * Not written. OpenCode documents two incompatible shapes (`mcp.<name>` with `enabled`, and `mcp.servers.<name>`
+   * with `disabled`) and nothing says which one an installed version reads, so a guess could break the user's
+   * `opencode.json` (`specs/025-mcp-server/research.md`).
+   */
+  override mcpSkipReason(): string | null {
+    return "OpenCode documents two incompatible MCP schemas and none is confirmed for installed versions; add the server by hand";
+  }
 }

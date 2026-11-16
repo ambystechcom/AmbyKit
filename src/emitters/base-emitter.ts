@@ -9,6 +9,11 @@ import type {
   RulesContext,
 } from "../core/types.js";
 
+/** The name AmbyKit's server is registered under in every tool's MCP config. */
+export const MCP_SERVER_NAME = "ambykit";
+/** How the assistant starts the server. */
+export const MCP_COMMAND = { command: "ambykit", args: ["mcp"] } as const;
+
 /**
  * Abstract base for all tool emitters. Holds the shared orchestration (the `emit` template method)
  * and rendering helpers; subclasses override only what differs for their tool. Adding a tool should
@@ -64,6 +69,28 @@ export abstract class BaseEmitter {
 
   protected personaDescription(role: Role): string {
     return `${role.name} — AmbyKit role for ${role.phases.length ? role.phases.join("/") : "reviews"}; use for that perspective.`;
+  }
+
+  /**
+   * The MCP server config for this tool (feature 025). Default: none. Only a target whose per-server entry
+   * shape is verified in `docs/tool-compatibility.md` overrides this, and `buildEmittedFiles` calls it only
+   * when `mcp.enabled` is set, so `emit` and every existing output stay as they were.
+   */
+  mcpFiles(_ctx: RulesContext): EmittedFile[] {
+    return [];
+  }
+
+  /** Why this tool gets no MCP config, or null when `mcpFiles` writes one. `sync` says it (FR-018). */
+  mcpSkipReason(): string | null {
+    return "no verified MCP config format (see docs/tool-compatibility.md)";
+  }
+
+  /**
+   * One MCP config file that adds `<key>.ambykit` to a JSON file (`merge: "json"`). The server is started as
+   * `ambykit mcp` (plan open decision 3), never `npx`, so enabling it never runs network code.
+   */
+  protected mcpFile(path: string, key: string, entry: Record<string, unknown>, scope: "project" | "user" = "project"): EmittedFile {
+    return { path, contents: JSON.stringify({ [key]: { [MCP_SERVER_NAME]: entry } }, null, 2) + "\n", scope, merge: "json" };
   }
 
   /** Tool-specific extra rules files (e.g. Claude's CLAUDE.md bridge). Default: none. */

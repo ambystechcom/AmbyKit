@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { BaseCommand, flag, type CliOptions } from "./base-command.js";
 import { applyFiles, backupFile } from "./io/fsops.js";
 import { legacyWorkflowFiles } from "../core/legacy.js";
-import { buildEmittedFiles } from "../core/emit.js";
+import { buildEmittedFiles, mcpUnwritten } from "../core/emit.js";
 import { loadConfig } from "../core/config.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
 import { loadRoles, validateRoles } from "../core/roles.js";
@@ -43,7 +43,7 @@ export class SyncCommand extends BaseCommand {
     const files = buildEmittedFiles(root, config);
     const result = applyFiles(root, files, {
       dryRun: this.dryRun || checkOnly,
-      includeUser,
+      includeUser: includeUser && !checkOnly, // user-level files never take part in the in-sync check (025 FR-018)
     });
     spin.stop();
 
@@ -63,8 +63,17 @@ export class SyncCommand extends BaseCommand {
     const changed = this.dryRun ? result.wouldChange : result.written;
     this.success(`${this.dryRun ? "Would sync" : "Synced"} ${changed.length} file(s).`);
     this.printSummary(result);
+    this.printMcpGaps(config);
     this.handleLegacyWorkflows(root, legacyWorkflowFiles(root, config), flag(opts, "prune-legacy"));
     return 0;
+  }
+
+  /** With `mcp.enabled`, say which enabled targets get no MCP config and why (feature 025, FR-018). */
+  private printMcpGaps(config: ReturnType<typeof loadConfig>): void {
+    const gaps = mcpUnwritten(config);
+    if (gaps.length === 0) return;
+    this.warn(`MCP server config not written for ${gaps.length} enabled target(s):`);
+    for (const g of gaps) this.info(`  ~ ${g.tool}: ${g.reason}`);
   }
 
   /**

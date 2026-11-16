@@ -48,3 +48,61 @@ describe("applyFiles", () => {
     expect(check.wouldChange).toContain("gen/output.md");
   });
 });
+
+describe("applyFiles: merge json (feature 025)", () => {
+  let root: string;
+  beforeEach(() => {
+    root = mkdtempSync(join(tmpdir(), "ambykit-fsops-json-"));
+  });
+  afterEach(() => {
+    rmSync(root, { recursive: true, force: true });
+  });
+
+  const entry = { type: "stdio", command: "ambykit", args: ["mcp"] };
+  const mcp = (path = ".mcp.json", key = "mcpServers"): EmittedFile => ({
+    path,
+    contents: JSON.stringify({ [key]: { ambykit: entry } }, null, 2) + "\n",
+    scope: "project",
+    merge: "json",
+  });
+
+  it("025:FR-019: creates the file when absent, then a second run changes nothing", () => {
+    const first = applyFiles(root, [mcp()], OPTS);
+    expect(first.created).toEqual([".mcp.json"]);
+    expect(JSON.parse(readFileSync(join(root, ".mcp.json"), "utf8"))).toEqual({ mcpServers: { ambykit: entry } });
+    const second = applyFiles(root, [mcp()], OPTS);
+    expect(second.unchanged).toEqual([".mcp.json"]);
+    expect(second.written).toEqual([]);
+  });
+
+  it("025:FR-019: adds only the ambykit entry to an existing file, preserving the user's servers, and backs it up", () => {
+    const original = JSON.stringify({ mcpServers: { mine: { command: "x" } }, other: true }, null, 2) + "\n";
+    writeFileSync(join(root, ".mcp.json"), original);
+    const result = applyFiles(root, [mcp()], OPTS);
+    expect(result.updated).toEqual([".mcp.json"]);
+    expect(result.backedUp).toHaveLength(1);
+    expect(readFileSync(join(root, result.backedUp[0]!), "utf8")).toBe(original);
+    expect(JSON.parse(readFileSync(join(root, ".mcp.json"), "utf8"))).toEqual({ mcpServers: { mine: { command: "x" }, ambykit: entry }, other: true });
+  });
+
+  it("025:FR-018: a file that is not plain JSON is skipped, reported and left byte-identical", () => {
+    const commented = '{\n  // hand written\n  "mcp": {}\n}\n';
+    writeFileSync(join(root, "opencode.json"), commented);
+    const result = applyFiles(root, [mcp("opencode.json", "mcp")], OPTS);
+    expect(result.skippedJson).toEqual([{ path: "opencode.json", reason: expect.stringMatching(/not plain JSON/) }]);
+    expect(result.written).toEqual([]);
+    expect(readFileSync(join(root, "opencode.json"), "utf8")).toBe(commented);
+  });
+
+  it("025:FR-019: a dry run reports what would change and writes nothing", () => {
+    const result = applyFiles(root, [mcp()], { dryRun: true, includeUser: false });
+    expect(result.wouldChange).toEqual([".mcp.json"]);
+    expect(() => readFileSync(join(root, ".mcp.json"), "utf8")).toThrow();
+  });
+
+  it("025:FR-018: a user-scope MCP file is skipped without consent, like any user-level file", () => {
+    const user: EmittedFile = { ...mcp(".copilot/mcp-config.json"), scope: "user" };
+    const result = applyFiles(root, [user], OPTS);
+    expect(result.skipped).toEqual([".copilot/mcp-config.json"]);
+  });
+});

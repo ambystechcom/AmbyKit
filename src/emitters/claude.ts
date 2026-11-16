@@ -7,7 +7,7 @@ import type {
   RulesContext,
 } from "../core/types.js";
 import { buildPointerRegion } from "../core/rules.js";
-import { BaseEmitter } from "./base-emitter.js";
+import { BaseEmitter, MCP_COMMAND } from "./base-emitter.js";
 
 /**
  * Claude Code emitter. Emits slash commands to `.claude/commands/amby.*.md` and a `CLAUDE.md`
@@ -46,6 +46,15 @@ export class ClaudeEmitter extends BaseEmitter {
     if (spec.allowedTools.includes("bash")) return tools;
     const verbs = [...new Set([...spec.body.matchAll(/`ambykit ([a-z][a-z-]*)[ `]/g)].map((m) => m[1]!))];
     return verbs.length ? `${tools}, ${verbs.map((v) => `Bash(ambykit ${v}:*)`).join(", ")}` : tools;
+  }
+
+  /** Project `.mcp.json`, `mcpServers.ambykit` (verified in `specs/025-mcp-server/research.md`). */
+  override mcpFiles(_ctx: RulesContext): EmittedFile[] {
+    return [this.mcpFile(".mcp.json", "mcpServers", { type: "stdio", ...MCP_COMMAND })];
+  }
+
+  override mcpSkipReason(): string | null {
+    return null;
   }
 
   /** Sub-agents at `.claude/agents/<name>.md` — `name` + `description` required (verified, feature 013). */

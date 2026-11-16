@@ -1,7 +1,7 @@
 import { join } from "node:path/posix";
 import type { CommandSpec, CommandSurface, EmittedFile, Role, RulesContext } from "../core/types.js";
 import { buildPointerRegion } from "../core/rules.js";
-import { BaseEmitter } from "./base-emitter.js";
+import { BaseEmitter, MCP_COMMAND } from "./base-emitter.js";
 
 /**
  * GitHub Copilot (VS Code) emitter. Phase prompts become prompt files at
@@ -43,6 +43,15 @@ export class CopilotEmitter extends BaseEmitter {
         ])}\n${this.personaBody(role)}\n`,
       scope: "project",
     }));
+  }
+
+  /** Workspace `.vscode/mcp.json`, `servers.ambykit` (verified in `specs/025-mcp-server/research.md`). */
+  override mcpFiles(_ctx: RulesContext): EmittedFile[] {
+    return [this.mcpFile(join(".vscode", "mcp.json"), "servers", { type: "stdio", ...MCP_COMMAND })];
+  }
+
+  override mcpSkipReason(): string | null {
+    return null;
   }
 
   protected override rulesFiles(_ctx: RulesContext): EmittedFile[] {
