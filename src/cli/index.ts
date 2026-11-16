@@ -18,6 +18,7 @@ import { ActivityCommand } from "./activity.js";
 import { LaneCommand } from "./lane.js";
 import { GraphCommand } from "./graph.js";
 import { TraceCommand } from "./trace.js";
+import { McpCommand } from "./mcp.js";
 import { outdatedWarning } from "./ui/callout.js";
 import { packageVersion } from "../core/paths.js";
 
@@ -35,6 +36,7 @@ const COMMANDS: BaseCommand[] = [
   new LaneCommand(),
   new GraphCommand(),
   new TraceCommand(),
+  new McpCommand(),
 ];
 
 /** Parse argv (after the command name) into positionals + flags. */

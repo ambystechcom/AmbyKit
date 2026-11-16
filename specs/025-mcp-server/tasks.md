@@ -24,16 +24,16 @@ created: 2026-11-16
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T010] [P] Add `mcp.enabled` and the single `fleet` config object (`stallMinutes` 15, `restartLimit` 2, `concurrency {total 3, perType 2}`, `roundLimit` 3, `tickSeconds`, `budgets`, `workerModel`) with defaults to the config schema and types; 028 extends it (batch B step 1), with tests (src/core/config.ts, src/core/types.ts, test/core/config.test.ts)
-- [ ] [T011] [P] Extend the activity marker with lane, state and run; lane-aware short file name; readers still accept today's names; with tests (src/core/activity.ts, test/core/activity.test.ts)
-- [ ] [T012] [P] Run record and fleet-dir helpers in the primary checkout: the `run.json` schema from data-model.md, `createRun` (explicit request only, as `<feature>.<n>`), `updateRun` and `resolveRun` (single unfinished run, or a warning naming several, or a warning when none; never an implicit run; no `adhoc`) (batch B step 1), with tests (src/core/fleet/runs.ts, src/core/fleet/types.ts, test/core/fleet-runs.test.ts)
-- [ ] [T013] [P] Lockfile and atomic temp-then-rename write helper with stale-lock recovery (batch B step 1), with tests (src/core/fleet/lock.ts, test/core/fleet-lock.test.ts)
-- [ ] [T014] [P] JSON-RPC 2.0 stdio framing and `initialize`, `ping`, `tools/list`, `tools/call` dispatch, with tests (src/mcp/protocol.ts, test/mcp/protocol.test.ts)
-- [ ] [T015] Tool registry: zod-validated inputs, published JSON schemas, uniform error and warning results, with tests (src/mcp/registry.ts, test/mcp/registry.test.ts)
-- [ ] [T016] `ambykit mcp` command serving the registry on stdio (stdout protocol-only), registered in the CLI, with a handshake test (src/mcp/server.ts, src/mcp/tools/index.ts, src/cli/mcp.ts, src/cli/index.ts, test/cli/mcp.test.ts)
+- [x] [T010] [P] Add `mcp.enabled` and the single `fleet` config object (`stallMinutes` 15, `restartLimit` 2, `concurrency {total 3, perType 2}`, `roundLimit` 3, `tickSeconds`, `budgets`, `workerModel`) with defaults to the config schema and types; 028 extends it (batch B step 1), with tests (src/core/config.ts, src/core/types.ts, test/core/config.test.ts)
+- [x] [T011] [P] Extend the activity marker with lane, state and run; lane-aware short file name; readers still accept today's names; with tests (src/core/activity.ts, test/core/activity.test.ts)
+- [x] [T012] [P] Run record and fleet-dir helpers in the primary checkout: the `run.json` schema from data-model.md, `createRun` (explicit request only, as `<feature>.<n>`), `updateRun` and `resolveRun` (single unfinished run, or a warning naming several, or a warning when none; never an implicit run; no `adhoc`) (batch B step 1), with tests (src/core/fleet/runs.ts, src/core/fleet/types.ts, test/core/fleet-runs.test.ts)
+- [x] [T013] [P] Lockfile and atomic temp-then-rename write helper with stale-lock recovery (batch B step 1), with tests (src/core/fleet/lock.ts, test/core/fleet-lock.test.ts)
+- [x] [T014] [P] JSON-RPC 2.0 stdio framing and `initialize`, `ping`, `tools/list`, `tools/call` dispatch, with tests (src/mcp/protocol.ts, test/mcp/protocol.test.ts)
+- [x] [T015] Tool registry: zod-validated inputs, published JSON schemas, uniform error and warning results, with tests (src/mcp/registry.ts, test/mcp/registry.test.ts)
+- [x] [T016] `ambykit mcp` command serving the registry on stdio (stdout protocol-only), registered in the CLI, with a handshake test (src/mcp/server.ts, src/mcp/tools/index.ts, src/cli/mcp.ts, src/cli/index.ts, test/cli/mcp.test.ts)
 - **Checkpoint:** an MCP client can initialize against `ambykit mcp` and list an empty tool set; old marker files still read.
 
-**Verify:** `npm run typecheck` and `npx vitest run test/core test/mcp test/cli/mcp.test.ts` pass, and the existing activity and dashboard tests still pass unchanged.
+**Verify:** `npm run typecheck` and `npx vitest run test/core test/mcp test/cli/mcp.test.ts` pass, and the existing activity and dashboard tests still pass unchanged. ✓ passed
 
 ## Phase 3 — User story US-1: ask for state, not files  (priority: P1)
 

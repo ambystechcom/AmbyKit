@@ -19,7 +19,16 @@ export interface ActivityMarker {
   task?: string;
   at: string; // ISO-8601
   pid?: number;
+  /** Feature 025: full lane name `NNN-slug.lane-p-k`; its short form is in the file name. */
+  lane?: string;
+  /** Feature 025: lane state; absent is read as `working`. */
+  state?: LaneState;
+  /** Feature 025: the fleet run this report belongs to. */
+  run?: string;
 }
+
+export const LANE_STATES = ["working", "waiting", "blocked", "paused", "done"] as const;
+export type LaneState = (typeof LANE_STATES)[number];
 
 export type PresenceState = "active" | "idle" | "stale";
 
@@ -56,12 +65,24 @@ export function parseMarker(text: string, feature: string): ActivityMarker | nul
   const marker: ActivityMarker = { feature, agent: m["agent"], phase: m["phase"], at: m["at"] };
   if (typeof m["task"] === "string") marker.task = m["task"];
   if (typeof m["pid"] === "number") marker.pid = m["pid"];
+  if (typeof m["lane"] === "string") marker.lane = m["lane"];
+  if (typeof m["state"] === "string" && (LANE_STATES as readonly string[]).includes(m["state"])) marker.state = m["state"] as LaneState;
+  if (typeof m["run"] === "string") marker.run = m["run"];
   return marker;
 }
 
-/** `<feature>.<agent>.json`, the marker file name. */
-export function markerFile(feature: string, agent: string): string {
-  return `${feature}.${agent}.json`;
+/** The short lane form used in file names: `NNN-slug.lane-p-k` → `lane-p-k`; an already short name is kept. */
+export function shortLane(lane: string): string {
+  const i = lane.lastIndexOf(".lane-");
+  return i >= 0 ? lane.slice(i + 1) : lane;
+}
+
+/**
+ * `<feature>.<agent>.json`, the marker file name; with a lane `<feature>.<agent>~<lane>.json` (feature 025,
+ * FR-008) so two lanes of one agent kind never overwrite each other. Readers take the agent from the body.
+ */
+export function markerFile(feature: string, agent: string, lane?: string): string {
+  return lane ? `${feature}.${agent}~${shortLane(lane)}.json` : `${feature}.${agent}.json`;
 }
 
 export function classify(ageMs: number, t: Thresholds): PresenceState {
@@ -172,7 +193,7 @@ export function writeMarker(checkoutRoot: string, marker: ActivityMarker): strin
   const ignore = join(dir, ".gitignore");
   if (!existsSync(ignore)) writeFileSync(ignore, "# AmbyKit agent activity markers (local only)\n*\n", "utf8");
   const { feature, ...body } = marker;
-  const path = join(dir, markerFile(feature, marker.agent));
+  const path = join(dir, markerFile(feature, marker.agent, marker.lane));
   writeFileSync(path, JSON.stringify(body) + "\n", "utf8");
   return path;
 }
