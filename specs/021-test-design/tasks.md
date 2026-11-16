@@ -17,9 +17,9 @@ created: 2026-11-16
 
 ## Phase 1 — Setup
 
-- [ ] [T001] [P] Add the `tests.md` template with the case/section/skip format and both `uncovered` forms from plan.md (src/templates/tests.md)
-- [ ] [T002] [P] Hand-author this feature's own `tests.md` in the new format before any code (dogfood, SC-006) (specs/021-test-design/tests.md)
-- **Verify:** `specs/021-test-design/tests.md` has a case for every acceptance criterion of US-1..US-7, each citing story and FR IDs, and the template parses by eye against plan.md.
+- [x] [T001] [P] Add the `tests.md` template with the case/section/skip format and both `uncovered` forms from plan.md (src/templates/tests.md)
+- [x] [T002] [P] Hand-author this feature's own `tests.md` in the new format before any code (dogfood, SC-006) (specs/021-test-design/tests.md)
+- **Verify:** `specs/021-test-design/tests.md` has a case for every acceptance criterion of US-1..US-7, each citing story and FR IDs, and the template parses by eye against plan.md. ✓ passed
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
