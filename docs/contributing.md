@@ -48,3 +48,12 @@ run `ambykit sync` and include the regenerated files in your commit.
 
 - Keep changes small and focused; update docs and the compatibility matrix alongside code.
 - Ensure `npm run typecheck` and `npm test` pass before opening a PR.
+
+## Release checklist
+
+- Move the `[Unreleased]` entries in `CHANGELOG.md` under the new version and bump `package.json`.
+- **Plugins:** state in the changelog whether plugins are affected. A change to anything in
+  [`plugin-api.md`](./plugin-api.md) (extension points, the `PluginApi`, the matrix-row shape, the
+  `ambykit.pluginApi` range, `PLUGIN_API_VERSION`) gets a line starting `[plugin-api]`; otherwise write
+  "Plugins: not affected." If the API changed incompatibly, bump `PLUGIN_API_VERSION`.
+- Run `npm run typecheck`, `npm test` and `ambykit sync --check`.

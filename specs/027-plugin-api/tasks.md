@@ -72,12 +72,12 @@ created: 2026-11-16
 
 ## Phase 6 — User story US-4  Trust a documented, versioned API (priority: P1)
 
-- [ ] [T060] [US4] Test the API-range refusal names the expected range and the found version, and the experimental label is printed (test/plugins/api-version.test.ts)
-- [ ] [T061] [P] [US4] Add the `[plugin-api]` changelog convention and the 1.6 entry stating the API is experimental (CHANGELOG.md)
-- [ ] [T062] [P] [US4] Add a release-checklist line: state in the changelog whether plugins are affected (docs/contributing.md)
+- [x] [T060] [US4] Test the API-range refusal names the expected range and the found version, and the experimental label is printed (test/plugins/api-version.test.ts)
+- [x] [T061] [P] [US4] Add the `[plugin-api]` changelog convention and the 1.6 entry stating the API is experimental (CHANGELOG.md)
+- [x] [T062] [P] [US4] Add a release-checklist line: state in the changelog whether plugins are affected (docs/contributing.md)
 - **Checkpoint:** US-4 holds: version mismatches are refused clearly and the stability promise is written down.
 
-**Verify:** `npx vitest run test/plugins/api-version.test.ts` passes, and CHANGELOG.md has a `[plugin-api]` line under the unreleased section.
+**Verify:** `npx vitest run test/plugins/api-version.test.ts` passes, and CHANGELOG.md has a `[plugin-api]` line under the unreleased section. ✓ passed
 
 ## Phase 7 — User story US-3  Prove a plugin against its compatibility row (priority: P1)
 
