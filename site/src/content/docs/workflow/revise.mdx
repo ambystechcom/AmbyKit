@@ -6,8 +6,8 @@ sidebar:
 phase: revise
 order: 4
 command: amby.revise
-reads: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md]
-writes: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md]
+reads: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md, specs/NNN-slug/tests.md]
+writes: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md, specs/NNN-slug/tests.md]
 ---
 
 import PhaseBadge from "../../../components/PhaseBadge.astro";
@@ -33,8 +33,8 @@ continuing design, it extends an existing `ui.md`, or directs you to `/amby.desi
 ## Artifacts read & written
 
 <Artifacts
-  reads={["specs/NNN-slug/spec.md", "specs/NNN-slug/ui.md"]}
-  writes={["specs/NNN-slug/spec.md", "specs/NNN-slug/ui.md"]}
+  reads={["specs/NNN-slug/spec.md", "specs/NNN-slug/ui.md", "specs/NNN-slug/tests.md"]}
+  writes={["specs/NNN-slug/spec.md", "specs/NNN-slug/ui.md", "specs/NNN-slug/tests.md"]}
 />
 
 Revise patches in place — it never rewrites untouched sections or renumbers existing ids.

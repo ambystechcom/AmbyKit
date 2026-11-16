@@ -100,7 +100,7 @@ cases exist before any story's implementation begins, without a separate step.
   only its own artifact, never source files.
 - **depends-on:** [US-1, 019:US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a run for a feature with a ready spec, When the tasks phase completes, Then the test design
@@ -120,7 +120,7 @@ checked from the design rather than guessed after the fact.
   without a model.
 - **depends-on:** [US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a feature with test design, When another tool reads it, Then it can list each case with its
@@ -143,7 +143,7 @@ and review the whole thing every time.
   updated.
 - **depends-on:** [US-1, US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given an acceptance criterion changes, When test design is refreshed, Then only the cases citing it

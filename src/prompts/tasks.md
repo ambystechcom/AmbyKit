@@ -5,7 +5,7 @@ description: Break the plan into an ordered, dependency-aware task checklist.
 argument-hint: "[feature id, defaults to current] [--skip-tests <reason>]"
 phase: tasks
 role: tech-lead
-reads: [specs/NNN-slug/plan.md, specs/NNN-slug/spec.md]
+reads: [specs/NNN-slug/plan.md, specs/NNN-slug/spec.md, specs/NNN-slug/tests.md]
 writes: [specs/NNN-slug/tasks.md, specs/NNN-slug/tests.md]
 allowedTools: [read, write, edit]
 ---
@@ -33,5 +33,7 @@ Run `ambykit activity <feature> --agent=$AGENT --phase=tasks` first, with that f
    With `--skip-tests <reason>`, write `tests.md` holding only the line `skipped: <reason>`.
 7. Cases are `auto` unless a fixed-list reason makes them manual (add `verify:` and `record:`). Each cites its `US-n#k`
    and `FR-###`s; `TC-###` is highest + 1, never reused. An FR with no case goes under `## Uncovered` with a reason.
+   With an existing `tests.md`, patch only the cases citing changed criteria (keep their ids, clear `[stale]`), mark
+   cases whose criterion was removed `[obsolete]` and add new ones; leave the rest untouched.
 
 Do not start implementing. Keep descriptions to one line each.

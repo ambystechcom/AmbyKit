@@ -9,6 +9,9 @@ import { describe, expect, it } from "vitest";
 const root = join(import.meta.dirname, "..");
 const read = (rel: string): string => readFileSync(join(root, rel), "utf8");
 const tasks = read("src/prompts/tasks.md");
+const implement = read("src/prompts/implement.md");
+const converge = read("src/prompts/converge.md");
+const revise = read("src/prompts/revise.md");
 const frontmatter = (text: string): string => /^---\n([\s\S]*?)\n---/.exec(text.replace(/\r\n/g, "\n"))?.[1] ?? "";
 
 describe("spec 021 prompt contract: /amby.tasks writes the test design", () => {
@@ -49,5 +52,35 @@ describe("spec 021 prompt contract: /amby.tasks writes the test design", () => {
 
   it("P3: the test-design rules stay short (the whole tasks prompt under 3000 characters)", () => {
     expect(tasks.length).toBeLessThan(3000);
+  });
+});
+
+describe("spec 021 prompt contract: the other phases use the test design", () => {
+  it("021:FR-011: /amby.implement says when tests.md is missing at the checkpoint instead of passing silently", () => {
+    expect(frontmatter(implement)).toMatch(/reads: \[[^\]]*specs\/NNN-slug\/tests\.md/);
+    expect(implement).toMatch(/at the story checkpoint say if `tests\.md` is missing, never pass silently/);
+  });
+
+  it("021:FR-012: /amby.implement builds to the story's cases and names tests with the qualified id", () => {
+    expect(implement).toMatch(/build to the story's cases in `tests\.md` and name tests `NNN:FR-###: …`/);
+  });
+
+  it("021:FR-014: /amby.converge reads tests.md after the trace matrix and treats its cases as the expected tests", () => {
+    expect(frontmatter(converge)).toMatch(/reads: \[[^\]]*specs\/NNN-slug\/tests\.md/);
+    expect(converge).toMatch(/read it after the `trace` matrix \(where there is one\) and treat its cases as the expected tests/);
+  });
+
+  it("021:FR-013: re-running /amby.tasks patches only the cases citing changed criteria and keeps their ids", () => {
+    expect(tasks).toMatch(/patch only the cases citing changed criteria \(keep their ids, clear `\[stale\]`\)/);
+    expect(tasks).toMatch(/mark\s+cases whose criterion was removed `\[obsolete\]`/);
+  });
+
+  it("021:FR-013: /amby.revise marks cases `[stale]` or `[obsolete]` and never deletes them", () => {
+    expect(frontmatter(revise)).toMatch(/writes: \[[^\]]*specs\/NNN-slug\/tests\.md/);
+    expect(revise).toMatch(/mark each case citing a changed criterion `\[stale\]` and each citing a removed one\s+`\[obsolete\]` \(never delete\)/);
+  });
+
+  it("P3: every edited prompt stays short", () => {
+    for (const text of [implement, converge, revise]) expect(text.length).toBeLessThan(3000);
   });
 });

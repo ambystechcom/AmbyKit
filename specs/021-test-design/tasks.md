@@ -51,12 +51,12 @@ created: 2026-11-16
 
 ## Phase 5 — User stories US-4, US-5, US-6  (priority: P2)
 
-- [ ] [T040] [P] [US4] Make `/amby.implement` note a missing `tests.md` at the checkpoint, build to the story's cases and name tests `NNN:FR-###` (src/prompts/implement.md)
-- [ ] [T041] [P] [US5] Make `/amby.converge` read `tests.md` cases as expected tests after the trace matrix when one exists (src/prompts/converge.md)
-- [ ] [T042] [P] [US6] Add refresh rules to the tasks prompt: patch only cases citing changed criteria, keep IDs, mark `[obsolete]`, clear `[stale]` (src/prompts/tasks.md)
-- [ ] [T043] [P] [US6] Make `/amby.revise` flag cases citing changed criteria as `[stale]` (src/prompts/revise.md)
+- [x] [T040] [P] [US4] Make `/amby.implement` note a missing `tests.md` at the checkpoint, build to the story's cases and name tests `NNN:FR-###` (src/prompts/implement.md)
+- [x] [T041] [P] [US5] Make `/amby.converge` read `tests.md` cases as expected tests after the trace matrix when one exists (src/prompts/converge.md)
+- [x] [T042] [P] [US6] Add refresh rules to the tasks prompt: patch only cases citing changed criteria, keep IDs, mark `[obsolete]`, clear `[stale]` (src/prompts/tasks.md)
+- [x] [T043] [P] [US6] Make `/amby.revise` flag cases citing changed criteria as `[stale]` (src/prompts/revise.md)
 - **Checkpoint:** US-4, US-5 and US-6 are demoable end to end on a sample feature.
-- **Verify:** each edited prompt still emits for every target (`npx vitest run test/command-spec.test.ts test/converge-emit.test.ts test/revise-emit.test.ts`).
+- **Verify:** each edited prompt still emits for every target (`npx vitest run test/command-spec.test.ts test/converge-emit.test.ts test/revise-emit.test.ts`). ✓ passed
 
 ## Phase 6 — Polish
 
