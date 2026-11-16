@@ -118,6 +118,10 @@ export interface RulesContext {
   manageRules: boolean;
   /** Roles installed in the project; empty/absent means phases run without a role (feature 013). */
   roles?: Role[];
+  /** The write-capable fleet worker persona (feature 019); emitted only by targets with a verified agent format. */
+  worker?: { id: string; name: string; description: string; body: string };
+  /** `fleet.workerModel` from the project config; applied only where the target documents a `model` key. */
+  workerModel?: string;
 }
 
 /** Persisted project configuration at .amby/config.json. */

@@ -45,6 +45,7 @@
     "dist",
     "src/templates",
     "src/prompts",
+    "src/agents",
     "src/reference",
     "src/roles",
     "README.md",
