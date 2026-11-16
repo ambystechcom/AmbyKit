@@ -127,7 +127,18 @@ export function featureRow(f: FeatureSnapshot): FeatureRow {
   // Only worktree rows carry their source, so output without worktrees is unchanged (017 FR-007/FR-008).
   if (f.checkout?.kind === "worktree") row.checkout = f.checkout;
   if (f.lanes && f.lanes.length > 0) row.lanes = f.lanes;
+  // Feature 020: undone tasks carrying a BLOCKED marker; omitted when zero so existing output is unchanged.
+  const blockedTasks = openBlockedTasks(f).length;
+  if (blockedTasks > 0) row.blocked = blockedTasks;
   return row;
+}
+
+/**
+ * Feature 020: tasks still open that carry a BLOCKED marker. A checked task with a leftover marker is an
+ * inconsistency (FR-004), reported by `analyze`, and never counts as blocked here.
+ */
+function openBlockedTasks(f: FeatureSnapshot): TaskLine[] {
+  return (f.tasks ?? []).filter((t) => !t.done && t.blocked !== undefined);
 }
 
 /** Feature-qualified, unambiguous story key for display, e.g. `014:US-3` or `008-alpha:US-1`. */
@@ -203,7 +214,17 @@ export function attentionItems(all: FeatureSnapshot[], scoped: FeatureSnapshot[]
   const problems: AttentionItem[] = [];
   const blocked: AttentionItem[] = [];
   const waiting: AttentionItem[] = [];
+  const taskBlocked: AttentionItem[] = [];
   for (const feature of scoped) {
+    // Feature 020 (FR-010): one item per open task with a BLOCKED marker, keyed by feature and task id.
+    for (const task of openBlockedTasks(feature)) {
+      taskBlocked.push({
+        key: `${feature.displayRef}:${task.id}`,
+        kind: "task-blocked",
+        refs: [task.id],
+        reason: task.blocked ? `BLOCKED: ${task.blocked}` : "BLOCKED (no reason given)",
+      });
+    }
     for (const story of feature.stories) {
       if (story.status === "done") continue;
       const key = storyLabel(feature, story);
@@ -248,7 +269,7 @@ export function attentionItems(all: FeatureSnapshot[], scoped: FeatureSnapshot[]
       }
     }
   }
-  return [...problems, ...blocked, ...waiting];
+  return [...problems, ...blocked, ...waiting, ...taskBlocked];
 }
 
 /**
@@ -269,6 +290,8 @@ export function upNext(
     for (const t of tasks) {
       if (t.done) continue;
       open += 1;
+      // Feature 020: a task marked BLOCKED is not offered as ready work; lane planning is unchanged.
+      if (t.blocked !== undefined) continue;
       const story = t.story ? byId.get(t.story) : undefined;
       const storyKey = story ? storyLabel(feature, story) : null;
       if (storyKey && held.has(storyKey)) continue;
