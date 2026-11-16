@@ -10,6 +10,7 @@ import { featureWorktrees } from "../core/worktree.js";
 import { ROLES_DIR, loadRoles, validateRoles } from "../core/roles.js";
 import { SHIPPED_ROLES } from "../core/scaffold.js";
 import { legacyWorkflowFiles } from "../core/legacy.js";
+import { movedTargetNotices } from "../core/moved-targets.js";
 import { loadPluginSession } from "../plugins/session.js";
 import { reportPlugins } from "../plugins/report.js";
 
@@ -41,6 +42,7 @@ export class CheckCommand extends BaseCommand {
       ok = false;
     }
     const registry = session?.registry;
+    for (const notice of movedTargetNotices(config.tools, (id) => getTarget(id, registry) !== undefined)) this.warn(notice);
     for (const t of config.tools) {
       if (!getTarget(t, registry)) {
         this.warn(`Configured tool '${t}' is not a known target.`);

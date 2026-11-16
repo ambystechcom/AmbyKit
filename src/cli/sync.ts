@@ -8,6 +8,8 @@ import { loadConfig } from "../core/config.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
 import { loadRoles, validateRoles } from "../core/roles.js";
 import type { TargetRegistry } from "../plugins/registry.js";
+import { movedTargetNotices } from "../core/moved-targets.js";
+import { getTarget } from "../emitters/index.js";
 import { loadPluginSession } from "../plugins/session.js";
 import { reportPlugins } from "../plugins/report.js";
 
@@ -48,6 +50,8 @@ export class SyncCommand extends BaseCommand {
     for (const line of plugins.info) this.info(line);
     for (const line of plugins.errors) this.error(line);
     const pluginStatus = plugins.errors.length > 0 ? 1 : 0;
+    // A configured target that moved to a plugin: say which package to install; remove nothing (FR-014).
+    for (const notice of movedTargetNotices(config.tools, (id) => getTarget(id, session?.registry) !== undefined)) this.warn(notice);
 
     const spin = this.spinner();
     spin.start(this.dryRun || checkOnly ? "Checking what would change…" : "Emitting tool files…");

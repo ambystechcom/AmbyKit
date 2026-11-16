@@ -98,13 +98,13 @@ created: 2026-11-16
 
 ## Phase 9 — User story US-5  Keep the core lean (priority: P2)
 
-- [ ] [T090] [P] [US5] Moved-target map (target id → official package) and a pure lookup (src/core/moved-targets.ts)
-- [ ] [T091] [US5] `sync` tells the person which package to install for a moved target and removes nothing; rebase on 025 T069 (src/cli/sync.ts)
-- [ ] [T092] [P] [US5] Record each target as built in or official plugin with the demand and churn evidence columns, for review at the 2.0 gate (docs/plugin-split.md)
-- [ ] [T093] [US5] Test the notice for a moved target and that no existing file is removed (test/plugins/moved-targets.test.ts)
+- [x] [T090] [P] [US5] Moved-target map (target id → official package) and a pure lookup (src/core/moved-targets.ts)
+- [x] [T091] [US5] `sync` tells the person which package to install for a moved target and removes nothing; rebase on 025 T069 (src/cli/sync.ts)
+- [x] [T092] [P] [US5] Record each target as built in or official plugin with the demand and churn evidence columns, for review at the 2.0 gate (docs/plugin-split.md)
+- [x] [T093] [US5] Test the notice for a moved target and that no existing file is removed (test/plugins/moved-targets.test.ts)
 - **Checkpoint:** US-5 mechanism is demoable; no built-in target is removed in 1.6 (see plan, open decision 3).
 
-**Verify:** `npx vitest run test/plugins/moved-targets.test.ts` passes, and `docs/plugin-split.md` lists all 18 targets.
+**Verify:** `npx vitest run test/plugins/moved-targets.test.ts` passes, and `docs/plugin-split.md` lists all 18 targets. ✓ passed
 
 ## Phase 10 — Polish
 
