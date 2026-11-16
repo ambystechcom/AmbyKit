@@ -99,11 +99,11 @@ created: 2026-11-16
 
 ## Phase 9 — User story US-5: know when a lane has stalled  (priority: P2)
 
-- [ ] [T090] [US5] `laneStatus`: the single per-lane stall implementation that 019, 028 and 029 call; state, stalled after `fleet.stallMinutes` with no report and no `tasks.md` change (only while working), directive status, independent of the dashboard idle limit (batch B step 1), with tests (src/core/fleet/lane-status.ts, test/core/lane-status.test.ts)
-- [ ] [T091] [US5] `lane_status` read tool, with tests (src/mcp/tools/read.ts, src/mcp/tools/index.ts, test/mcp/lane-status-tool.test.ts)
+- [x] [T090] [US5] `laneStatus`: the single per-lane stall implementation that 019, 028 and 029 call; state, stalled after `fleet.stallMinutes` with no report and no `tasks.md` change (only while working), directive status, independent of the dashboard idle limit (batch B step 1), with tests (src/core/fleet/lane-status.ts, test/core/lane-status.test.ts)
+- [x] [T091] [US5] `lane_status` read tool, with tests (src/mcp/tools/read.ts, src/mcp/tools/index.ts, test/mcp/lane-status-tool.test.ts)
 - **Checkpoint:** US-5 is demoable: a lane left in working past the limit reads as stalled; waiting, blocked and done never do.
 
-**Verify:** `npx vitest run test/core/lane-status.test.ts test/mcp/lane-status-tool.test.ts` passes, including a configured limit and a limit different from the dashboard's.
+**Verify:** `npx vitest run test/core/lane-status.test.ts test/mcp/lane-status-tool.test.ts` passes, including a configured limit and a limit different from the dashboard's. ✓ passed
 
 ## Phase 10 — Polish
 
