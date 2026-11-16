@@ -37,11 +37,11 @@ created: 2026-11-16
 
 ## Phase 4 — User story US-2  (priority: P1)
 
-- [ ] [T030] [P] [US2] Test today's syntax: `depends-on: [US-1]` same-feature, `[015:US-2]` cross-feature, the `NNN/US-1` form, `blocked-by` as a distinct kind, and a node with no edges (test/core/graph-syntax.test.ts)
-- [ ] [T031] [P] [US2] Parity test: story edges built from every `specs/*/spec.md` in this repo equal the T001 golden of `analyze`, with no new errors (test/core/graph-parity.test.ts)
+- [x] [T030] [P] [US2] Test today's syntax: `depends-on: [US-1]` same-feature, `[015:US-2]` cross-feature, the `NNN/US-1` form, `blocked-by` as a distinct kind, and a node with no edges (test/core/graph-syntax.test.ts)
+- [x] [T031] [P] [US2] Parity test: story edges built from every `specs/*/spec.md` in this repo equal the T001 golden of `analyze`, with no new errors (test/core/graph-parity.test.ts)
 - **Checkpoint:** US-2 is demoable: the graph over this repo's real specs matches today's `analyze`.
 
-**Verify:** `npm test -- graph-syntax graph-parity` passes.
+**Verify:** `npm test -- graph-syntax graph-parity` passes. ✓ passed
 
 ## Phase 5 — User story US-3  (priority: P1)
 

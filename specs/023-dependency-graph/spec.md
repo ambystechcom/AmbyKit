@@ -58,7 +58,7 @@ so that I get it in 1.5 without editing anything.
   the story edges match what `analyze` reports today.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given `depends-on: [US-1]` in a spec, When read, Then it is a same-feature edge.
