@@ -5,7 +5,10 @@ import { describe, expect, it } from "vitest";
 import { DashboardCommand } from "../../src/cli/dashboard.js";
 import { artifactLines } from "../../src/cli/ui/dashboard/feature-view.js";
 import { readFeatures } from "../../src/core/features.js";
-import { hasAnsi } from "../ui/helpers.js";
+import { visibleWidth } from "../../src/cli/ui/dashboard/panel.js";
+import { renderFeatureView } from "../../src/cli/ui/dashboard/render-overview.js";
+import { applyFilters, computeOverview } from "../../src/core/overview.js";
+import { fakeCapabilities, hasAnsi, stripAnsi } from "../ui/helpers.js";
 
 /**
  * One feature with three phases, each with one task:
@@ -136,5 +139,17 @@ describe("dashboard surfaces failed and missing Verify lines (spec 020, US-4)", 
     expect(tasksLine?.detail).toBe("1 / 3  verify 1/2, FAILED phase 2");
     const clean = readFeatures(project("none")).features[0];
     expect(artifactLines(clean!).find((l) => l.file === "tasks.md")?.detail).toBe("1 / 3");
+  });
+  it("FR-014: at a narrow width the feature view still names the failed phase as plain text", () => {
+    const { features, issues } = readFeatures(project("mixed"));
+    const filters = { feature: "001" };
+    const view = {
+      overview: computeOverview(features, filters, { upNextCap: 5 }, issues),
+      feature: applyFilters(features, filters)[0]!,
+      meta: { crumb: [], cwd: "~/proj", version: "1.4.0" },
+    };
+    const out = stripAnsi(renderFeatureView(fakeCapabilities({ color: false, columns: 80 }), view));
+    expect(out).toContain("FAILED phase 2");
+    for (const line of out.split("\n")) expect(visibleWidth(line)).toBeLessThanOrEqual(80);
   });
 });

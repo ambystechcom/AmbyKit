@@ -270,7 +270,7 @@ Also reports, as warnings only (the exit code never changes), what the task file
 
 In `--json` these are the keys `blockedTasks` (`feature`, `task`, `story`, `reason`), `deviations`
 (`feature`, `task`, `note`), `markerIssues` (`feature`, `task`, `kind` `missing-reason` or
-`checked-but-blocked`, `message`) and `verifyIssues` (`feature`, `phase`, `title`, `kind` `missing`
+`checked-but-blocked` or `path-after-marker` (a `(file/path)` group after the marker), `message`) and `verifyIssues` (`feature`, `phase`, `title`, `kind` `missing`
 or `failed`, `why` for failed). Each key is absent when it has no entries, so output for a project
 without markers is unchanged.
 

@@ -4,7 +4,11 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { AnalyzeCommand } from "../../src/cli/analyze.js";
 import { DashboardCommand } from "../../src/cli/dashboard.js";
-import { hasAnsi } from "../ui/helpers.js";
+import { featureChart } from "../../src/cli/ui/dashboard/feature-chart.js";
+import { visibleWidth } from "../../src/cli/ui/dashboard/panel.js";
+import { readFeatures } from "../../src/core/features.js";
+import { computeOverview } from "../../src/core/overview.js";
+import { fakeCapabilities, hasAnsi, stripAnsi } from "../ui/helpers.js";
 
 /** A one-feature project. `markers: false` is the same project with every marker removed. */
 function project(markers: boolean): string {
@@ -76,6 +80,19 @@ describe("dashboard and analyze surface BLOCKED markers (spec 020, US-2)", () =>
     expect(/^[\x00-\x7f\n]*$/.test(out.replace(/[—]/g, "-"))).toBe(true);
     expect(out).toContain("[b] 001:T001");
     expect(out).toContain("2 blocked");
+  });
+
+  it("FR-014: at a narrow width the feature row still carries the blocked count as plain text", () => {
+    const { features, issues } = readFeatures(project(true));
+    const overview = computeOverview(features, {}, { upNextCap: 5 }, issues);
+    const caps = fakeCapabilities({ color: false, columns: 80 });
+    const rows = featureChart(caps, overview.features, "narrow").map(stripAnsi);
+    expect(rows.join("\n")).toContain("2 blocked");
+    for (const line of rows) expect(visibleWidth(line)).toBeLessThanOrEqual(80);
+    // and a feature with no blocked tasks adds nothing at the same width
+    const clean = readFeatures(project(false));
+    const cleanRows = featureChart(caps, computeOverview(clean.features, {}, { upNextCap: 5 }, clean.issues).features, "narrow");
+    expect(stripAnsi(cleanRows.join("\n"))).not.toContain("blocked");
   });
 
   it("FR-013: --json --overview adds task-blocked items and the blocked count; the bare --json story shape is unchanged", async () => {
