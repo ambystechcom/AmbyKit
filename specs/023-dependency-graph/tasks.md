@@ -89,8 +89,8 @@ created: 2026-11-16
 
 ## Phase 9 — Polish
 
-- [ ] [T090] [P] Add the single shared graph to the architecture notes and list `graph` in the README command table (docs/architecture.md, README.md)
-- [ ] [T091] Dogfood check (SC-005): run `ambykit graph 023` and confirm this feature's stories resolve with no broken edges and in dependency order (specs/023-dependency-graph/tasks.md)
-- [ ] [T092] Final gate: `npm run typecheck` and `npm test` pass, and every FR in the spec has at least one test (specs/023-dependency-graph/plan.md)
+- [x] [T090] [P] Add the single shared graph to the architecture notes and list `graph` in the README command table (docs/architecture.md, README.md)
+- [x] [T091] Dogfood check (SC-005): run `ambykit graph 023` and confirm this feature's stories resolve with no broken edges and in dependency order (specs/023-dependency-graph/tasks.md)
+- [x] [T092] Final gate: `npm run typecheck` and `npm test` pass, and every FR in the spec has at least one test (specs/023-dependency-graph/plan.md)
 
-**Verify:** `npm run typecheck` and `npm test` pass; `ambykit graph` exits 0 on this repo.
+**Verify:** `npm run typecheck` and `npm test` pass; `ambykit graph` exits 0 on this repo. ✓ passed

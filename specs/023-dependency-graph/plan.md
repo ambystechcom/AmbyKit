@@ -148,3 +148,25 @@ longest-path over the acyclic part (nodes on cycles excluded). Neither adds a fi
 6. **Interactive view needs `/amby.design` sign-off.** Default: ship a minimal text-list view from US-6's acceptance criteria; revisit after design or at spec 032.
 7. **Key binding for the view.** Default: `g` from the overview, `escape` returns; check against the help overlay for conflicts.
 8. **Mermaid shape.** Default: one subgraph per feature, solid arrows for `depends-on`, dashed for `blocked-by`, thick arrows between subgraphs for feature edges.
+
+## Requirement → test (final gate, T092)
+
+| Requirement | Test |
+|---|---|
+| FR-001, FR-002 | `test/core/graph.test.ts` (build, derived feature edges, no mutation) |
+| FR-003 | `test/core/graph-syntax.test.ts` |
+| FR-004, FR-005 | `test/core/graph.test.ts` (broken edges, cycles, self-dependency) |
+| FR-006 | `test/core/graph.test.ts` (determinism under shuffled input) |
+| FR-007 | `test/core/graph-format.test.ts`, `test/cli/graph.test.ts` |
+| FR-008 | `test/core/graph-format.test.ts` (versioned shape), `contracts/graph-json.md` |
+| FR-009 | `test/core/graph-format.test.ts` (scope), `test/cli/graph.test.ts` |
+| FR-010 | `test/cli/graph.test.ts` (non-zero exit on broken edges and cycles) |
+| FR-011 | `test/core/graph-consumers.test.ts` (one parser, one resolver, agreement); the scheduler and MCP consumers belong to specs 028 and 025 |
+| FR-012, FR-013 | `test/core/graph-paths.test.ts` |
+| FR-014, FR-016 | `test/ui/dashboard-graph.test.ts` |
+| FR-015 | `test/cli/dashboard-perf.test.ts` (budget and load guard) |
+| FR-017, SC-002 | `test/core/graph-golden.test.ts`, `test/core/graph-parity.test.ts` |
+| FR-018 | Satisfied by absence: no prompt or template text was added, so nothing is emitted per tool |
+| SC-001 | `test/core/graph.test.ts` (200 features), `test/cli/dashboard-perf.test.ts` |
+| SC-003 | `test/core/graph-consumers.test.ts`; note the dashboard names the highest-ranked kind of blocker, not every one |
+| SC-005 | `ambykit graph 023`: all six stories resolve with no broken edges |
