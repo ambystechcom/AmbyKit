@@ -36,14 +36,14 @@ created: 2026-11-16
 
 ## Phase 4 — User story US-2  (priority: P1)
 
-- [ ] [T030] [US2] Implement migrate v1 to v2 for spec.md and tasks.md with the per-phase block layout, a dry-run diff summary, and skip-and-list for specs it cannot convert safely (spikes/026-spec-format-v2/migrate.mjs)
-- [ ] [T031] [US2] Add the per-task block layout as a second migrate option (spikes/026-spec-format-v2/migrate.mjs)
-- [ ] [T032] [US2] Dry-run over a temporary copy of `specs/` and prove nothing was written by hashing the tree before and after (spikes/026-spec-format-v2/results/us2-dryrun.txt)
-- [ ] [T033] [US2] Run migrate twice for real on the copy and prove the second run changes nothing and prose lines are unchanged (spikes/026-spec-format-v2/results/us2-idempotence.txt)
-- [ ] [T034] [P] [US2] Read the converted copy in both layouts and compare with the baseline model (spikes/026-spec-format-v2/results/us2-v2-vs-v1.txt)
-- [ ] [T035] [P] [US2] Run the current built parsers on the converted copy and record, per field, whether 1.x can still read it (spikes/026-spec-format-v2/results/us2-v1-reader-on-v2.txt)
+- [x] [T030] [US2] Implement migrate v1 to v2 for spec.md and tasks.md with the per-phase block layout, a dry-run diff summary, and skip-and-list for specs it cannot convert safely (spikes/026-spec-format-v2/migrate.mjs)
+- [x] [T031] [US2] Add the per-task block layout as a second migrate option (spikes/026-spec-format-v2/migrate.mjs)
+- [x] [T032] [US2] Dry-run over a temporary copy of `specs/` and prove nothing was written by hashing the tree before and after (spikes/026-spec-format-v2/results/us2-dryrun.txt)
+- [x] [T033] [US2] Run migrate twice for real on the copy and prove the second run changes nothing and prose lines are unchanged (spikes/026-spec-format-v2/results/us2-idempotence.txt)
+- [x] [T034] [P] [US2] Read the converted copy in both layouts and compare with the baseline model (spikes/026-spec-format-v2/results/us2-v2-vs-v1.txt)
+- [x] [T035] [P] [US2] Run the current built parsers on the converted copy and record, per field, whether 1.x can still read it (spikes/026-spec-format-v2/results/us2-v1-reader-on-v2.txt)
 - **Checkpoint:** US-2 is demoable: safe, repeatable, previewable migration on AmbyKit's own specs.
-- **Verify:** the dry-run tree hash is unchanged, the second real run produces an empty diff, every v2 model equals the baseline or each difference is listed, and every skipped spec is listed untouched.
+- **Verify:** the dry-run tree hash is unchanged, the second real run produces an empty diff, every v2 model equals the baseline or each difference is listed, and every skipped spec is listed untouched. ✓ passed
 
 ## Phase 5 — User story US-3  (priority: P2)
 

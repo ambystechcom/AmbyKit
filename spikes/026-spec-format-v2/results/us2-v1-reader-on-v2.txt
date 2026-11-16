@@ -1,0 +1,42 @@
+== 1.x reader (shipped parseStories/parseTasks/parsePhases) on converted copy, layout=phase
+field                           items wrong / total   verdict
+story id/title                      0 / 126      readable
+story priority                      0 / 126      readable
+story status                      126 / 126      NOT readable (all empty/changed)
+story depends-on                   86 / 126      partly readable
+story blocked-by                    0 / 126      readable
+task id/done/story/[P]/phase        0 / 817      readable
+task description                    9 / 817      partly readable
+task paths (ownership)            793 / 817      partly readable
+task BLOCKED/DEVIATION              0 / 817      readable
+phase Verify check+result          61 / 193      partly readable
+=> 1.x reads the converted files WITHOUT error but loses the moved fields: readable only with the new reader.
+
+== 1.x reader (shipped parseStories/parseTasks/parsePhases) on converted copy, layout=task
+field                           items wrong / total   verdict
+story id/title                      0 / 126      readable
+story priority                      0 / 126      readable
+story status                      126 / 126      NOT readable (all empty/changed)
+story depends-on                   86 / 126      partly readable
+story blocked-by                    0 / 126      readable
+task id/done/story/[P]/phase        0 / 817      readable
+task description                    9 / 817      partly readable
+task paths (ownership)            793 / 817      partly readable
+task BLOCKED/DEVIATION              0 / 817      readable
+phase Verify check+result          61 / 193      partly readable
+=> 1.x reads the converted files WITHOUT error but loses the moved fields: readable only with the new reader.
+
+== 1.x reader (shipped parseStories/parseTasks/parsePhases) on converted copy, layout=phase-dual
+field                           items wrong / total   verdict
+story id/title                      0 / 126      readable
+story priority                      0 / 126      readable
+story status                        0 / 126      readable
+story depends-on                    0 / 126      readable
+story blocked-by                    0 / 126      readable
+task id/done/story/[P]/phase        0 / 817      readable
+task description                    0 / 817      readable
+task paths (ownership)              0 / 817      readable
+task BLOCKED/DEVIATION              0 / 817      readable
+phase Verify check+result           0 / 193      readable
+=> 1.x reads everything unchanged (dual-write).
+

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://ambystech.dev/schemas/design-tokens.json",
+  "$note": "Terminal UI tokens for feature 010. Extends specs/006-enhanced-tui/design-tokens.json (theme.ts). Adds box-drawing glyphs and a warn callout component. 'color' primitives are ANSI SGR params; 'glyph' primitives carry {u,a} unicode/ASCII fallbacks selected by Capabilities.unicode; 'space' is in character columns.",
+  "primitive": {
+    "sgr": {
+      "reset": "0",
+      "bold": "1",
+      "dim": "2",
+      "fg-yellow": "33",
+      "fg-default": "39"
+    },
+    "glyph": {
+      "bang": { "u": "!", "a": "!" },
+      "arrow": { "u": "→", "a": "->" },
+      "box-tl": { "u": "┌", "a": "+" },
+      "box-tr": { "u": "┐", "a": "+" },
+      "box-bl": { "u": "└", "a": "+" },
+      "box-br": { "u": "┘", "a": "+" },
+      "box-h": { "u": "─", "a": "-" },
+      "box-v": { "u": "│", "a": "|" }
+    },
+    "space": { "col-2": 2, "box-pad": 1 }
+  },
+  "semantic": {
+    "color": {
+      "warn": "{primitive.sgr.fg-yellow}",
+      "muted": "{primitive.sgr.dim}",
+      "text": "{primitive.sgr.fg-default}"
+    },
+    "symbol": {
+      "warn": "{primitive.glyph.bang}",
+      "version-arrow": "{primitive.glyph.arrow}",
+      "box-top-left": "{primitive.glyph.box-tl}",
+      "box-top-right": "{primitive.glyph.box-tr}",
+      "box-bottom-left": "{primitive.glyph.box-bl}",
+      "box-bottom-right": "{primitive.glyph.box-br}",
+      "box-horizontal": "{primitive.glyph.box-h}",
+      "box-vertical": "{primitive.glyph.box-v}"
+    },
+    "space": { "gutter": "{primitive.space.col-2}" }
+  },
+  "component": {
+    "callout": {
+      "warn": {
+        "border-fg": "{semantic.color.warn}",
+        "text-fg": "{semantic.color.warn}",
+        "symbol": "{semantic.symbol.warn}",
+        "version-arrow": "{semantic.symbol.version-arrow}",
+        "gutter": "{semantic.space.gutter}",
+        "pad-x": "{primitive.space.box-pad}",
+        "corner-tl": "{semantic.symbol.box-top-left}",
+        "corner-tr": "{semantic.symbol.box-top-right}",
+        "corner-bl": "{semantic.symbol.box-bottom-left}",
+        "corner-br": "{semantic.symbol.box-bottom-right}",
+        "edge-h": "{semantic.symbol.box-horizontal}",
+        "edge-v": "{semantic.symbol.box-vertical}"
+      }
+    },
+    "update-result": {
+      "updated-fg": "{semantic.color.warn}",
+      "uptodate-fg": "{semantic.color.text}",
+      "manual-step-fg": "{semantic.color.muted}",
+      "manual-step-symbol": "{semantic.symbol.version-arrow}"
+    }
+  }
+}

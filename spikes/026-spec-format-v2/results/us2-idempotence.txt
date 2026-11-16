@@ -1,0 +1,174 @@
+== real run, layout=phase
+  converted  001-core-and-claude-emitter/spec.md  +12 -9
+  converted  001-core-and-claude-emitter/tasks.md  +56 -16
+  converted  002-copilot-emitters/spec.md  +8 -6
+  converted  002-copilot-emitters/tasks.md  +28 -6
+  converted  003-opencode-cursor-antigravity/spec.md  +10 -3
+  converted  003-opencode-cursor-antigravity/tasks.md  +36 -8
+  converted  004-templates-and-ui-depth/spec.md  +7 -2
+  converted  004-templates-and-ui-depth/tasks.md  +28 -8
+  converted  005-analyze-and-release/spec.md  +10 -3
+  converted  005-analyze-and-release/tasks.md  +24 -6
+  converted  006-enhanced-tui/spec.md  +28 -21
+  converted  006-enhanced-tui/tasks.md  +118 -39
+  converted  007-documentation-site/spec.md  +24 -18
+  converted  007-documentation-site/tasks.md  +108 -36
+  converted  008-brownfield-support/spec.md  +20 -15
+  converted  008-brownfield-support/tasks.md  +108 -40
+  converted  008-codex-integration/spec.md  +16 -12
+  converted  008-codex-integration/tasks.md  +44 -12
+  converted  009-continue-spec/spec.md  +16 -12
+  converted  009-continue-spec/tasks.md  +58 -15
+  converted  010-version-update/spec.md  +14 -12
+  converted  010-version-update/tasks.md  +82 -27
+  converted  011-converge/spec.md  +20 -15
+  converted  011-converge/tasks.md  +60 -18
+  converted  012-worktree-isolation/spec.md  +20 -15
+  converted  012-worktree-isolation/tasks.md  +80 -28
+  converted  013-multi-agent-roles/spec.md  +19 -15
+  converted  013-multi-agent-roles/tasks.md  +98 -33
+  converted  014-enhanced-dashboard/spec.md  +28 -21
+  converted  014-enhanced-dashboard/tasks.md  +178 -67
+  converted  015-parallel-lanes/spec.md  +16 -12
+  converted  015-parallel-lanes/tasks.md  +116 -44
+  converted  016-agent-surface-expansion/spec.md  +20 -15
+  converted  016-agent-surface-expansion/tasks.md  +108 -38
+  converted  017-live-dashboard/spec.md  +16 -12
+  converted  017-live-dashboard/tasks.md  +146 -59
+  converted  018-antigravity-skills-surface/spec.md  +16 -12
+  converted  018-antigravity-skills-surface/tasks.md  +88 -30
+  converted  019-amby-run-prompt/spec.md  +32 -24
+  converted  019-amby-run-prompt/tasks.md  +171 -69
+  converted  020-blocked-and-verify/spec.md  +19 -15
+  converted  020-blocked-and-verify/tasks.md  +140 -52
+  converted  021-test-design/spec.md  +27 -21
+  converted  021-test-design/tasks.md  +87 -32
+  converted  022-amby-decide/spec.md  +26 -21
+  converted  022-amby-decide/tasks.md  +130 -45
+  converted  023-dependency-graph/spec.md  +24 -18
+  converted  023-dependency-graph/tasks.md  +117 -41
+  converted  024-trace/spec.md  +26 -21
+  converted  024-trace/tasks.md  +142 -53
+  converted  026-spec-format-v2-spike/spec.md  +16 -12
+  converted  026-spec-format-v2-spike/tasks.md  +88 -32
+  52 converted, 0 unchanged, 0 skipped (left untouched)
+PASS  second run changed nothing (tree hash 6dcb704a9b28ce21 == 6dcb704a9b28ce21; 52 unchanged, 0 skipped)
+PASS  prose preserved: every prose line (4265 checked across converted files) still present, in order; none lost
+PASS  no foreign lines added outside frontmatter, yaml blocks and rewritten task lines (0 found)
+
+== real run, layout=task
+  converted  001-core-and-claude-emitter/spec.md  +12 -9
+  converted  001-core-and-claude-emitter/tasks.md  +64 -16
+  converted  002-copilot-emitters/spec.md  +8 -6
+  converted  002-copilot-emitters/tasks.md  +24 -6
+  converted  003-opencode-cursor-antigravity/spec.md  +10 -3
+  converted  003-opencode-cursor-antigravity/tasks.md  +32 -8
+  converted  004-templates-and-ui-depth/spec.md  +7 -2
+  converted  004-templates-and-ui-depth/tasks.md  +32 -8
+  converted  005-analyze-and-release/spec.md  +10 -3
+  converted  005-analyze-and-release/tasks.md  +24 -6
+  converted  006-enhanced-tui/spec.md  +28 -21
+  converted  006-enhanced-tui/tasks.md  +156 -39
+  converted  007-documentation-site/spec.md  +24 -18
+  converted  007-documentation-site/tasks.md  +144 -36
+  converted  008-brownfield-support/spec.md  +20 -15
+  converted  008-brownfield-support/tasks.md  +160 -40
+  converted  008-codex-integration/spec.md  +16 -12
+  converted  008-codex-integration/tasks.md  +48 -12
+  converted  009-continue-spec/spec.md  +16 -12
+  converted  009-continue-spec/tasks.md  +60 -15
+  converted  010-version-update/spec.md  +14 -12
+  converted  010-version-update/tasks.md  +108 -27
+  converted  011-converge/spec.md  +20 -15
+  converted  011-converge/tasks.md  +72 -18
+  converted  012-worktree-isolation/spec.md  +20 -15
+  converted  012-worktree-isolation/tasks.md  +112 -28
+  converted  013-multi-agent-roles/spec.md  +19 -15
+  converted  013-multi-agent-roles/tasks.md  +132 -33
+  converted  014-enhanced-dashboard/spec.md  +28 -21
+  converted  014-enhanced-dashboard/tasks.md  +268 -67
+  converted  015-parallel-lanes/spec.md  +16 -12
+  converted  015-parallel-lanes/tasks.md  +176 -44
+  converted  016-agent-surface-expansion/spec.md  +20 -15
+  converted  016-agent-surface-expansion/tasks.md  +152 -38
+  converted  017-live-dashboard/spec.md  +16 -12
+  converted  017-live-dashboard/tasks.md  +236 -59
+  converted  018-antigravity-skills-surface/spec.md  +16 -12
+  converted  018-antigravity-skills-surface/tasks.md  +120 -30
+  converted  019-amby-run-prompt/spec.md  +32 -24
+  converted  019-amby-run-prompt/tasks.md  +276 -69
+  converted  020-blocked-and-verify/spec.md  +19 -15
+  converted  020-blocked-and-verify/tasks.md  +217 -52
+  converted  021-test-design/spec.md  +27 -21
+  converted  021-test-design/tasks.md  +133 -32
+  converted  022-amby-decide/spec.md  +26 -21
+  converted  022-amby-decide/tasks.md  +190 -45
+  converted  023-dependency-graph/spec.md  +24 -18
+  converted  023-dependency-graph/tasks.md  +172 -41
+  converted  024-trace/spec.md  +26 -21
+  converted  024-trace/tasks.md  +221 -53
+  converted  026-spec-format-v2-spike/spec.md  +16 -12
+  converted  026-spec-format-v2-spike/tasks.md  +131 -32
+  52 converted, 0 unchanged, 0 skipped (left untouched)
+PASS  second run changed nothing (tree hash bf48e36e20f739e0 == bf48e36e20f739e0; 52 unchanged, 0 skipped)
+PASS  prose preserved: every prose line (4265 checked across converted files) still present, in order; none lost
+PASS  no foreign lines added outside frontmatter, yaml blocks and rewritten task lines (0 found)
+
+== real run, layout=phase-dual
+  converted  001-core-and-claude-emitter/spec.md  +12 -0
+  converted  001-core-and-claude-emitter/tasks.md  +40 -0
+  converted  002-copilot-emitters/spec.md  +8 -0
+  converted  002-copilot-emitters/tasks.md  +22 -0
+  converted  003-opencode-cursor-antigravity/spec.md  +10 -0
+  converted  003-opencode-cursor-antigravity/tasks.md  +28 -0
+  converted  004-templates-and-ui-depth/spec.md  +7 -0
+  converted  004-templates-and-ui-depth/tasks.md  +20 -0
+  converted  005-analyze-and-release/spec.md  +10 -0
+  converted  005-analyze-and-release/tasks.md  +18 -0
+  converted  006-enhanced-tui/spec.md  +28 -0
+  converted  006-enhanced-tui/tasks.md  +79 -0
+  converted  007-documentation-site/spec.md  +24 -0
+  converted  007-documentation-site/tasks.md  +72 -0
+  converted  008-brownfield-support/spec.md  +20 -0
+  converted  008-brownfield-support/tasks.md  +68 -0
+  converted  008-codex-integration/spec.md  +16 -0
+  converted  008-codex-integration/tasks.md  +32 -0
+  converted  009-continue-spec/spec.md  +16 -0
+  converted  009-continue-spec/tasks.md  +43 -0
+  converted  010-version-update/spec.md  +14 -0
+  converted  010-version-update/tasks.md  +55 -0
+  converted  011-converge/spec.md  +20 -0
+  converted  011-converge/tasks.md  +42 -0
+  converted  012-worktree-isolation/spec.md  +20 -0
+  converted  012-worktree-isolation/tasks.md  +52 -0
+  converted  013-multi-agent-roles/spec.md  +19 -0
+  converted  013-multi-agent-roles/tasks.md  +65 -0
+  converted  014-enhanced-dashboard/spec.md  +28 -0
+  converted  014-enhanced-dashboard/tasks.md  +111 -0
+  converted  015-parallel-lanes/spec.md  +16 -0
+  converted  015-parallel-lanes/tasks.md  +72 -0
+  converted  016-agent-surface-expansion/spec.md  +20 -0
+  converted  016-agent-surface-expansion/tasks.md  +70 -0
+  converted  017-live-dashboard/spec.md  +16 -0
+  converted  017-live-dashboard/tasks.md  +87 -0
+  converted  018-antigravity-skills-surface/spec.md  +16 -0
+  converted  018-antigravity-skills-surface/tasks.md  +58 -0
+  converted  019-amby-run-prompt/spec.md  +32 -0
+  converted  019-amby-run-prompt/tasks.md  +113 -0
+  converted  020-blocked-and-verify/spec.md  +19 -0
+  converted  020-blocked-and-verify/tasks.md  +97 -0
+  converted  021-test-design/spec.md  +27 -0
+  converted  021-test-design/tasks.md  +61 -0
+  converted  022-amby-decide/spec.md  +26 -0
+  converted  022-amby-decide/tasks.md  +95 -0
+  converted  023-dependency-graph/spec.md  +24 -0
+  converted  023-dependency-graph/tasks.md  +85 -0
+  converted  024-trace/spec.md  +26 -0
+  converted  024-trace/tasks.md  +98 -0
+  converted  026-spec-format-v2-spike/spec.md  +16 -0
+  converted  026-spec-format-v2-spike/tasks.md  +63 -0
+  52 converted, 0 unchanged, 0 skipped (left untouched)
+PASS  second run changed nothing (tree hash 379042e34aa5b7e6 == 379042e34aa5b7e6; 52 unchanged, 0 skipped)
+PASS  prose preserved: every prose line (4265 checked across converted files) still present, in order; none lost
+PASS  no foreign lines added outside frontmatter, yaml blocks and rewritten task lines (0 found)
+
