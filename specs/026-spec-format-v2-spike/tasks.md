@@ -12,27 +12,27 @@ created: 2026-11-16
 
 ## Phase 1 — Setup  (day 1)
 
-- [ ] [T001] Create the scratch directory with a README stating how to run it and that nothing here ships (spikes/026-spec-format-v2/README.md)
-- [ ] [T002] [P] Build the repo and confirm `dist/core/dashboard.js` imports from a plain `.mjs`; record the Node version (spikes/026-spec-format-v2/NOTES.md)
-- [ ] [T003] [P] Inventory every reader of status, depends-on, blocked-by and trailing file paths in `src/core` and `src/cli`, with file and line (spikes/026-spec-format-v2/INVENTORY.md)
-- **Verify:** README states the not-shipped rule, `node -e "import('./dist/core/dashboard.js')"` exits 0, and INVENTORY lists each reader with file and line.
+- [x] [T001] Create the scratch directory with a README stating how to run it and that nothing here ships (spikes/026-spec-format-v2/README.md)
+- [x] [T002] [P] Build the repo and confirm `dist/core/dashboard.js` imports from a plain `.mjs`; record the Node version (spikes/026-spec-format-v2/NOTES.md)
+- [x] [T003] [P] Inventory every reader of status, depends-on, blocked-by and trailing file paths in `src/core` and `src/cli`, with file and line (spikes/026-spec-format-v2/INVENTORY.md)
+- **Verify:** README states the not-shipped rule, `node -e "import('./dist/core/dashboard.js')"` exits 0, and INVENTORY lists each reader with file and line. ✓ passed
 
 ## Phase 2 — Foundational  (day 1–2, blocks all story work)
 
-- [ ] [T010] Define the one comparable model: feature meta, stories, tasks with paths and phase verify, plus the format used per file (spikes/026-spec-format-v2/model.mjs)
-- [ ] [T011] [P] Write the baseline script that builds the v1 model for every spec through the built `parseStories` and `parseTasks` (spikes/026-spec-format-v2/baseline.mjs, spikes/026-spec-format-v2/model-v1.json)
-- [ ] [T012] [P] Write the compare script: structural model diff that lists every differing field with its location (spikes/026-spec-format-v2/compare.mjs)
-- [ ] [T013] [P] Hand-write v2 fixtures and v1 twins for the spec edge cases: cross-feature story link, clarification marker, CRLF, unusual path characters, malformed block, mixed formats (spikes/026-spec-format-v2/fixtures/)
-- **Verify:** model-v1.json has an entry for every `specs/` directory that has a spec.md, and compare reports zero differences for two identical models and names the field for a mutated one.
+- [x] [T010] Define the one comparable model: feature meta, stories, tasks with paths and phase verify, plus the format used per file (spikes/026-spec-format-v2/model.mjs)
+- [x] [T011] [P] Write the baseline script that builds the v1 model for every spec through the built `parseStories` and `parseTasks` (spikes/026-spec-format-v2/baseline.mjs, spikes/026-spec-format-v2/model-v1.json)
+- [x] [T012] [P] Write the compare script: structural model diff that lists every differing field with its location (spikes/026-spec-format-v2/compare.mjs)
+- [x] [T013] [P] Hand-write v2 fixtures and v1 twins for the spec edge cases: cross-feature story link, clarification marker, CRLF, unusual path characters, malformed block, mixed formats (spikes/026-spec-format-v2/fixtures/)
+- **Verify:** model-v1.json has an entry for every `specs/` directory that has a spec.md, and compare reports zero differences for two identical models and names the field for a mutated one. ✓ passed
 
 ## Phase 3 — User story US-1  (priority: P1)
 
-- [ ] [T020] [US1] Implement the v2 reader: frontmatter through gray-matter, fenced yaml blocks through its yaml engine, errors carrying file and line (spikes/026-spec-format-v2/read-v2.mjs)
-- [ ] [T021] [US1] Implement the dispatcher that detects v1 or v2 per file and reports which parts of a mixed feature used which format (spikes/026-spec-format-v2/read.mjs)
-- [ ] [T022] [US1] Run the reader over every fixture pair: twins give identical models and malformed inputs report their location (spikes/026-spec-format-v2/results/us1-fixtures.txt)
-- [ ] [T023] [US1] Run the reader over every real spec as v1 and compare with the baseline model (spikes/026-spec-format-v2/results/us1-real-v1.txt)
+- [x] [T020] [US1] Implement the v2 reader: frontmatter through gray-matter, fenced yaml blocks through its yaml engine, errors carrying file and line (spikes/026-spec-format-v2/read-v2.mjs)
+- [x] [T021] [US1] Implement the dispatcher that detects v1 or v2 per file and reports which parts of a mixed feature used which format (spikes/026-spec-format-v2/read.mjs)
+- [x] [T022] [US1] Run the reader over every fixture pair: twins give identical models and malformed inputs report their location (spikes/026-spec-format-v2/results/us1-fixtures.txt)
+- [x] [T023] [US1] Run the reader over every real spec as v1 and compare with the baseline model (spikes/026-spec-format-v2/results/us1-real-v1.txt)
 - **Checkpoint:** US-1 is demoable: one model from both formats, with locations on bad input.
-- **Verify:** all fixture twins show zero differences, every malformed fixture prints a file and line, and every real v1 spec compares identical to model-v1.json.
+- **Verify:** all fixture twins show zero differences, every malformed fixture prints a file and line, and every real v1 spec compares identical to model-v1.json. ✓ passed
 
 ## Phase 4 — User story US-2  (priority: P1)
 
