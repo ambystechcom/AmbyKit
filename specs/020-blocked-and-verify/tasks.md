@@ -61,19 +61,19 @@ created: 2026-11-16
 - [x] [T041] [P] [US3] Make `/amby.tasks` emit exactly one `**Verify:**` line per phase, plain text after the phase's tasks (FR-005, FR-015) (src/prompts/tasks.md)
 - [x] [T042] [P] [US3] Add a Verify line to each phase of the tasks template and document the result suffix (FR-005, FR-015) (src/templates/tasks.md)
 - [x] [T043] [P] [US3] Document the Verify line and its result suffix in the tasks artifact page (FR-015) (docs/artifacts/tasks.md)
-- [ ] [T044] [US3] Test `parsePhases`: pass, fail with reason, unverified, overwritten result, several Verify lines in one phase, a Verify line outside a phase, a feature with no phases (FR-005, FR-006, FR-007) (test/core/verify-lines.test.ts)
+- [x] [T044] [US3] Test `parsePhases`: pass, fail with reason, unverified, overwritten result, several Verify lines in one phase, a Verify line outside a phase, a feature with no phases (FR-005, FR-006, FR-007) (test/core/verify-lines.test.ts)
 - **Checkpoint:** US-3 is demoable: a new `tasks.md` carries a Verify line per phase and its result is readable from the file.
-- **Verify:** `npm run typecheck && npx vitest run test/core/verify-lines.test.ts test/core/markers.test.ts`
+- **Verify:** `npm run typecheck && npx vitest run test/core/verify-lines.test.ts test/core/markers.test.ts` ✓ passed
 
 ## Phase 6 — User story US-4  (priority: P2)
 
 - [x] [T050] [P] [US4] Report phases without a Verify line (features not yet done, grouped per feature in text) and phases whose last Verify failed, in `analyze` text and `--json`, as warnings that never change the exit status (FR-009, FR-011) (src/core/analyze.ts, src/cli/analyze.ts)
 - [x] [T051] [P] [US4] Add `verify-failed` attention items and `FeatureRow.verify` (verified, failed, missing counts; omitted when the feature has no Verify lines) (FR-010) (src/core/overview.ts)
 - [x] [T052] [P] [US4] Show verify progress in the feature view's `tasks.md` artifact line and mark a failed phase in text (FR-010, FR-014) (src/cli/ui/dashboard/feature-view.ts)
-- [ ] [T053] [US4] Test the analyze Verify findings: missing, failed, all verified, old feature stays warning-only (FR-009, FR-011) (test/core/analyze-verify.test.ts)
-- [ ] [T054] [US4] E2E: failed Verify keeps a feature from showing as fully verified; JSON shape stable; plain layout (SC-003, FR-010, FR-013, FR-014) (test/cli/verify-surface.test.ts)
+- [x] [T053] [US4] Test the analyze Verify findings: missing, failed, all verified, old feature stays warning-only (FR-009, FR-011) (test/core/analyze-verify.test.ts)
+- [x] [T054] [US4] E2E: failed Verify keeps a feature from showing as fully verified; JSON shape stable; plain layout (SC-003, FR-010, FR-013, FR-014) (test/cli/verify-surface.test.ts)
 - **Checkpoint:** US-4 is demoable: a failed or missing Verify is reported by `analyze` and shown on the dashboard.
-- **Verify:** `npm run typecheck && npx vitest run test/core/analyze-verify.test.ts test/cli/verify-surface.test.ts test/cli/markers-surface.test.ts`
+- **Verify:** `npm run typecheck && npx vitest run test/core/analyze-verify.test.ts test/cli/verify-surface.test.ts test/cli/markers-surface.test.ts` ✓ passed
 
 ## Phase 7 — User story US-5  (priority: P1)
 

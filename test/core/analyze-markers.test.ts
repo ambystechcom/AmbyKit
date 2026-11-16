@@ -85,9 +85,11 @@ describe("analyze: BLOCKED and DEVIATION markers (spec 020, FR-009)", () => {
     expect(tasks.find((t) => t.id === "T001")!.description).not.toContain("BLOCKED");
   });
 
-  it("FR-011: without markers no new key appears in the report", () => {
+  it("FR-011: without markers no marker key appears in the report", () => {
     const report = analyzeProject(project(false));
-    expect(Object.keys(report)).toEqual(["total", "issues", "blocked", "buildable", "orphans", "lanes"]);
+    // The fixture's unfinished phase has no Verify line, so the missing-Verify warning (`verifyIssues`) is the
+    // only addition; blockedTasks, deviations and markerIssues stay absent.
+    expect(Object.keys(report)).toEqual(["total", "issues", "blocked", "buildable", "orphans", "lanes", "verifyIssues"]);
   });
 
   it("FR-009: markers are warnings; the exit status does not change", async () => {

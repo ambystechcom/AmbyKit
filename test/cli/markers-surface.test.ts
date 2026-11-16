@@ -118,7 +118,10 @@ describe("dashboard and analyze surface BLOCKED markers (spec 020, US-2)", () =>
     expect(doc.attention).toEqual([]);
     expect("blocked" in doc.features[0]).toBe(false);
     const a = JSON.parse((await analyze(root, { json: true })).out);
-    expect(Object.keys(a)).toEqual(["total", "issues", "blocked", "buildable", "orphans", "lanes"]);
+    // FR-011: no marker keys appear. The only addition is the missing-Verify warning (`verifyIssues`): this
+    // fixture is an unfinished feature whose phase has no Verify line.
+    expect(Object.keys(a)).toEqual(["total", "issues", "blocked", "buildable", "orphans", "lanes", "verifyIssues"]);
+    expect(a.verifyIssues).toEqual([expect.objectContaining({ kind: "missing", phase: "001:phase-1" })]);
     expect((await analyze(root)).out).not.toContain("BLOCKED");
   });
 
