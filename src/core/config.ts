@@ -14,6 +14,12 @@ const configSchema = z.object({
       idleMinutes: z.number().positive().optional(),
     })
     .optional(),
+  trace: z
+    .object({
+      roots: z.array(z.string()).optional(),
+      ignore: z.array(z.string()).optional(),
+    })
+    .optional(),
 });
 
 /** Path to a project's config file. */
