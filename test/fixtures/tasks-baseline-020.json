@@ -1,0 +1,6691 @@
+{
+  "001-core-and-claude-emitter": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "package.json"
+      ],
+      "pathIssue": null,
+      "description": "Node/TS ESM scaffold: package.json, tsconfig (package.json)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/types.ts"
+      ],
+      "pathIssue": null,
+      "description": "Core types (src/core/types.ts)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/command-spec.ts"
+      ],
+      "pathIssue": null,
+      "description": "CommandSpec loader with gray-matter + zod (src/core/command-spec.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/paths.ts"
+      ],
+      "pathIssue": null,
+      "description": "Package/project path resolution (src/core/paths.ts)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/config.ts"
+      ],
+      "pathIssue": null,
+      "description": "Config load/save (src/core/config.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/emitters/base-emitter.ts"
+      ],
+      "pathIssue": null,
+      "description": "BaseEmitter abstract class + template method (src/emitters/base-emitter.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/emitters/claude.ts"
+      ],
+      "pathIssue": null,
+      "description": "ClaudeEmitter subclass (src/emitters/claude.ts)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/emitters/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Emitter registry + target map (src/emitters/index.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/base-command.ts",
+        "src/cli/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "BaseCommand + dispatcher (src/cli/base-command.ts, src/cli/index.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/fsops.ts"
+      ],
+      "pathIssue": null,
+      "description": "File writer with dry-run/idempotency (src/cli/fsops.ts)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/init.ts"
+      ],
+      "pathIssue": null,
+      "description": "init command (src/cli/init.ts)"
+    },
+    {
+      "id": "T033",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "src/cli/sync.ts"
+      ],
+      "pathIssue": null,
+      "description": "sync command with --check (src/cli/sync.ts)"
+    },
+    {
+      "id": "T034",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "src/cli/add.ts"
+      ],
+      "pathIssue": null,
+      "description": "add command (src/cli/add.ts)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/core/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "Story/task parsers + progress computation (src/core/dashboard.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "dashboard command: table + detail (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "test"
+      ],
+      "pathIssue": null,
+      "description": "Tests: emitter snapshot, loader, dashboard (test/)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 6,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Self-host: `ambykit sync` regenerates repo's own .claude/ with no diff"
+    }
+  ],
+  "002-copilot-emitters": [
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "src/emitters/base-emitter.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `transformBody` hook to BaseEmitter (src/emitters/base-emitter.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/emitters/copilot.ts"
+      ],
+      "pathIssue": null,
+      "description": "CopilotEmitter: prompt files + copilot-instructions (src/emitters/copilot.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/emitters/copilot.ts"
+      ],
+      "pathIssue": null,
+      "description": "$ARGUMENTS → ${input:args} transform (src/emitters/copilot.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/emitters/copilot-cli.ts"
+      ],
+      "pathIssue": null,
+      "description": "CopilotCliEmitter extends CopilotEmitter; skills surface (src/emitters/copilot-cli.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/emitters/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Register copilot + copilot-cli targets (src/emitters/index.ts)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "test/copilot-emitter.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests: Copilot + Copilot CLI emitters (test/copilot-emitter.test.ts)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 4,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Verify `ambykit add copilot copilot-cli` end-to-end in a temp project"
+    }
+  ],
+  "003-opencode-cursor-antigravity": [
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "src/emitters/base-emitter.ts"
+      ],
+      "pathIssue": null,
+      "description": "BaseEmitter: default toolNameMap + empty-frontmatter command support (src/emitters/base-emitter.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/emitters/opencode.ts"
+      ],
+      "pathIssue": null,
+      "description": "OpenCodeEmitter (src/emitters/opencode.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/emitters/cursor.ts"
+      ],
+      "pathIssue": null,
+      "description": "CursorEmitter: plain commands + .mdc rule (src/emitters/cursor.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/emitters/cursor-cli.ts"
+      ],
+      "pathIssue": null,
+      "description": "CursorCliEmitter: surface none (src/emitters/cursor-cli.ts)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US3",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/emitters/antigravity.ts"
+      ],
+      "pathIssue": null,
+      "description": "AntigravityEmitter: workflows surface (src/emitters/antigravity.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US3",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/emitters/antigravity-cli.ts"
+      ],
+      "pathIssue": null,
+      "description": "AntigravityCliEmitter reuses IDE output (src/emitters/antigravity-cli.ts)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": null,
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/emitters/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Register all five targets (src/emitters/index.ts)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "test/m3-emitters.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests: M3 emitters (test/m3-emitters.test.ts)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 5,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Verify all nine targets end-to-end in a temp project (init + check)"
+    }
+  ],
+  "004-templates-and-ui-depth": [
+    {
+      "id": "T010",
+      "done": true,
+      "story": "US2",
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "src/templates/ui.md"
+      ],
+      "pathIssue": null,
+      "description": "Enrich ui.md template (states, token names, a11y) (src/templates/ui.md)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": "US2",
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "src/reference/design-conventions.md"
+      ],
+      "pathIssue": null,
+      "description": "Add design-conventions reference (src/reference/design-conventions.md)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/scaffold.ts",
+        "src/core/paths.ts"
+      ],
+      "pathIssue": null,
+      "description": "installArtifactTemplates + referenceDir (src/core/scaffold.ts, src/core/paths.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/cli/init.ts"
+      ],
+      "pathIssue": null,
+      "description": "init installs templates (src/cli/init.ts)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US1",
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/cli/sync.ts"
+      ],
+      "pathIssue": null,
+      "description": "sync adds new templates write-if-absent (src/cli/sync.ts)"
+    },
+    {
+      "id": "T023",
+      "done": true,
+      "story": "US1",
+      "phase": 2,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "glob",
+      "description": "Reference templates from prompts via @path (src/prompts/*.md)"
+    },
+    {
+      "id": "T024",
+      "done": true,
+      "story": "US1",
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "package.json"
+      ],
+      "pathIssue": null,
+      "description": "Ship src/reference in npm package (package.json)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "test/scaffold.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests: installArtifactTemplates (test/scaffold.test.ts)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 3,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Re-sync repo: install .amby/templates + regenerate commands; sync --check clean"
+    }
+  ],
+  "005-analyze-and-release": [
+    {
+      "id": "T010",
+      "done": true,
+      "story": "US1",
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "src/core/analyze.ts"
+      ],
+      "pathIssue": null,
+      "description": "Graph analyzer: cycles, dangling, blocked/buildable, orphans (src/core/analyze.ts)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": "US1",
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "src/cli/analyze.ts",
+        "src/cli/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "AnalyzeCommand + register (src/cli/analyze.ts, src/cli/index.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": "US1",
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "test/analyze.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests for the analyzer (test/analyze.test.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US2",
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        ".github/workflows/ci.yml"
+      ],
+      "pathIssue": null,
+      "description": "CI workflow: typecheck, test, build, sync --check, analyze (.github/workflows/ci.yml)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US3",
+      "phase": 3,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "LICENSE (MIT)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US3",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "package.json"
+      ],
+      "pathIssue": null,
+      "description": "package.json: repository/homepage/bugs + prepublishOnly (package.json)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US3",
+      "phase": 3,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Verify `npm pack --dry-run` contents"
+    },
+    {
+      "id": "T033",
+      "done": true,
+      "story": "US3",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "docs/cli-reference.md",
+        "readme.md"
+      ],
+      "pathIssue": null,
+      "description": "Document analyze in CLI reference + README (docs/cli-reference.md, README.md)"
+    }
+  ],
+  "006-enhanced-tui": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui"
+      ],
+      "pathIssue": null,
+      "description": "Create `src/cli/ui/` and `src/cli/ui/interactive/` module folders (src/cli/ui/)"
+    },
+    {
+      "id": "T002",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/types.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add shared UI value-object types — Capabilities, Symbols, ChangeSummary, TableModel, MenuState (src/cli/ui/types.ts)"
+    },
+    {
+      "id": "T003",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "test/ui/helpers.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add test helpers: `stripAnsi` + `fakeCapabilities()` factory for injection (test/ui/helpers.ts)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/capabilities.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `detectCapabilities(env?, stdout?)` — isTTY/color/unicode/columns with safe defaults (src/cli/ui/capabilities.ts)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/theme.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `theme.ts` — `symbols(caps)` (unicode/ASCII) + `paint(caps,style,s)` from design-tokens (src/cli/ui/theme.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "test/ui/capabilities.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Unit-test capability detection: non-TTY / NO_COLOR / narrow / non-UTF-8 flips each field (test/ui/capabilities.test.ts)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "test/ui/theme.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Unit-test theme: color=false ⇒ zero ANSI; unicode=false ⇒ ASCII glyphs (test/ui/theme.test.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/render.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `render.ts` — info(passthrough)/success/warn/error/heading over theme (src/cli/ui/render.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/base-command.ts"
+      ],
+      "pathIssue": null,
+      "description": "Refactor `BaseCommand.info/success/warn/error` to hold Capabilities and delegate to render.ts (src/cli/base-command.ts)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/banner.ts"
+      ],
+      "pathIssue": null,
+      "description": "Refactor banner to drop local `useColor()` and use `theme.paint` (src/cli/banner.ts)"
+    },
+    {
+      "id": "T023",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "test/ui/render.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Snapshot-test each message kind under color=true|false; assert `info(json)` byte-identical (test/ui/render.test.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/table.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `progressCell(done,total)` + ProgressBar rendering with state-based fg (src/cli/ui/table.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/table.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement StatusBadge (status→token color, word always shown) (src/cli/ui/table.ts)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/table.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement responsive `renderTable(model)` — fit to width, drop columns by priority (src/cli/ui/table.ts)"
+    },
+    {
+      "id": "T033",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "Swap dashboard `formatTable` for `renderTable`; add progress + status cells; keep `--json` plain (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T034",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "test/ui/table.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: widths 120/80/40 never overflow, drop by priority; ProgressCell fill ratio; ASCII bar (test/ui/table.test.ts)"
+    },
+    {
+      "id": "T035",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "test/cli/dashboard-json.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Regression test: `dashboard --json` output byte-identical to pre-change (test/cli/dashboard-json.test.ts)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/progress.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `spinner(caps)` — animating on TTY, no-op static line otherwise (src/cli/ui/progress.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/progress.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `summarize(caps,result,{dryRun})` over WriteResult with token colors (src/cli/ui/progress.ts)"
+    },
+    {
+      "id": "T042",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/sync.ts"
+      ],
+      "pathIssue": null,
+      "description": "Wire spinner + summary into sync (src/cli/sync.ts)"
+    },
+    {
+      "id": "T043",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/init.ts",
+        "src/cli/add.ts"
+      ],
+      "pathIssue": null,
+      "description": "Wire spinner + summary into init and add (src/cli/init.ts, src/cli/add.ts)"
+    },
+    {
+      "id": "T044",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/upgrade.ts"
+      ],
+      "pathIssue": null,
+      "description": "Wire spinner + summary into upgrade (src/cli/upgrade.ts)"
+    },
+    {
+      "id": "T045",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "test/ui/progress.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: summarize counts + dry-run \"would\" wording; non-TTY spinner emits no control codes (test/ui/progress.test.ts)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui"
+      ],
+      "pathIssue": null,
+      "description": "Audit all render/table/progress call sites gate correctly on Capabilities (no stray ANSI) (src/cli/ui/)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "test/ui/degradation.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: non-TTY + NO_COLOR ⇒ zero ANSI across message/table/summary (SC-002) (test/ui/degradation.test.ts)"
+    },
+    {
+      "id": "T052",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "test/ui/degradation.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: unicode=false ⇒ ASCII glyphs/bars everywhere; narrow width stays aligned (test/ui/degradation.test.ts)"
+    },
+    {
+      "id": "T060",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/render.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `error(caps,s,next?)` next-step line + ensure error≠warn visual treatment (src/cli/ui/render.ts)"
+    },
+    {
+      "id": "T061",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "src/cli/base-command.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add actionable next-step hints to existing error/warn sites (base-command + commands) (src/cli/base-command.ts)"
+    },
+    {
+      "id": "T062",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "test/ui/render.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: error vs warn styles distinct; next-step `→` line renders and is muted (test/ui/render.test.ts)"
+    },
+    {
+      "id": "T070",
+      "done": true,
+      "story": "US6",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/interactive/fullscreen.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `runFullscreen(caps,{render,reduce,initial})` — alt-screen, raw mode, guaranteed restore + signals (src/cli/ui/interactive/fullscreen.ts)"
+    },
+    {
+      "id": "T071",
+      "done": true,
+      "story": "US6",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/interactive/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement pure dashboard reducer + view — list/detail/quit navigation (src/cli/ui/interactive/dashboard.ts)"
+    },
+    {
+      "id": "T072",
+      "done": true,
+      "story": "US6",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `--interactive` flag to dashboard; launch fullscreen on TTY, fall back to one-shot otherwise (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T073",
+      "done": true,
+      "story": "US6",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "test/ui/interactive-dashboard.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: reducer nav (↑/↓/enter/←/q) transitions; non-TTY falls back; restore sequence emitted (test/ui/interactive-dashboard.test.ts)"
+    },
+    {
+      "id": "T080",
+      "done": true,
+      "story": "US7",
+      "phase": 9,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/interactive/prompt.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `multiSelect(caps,{message,options,preselected})` — pure reducer + keypress host (src/cli/ui/interactive/prompt.ts)"
+    },
+    {
+      "id": "T081",
+      "done": true,
+      "story": "US7",
+      "phase": 9,
+      "parallel": false,
+      "paths": [
+        "src/cli/init.ts",
+        "src/cli/add.ts"
+      ],
+      "pathIssue": null,
+      "description": "Wire init/add to prompt when tool flags absent on a TTY; flags always suppress prompt (src/cli/init.ts, src/cli/add.ts)"
+    },
+    {
+      "id": "T082",
+      "done": true,
+      "story": "US7",
+      "phase": 9,
+      "parallel": false,
+      "paths": [
+        "src/cli/init.ts",
+        "src/cli/add.ts"
+      ],
+      "pathIssue": null,
+      "description": "Non-TTY + missing selection ⇒ actionable error, never blocks (src/cli/init.ts, src/cli/add.ts)"
+    },
+    {
+      "id": "T083",
+      "done": true,
+      "story": "US7",
+      "phase": 9,
+      "parallel": false,
+      "paths": [
+        "test/ui/prompt.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: simulated space/enter selection; flags skip prompt; non-TTY errors not hangs (test/ui/prompt.test.ts)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 10,
+      "parallel": false,
+      "paths": [
+        "docs"
+      ],
+      "pathIssue": null,
+      "description": "Document the enhanced UI + `--interactive`/prompt behavior in user docs (docs/)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 10,
+      "parallel": false,
+      "paths": [
+        ".claude"
+      ],
+      "pathIssue": null,
+      "description": "Re-run `ambykit sync` so the repo's own tool files stay in sync (Principle 6) (.claude/)"
+    },
+    {
+      "id": "T092",
+      "done": true,
+      "story": null,
+      "phase": 10,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Run `npm run typecheck` and `npm test`; update snapshots; ensure all green before commit (—)"
+    }
+  ],
+  "007-documentation-site": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "site"
+      ],
+      "pathIssue": null,
+      "description": "Scaffold an Astro Starlight project in `site/` (site/)"
+    },
+    {
+      "id": "T002",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "site/astro.config.mjs",
+        "site/src/styles/global.css"
+      ],
+      "pathIssue": null,
+      "description": "Add Tailwind v4 to the Astro build via `@tailwindcss/vite` + starlight-tailwind (site/astro.config.mjs, site/src/styles/global.css)"
+    },
+    {
+      "id": "T003",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "site/package.json"
+      ],
+      "pathIssue": null,
+      "description": "Add Mermaid dependency for the diagram component (site/package.json)"
+    },
+    {
+      "id": "T004",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "site/astro.config.mjs"
+      ],
+      "pathIssue": null,
+      "description": "Configure site metadata + sidebar nav skeleton (Start / Workflow) (site/astro.config.mjs)"
+    },
+    {
+      "id": "T005",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "site/.gitignore",
+        "site/package.json"
+      ],
+      "pathIssue": null,
+      "description": "Add `site/.gitignore` (node_modules, dist, .astro) + dev/build/preview scripts (site/.gitignore, site/package.json)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "site/src/styles/tokens.css"
+      ],
+      "pathIssue": null,
+      "description": "Translate `design-tokens.json` → CSS custom properties (primitive + semantic light/dark) (site/src/styles/tokens.css)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "site/src/styles/theme.css"
+      ],
+      "pathIssue": null,
+      "description": "Map brand tokens onto Starlight theme vars + Tailwind theme colors (site/src/styles/theme.css)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "site/src/styles/tokens.css"
+      ],
+      "pathIssue": null,
+      "description": "Wire light/dark so semantic `{light,dark}` tokens swap with the theme toggle (site/src/styles/tokens.css)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "site/src/styles/mermaid.ts"
+      ],
+      "pathIssue": null,
+      "description": "Configure the Mermaid theme from `component.mermaid.*`, legible in both modes (site/src/styles/mermaid.ts)"
+    },
+    {
+      "id": "T014",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "site/src/components/sitetitle.astro"
+      ],
+      "pathIssue": null,
+      "description": "Override the Starlight header: branded SiteTitle placeholder + GitHub link (site/src/components/SiteTitle.astro)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "site/src/content/docs/index.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Home splash + hero wired into the nav groups (site/src/content/docs/index.mdx)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "site"
+      ],
+      "pathIssue": null,
+      "description": "Verify the build serves a navigable site with search and base-correct internal links (site/)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "site/src/components/phasebadge.astro",
+        "site/src/components/artifacts.astro"
+      ],
+      "pathIssue": null,
+      "description": "Phase-doc template: `PhaseBadge` + `Artifacts` components (purpose/command/reads/writes) (site/src/components/PhaseBadge.astro, site/src/components/Artifacts.astro)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "site/src/content/docs/workflow/index.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Workflow overview page (phase index cards + intro) (site/src/content/docs/workflow/index.mdx)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/start/getting-started.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Getting-started page: install → first artifact (SC-001) (site/src/content/docs/start/getting-started.mdx)"
+    },
+    {
+      "id": "T033",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "glob",
+      "description": "Author the 8 phase pages (constitution…implement) with phase frontmatter facts (site/src/content/docs/workflow/*.mdx)"
+    },
+    {
+      "id": "T034",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "site"
+      ],
+      "pathIssue": null,
+      "description": "Verify all 8 phases have one page; Starlight pagination chains in order; links base-correct (SC-002/003) (site/)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "site/src/components/diagram.astro"
+      ],
+      "pathIssue": null,
+      "description": "`Diagram` wrapper: Mermaid + caption + text-summary fallback, re-themes on toggle (site/src/components/Diagram.astro)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "site/src/content/docs/workflow/index.mdx"
+      ],
+      "pathIssue": null,
+      "description": "D1 workflow-sequence diagram on the overview page (site/src/content/docs/workflow/index.mdx)"
+    },
+    {
+      "id": "T042",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/concepts/architecture.mdx"
+      ],
+      "pathIssue": null,
+      "description": "D2 author-once/emit-per-tool diagram on the architecture page (site/src/content/docs/concepts/architecture.mdx)"
+    },
+    {
+      "id": "T043",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/workflow/analyze.mdx"
+      ],
+      "pathIssue": null,
+      "description": "D3 story dependency-graph diagram on the analyze page (site/src/content/docs/workflow/analyze.mdx)"
+    },
+    {
+      "id": "T044",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "site"
+      ],
+      "pathIssue": null,
+      "description": "Verify diagrams render + fallback text in static HTML (SC-005); live theming via CSS-var themeVariables (site/)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "site/src/styles/brand.css"
+      ],
+      "pathIssue": null,
+      "description": "Home hero: signature gradient panel + Deep scrim for AA white text; solid fallback (site/src/styles/brand.css)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "site/src/styles/brand.css",
+        "theme.css"
+      ],
+      "pathIssue": null,
+      "description": "Apply palette across links/active-nav/footer hairline; brand tokens on Starlight vars (site/src/styles/brand.css, theme.css)"
+    },
+    {
+      "id": "T052",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "site/src/assets/ambykit_logo.png",
+        "site/public/favicon.svg"
+      ],
+      "pathIssue": null,
+      "description": "Header logo: real AmbyKit lockup (Starlight `logo`, replacesTitle), downscaled 2.2MB→11KB; gradient favicon (site/src/assets/ambykit_logo.png, site/public/favicon.svg)"
+    },
+    {
+      "id": "T053",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "site"
+      ],
+      "pathIssue": null,
+      "description": "Verify palette + gradient in bundle; hero scrim (45→75% Deep) sizes white text to AA (SC-004) (site/)"
+    },
+    {
+      "id": "T060",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "site/src/content/docs/cli/index.mdx"
+      ],
+      "pathIssue": null,
+      "description": "CLI reference page: one entry per verb (usage/flags/examples) for all 7 verbs (site/src/content/docs/cli/index.mdx)"
+    },
+    {
+      "id": "T061",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/cli/compatibility.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Tool-compatibility page: targets + surface + file matrix (site/src/content/docs/cli/compatibility.mdx)"
+    },
+    {
+      "id": "T062",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "site"
+      ],
+      "pathIssue": null,
+      "description": "Verify all 7 verbs on the reference page; every non-alias target listed (SC-007) (site/)"
+    },
+    {
+      "id": "T070",
+      "done": true,
+      "story": "US6",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "site/src/components/diagram.astro",
+        "brand.css"
+      ],
+      "pathIssue": null,
+      "description": "Responsive: Starlight layout + diagram/table `overflow-x` containers (no page overflow) (site/src/components/Diagram.astro, brand.css)"
+    },
+    {
+      "id": "T071",
+      "done": true,
+      "story": "US6",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "site/src/styles/theme.css"
+      ],
+      "pathIssue": null,
+      "description": "Accessibility: focus rings, Starlight skip-link/landmarks, neutral-token AA text, diagram text fallbacks (site/src/styles/theme.css)"
+    },
+    {
+      "id": "T072",
+      "done": true,
+      "story": "US6",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        ".github/workflows/site.yml"
+      ],
+      "pathIssue": null,
+      "description": "GitHub Actions: docs-sync → build → deploy `site/` to GitHub Pages on default-branch merge (FR-015) (.github/workflows/site.yml)"
+    },
+    {
+      "id": "T073",
+      "done": true,
+      "story": "US6",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "scripts/check-docs-sync.mjs",
+        "test/check-docs-sync.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Docs-sync check per `@contracts/docs-sync.md` (A1–A5) + happy-path test; proven to catch drift; runs in CI before build (FR-014) (scripts/check-docs-sync.mjs, test/check-docs-sync.test.ts)"
+    },
+    {
+      "id": "T074",
+      "done": true,
+      "story": "US6",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "site",
+        ".github"
+      ],
+      "pathIssue": null,
+      "description": "Verify docs-sync check + site build pass (deploy runs on push to Pages) (site/, .github/)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 9,
+      "parallel": false,
+      "paths": [
+        "readme.md"
+      ],
+      "pathIssue": null,
+      "description": "Clean build (15 pages, base-correct links); linked the site from the root `README.md` (README.md)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 9,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Confirmed `ambykit sync --check` stays green + root typecheck/tests pass — CLI package untouched (Principle 6/7)"
+    },
+    {
+      "id": "T092",
+      "done": true,
+      "story": null,
+      "phase": 9,
+      "parallel": false,
+      "paths": [
+        "site/readme.md"
+      ],
+      "pathIssue": null,
+      "description": "Documented the build/publish command; site builds reproducibly (site/README.md)"
+    }
+  ],
+  "008-brownfield-support": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "src/core/types.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `merge?: \"overwrite\" | \"region\"` (default overwrite) to `EmittedFile` (src/core/types.ts)"
+    },
+    {
+      "id": "T002",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "src/cli/fsops.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `skipped`/`aborted` reason buckets + backup paths to `WriteResult` shape (src/cli/fsops.ts)"
+    },
+    {
+      "id": "T003",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        ".gitignore"
+      ],
+      "pathIssue": null,
+      "description": "`.amby/backups/` added to `.gitignore` + documented; tests use inline temp dirs (no fixtures dir needed) (.gitignore)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/merge.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `findRegion` — parse `### AmbyKit usage` → next same/higher heading or EOF; throw on >1 (src/core/merge.ts)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/merge.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement newline/trailing-newline normalization helper for region bytes (src/core/merge.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/merge.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `fingerprint(body)` hash excluding the fingerprint footer line (src/core/merge.ts)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/merge.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `mergeRegion(existing, region)` returning `MergePlan` per data-model transitions (src/core/merge.ts)"
+    },
+    {
+      "id": "T014",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/core/merge.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Unit tests for findRegion/mergeRegion incl. idempotency + multi-region abort (test/core/merge.test.ts)"
+    },
+    {
+      "id": "T015",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/rules.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `buildAmbyRegion(ctx)` neutral region string with fingerprint footer, authored once (src/core/rules.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/fsops.ts"
+      ],
+      "pathIssue": null,
+      "description": "Branch `applyFiles` on `file.merge`; route `region` files through `mergeRegion` (src/cli/fsops.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/fsops.ts"
+      ],
+      "pathIssue": null,
+      "description": "Write timestamped backup to `.amby/backups/<name>.<ts>.bak` before modifying an existing file (src/cli/fsops.ts)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/fsops.ts"
+      ],
+      "pathIssue": null,
+      "description": "Wrap each file write in try/catch → `aborted` + reason, no partial write (src/cli/fsops.ts)"
+    },
+    {
+      "id": "T023",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/emit.ts",
+        "src/core/rules.ts"
+      ],
+      "pathIssue": null,
+      "description": "Emit shared AGENTS.md as `merge:\"region\"` using `buildAmbyRegion` (src/cli/emit.ts, src/core/rules.ts)"
+    },
+    {
+      "id": "T024",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/emitters/claude.ts"
+      ],
+      "pathIssue": null,
+      "description": "Claude emitter: emit region + ensure `@AGENTS.md` import at file top on merge (src/emitters/claude.ts)"
+    },
+    {
+      "id": "T025",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/emitters/copilot.ts",
+        "cursor.ts"
+      ],
+      "pathIssue": null,
+      "description": "Update remaining emitters' rules files to `merge:\"region\"` per matrix (src/emitters/copilot.ts, cursor.ts)"
+    },
+    {
+      "id": "T026",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "test/emitters-region.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Region-emitter tests: each rules file is `merge:\"region\"` with one fingerprinted region (test/emitters-region.test.ts)"
+    },
+    {
+      "id": "T027",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "test/cli/brownfield-merge.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "E2E: merge over existing AGENTS.md/CLAUDE.md w/ sentinel — sentinel kept, region added (test/cli/brownfield-merge.test.ts)"
+    },
+    {
+      "id": "T028",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "test/cli/brownfield-merge.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "E2E: no rules file → complete greenfield files written (FR-002) (test/cli/brownfield-merge.test.ts)"
+    },
+    {
+      "id": "T029",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "test/cli/brownfield-merge.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Regression: user-scope files untouched without `--include-user` (FR-012) (test/cli/brownfield-merge.test.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/core/merge.ts"
+      ],
+      "pathIssue": null,
+      "description": "Idempotent re-run: region present + fingerprint match → splice in place, no duplicate (src/core/merge.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/fsops.ts",
+        "src/cli/base-command.ts"
+      ],
+      "pathIssue": null,
+      "description": "Fingerprint mismatch → `skippedRegions` + reason; surface backups/skips/aborts in CLI output (src/cli/fsops.ts, src/cli/base-command.ts)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/sync.ts"
+      ],
+      "pathIssue": null,
+      "description": "Confirm `sync` is the update path (region-aware via shared `applyFiles`, multi-tool) — no new verb (src/cli/sync.ts)"
+    },
+    {
+      "id": "T033",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/check.ts"
+      ],
+      "pathIssue": null,
+      "description": "`.amby/backups/` lives outside the emitted set, so `check` stays green (verified in test) (src/cli/check.ts)"
+    },
+    {
+      "id": "T034",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/cli/sync-brownfield.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "E2E: re-run sync twice → exactly one region (SC-002); hand-edited region skipped (test/cli/sync-brownfield.test.ts)"
+    },
+    {
+      "id": "T035",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/cli/sync-brownfield.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "E2E: multi-tool project — every configured rules file gets native region (FR-006) (test/cli/sync-brownfield.test.ts)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/core/classify.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `classifyProject(root)` — rules file / non-AmbyKit source / git-history signals (src/core/classify.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/core/classify.ts"
+      ],
+      "pathIssue": null,
+      "description": "Guarded git probe (`.git` + `git rev-parse --verify HEAD`), never throws (src/core/classify.ts)"
+    },
+    {
+      "id": "T042",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/init.ts"
+      ],
+      "pathIssue": null,
+      "description": "init reports detected mode; write path is non-destructive regardless (FR-009) (src/cli/init.ts)"
+    },
+    {
+      "id": "T043",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/core/classify.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Unit + E2E: empty dir→greenfield, dir w/ source or rules or commits→brownfield (test/core/classify.test.ts)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/fsops.ts"
+      ],
+      "pathIssue": null,
+      "description": "`--dry-run` reports planned per-file change without writing or backing up (FR-008b) (src/cli/fsops.ts)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/fsops.ts",
+        "src/cli/restore.ts",
+        "src/cli/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Backup restore surface — `listBackups`/`restoreLatestBackup` + `ambykit restore` command (src/cli/fsops.ts, src/cli/restore.ts, src/cli/index.ts)"
+    },
+    {
+      "id": "T052",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "test/cli/restore.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "E2E: modify via AmbyKit then restore original from backup (SC-005) (test/cli/restore.test.ts)"
+    },
+    {
+      "id": "T070",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "docs/getting-started.md",
+        "readme.md"
+      ],
+      "pathIssue": null,
+      "description": "Document non-destructive init preserving existing docs in getting-started (docs/getting-started.md, README.md)"
+    },
+    {
+      "id": "T071",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "docs/cli-reference.md"
+      ],
+      "pathIssue": null,
+      "description": "Document `init`/`sync` brownfield flags + `restore`: `--dry-run`, detection, backups, recovery (docs/cli-reference.md)"
+    },
+    {
+      "id": "T072",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "docs/architecture.md"
+      ],
+      "pathIssue": null,
+      "description": "Document the region-merge model + backups in architecture overview (docs/architecture.md)"
+    },
+    {
+      "id": "T073",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "docs/tool-compatibility.md"
+      ],
+      "pathIssue": null,
+      "description": "Note the rules-file wrapping change in the compatibility matrix (docs/tool-compatibility.md)"
+    },
+    {
+      "id": "T074",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "site/src/content/docs/start/getting-started.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Mirror getting-started brownfield note on the dev site (site/src/content/docs/start/getting-started.mdx)"
+    },
+    {
+      "id": "T075",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/cli/index.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Mirror CLI reference brownfield flags + `restore` on the dev site (site/src/content/docs/cli/index.mdx)"
+    },
+    {
+      "id": "T076",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/concepts/architecture.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Mirror region-merge model on the dev site architecture page (site/src/content/docs/concepts/architecture.mdx)"
+    },
+    {
+      "id": "T077",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "docs",
+        "site/src/content/docs"
+      ],
+      "pathIssue": null,
+      "description": "Cross-surface consistency pass: `docs/` ↔ `site/` describe brownfield identically; docs-sync green (FR-015, SC-006) (docs/, site/src/content/docs/)"
+    },
+    {
+      "id": "T092",
+      "done": true,
+      "story": null,
+      "phase": 8,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Run `ambykit sync` to regenerate this repo's own tool files; `npm run typecheck` + `npm test` green (repo root)"
+    }
+  ],
+  "008-codex-integration": [
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "src/emitters/codex.ts"
+      ],
+      "pathIssue": null,
+      "description": "CodexEmitter: skills surface, `.agents/skills/<skill>/SKILL.md` path via skill-name helper (src/emitters/codex.ts)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "src/emitters/codex.ts"
+      ],
+      "pathIssue": null,
+      "description": "CodexEmitter: `commandFrontmatter` → `name` + `description` only (src/emitters/codex.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "src/emitters/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Register `codex` target in the registry (src/emitters/index.ts)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/cli/compatibility.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Add minimal `codex` mention to the compatibility page — required immediately, `check-docs-sync.test.ts` assertion A5 fails the instant a non-alias target is registered without it (site/src/content/docs/cli/compatibility.mdx)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "test/m3-emitters.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Snapshot test: `amby.specify` emits to `.agents/skills/amby-specify/SKILL.md` with `name`/`description` frontmatter (test/m3-emitters.test.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "test/m3-emitters.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Snapshot test: two consecutive `emit()` calls produce identical output (idempotent sync, FR-005) (test/m3-emitters.test.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "test/m3-emitters.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: `CodexEmitter.emit()` with `manageRules: true` emits no Codex-specific rules file, relying on the shared `AGENTS.md` (test/m3-emitters.test.ts)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US3",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/emitters/codex.ts"
+      ],
+      "pathIssue": null,
+      "description": "CodexEmitter: `transformBody` rewrites `$ARGUMENTS`/`$N` placeholders into prose instructing the agent to use the trailing free text (src/emitters/codex.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US3",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "test/m3-emitters.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: no literal `$ARGUMENTS`/`$1` token survives in the emitted `SKILL.md` body (test/m3-emitters.test.ts)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US4",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "docs/tool-compatibility.md"
+      ],
+      "pathIssue": null,
+      "description": "Full `docs/tool-compatibility.md` matrix row for Codex — rules file, command surface, frontmatter, MCP (out of scope note) (docs/tool-compatibility.md)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US4",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "site/src/content/docs/cli/compatibility.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Full \"Where files land\" row for Codex on the compatibility page (site/src/content/docs/cli/compatibility.mdx)"
+    },
+    {
+      "id": "T052",
+      "done": true,
+      "story": "US4",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        ".amby/config.json"
+      ],
+      "pathIssue": null,
+      "description": "Add `codex` to this repo's own target list (.amby/config.json)"
+    },
+    {
+      "id": "T053",
+      "done": true,
+      "story": "US4",
+      "phase": 5,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Run `ambykit sync`; commit this repo's own generated `.agents/skills/amby-*/SKILL.md` files (repo root)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 6,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "`npm run typecheck && npm test` passes clean"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 6,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Verify all ten targets end-to-end in a temp project (`init` + `check`), including `codex`"
+    }
+  ],
+  "009-continue-spec": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "src/core/rules.ts"
+      ],
+      "pathIssue": null,
+      "description": "Confirm `revise` is a free CommandSpec id/name and pick its `PHASE_SEQUENCE` slot (after `clarify`) (src/core/rules.ts)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/prompts/revise.md"
+      ],
+      "pathIssue": null,
+      "description": "Create `src/prompts/revise.md` with valid frontmatter (id/name/description/argument-hint/phase/reads/writes/allowedTools) + body skeleton (src/prompts/revise.md)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/rules.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `\"revise\"` to `PHASE_SEQUENCE` after `\"clarify\"` (src/core/rules.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/revise-emit.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: `loadCommandSpecs` parses `revise` and every emitter emits its command file (FR-006) (test/revise-emit.test.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/prompts/revise.md"
+      ],
+      "pathIssue": null,
+      "description": "Author the continue body: resolve feature dir; add/refine `US-#`/`FR-###`/`SC-###` in place, preserving existing IDs/text; new items take the next number (FR-001/002, Principle 3) (src/prompts/revise.md)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/prompts/revise.md"
+      ],
+      "pathIssue": null,
+      "description": "Instruct EARS for new requirements + Given/When/Then for acceptance, consistent with `specify` (src/prompts/revise.md)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/prompts/revise.md"
+      ],
+      "pathIssue": null,
+      "description": "Feature-not-found → clear error, no changes (FR-007) (src/prompts/revise.md)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/prompts/revise.md"
+      ],
+      "pathIssue": null,
+      "description": "Add the done-guard: `spec.md` status `done` → make no edits, direct the author to `/amby.specify` a new feature (FR-003) (src/prompts/revise.md)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/prompts/revise.md"
+      ],
+      "pathIssue": null,
+      "description": "On continue, set `spec.md` status to `in-progress`; leave individual `done` stories untouched, allow new stories (FR-004) (src/prompts/revise.md)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/prompts/revise.md"
+      ],
+      "pathIssue": null,
+      "description": "State the command's scope as distinct from `clarify` (markers only) and `specify` (new feature) (FR-008) (src/prompts/revise.md)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/dashboard-status.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Verification test: a story set to `in-progress` renders in-progress on the dashboard; a `done` feature stays done (no code change — R-1) (test/dashboard-status.test.ts)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/prompts/revise.md"
+      ],
+      "pathIssue": null,
+      "description": "Author the design branch: if `ui.md` exists, continue it in place preserving existing sections; if absent, direct the author to `/amby.design` (FR-009) (src/prompts/revise.md)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "glob",
+      "description": "Add site workflow page `revise.mdx` (phase/command/reads/writes) + renumber `order` after clarify for A3 contiguity (site/src/content/docs/workflow/revise.mdx, site/src/content/docs/workflow/*.mdx)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "docs/workflow.md"
+      ],
+      "pathIssue": null,
+      "description": "Mention `/amby.revise` in the workflow docs (docs/workflow.md)"
+    },
+    {
+      "id": "T092",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "glob",
+      "description": "docs-sync green ✓ + emitter/e2e file-count updated ✓; **pending:** run `ambykit sync` to regenerate the repo's own `.claude/commands/amby.revise.md` (self-host, user-controlled) (repo root, test/*)"
+    },
+    {
+      "id": "T093",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "`npm run typecheck` + `npm test` green (repo root)"
+    }
+  ],
+  "010-version-update": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/theme.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add box-drawing glyph pairs (box-tl/-tr/-bl/-br/-h/-v, {u,a}) to the glyph set (src/cli/ui/theme.ts)"
+    },
+    {
+      "id": "T002",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "src/core/types.ts",
+        "src/cli/version-check.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `VersionCache` type + user-cache path constant (`~/.ambykit/version-cache.json`) (src/core/types.ts, src/cli/version-check.ts)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/version.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `core/version.ts`: `installedVersion`, `isDevPlaceholder`, `compareVersions`, `isOutdated` (src/core/version.ts)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/core/version.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Unit tests for version compare / isOutdated / dev-placeholder (test/core/version.test.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/cli/index.ts",
+        "src/cli/init.ts"
+      ],
+      "pathIssue": null,
+      "description": "Replace the hard-coded `\"0.0.0\"` version constants with `installedVersion()` (src/cli/index.ts, src/cli/init.ts)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/cli/version-check.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `version-check.ts`: `latestFromCache`, `cacheIsStale`, `refreshLatest` (registry fetch + timeout + cache write) (src/cli/version-check.ts)"
+    },
+    {
+      "id": "T014",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/cli/version-check.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Unit tests: cache read/TTL/stale, refresh timeout & failure → null, never throws (test/cli/version-check.test.ts)"
+    },
+    {
+      "id": "T015",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/paths.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `projectAtCwd(cwd)` — `.amby/` AND `specs/` at the invocation dir (not walk-up) (src/core/paths.ts)"
+    },
+    {
+      "id": "T016",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/callout.ts"
+      ],
+      "pathIssue": null,
+      "description": "Implement `versionWarning` callout renderer (box + ascii/mono/suppressed states) per ui.md/tokens (src/cli/ui/callout.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/base-command.ts",
+        "src/cli/init.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `preamble()` hook to `BaseCommand`; move init's banner into `preamble()` (src/cli/base-command.ts, src/cli/init.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/base-command.ts"
+      ],
+      "pathIssue": null,
+      "description": "In `run()`: after preamble, print `versionWarning` gated on `caps.isTTY && !--json`; best-effort refresh when cache stale (src/cli/base-command.ts)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "test/cli/ui/callout.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Renderer tests: outdated shows both versions; current/dev/null suppressed; ascii + monochrome degradation (test/cli/ui/callout.test.ts)"
+    },
+    {
+      "id": "T023",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "test/cli/version-warning.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Integration test: warning sits between preamble and content; suppressed on non-TTY and `--json` — incl. a `dashboard --json` case asserting byte-clean JSON (gate is in `run()` before `execute()`) (test/cli/version-warning.test.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/update.ts"
+      ],
+      "pathIssue": null,
+      "description": "Create `UpdateCommand` (BaseCommand, `requiresProject=false`): compare `installedVersion()` vs `refreshLatest()` (src/cli/update.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/update.ts"
+      ],
+      "pathIssue": null,
+      "description": "Outdated → `spawnSync npm i -g @ambystech/ambykit@latest`; on success stop + instruct re-run (no re-exec) (src/cli/update.ts)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/update.ts"
+      ],
+      "pathIssue": null,
+      "description": "Install failure (npx/EACCES) → print exact command, leave install intact (FR-011) (src/cli/update.ts)"
+    },
+    {
+      "id": "T033",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Register `update` in the command registry + help (src/cli/index.ts)"
+    },
+    {
+      "id": "T034",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/cli/update.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests (mock spawn): outdated→install attempted + re-run message; failure→prints command (test/cli/update.test.ts)"
+    },
+    {
+      "id": "T035",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/cli/version-check.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: the callout (US-1) and `update` read \"latest\" from the same `version-check.ts` — they never disagree (FR-012) (test/cli/version-check.test.ts)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/update.ts"
+      ],
+      "pathIssue": null,
+      "description": "CLI current → if `projectAtCwd(cwd)` then `buildEmittedFiles`+`applyFiles` refresh (sync pipeline) (src/cli/update.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/update.ts"
+      ],
+      "pathIssue": null,
+      "description": "Outside a project (no `.amby/`+`specs/` at cwd) → skip refresh, report accordingly (src/cli/update.ts)"
+    },
+    {
+      "id": "T042",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/cli/update.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "E2E: stale in-project prompts refreshed & `check` stays green; outside-project skips refresh (test/cli/update.test.ts)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/update.ts",
+        "src/cli/base-command.ts"
+      ],
+      "pathIssue": null,
+      "description": "Result reporting: updated line / refresh summary / exact `Everything is up to date` (src/cli/update.ts, src/cli/base-command.ts)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Remove the former `upgrade` command; `update` is the sole update command (FR-014) (src/cli/index.ts, src/cli/upgrade.ts removed)"
+    },
+    {
+      "id": "T052",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "test/cli/update.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests: nothing-to-do prints the exact string `Everything is up to date` (test/cli/update.test.ts)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "docs/cli-reference.md",
+        "readme.md"
+      ],
+      "pathIssue": null,
+      "description": "Document `update` (and the deprecated `upgrade`) + the outdated-version warning; note the two-step flow when outdated (run `update` to upgrade the CLI, then run it again to refresh prompts) (docs/cli-reference.md, README.md)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/cli/index.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Mirror on the dev site; ensure the docs-sync verb check lists `update` (site/src/content/docs/cli/index.mdx)"
+    },
+    {
+      "id": "T092",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "`npm run typecheck` + `npm test` green; docs-sync green. (No `ambykit sync` needed — feature 010 adds CLI code only, no prompts/templates, so nothing new is emitted.) (repo root)"
+    }
+  ],
+  "011-converge": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Create branch `011-converge` from `main` (git)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/prompts/converge.md"
+      ],
+      "pathIssue": null,
+      "description": "Add `converge.md` prompt skeleton: frontmatter per plan contract table (id/name/phase/argument-hint/reads/writes/allowedTools `[read, edit]`), empty body (src/prompts/converge.md)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/rules.ts"
+      ],
+      "pathIssue": null,
+      "description": "Append `\"converge\"` after `\"implement\"` in `PHASE_SEQUENCE` (src/core/rules.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/converge-emit.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add emit test asserting id/name/phase/`allowedTools` and that Claude, Cursor, and Copilot emitters emit `amby.converge` (test/converge-emit.test.ts)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "test"
+      ],
+      "pathIssue": null,
+      "description": "Run `npm run typecheck` and `npm test`; confirm T012 passes and existing snapshot tests still pass (test/)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/prompts/converge.md"
+      ],
+      "pathIssue": null,
+      "description": "Write body step 1: resolve `$ARGUMENTS`/current feature; stop if `tasks.md` missing (FR-011); note plan-less mode (FR-012, FR-015) (src/prompts/converge.md)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/prompts/converge.md"
+      ],
+      "pathIssue": null,
+      "description": "Write body step 2: classify every `FR-###`/`SC-###`, plan decision, checked `T###` as covered / gap / unverified; skip deferred/out-of-scope items (FR-002, FR-003, FR-013) (src/prompts/converge.md)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/prompts/converge.md"
+      ],
+      "pathIssue": null,
+      "description": "Write body step 5: verdict, counts, per-ID table with one-line reasons (FR-008) (src/prompts/converge.md)"
+    },
+    {
+      "id": "T023",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Manual fixture check: scratch feature with 1 unimplemented FR → reported as gap; fully implemented feature → **converged** (manual, scratchpad project)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/prompts/converge.md"
+      ],
+      "pathIssue": null,
+      "description": "Write body step 3: append `## Convergence` tasks — one per gap `(closes FR-…)`, one `[VERIFY]` per unverified; IDs continue from highest `T###` anywhere in file; skip existing unchecked duplicates; no-op when nothing to append (FR-004, FR-005, FR-007, FR-013) (src/prompts/converge.md)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Manual fixture check: 2 gaps + 1 unverified → exactly 3 new tasks, prior content byte-identical; second run appends nothing (SC-001, SC-002) (manual, scratchpad project)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/prompts/converge.md"
+      ],
+      "pathIssue": null,
+      "description": "Verify word count of prompt body is in the `analyze`/`implement` band (~150–180 words) (FR-014) (src/prompts/converge.md)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/prompts/converge.md"
+      ],
+      "pathIssue": null,
+      "description": "Write body step 4: patch only `status:` lines — story → `done` when all its FR/SC covered; feature → `done` when all stories done (FR-009) (src/prompts/converge.md)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "specs/001-core-and-claude-emitter/spec.md"
+      ],
+      "pathIssue": null,
+      "description": "Dogfood: run `/amby.converge 001-core-and-claude-emitter`; expect **converged** and `status: done`; confirm `ambykit dashboard` shows it (SC-005) (specs/001-core-and-claude-emitter/spec.md)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        ".claude/commands",
+        "agents.md"
+      ],
+      "pathIssue": null,
+      "description": "Run `ambykit sync` on the repo; commit regenerated `.claude/commands/amby.converge.md` and any updated `AGENTS.md`/`CLAUDE.md` region (.claude/commands/, AGENTS.md)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Run `ambykit check`; confirm no drift (CLI)"
+    },
+    {
+      "id": "T060",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/workflow/converge.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Add site phase page with frontmatter `phase: converge`, `command: amby.converge`, `reads`/`writes` matching the prompt, `order: 10` (site/src/content/docs/workflow/converge.mdx)"
+    },
+    {
+      "id": "T061",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/workflow/index.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Add LinkCard, Mermaid node `implement ⇄ converge`, and `converge` in the a11y summary (site/src/content/docs/workflow/index.mdx)"
+    },
+    {
+      "id": "T062",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "docs/workflow.md"
+      ],
+      "pathIssue": null,
+      "description": "Add Converge row to the phase table and a short section describing the loop (docs/workflow.md)"
+    },
+    {
+      "id": "T063",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "readme.md"
+      ],
+      "pathIssue": null,
+      "description": "Add `/amby.converge` to the command list and workflow table (README.md)"
+    },
+    {
+      "id": "T064",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "docs/getting-started.md"
+      ],
+      "pathIssue": null,
+      "description": "Mention the implement → converge loop after `/amby.implement` (docs/getting-started.md)"
+    },
+    {
+      "id": "T065",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "scripts/check-docs-sync.mjs"
+      ],
+      "pathIssue": null,
+      "description": "Run `node scripts/check-docs-sync.mjs`; all A1–A9 pass (scripts/check-docs-sync.mjs)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 8,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Final `npm run typecheck && npm test`; open PR `011-converge` → `main` (git)"
+    }
+  ],
+  "012-worktree-isolation": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Create branch `012-worktree-isolation` from `main` (git)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/git.ts"
+      ],
+      "pathIssue": null,
+      "description": "Git wrappers via `execFileSync`: `isRepo`, `defaultBranch`, `branchExists`, `currentBranch`, `worktreeList` (porcelain parse), `isDirty`, `isMerged` (src/core/git.ts)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/worktree.ts"
+      ],
+      "pathIssue": null,
+      "description": "Pure worktree logic: `featureIds`, `worktreePath`, `ensureGitignore(text)`, `planCreate`/`planRemove`, `staleWorktrees` (src/core/worktree.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/types.ts",
+        "src/core/config.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `worktrees?: boolean` to `AmbyConfig` and the zod schema, default absent/false (src/core/types.ts, src/core/config.ts)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/helpers/git-repo.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test helper: temp git repo with initial commit on `main`, `.amby/`, `specs/003-foo/`; skip when git missing (test/helpers/git-repo.ts)"
+    },
+    {
+      "id": "T014",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "test/core/worktree.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Unit tests for `worktree.ts` pure functions and `git.ts` porcelain parsing (test/core/worktree.test.ts)"
+    },
+    {
+      "id": "T015",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Export new core modules; `npm run typecheck && npm test` green (src/core/index.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/worktree.ts",
+        "src/cli/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "`WorktreeCommand` skeleton: name/summary/usage, subcommand dispatch, not-a-repo guard (FR-009), register in `COMMANDS` (src/cli/worktree.ts, src/cli/index.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/worktree.ts"
+      ],
+      "pathIssue": null,
+      "description": "Create path: validate feature (FR-004) → existing worktree no-op (FR-005) → ensure `.gitignore` (FR-002) → `git worktree add` with/without `-b` from default branch (FR-003) (src/cli/worktree.ts)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/worktree.ts"
+      ],
+      "pathIssue": null,
+      "description": "`--dry-run` and `--json` output for create (FR-008) (src/cli/worktree.ts)"
+    },
+    {
+      "id": "T023",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/worktree.ts"
+      ],
+      "pathIssue": null,
+      "description": "Edge cases: branch checked out elsewhere, directory present but unregistered → refuse with path (src/cli/worktree.ts)"
+    },
+    {
+      "id": "T024",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "test/cli/worktree.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "E2E tests for FR-002/003/004/005/008/009 and SC-002 (main checkout `git status` unchanged) (test/cli/worktree.test.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/worktree.ts"
+      ],
+      "pathIssue": null,
+      "description": "`list`: table of feature, branch, path, clean/dirty, stale; `--json` array (FR-006) (src/cli/worktree.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/worktree.ts"
+      ],
+      "pathIssue": null,
+      "description": "`remove <id> [--force]`: nonexistent → info exit 0; dirty guard; `git worktree remove`; branch untouched (FR-007) (src/cli/worktree.ts)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "test/cli/worktree.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "E2E tests for FR-006/007 and SC-003 (test/cli/worktree.test.ts)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/core/rules.ts"
+      ],
+      "pathIssue": null,
+      "description": "Append the \"Current feature\" resolution paragraph to `buildAmbyRegion` (FR-010) (src/core/rules.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/core/worktree.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: `findProjectRoot` from inside `.worktrees/<id>/sub` returns the worktree root, not the parent (test/core/worktree.test.ts)"
+    },
+    {
+      "id": "T042",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "test",
+        "agents.md",
+        ".claude"
+      ],
+      "pathIssue": null,
+      "description": "Update rules snapshot tests if any assert the region text; `ambykit sync`; `ambykit check` clean (test/, AGENTS.md, .claude/)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/interactive/prompt.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `confirm(question, defaultNo)` y/N prompt with the same TTY guards as `multiSelect` (src/cli/ui/interactive/prompt.ts)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/init.ts"
+      ],
+      "pathIssue": null,
+      "description": "`init`: on TTY && !`--yes`, ask \"Enable worktree isolation?\" and persist `worktrees` (FR-011a) (src/cli/init.ts)"
+    },
+    {
+      "id": "T052",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "test/cli/interactive-nontty.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test: init on non-TTY / `--yes` leaves `worktrees` unset without prompting (test/cli/interactive-nontty.test.ts)"
+    },
+    {
+      "id": "T053",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/prompts/specify.md"
+      ],
+      "pathIssue": null,
+      "description": "Specify prompt: final conditional step running `ambykit worktree <id>` when config enables it and repo is git; add `bash` to `allowedTools`, `.amby/config.json` to `reads` (FR-011, FR-009) (src/prompts/specify.md)"
+    },
+    {
+      "id": "T054",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "site/src/content/docs/workflow/specify.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Update `specify.mdx` frontmatter `reads` to match; `ambykit sync`; `node scripts/check-docs-sync.mjs` (site/src/content/docs/workflow/specify.mdx)"
+    },
+    {
+      "id": "T060",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "src/cli/check.ts"
+      ],
+      "pathIssue": null,
+      "description": "`check`: warn per worktree whose branch is merged into the default branch, with the remove command (FR-013) (src/cli/check.ts)"
+    },
+    {
+      "id": "T061",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "test/cli/worktree.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test for the stale-worktree warning (test/cli/worktree.test.ts)"
+    },
+    {
+      "id": "T062",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "docs/cli-reference.md",
+        "site/src/content/docs/cli/index.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Document `ambykit worktree` in both CLI references (docs/cli-reference.md, site/src/content/docs/cli/index.mdx)"
+    },
+    {
+      "id": "T063",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "readme.md",
+        "docs/workflow.md"
+      ],
+      "pathIssue": null,
+      "description": "README CLI table row + \"Parallel features\" section in the workflow guide (README.md, docs/workflow.md)"
+    },
+    {
+      "id": "T064",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "agents.md"
+      ],
+      "pathIssue": null,
+      "description": "Add `worktree` to the `src/cli/` structure line so docs-sync A9 passes (AGENTS.md)"
+    },
+    {
+      "id": "T065",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "scripts/check-docs-sync.mjs"
+      ],
+      "pathIssue": null,
+      "description": "`node scripts/check-docs-sync.mjs` and site build pass (scripts/check-docs-sync.mjs)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 8,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Final `npm run typecheck && npm test`; open PR `012-worktree-isolation` → `main` (git)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 8,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Follow-up (SC-005, non-blocking): develop the next feature inside `.worktrees/` and note it in that feature's spec (specs/) — done: 013 built in `.worktrees/013-multi-agent-roles/`"
+    }
+  ],
+  "013-multi-agent-roles": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        ".worktrees"
+      ],
+      "pathIssue": null,
+      "description": "After #7 merges: `ambykit worktree 013-multi-agent-roles` and work inside `.worktrees/013-multi-agent-roles/` (closes 012 T091 / SC-006) (.worktrees/)"
+    },
+    {
+      "id": "T002",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "specs/013-multi-agent-roles/research.md"
+      ],
+      "pathIssue": null,
+      "description": "Phase 0 research: verify agent-file frontmatter for Claude Code, OpenCode, Copilot against official docs; record outcome per target (specs/013-multi-agent-roles/research.md)"
+    },
+    {
+      "id": "T003",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "docs/tool-compatibility.md"
+      ],
+      "pathIssue": null,
+      "description": "Add an \"Agent frontmatter\" row with the verified keys (or \"unverified — not emitted\") (docs/tool-compatibility.md)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/roles/pm.md",
+        "ux.md",
+        "architect.md",
+        "tech-lead.md",
+        "developer.md",
+        "qa.md"
+      ],
+      "pathIssue": null,
+      "description": "Write six default roles ≤ 150 words each with `id`/`name`/`phases` frontmatter (src/roles/pm.md, ux.md, architect.md, tech-lead.md, developer.md, qa.md)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/types.ts"
+      ],
+      "pathIssue": null,
+      "description": "`Role` type + `roles?: Role[]` on `RulesContext`; optional `role` on `CommandSpec` (src/core/types.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/roles.ts"
+      ],
+      "pathIssue": null,
+      "description": "`loadRoles(root)`, `validateRoles(roles)` (duplicate ids case-insensitive → error; >150 words → warning), `wordCount` (src/core/roles.ts)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/command-spec.ts"
+      ],
+      "pathIssue": null,
+      "description": "Accept optional `role: <id>` in prompt frontmatter schema (src/core/command-spec.ts)"
+    },
+    {
+      "id": "T014",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/scaffold.ts",
+        "src/core/paths.ts"
+      ],
+      "pathIssue": null,
+      "description": "Install `src/roles/*.md` into `.amby/roles/` write-if-absent alongside templates/reference; `rolesDir()` path helper (src/core/scaffold.ts, src/core/paths.ts)"
+    },
+    {
+      "id": "T015",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "test/core/roles.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Unit tests: loader parsing, duplicate refusal, word-count warning at 151, every shipped role ≤ 150 words (FR-010, SC-004) (test/core/roles.test.ts)"
+    },
+    {
+      "id": "T016",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Export new module; `npm run typecheck && npm test` green (src/core/index.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "glob",
+      "description": "Add `role:` to every phase prompt per the default mapping (pm/ux/architect/tech-lead/developer/qa) (src/prompts/*.md)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/emitters/base-emitter.ts"
+      ],
+      "pathIssue": null,
+      "description": "`BaseEmitter.transformBody`: when `ctx.roles` is non-empty and the spec has a role, prepend the role line (act-as + `--as` override + missing-file refusal) (src/emitters/base-emitter.ts)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/core/emit.ts"
+      ],
+      "pathIssue": null,
+      "description": "`buildEmittedFiles`: load roles from the project root into `ctx.roles` (src/core/emit.ts)"
+    },
+    {
+      "id": "T023",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "test/roles-emit.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Snapshot tests: with roles → line present on every command for every emitter; without `.amby/roles/` → output byte-identical to pre-feature (FR-003, FR-004, SC-001) (test/roles-emit.test.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/sync.ts"
+      ],
+      "pathIssue": null,
+      "description": "`sync`: run `validateRoles` — print warnings, refuse (exit 1) on duplicate ids (src/cli/sync.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/check.ts"
+      ],
+      "pathIssue": null,
+      "description": "`check`: report role warnings/errors and any shipped default missing from `.amby/roles/` (src/cli/check.ts)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/init.ts"
+      ],
+      "pathIssue": null,
+      "description": "`init`: roles installed with templates (via T014); confirm in the init summary line (src/cli/init.ts)"
+    },
+    {
+      "id": "T033",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "test/cli/roles.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "E2E tests: edited role needs no command re-sync (`@path` load); duplicate → sync exit 1; 151-word role → exactly one warning; missing default reported by check (SC-003, SC-004) (test/cli/roles.test.ts)"
+    },
+    {
+      "id": "T034",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        ".amby/roles",
+        ".claude",
+        ".agents"
+      ],
+      "pathIssue": null,
+      "description": "`ambykit sync` on this repo → `.amby/roles/` installed, commands regenerated; `ambykit check` clean (.amby/roles/, .claude/, .agents/)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US4",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/emitters/base-emitter.ts"
+      ],
+      "pathIssue": null,
+      "description": "Finalize the `--as <id>` clause wording: use `@.amby/roles/<id>.md`; if missing, stop and list `.amby/roles/` (FR-005) (src/emitters/base-emitter.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US4",
+      "phase": 5,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Manual fixture: `/amby.plan --as qa` states \"acting as QA\"; `/amby.plan --as nope` refuses and lists roles (manual, scratchpad project)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US3",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/prompts/review.md"
+      ],
+      "pathIssue": null,
+      "description": "Write the review phase: `/amby.review <artifact> [--as <role>] [--apply]` — findings `ID · severity · finding · fix`; read-only by default; `--apply` patches in place preserving IDs and appends a `## Reviews` record; zero findings → approval line (FR-006/007/008) (src/prompts/review.md)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US3",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "src/core/rules.ts"
+      ],
+      "pathIssue": null,
+      "description": "Append `\"review\"` to `PHASE_SEQUENCE` after `converge` (src/core/rules.ts)"
+    },
+    {
+      "id": "T052",
+      "done": true,
+      "story": "US3",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "test/review-emit.test.ts",
+        "test/command-spec.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Emit test: loads as `amby.review`, `allowedTools: [read, edit]`, emitted by every command-surface emitter; update the phase-id list test (test/review-emit.test.ts, test/command-spec.test.ts)"
+    },
+    {
+      "id": "T053",
+      "done": true,
+      "story": "US3",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/workflow/review.mdx",
+        "index.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Site page `order: 11` + LinkCard/Mermaid node/summary in the workflow overview (site/src/content/docs/workflow/review.mdx, index.mdx)"
+    },
+    {
+      "id": "T054",
+      "done": true,
+      "story": "US3",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "readme.md",
+        "docs/workflow.md"
+      ],
+      "pathIssue": null,
+      "description": "`/amby.review` in the README command list/table and `docs/workflow.md` phase table + section (README.md, docs/workflow.md)"
+    },
+    {
+      "id": "T055",
+      "done": true,
+      "story": "US3",
+      "phase": 6,
+      "parallel": false,
+      "paths": [],
+      "pathIssue": "missing",
+      "description": "Manual fixture: flawed spec (untestable FR, missing negative case, unmeasurable SC) → QA review reports all three IDs; `--apply` preserves IDs and appends the record (SC-002) (manual, scratchpad project)"
+    },
+    {
+      "id": "T056",
+      "done": true,
+      "story": "US3",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "specs/013-multi-agent-roles/spec.md"
+      ],
+      "pathIssue": null,
+      "description": "Dogfood: run a QA review of this feature's spec and record it (SC-006) (specs/013-multi-agent-roles/spec.md)"
+    },
+    {
+      "id": "T060",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "src/emitters/base-emitter.ts"
+      ],
+      "pathIssue": null,
+      "description": "`BaseEmitter.roleFiles(roles, ctx)` default `[]`; called from `emit()` when `ctx.manageRules` (src/emitters/base-emitter.ts)"
+    },
+    {
+      "id": "T061",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "src/emitters/claude.ts",
+        "opencode.ts"
+      ],
+      "pathIssue": null,
+      "description": "Override `roleFiles` for each target verified in T002 only (e.g. `.claude/agents/amby-<id>.md`), body = role body + pointer to `AGENTS.md` (src/emitters/claude.ts, opencode.ts, copilot.ts as verified)"
+    },
+    {
+      "id": "T062",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "test/roles-emit.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Snapshot tests: one persona file per role for verified targets; none for cursor/antigravity/codex (FR-009) (test/roles-emit.test.ts)"
+    },
+    {
+      "id": "T063",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        ".claude/agents"
+      ],
+      "pathIssue": null,
+      "description": "`ambykit sync` + `ambykit check` on this repo cover the persona files (.claude/agents/)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 8,
+      "parallel": true,
+      "paths": [
+        "docs/workflow.md",
+        "docs/cli-reference.md",
+        "site/src/content/docs/cli/index.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Workflow guide \"Roles\" section; CLI reference notes on `sync`/`check` role validation (docs/workflow.md, docs/cli-reference.md, site/src/content/docs/cli/index.mdx)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 8,
+      "parallel": true,
+      "paths": [
+        "specs/012-worktree-isolation/tasks.md"
+      ],
+      "pathIssue": null,
+      "description": "Tick 012's T091 now that this feature was developed in a worktree (specs/012-worktree-isolation/tasks.md)"
+    },
+    {
+      "id": "T092",
+      "done": true,
+      "story": null,
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "scripts/check-docs-sync.mjs"
+      ],
+      "pathIssue": null,
+      "description": "`node scripts/check-docs-sync.mjs`, site build, `npm run typecheck && npm test` all green (scripts/check-docs-sync.mjs)"
+    }
+  ],
+  "014-enhanced-dashboard": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "test/helpers/dashboard-fixture.ts"
+      ],
+      "pathIssue": null,
+      "description": "Shared overview fixture builder: 3 features / 10 stories / 25 of 40 tasks, plus blocked, waiting, cycle, unknown-ref, not-planned, duplicate `008-*`, unknown status, unassigned task, malformed file (test/helpers/dashboard-fixture.ts)"
+    },
+    {
+      "id": "T002",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "test/helpers/dashboard-perf-fixture.ts"
+      ],
+      "pathIssue": null,
+      "description": "Perf fixture generator: 30 features / 1,000 tasks for SC-003 (test/helpers/dashboard-perf-fixture.ts)"
+    },
+    {
+      "id": "T003",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "test/helpers/git-history-fixture.ts"
+      ],
+      "pathIssue": null,
+      "description": "Temp git repo helper committing `tasks.md` check-offs at fixed GIT_*_DATE values (test/helpers/git-history-fixture.ts)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/overview-types.ts"
+      ],
+      "pathIssue": null,
+      "description": "Data-model types: Status, Phase, FeatureSnapshot, ParseIssue, Filters, Overview, Burndown (src/core/overview-types.ts)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/clarifications.ts"
+      ],
+      "pathIssue": null,
+      "description": "Clarification counter ignoring inline code + fenced blocks, with line/text capture — R-1 (src/core/clarifications.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/core/clarifications.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests for the clarification counter, incl. this repo's 014 spec counting 0 (test/core/clarifications.test.ts)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/features.ts"
+      ],
+      "pathIssue": null,
+      "description": "`readFeatures(root)`: one pass over `specs/*`, artifacts, `ui.md` signed_off via gray-matter, tasks or null, ParseIssue on failure, unique displayRef — I-5, FR-014 (src/core/features.ts)"
+    },
+    {
+      "id": "T014",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "test/core/features.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests for `readFeatures`: malformed file skipped and named, duplicate `008-*` display refs, missing tasks.md → null (test/core/features.test.ts)"
+    },
+    {
+      "id": "T015",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/analyze.ts"
+      ],
+      "pathIssue": null,
+      "description": "Export `resolveDepKey` from analyze.ts (no behavior change) (src/core/analyze.ts)"
+    },
+    {
+      "id": "T016",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/capabilities.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `truecolor` + `background` to Capabilities and detect via COLORTERM / COLORFGBG — R-3 (src/cli/ui/capabilities.ts)"
+    },
+    {
+      "id": "T017",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/ui/capabilities.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Capability detection tests for truecolor/background, incl. fallback to ansi16 + dark (test/ui/capabilities.test.ts)"
+    },
+    {
+      "id": "T018",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/theme.ts"
+      ],
+      "pathIssue": null,
+      "description": "`paintToken(caps, token, s)` resolving truecolor.dark/light → ansi16 → none (src/cli/ui/theme.ts)"
+    },
+    {
+      "id": "T019",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/tokens.ts"
+      ],
+      "pathIssue": null,
+      "description": "Dashboard token mirror of 014 design-tokens.json: glyph pairs, colors, spaces, limits (src/cli/ui/dashboard/tokens.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/ui/dashboard-tokens.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test that tokens.ts matches specs/014-enhanced-dashboard/design-tokens.json (test/ui/dashboard-tokens.test.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/panel.ts"
+      ],
+      "pathIssue": null,
+      "description": "Framed panel: normal/focused frame, title with count, truncation `…`, `+N more` elision, ASCII frames (src/cli/ui/dashboard/panel.ts)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/ui/dashboard-panel.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Panel tests across unicode/ASCII and focused/normal (test/ui/dashboard-panel.test.ts)"
+    },
+    {
+      "id": "T023",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/layout.ts"
+      ],
+      "pathIssue": null,
+      "description": "Layout mode selection wide | narrow | plain from caps per ui.md Capability states (src/cli/ui/dashboard/layout.ts)"
+    },
+    {
+      "id": "T024",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "`computeOverview` skeleton: filters applied first (feature by ref or dir, status) — I-9, FR-011 (src/core/overview.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/core/overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "Summary aggregate (features, stories, tasks, percent null on 0 tasks) — I-1, FR-002 (src/core/overview.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "test/core/overview-summary.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Summary value tests on fixture: 3 / 10 / 25 of 40 / 63% and empty project — SC-002 (test/core/overview-summary.test.ts)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/cards.ts"
+      ],
+      "pathIssue": null,
+      "description": "Header + SummaryCard widgets incl. COMPLETE bar with eighths and empty state (src/cli/ui/dashboard/cards.ts)"
+    },
+    {
+      "id": "T033",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/render-overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "Compose overview (header, cards, hint line, parse notices) in wide/narrow/plain (src/cli/ui/dashboard/render-overview.ts)"
+    },
+    {
+      "id": "T034",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "Default one-shot → overview; keep old table behind `--stories`; empty project renders zeroed cards + hint, exit 0 — FR-013, FR-015 (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T035",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "test/ui/dashboard-overview.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Snapshots: wide, narrow, plain, ASCII, NO_COLOR, empty (test/ui/dashboard-overview.test.ts)"
+    },
+    {
+      "id": "T036",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "test/cli/dashboard-overview.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "CLI tests: default output, `--stories` table, story detail unchanged, non-TTY plain — FR-015, FR-016 (test/cli/dashboard-overview.test.ts)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/core/overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "Status counts with fixed order and `other` bucket — I-2, FR-003 (src/core/overview.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/core/overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "Feature rows ordered by number then dir, percent or not-planned, phase, clarifications — I-3, I-7, FR-005, FR-010 (src/core/overview.ts)"
+    },
+    {
+      "id": "T042",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/core/overview-charts.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests for status counts, feature ordering, not-planned, phase derivation (test/core/overview-charts.test.ts)"
+    },
+    {
+      "id": "T043",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/dashboard/status-chart.ts"
+      ],
+      "pathIssue": null,
+      "description": "Status stacked bar with largest-remainder widths and glyph legend — FR-004, FR-006 (src/cli/ui/dashboard/status-chart.ts)"
+    },
+    {
+      "id": "T044",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/dashboard/feature-chart.ts"
+      ],
+      "pathIssue": null,
+      "description": "Feature completion chart with phase + clarif. columns and truncation (src/cli/ui/dashboard/feature-chart.ts)"
+    },
+    {
+      "id": "T045",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/render-overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "Wire both charts into the overview composition (src/cli/ui/dashboard/render-overview.ts)"
+    },
+    {
+      "id": "T046",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/ui/dashboard-charts.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Chart snapshots incl. NO_COLOR distinguishability — SC-006 (test/ui/dashboard-charts.test.ts)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/core/overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "Attention items: graph problems from analyzeGraph, blocked (status or not-done blocked-by), waiting; ranked, deduped — I-4, FR-007, FR-008 (src/core/overview.ts)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/core/overview-attention.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Attention tests: done blockers hidden, cycle + unknown ref flagged first, done stories excluded (test/core/overview-attention.test.ts)"
+    },
+    {
+      "id": "T052",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/attention.ts"
+      ],
+      "pathIssue": null,
+      "description": "Attention panel with kind glyphs, \"Nothing blocked.\" and `+N more` (src/cli/ui/dashboard/attention.ts)"
+    },
+    {
+      "id": "T053",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/render-overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "Wire Attention into wide (side-by-side) and narrow/plain (stacked) layouts (src/cli/ui/dashboard/render-overview.ts)"
+    },
+    {
+      "id": "T054",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/ui/dashboard-attention.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Attention snapshots incl. empty state (test/ui/dashboard-attention.test.ts)"
+    },
+    {
+      "id": "T060",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/core/overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "Up-next selection: undone tasks of stories not in attention, feature then T### order, cap, eligible, allDone — I-6, FR-009 (src/core/overview.ts)"
+    },
+    {
+      "id": "T061",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "test/core/overview-upnext.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Up-next tests: blocked-story tasks excluded, unassigned included, cap, all-done (test/core/overview-upnext.test.ts)"
+    },
+    {
+      "id": "T062",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/up-next.ts"
+      ],
+      "pathIssue": null,
+      "description": "Up-next panel with `<shown> of <total>` title and `/amby.converge` completion line (src/cli/ui/dashboard/up-next.ts)"
+    },
+    {
+      "id": "T063",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "`--next=N` flag parsing; invalid value → error, exit 1 — R-4 (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T064",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "test/cli/dashboard-upnext.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Up-next snapshots and `--next` CLI tests (test/cli/dashboard-upnext.test.ts)"
+    },
+    {
+      "id": "T070",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/feature-view.ts"
+      ],
+      "pathIssue": null,
+      "description": "Feature view: ARTIFACTS, OPEN CLARIFICATIONS, STATUS panels + existing story table with Waiting-on column (src/cli/ui/dashboard/feature-view.ts)"
+    },
+    {
+      "id": "T071",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "`--feature=X` one-shot renders the feature view; all widgets filtered — FR-011 (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T072",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "test/ui/dashboard-feature-view.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Feature view snapshots + filter propagation tests (test/ui/dashboard-feature-view.test.ts)"
+    },
+    {
+      "id": "T073",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/interactive/fullscreen.ts"
+      ],
+      "pathIssue": null,
+      "description": "Optional backward-compatible `start(update)` hook on the fullscreen host (src/cli/ui/interactive/fullscreen.ts)"
+    },
+    {
+      "id": "T074",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/interactive/overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "Interactive overview reducer/renderer: panel focus (tab), cursor, ⏎ open, esc back, `f` filter input, `s` status cycle, `q`; delegates story list/detail to existing module (src/cli/ui/interactive/overview.ts)"
+    },
+    {
+      "id": "T075",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "`--interactive` launches the overview TUI (TTY only, plain fallback otherwise) (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T076",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "test/ui/interactive-overview.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Reducer + render tests for the interactive overview and the `start` hook; existing interactive tests untouched (test/ui/interactive-overview.test.ts)"
+    },
+    {
+      "id": "T080",
+      "done": true,
+      "story": "US7",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "src/core/burndown.ts"
+      ],
+      "pathIssue": null,
+      "description": "`readTaskHistory`: one `git log` + one `git cat-file --batch`, scoped by feature, no-history reasons — R-2, FR-019 (src/core/burndown.ts)"
+    },
+    {
+      "id": "T081",
+      "done": true,
+      "story": "US7",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "src/core/git.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add a stdin-capable sync git helper for `cat-file --batch` (src/core/git.ts)"
+    },
+    {
+      "id": "T082",
+      "done": true,
+      "story": "US7",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "src/core/burndown.ts"
+      ],
+      "pathIssue": null,
+      "description": "`buildBurndown`: period choice, per-period sampling, carry-forward, working-tree last point, delta — I-8 (src/core/burndown.ts)"
+    },
+    {
+      "id": "T083",
+      "done": true,
+      "story": "US7",
+      "phase": 8,
+      "parallel": true,
+      "paths": [
+        "test/core/burndown.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Burndown tests on the temp git repo: values per period, non-repo, too little history, feature scope — FR-018, FR-019 (test/core/burndown.test.ts)"
+    },
+    {
+      "id": "T084",
+      "done": true,
+      "story": "US7",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/burndown-chart.ts"
+      ],
+      "pathIssue": null,
+      "description": "Burndown chart: stacked columns, axes, labels, legend, no-history and computing states (src/cli/ui/dashboard/burndown-chart.ts)"
+    },
+    {
+      "id": "T085",
+      "done": true,
+      "story": "US7",
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/render-overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "Wire burndown into one-shot (sync), plain series line, and interactive (async via `start`) (src/cli/ui/dashboard/render-overview.ts)"
+    },
+    {
+      "id": "T086",
+      "done": true,
+      "story": "US7",
+      "phase": 8,
+      "parallel": true,
+      "paths": [
+        "test/ui/dashboard-burndown.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Burndown snapshots: wide, narrow, ASCII, plain, no-history, computing — FR-018 (test/ui/dashboard-burndown.test.ts)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": "US6",
+      "phase": 9,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "`--json --overview` object per contract; bare `--json` path untouched — FR-012 (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": "US6",
+      "phase": 9,
+      "parallel": true,
+      "paths": [
+        "test/cli/dashboard-json-overview.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Contract tests: `stories` equals bare `--json`, all members present, filters applied, no ANSI (test/cli/dashboard-json-overview.test.ts)"
+    },
+    {
+      "id": "T100",
+      "done": true,
+      "story": null,
+      "phase": 10,
+      "parallel": true,
+      "paths": [
+        "test/cli/dashboard-perf.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Perf test: perf fixture renders < 1 s incl. burndown — SC-003 (test/cli/dashboard-perf.test.ts)"
+    },
+    {
+      "id": "T101",
+      "done": true,
+      "story": null,
+      "phase": 10,
+      "parallel": true,
+      "paths": [
+        "test/cli/dashboard-readonly.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Read-only test: working tree unchanged after a dashboard run — FR-017 (test/cli/dashboard-readonly.test.ts)"
+    },
+    {
+      "id": "T102",
+      "done": true,
+      "story": null,
+      "phase": 10,
+      "parallel": true,
+      "paths": [
+        "docs/cli-reference.md"
+      ],
+      "pathIssue": null,
+      "description": "Document new default output, `--stories`, `--next`, `--json --overview` (docs/cli-reference.md)"
+    },
+    {
+      "id": "T103",
+      "done": true,
+      "story": null,
+      "phase": 10,
+      "parallel": true,
+      "paths": [
+        "changelog.md"
+      ],
+      "pathIssue": null,
+      "description": "CHANGELOG entry incl. default-output change (CHANGELOG.md)"
+    },
+    {
+      "id": "T104",
+      "done": true,
+      "story": null,
+      "phase": 10,
+      "parallel": false,
+      "paths": [
+        "specs/014-enhanced-dashboard/plan.md"
+      ],
+      "pathIssue": null,
+      "description": "Dogfood on this repo: check SC-001 fold layout at 100×30 and SC-003 timing; record results (specs/014-enhanced-dashboard/plan.md)"
+    },
+    {
+      "id": "T105",
+      "done": true,
+      "story": null,
+      "phase": 10,
+      "parallel": false,
+      "paths": [
+        "package.json"
+      ],
+      "pathIssue": null,
+      "description": "Run `npm run typecheck` and `npm test`; all existing dashboard tests pass unchanged — SC-005 (package.json)"
+    },
+    {
+      "id": "T106",
+      "done": true,
+      "story": null,
+      "phase": 10,
+      "parallel": true,
+      "paths": [
+        "test/cli/dashboard-local-only.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Local-only test: overview + burndown read only `specs/*` and git objects, no network/model access — FR-001, SC-004 (test/cli/dashboard-local-only.test.ts)"
+    },
+    {
+      "id": "T107",
+      "done": true,
+      "story": null,
+      "phase": 10,
+      "parallel": false,
+      "paths": [
+        "specs/014-enhanced-dashboard/plan.md"
+      ],
+      "pathIssue": null,
+      "description": "~~Hallway test with ≥3 users~~ → layout check per revised SC-001: at 100 columns completion, blocked count and next task are in the first 30 rows; results recorded — SC-001 (specs/014-enhanced-dashboard/plan.md)"
+    },
+    {
+      "id": "T108",
+      "done": true,
+      "story": "US6",
+      "phase": 11,
+      "parallel": false,
+      "paths": [
+        "src/core/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "Make the legacy story list skip unreadable spec/tasks files (and report them) so `--json`, `--json --overview`, `--stories` and story detail no longer fail with EISDIR (closes FR-014) (src/core/dashboard.ts)"
+    }
+  ],
+  "015-parallel-lanes": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "test/helpers/tasks-fixture.ts"
+      ],
+      "pathIssue": null,
+      "description": "Fixture builder for tasks.md bodies: phases, [P], multi/no/glob paths, checked lines (test/helpers/tasks-fixture.ts)"
+    },
+    {
+      "id": "T002",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "test/helpers/lane-fixture.ts"
+      ],
+      "pathIssue": null,
+      "description": "Lane git fixture: repo + feature branch + feature worktree, `worktrees: true` config (test/helpers/lane-fixture.ts)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "Extend TaskLine with phase/parallel/paths/pathIssue; parseTasks reads headings and trailing path group (src/core/dashboard.ts)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/lanes.ts"
+      ],
+      "pathIssue": null,
+      "description": "normalizePath + overlaps + lane-name helpers (`laneName`, `parseLaneName`) (src/core/lanes.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/core/lanes.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Unit tests: normalization, overlap prefix rule, lane-name round trip (test/core/lanes.test.ts)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/dashboard.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Regression: existing parse consumers unchanged — dashboard/overview tests still pass (test/dashboard.test.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "test/core/tasks-parse.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Parse tests: single/multi path, backticks, prose parenthetical ignored, path-less and glob flagged, pre-015 tasks.md parses — SC-004 (test/core/tasks-parse.test.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/core/lanes.ts"
+      ],
+      "pathIssue": null,
+      "description": "`declarations(tasks)` over open tasks only — FR-002/015/016 (src/core/lanes.ts)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "src/prompts/tasks.md"
+      ],
+      "pathIssue": null,
+      "description": "Tasks prompt step 4: comma-separated repo-relative paths, dirs end `/`, no globs, [P] only when no overlap in phase (src/prompts/tasks.md)"
+    },
+    {
+      "id": "T023",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "src/templates/tasks.md"
+      ],
+      "pathIssue": null,
+      "description": "Template header line format shows multi-path example (src/templates/tasks.md)"
+    },
+    {
+      "id": "T024",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        ".claude/commands/amby.tasks.md",
+        "test/claude-emitter.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "`ambykit sync` regenerates the tasks command; emitter tests assert the new line (.claude/commands/amby.tasks.md, test/claude-emitter.test.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/core/lanes.ts"
+      ],
+      "pathIssue": null,
+      "description": "`laneConflicts(feature, tasks)`: open tasks, same phase, ≥1 [P], grouped per path, sequencing hint — FR-004/005/006/015 (src/core/lanes.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/core/lane-conflicts.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Conflict tests: seeded collision, disjoint, dir-vs-file, cross-phase, [P]-vs-sequential, done tasks ignored, shared path → one finding — SC-001/002 (test/core/lane-conflicts.test.ts)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/core/analyze.ts"
+      ],
+      "pathIssue": null,
+      "description": "AnalysisReport.lanes + analyzeProject reads tasks per feature (src/core/analyze.ts)"
+    },
+    {
+      "id": "T033",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/analyze.ts"
+      ],
+      "pathIssue": null,
+      "description": "`ambykit analyze`: \"Lane conflicts\" block → exit 1, declarations as warnings, JSON — FR-007 (src/cli/analyze.ts)"
+    },
+    {
+      "id": "T034",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/cli/analyze-lanes.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "CLI e2e: conflict exits 1 naming ids+path; disjoint exits 0; repo's own specs pass — SC-009 (test/cli/analyze-lanes.test.ts)"
+    },
+    {
+      "id": "T035",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/core/lanes-perf.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Perf: 200-task fixture through laneConflicts + planLanes < 200 ms — SC-005 (test/core/lanes-perf.test.ts)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/core/lanes.ts"
+      ],
+      "pathIssue": null,
+      "description": "`planLanes(feature, tasks, {phase, lanes})`: default phase, round-robin, stays, complete/no-parallel/conflict — FR-008/017 (src/core/lanes.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/core/lane-plan.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "planLanes tests: 2 lanes from 5 [P] tasks, n > count clamps, all-done → complete, conflict → refused (test/core/lane-plan.test.ts)"
+    },
+    {
+      "id": "T042",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/core/worktree.ts"
+      ],
+      "pathIssue": null,
+      "description": "`featureWorktrees` excludes lane dirs; `laneWorktrees`; `featureFromWorktreePath` maps lane → feature (src/core/worktree.ts)"
+    },
+    {
+      "id": "T043",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/core/lanes.ts"
+      ],
+      "pathIssue": null,
+      "description": "`mergeCheckoffs(base, ours, theirs)` pure + manifest read/write/drift helpers — FR-019/020 (src/core/lanes.ts)"
+    },
+    {
+      "id": "T044",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/core/lane-merge.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests: adjacent check-offs union, non-checkbox difference → null, CRLF kept, drift ids (test/core/lane-merge.test.ts)"
+    },
+    {
+      "id": "T045",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/lane.ts"
+      ],
+      "pathIssue": null,
+      "description": "`LaneCommand` create: config gate, feature-branch resolution, worktree add per lane, manifest, idempotent, --dry-run/--json — FR-009/011 (src/cli/lane.ts)"
+    },
+    {
+      "id": "T046",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/lane.ts"
+      ],
+      "pathIssue": null,
+      "description": "`lane list` (tasks, paths, clean/dirty/merged, drift) and `lane remove [<lane>] [--force]` keeping branches — FR-010/020 (src/cli/lane.ts)"
+    },
+    {
+      "id": "T047",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/lane.ts"
+      ],
+      "pathIssue": null,
+      "description": "`lane merge <feature> [<lane>]`: clean check, --no-commit merge, check-off auto-resolve, abort on other conflicts — FR-019 (src/cli/lane.ts)"
+    },
+    {
+      "id": "T048",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Register the verb (src/cli/index.ts)"
+    },
+    {
+      "id": "T049",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/cli/lane.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "e2e: two lanes created, each manifest lists only its tasks; second run no-op; conflict → none created; opt-out refused — SC-003 (test/cli/lane.test.ts)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/cli/lane-merge.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "e2e merge: adjacent check-offs merge clean with both ticks; seeded code conflict leaves feature checkout clean — SC-008 (test/cli/lane-merge.test.ts)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "src/prompts/implement.md"
+      ],
+      "pathIssue": null,
+      "description": "Implement prompt: lane manifest scopes the tasks — FR-018 (src/prompts/implement.md)"
+    },
+    {
+      "id": "T052",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "src/core/rules.ts"
+      ],
+      "pathIssue": null,
+      "description": "Rules region: current feature inside `.worktrees/NNN-slug.lane-p-k/` (src/core/rules.ts)"
+    },
+    {
+      "id": "T053",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "test/emitters-region.test.ts",
+        "agents.md"
+      ],
+      "pathIssue": null,
+      "description": "`ambykit sync` + emitter test for implement lane line and rules region (test/emitters-region.test.ts, AGENTS.md)"
+    },
+    {
+      "id": "T060",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/core/checkouts.ts",
+        "src/core/overview-types.ts"
+      ],
+      "pathIssue": null,
+      "description": "resolveCheckouts returns lanes (dirty + merged-into-feature in the concurrent batch); Checkout kind \"lane\" (src/core/checkouts.ts, src/core/overview-types.ts)"
+    },
+    {
+      "id": "T061",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/core/checkouts.ts"
+      ],
+      "pathIssue": null,
+      "description": "FeatureSnapshot.lanes + done-union of lane check-offs into feature progress (src/core/checkouts.ts)"
+    },
+    {
+      "id": "T062",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "test/core/checkouts.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Checkout tests: lanes attached, not treated as features, union counts, no lanes → unchanged (test/core/checkouts.test.ts)"
+    },
+    {
+      "id": "T063",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/worktrees-panel.ts"
+      ],
+      "pathIssue": null,
+      "description": "Lane sub-rows in WORKTREES & AGENTS panel (unicode/ascii, narrow) and plain layout (src/cli/ui/dashboard/worktrees-panel.ts)"
+    },
+    {
+      "id": "T064",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "`--json --overview` adds `lanes` only when present; lane checkouts join allCheckouts for watch + presence (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T065",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "test/ui/dashboard-lanes.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Renderer + JSON tests: per-lane counts match lane tasks.md, byte-identical output without lanes (test/ui/dashboard-lanes.test.ts)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "docs/cli-reference.md"
+      ],
+      "pathIssue": null,
+      "description": "CLI reference: `ambykit lane` and analyze lane conflicts (docs/cli-reference.md)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "docs/workflow.md"
+      ],
+      "pathIssue": null,
+      "description": "Workflow guide \"Parallel lanes\" + task-line path convention (docs/workflow.md)"
+    },
+    {
+      "id": "T092",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/cli/index.mdx",
+        "site/src/content/docs/workflow/tasks.mdx",
+        "site/src/content/docs/workflow/implement.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Site CLI page and workflow page (site/src/content/docs/cli/index.mdx, site/src/content/docs/workflow/tasks.mdx, site/src/content/docs/workflow/implement.mdx)"
+    },
+    {
+      "id": "T093",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "readme.md",
+        "agents.md"
+      ],
+      "pathIssue": null,
+      "description": "README + AGENTS.md project-structure line for the `lane` verb (README.md, AGENTS.md)"
+    },
+    {
+      "id": "T094",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "changelog.md"
+      ],
+      "pathIssue": null,
+      "description": "CHANGELOG Unreleased entry (CHANGELOG.md)"
+    },
+    {
+      "id": "T095",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "test/check-docs-sync.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "FR→test traceability check; `npm run typecheck` + `npm test` + docs-sync — SC-006 (test/check-docs-sync.test.ts)"
+    },
+    {
+      "id": "T096",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        ".amby/config.json"
+      ],
+      "pathIssue": null,
+      "description": "Dogfood: set `worktrees: true`, run `ambykit analyze` clean on this tasks.md, execute two Phase 7 tasks in separate lanes and merge — SC-007 (.amby/config.json)"
+    }
+  ],
+  "016-agent-surface-expansion": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "test/helpers/emit-target.ts"
+      ],
+      "pathIssue": null,
+      "description": "Helper: emit one target into a temp project and return the path→contents map (test/helpers/emit-target.ts)"
+    },
+    {
+      "id": "T002",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "test/emitters-golden.test.ts",
+        "test/fixtures/emitters-golden"
+      ],
+      "pathIssue": null,
+      "description": "Golden test: record every file of the ten existing targets, then assert byte-identical — FR-010, SC-004 (test/emitters-golden.test.ts, test/fixtures/emitters-golden/)"
+    },
+    {
+      "id": "T005",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/emitters/base-emitter.ts"
+      ],
+      "pathIssue": null,
+      "description": "Extract `renderCommand(pairs, notice, body)` hook from commandFile; no output change (src/emitters/base-emitter.ts)"
+    },
+    {
+      "id": "T006",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/emitters/skills-emitter.ts"
+      ],
+      "pathIssue": null,
+      "description": "`SkillsEmitter` abstract (skillName, SKILL.md path, name+description, `$ARGUMENTS`→prose) (src/emitters/skills-emitter.ts)"
+    },
+    {
+      "id": "T007",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/emitters/codex.ts",
+        "src/emitters/copilot-cli.ts"
+      ],
+      "pathIssue": null,
+      "description": "Move Codex and Copilot CLI onto SkillsEmitter; golden test still green (src/emitters/codex.ts, src/emitters/copilot-cli.ts)"
+    },
+    {
+      "id": "T008",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/emit.ts"
+      ],
+      "pathIssue": null,
+      "description": "Collision guard: same path + different contents throws naming both tool ids — FR-007 (src/core/emit.ts)"
+    },
+    {
+      "id": "T009",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/emit-collision.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Guard tests: identical shared output written once; differing output throws (test/emit-collision.test.ts)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "docs/tool-compatibility.md"
+      ],
+      "pathIssue": null,
+      "description": "Matrix: eight new columns, sources, \"Out of scope\" (Amazon Q, Kiro prompts, persona files), live-verify list, `.agents/skills` overlap note — FR-001/002 (docs/tool-compatibility.md)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "specs/016-agent-surface-expansion/research.md"
+      ],
+      "pathIssue": null,
+      "description": "Verify CLI executable names from official install docs; record in research R9 (specs/016-agent-surface-expansion/research.md)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "scripts/check-docs-sync.mjs"
+      ],
+      "pathIssue": null,
+      "description": "docs-sync passes with the new matrix (scripts/check-docs-sync.mjs)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US3",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/emitters/toml-command-emitter.ts"
+      ],
+      "pathIssue": null,
+      "description": "`TomlCommandEmitter`: `# notice`, basic-escaped description, literal `'''` prompt with `\"\"\"` fallback, `{{args}}` (src/emitters/toml-command-emitter.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US3",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/emitters/gemini.ts"
+      ],
+      "pathIssue": null,
+      "description": "GeminiEmitter: `.gemini/commands/amby.<phase>.toml` + GEMINI.md pointer region (src/emitters/gemini.ts)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US3",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/emitters/llxprt.ts"
+      ],
+      "pathIssue": null,
+      "description": "LlxprtEmitter: `.llxprt/commands/amby.<phase>.toml` + LLXPRT.md pointer region (src/emitters/llxprt.ts)"
+    },
+    {
+      "id": "T023",
+      "done": true,
+      "story": "US3",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/emitters/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Register gemini + llxprt targets (src/emitters/index.ts)"
+    },
+    {
+      "id": "T024",
+      "done": true,
+      "story": "US3",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/toml-emitters.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests: paths/keys per matrix, `{{args}}`, escaping (backslash, quotes, `'''` fallback), TOML round-trip parse in test only, prompts contain no `!{`/`@{` (test/toml-emitters.test.ts)"
+    },
+    {
+      "id": "T025",
+      "done": true,
+      "story": "US3",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "specs/016-agent-surface-expansion/research.md"
+      ],
+      "pathIssue": null,
+      "description": "(waived 2026-11-04: Gemini CLI is now enterprise/API only, see research) Manual: load `/amby.specify` in a live Gemini CLI from emitted files; record result — SC-006 (specs/016-agent-surface-expansion/research.md)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "src/emitters/qwen.ts"
+      ],
+      "pathIssue": null,
+      "description": "QwenEmitter: `.qwen/commands/*.md`, description + argument-hint, `$ARGUMENTS`→`{{args}}` (src/emitters/qwen.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "src/emitters/kilo.ts"
+      ],
+      "pathIssue": null,
+      "description": "KiloEmitter: `.kilo/commands/*.md`, description (src/emitters/kilo.ts)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US2",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "src/emitters/augment.ts"
+      ],
+      "pathIssue": null,
+      "description": "AugmentEmitter: `.augment/commands/*.md`, description + argument-hint (src/emitters/augment.ts)"
+    },
+    {
+      "id": "T033",
+      "done": true,
+      "story": "US2",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "src/emitters/windsurf.ts"
+      ],
+      "pathIssue": null,
+      "description": "WindsurfEmitter: `.windsurf/workflows/*.md`, no frontmatter, `$ARGUMENTS`→prose (src/emitters/windsurf.ts)"
+    },
+    {
+      "id": "T034",
+      "done": true,
+      "story": "US2",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/emitters/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Register qwen, kilo, augment, windsurf targets (src/emitters/index.ts)"
+    },
+    {
+      "id": "T035",
+      "done": true,
+      "story": "US2",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/markdown-emitters-016.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests per target: exact file set, keys and nothing else, no rules file (AGENTS.md native), Windsurf files ≤ 12,000 chars (test/markdown-emitters-016.test.ts)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/emitters/kiro.ts"
+      ],
+      "pathIssue": null,
+      "description": "KiroEmitter on SkillsEmitter: `.kiro/skills/amby-<phase>/SKILL.md` (src/emitters/kiro.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/emitters/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Pi target as alias of the Codex emitter; register kiro + pi (src/emitters/index.ts)"
+    },
+    {
+      "id": "T042",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "test/skills-emitters-016.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests: Kiro names match dirs (no dots); Pi alone = Codex files; Pi+Codex written once; dropping one keeps files (test/skills-emitters-016.test.ts)"
+    },
+    {
+      "id": "T043",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/check.ts"
+      ],
+      "pathIssue": null,
+      "description": "`ambykit check` lists owners of shared outputs (src/cli/check.ts)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/interactive/prompt.ts"
+      ],
+      "pathIssue": null,
+      "description": "Selector viewport: scroll with cursor, ↑/↓ more hints, ASCII fallback — FR-013 (src/cli/ui/interactive/prompt.ts)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "test/ui/prompt-viewport.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Selector tests: 18 options in 12 rows, every option reachable, hints correct (test/ui/prompt-viewport.test.ts)"
+    },
+    {
+      "id": "T052",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "src/core/agents.ts"
+      ],
+      "pathIssue": null,
+      "description": "AgentFamily + AGENTS entries for new ids (executables per T011) (src/core/agents.ts)"
+    },
+    {
+      "id": "T053",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "specs/017-live-dashboard/design-tokens.json",
+        "src/cli/ui/dashboard/live-tokens.ts"
+      ],
+      "pathIssue": null,
+      "description": "Glyph, ASCII tag and color per new family, AA contrast row (specs/017-live-dashboard/design-tokens.json, src/cli/ui/dashboard/live-tokens.ts)"
+    },
+    {
+      "id": "T054",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "test/cli/check-targets.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "`ambykit check` e2e per new target: present → clean; hand edit → drift — FR-012 (test/cli/check-targets.test.ts)"
+    },
+    {
+      "id": "T055",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "test/cli/sync-all-targets.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "One-prompt-edit e2e: all 18 targets update via sync, `sync --check` clean — SC-005 (test/cli/sync-all-targets.test.ts)"
+    },
+    {
+      "id": "T056",
+      "done": true,
+      "story": "US5",
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "test/emit-scope.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Every new emitted file is `scope: \"project\"` — FR-008 (test/emit-scope.test.ts)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 8,
+      "parallel": true,
+      "paths": [
+        "readme.md"
+      ],
+      "pathIssue": null,
+      "description": "README supported-assistants list (README.md)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 8,
+      "parallel": true,
+      "paths": [
+        "docs/cli-reference.md",
+        "docs/workflow.md"
+      ],
+      "pathIssue": null,
+      "description": "CLI reference `--tools` ids and workflow guide target list (docs/cli-reference.md, docs/workflow.md)"
+    },
+    {
+      "id": "T092",
+      "done": true,
+      "story": null,
+      "phase": 8,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/cli/compatibility.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Site compatibility page (site/src/content/docs/cli/compatibility.mdx)"
+    },
+    {
+      "id": "T093",
+      "done": true,
+      "story": null,
+      "phase": 8,
+      "parallel": true,
+      "paths": [
+        "changelog.md"
+      ],
+      "pathIssue": null,
+      "description": "CHANGELOG Unreleased entry (CHANGELOG.md)"
+    },
+    {
+      "id": "T094",
+      "done": true,
+      "story": null,
+      "phase": 8,
+      "parallel": false,
+      "paths": [
+        "test/check-docs-sync.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "FR→test traceability; `npm run typecheck` + `npm test` + docs-sync — SC-007 (test/check-docs-sync.test.ts)"
+    }
+  ],
+  "017-live-dashboard": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "test/helpers/worktree-fixture.ts"
+      ],
+      "pathIssue": null,
+      "description": "Worktree fixture: temp repo with `.amby/`, specs on main, `ambykit`-style `.worktrees/<id>` via real `git worktree add`, helpers to tick tasks in a checkout (test/helpers/worktree-fixture.ts)"
+    },
+    {
+      "id": "T002",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": true,
+      "paths": [
+        "test/helpers/dashboard-perf-fixture.ts"
+      ],
+      "pathIssue": null,
+      "description": "Perf fixture variant: 10 worktrees / 50 features for SC-003 (test/helpers/dashboard-perf-fixture.ts)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/overview-types.ts"
+      ],
+      "pathIssue": null,
+      "description": "Types: Checkout, `FeatureSnapshot.checkout`, ActivityMarker, Presence, AgentProcess, LiveState (src/core/overview-types.ts)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/core/features.ts"
+      ],
+      "pathIssue": null,
+      "description": "`readFeatures` sets `checkout: {root, kind: \"main\"}` by default (no output change) (src/core/features.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/dashboard/live-tokens.ts"
+      ],
+      "pathIssue": null,
+      "description": "LIVE_TOKENS mirror of 017 design-tokens.json resolved against 014 tokens (src/cli/ui/dashboard/live-tokens.ts)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/ui/dashboard-live-tokens.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Mirror test for LIVE_TOKENS, plus contrast table presence (test/ui/dashboard-live-tokens.test.ts)"
+    },
+    {
+      "id": "T014",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/capabilities.ts"
+      ],
+      "pathIssue": null,
+      "description": "`Capabilities.icons` (ascii when !unicode, nerd via AMBYKIT_ICONS=nerd, else unicode) + tests (src/cli/ui/capabilities.ts)"
+    },
+    {
+      "id": "T015",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/config.ts"
+      ],
+      "pathIssue": null,
+      "description": "Optional `dashboard: {activeMinutes, idleMinutes}` in config schema + tests (src/core/config.ts)"
+    },
+    {
+      "id": "T016",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/interactive/fullscreen.ts"
+      ],
+      "pathIssue": null,
+      "description": "FullscreenApp: optional `stop()` in cleanup, `resize` redraw, in-place repaint (home + EL per line + ED) (src/cli/ui/interactive/fullscreen.ts)"
+    },
+    {
+      "id": "T017",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "test/ui/interactive-dashboard.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests: stop() runs on q/Ctrl-C/SIGTERM, resize redraws, no `2J` in frames (test/ui/interactive-dashboard.test.ts)"
+    },
+    {
+      "id": "T018",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/agents.ts"
+      ],
+      "pathIssue": null,
+      "description": "AGENTS table keyed by emit-target id (family, executable matchers per C-2) + test that every TARGETS id is covered (src/core/agents.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/core/checkouts.ts"
+      ],
+      "pathIssue": null,
+      "description": "`resolveCheckouts(root)`: primary from `worktreeList()[0]`, feature worktrees, dirty per worktree, merged via one `branch --merged` (src/core/checkouts.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/core/checkouts.ts"
+      ],
+      "pathIssue": null,
+      "description": "Pure `mergeCheckouts(primary, worktrees)`: own-dir override/insert, ignore other copies, re-sort, displayRef collision rule (src/core/checkouts.ts)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "test/core/checkouts.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Unit tests for merge rules: override, worktree-only, ignored copies, collision (test/core/checkouts.test.ts)"
+    },
+    {
+      "id": "T023",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/core/checkouts.ts"
+      ],
+      "pathIssue": null,
+      "description": "`readProjectFeatures(root)` edge: resolve + read each checkout + merge; unreadable worktree → ParseIssue (src/core/checkouts.ts)"
+    },
+    {
+      "id": "T024",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "Dashboard command uses `readProjectFeatures`; `tasksForStory` and burndown take `snapshot.checkout.root` (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T025",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "`--json --overview` adds `checkout` per feature (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T026",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/dashboard/checkout-tag.ts"
+      ],
+      "pathIssue": null,
+      "description": "CheckoutTag/CheckoutBadge widget (unicode/ascii/plain) (src/cli/ui/dashboard/checkout-tag.ts)"
+    },
+    {
+      "id": "T027",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/feature-chart.ts"
+      ],
+      "pathIssue": null,
+      "description": "Feature chart renders the tag column only when any feature is from a worktree (src/cli/ui/dashboard/feature-chart.ts)"
+    },
+    {
+      "id": "T028",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/worktrees-panel.ts"
+      ],
+      "pathIssue": null,
+      "description": "WorktreesPanel (checkout columns only for now) in one-shot overview when worktrees exist (src/cli/ui/dashboard/worktrees-panel.ts)"
+    },
+    {
+      "id": "T029",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "test/cli/dashboard-worktrees.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Integration: from main and from inside a worktree show identical counts; no-worktree output byte-identical to 014 — SC-001, FR-008 (test/cli/dashboard-worktrees.test.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "test/ui/dashboard-worktrees.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Renderer tests: tag + panel in wide/narrow/plain, NO_COLOR, ASCII (test/ui/dashboard-worktrees.test.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "test/cli/dashboard-perf.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Perf: one-shot with 10 worktrees / 50 features < 1 s — SC-003 (test/cli/dashboard-perf.test.ts)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/interactive/live.ts"
+      ],
+      "pathIssue": null,
+      "description": "`watchProject(checkouts, onChange, deps)`: recursive watch of specs/<id> + activity dirs + `.worktrees`, md/marker filter, debounce, poll fallback, `stop()` (src/cli/ui/interactive/live.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/ui/live.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests with injected fs/timers: debounce coalesces bursts, throwing watch → polling, stop() clears all (test/ui/live.test.ts)"
+    },
+    {
+      "id": "T042",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/interactive/overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "Pure `applyData(state, old, next)`: id-stable cursors with clamp, keep input/help, compute `changed` (src/cli/ui/interactive/overview.ts)"
+    },
+    {
+      "id": "T043",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/ui/interactive-overview.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Reducer tests for applyData: removed row clamp, filter text kept, changed keys (test/ui/interactive-overview.test.ts)"
+    },
+    {
+      "id": "T044",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/dashboard/live-indicator.ts"
+      ],
+      "pathIssue": null,
+      "description": "LiveIndicator (watching/polling/paused, ago formatting, clock-skew → now) (src/cli/ui/dashboard/live-indicator.ts)"
+    },
+    {
+      "id": "T045",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/cards.ts"
+      ],
+      "pathIssue": null,
+      "description": "Header meta shows LiveIndicator in interactive mode; ChangedHighlight on changed rows (src/cli/ui/dashboard/cards.ts)"
+    },
+    {
+      "id": "T046",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "Wire interactive(): data as state, watcher → re-read → update(applyData), heartbeat, burndown cache invalidation, `r` retry, resize columns (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T047",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "test/cli/dashboard-live.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Live e2e: open app on fake stdin, tick a worktree task, frame updates within 1 s; non-interactive modes create no watcher — SC-002, FR-017 (test/cli/dashboard-live.test.ts)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/core/activity.ts"
+      ],
+      "pathIssue": null,
+      "description": "Pure marker parse + `presenceOf(markers, tasksMtime, now, thresholds)` (src/core/activity.ts)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/core/activity.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests: corrupt marker ignored, future timestamp clamped, active/idle/stale, several agents → most recent + others (test/core/activity.test.ts)"
+    },
+    {
+      "id": "T052",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/activity.ts"
+      ],
+      "pathIssue": null,
+      "description": "`ambykit activity <feature> --agent= --phase= [--task=]` verb; writes marker + self-ignoring `.gitignore`; never fails the agent (src/cli/activity.ts)"
+    },
+    {
+      "id": "T053",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Register the verb (src/cli/index.ts)"
+    },
+    {
+      "id": "T054",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/cli/activity.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Verb tests: round-trip per tool id, gitignore created, unknown feature warns exit 0 (test/cli/activity.test.ts)"
+    },
+    {
+      "id": "T055",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/emitters/base-emitter.ts"
+      ],
+      "pathIssue": null,
+      "description": "`$AGENT` substitution in `BaseEmitter.commandFile` after transformBody (src/emitters/base-emitter.ts)"
+    },
+    {
+      "id": "T056",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/prompts/implement.md"
+      ],
+      "pathIssue": null,
+      "description": "One-line self-report step in specify/design/plan/tasks/implement/converge; `--task=` on implement step 4 (src/prompts/implement.md)"
+    },
+    {
+      "id": "T057",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "test/emitters"
+      ],
+      "pathIssue": null,
+      "description": "Update emitter snapshot tests for each tool id; run `ambykit sync` for repo tool files (test/emitters)"
+    },
+    {
+      "id": "T058",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/core/agents.ts"
+      ],
+      "pathIssue": null,
+      "description": "Pure `matchAgents(procs, checkouts)`: C-2 matchers, `agent` only with cursor path, cwd containment, unlocated (src/core/agents.ts)"
+    },
+    {
+      "id": "T059",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/core/agents.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Tests for matchAgents incl. self pid excluded and generic `agent` rejected (test/core/agents.test.ts)"
+    },
+    {
+      "id": "T060",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/interactive/agent-scan.ts"
+      ],
+      "pathIssue": null,
+      "description": "Async process scanner per OS (CIM on Windows, ps + lsof on macOS, ps + /proc on Linux), in-flight guard (src/cli/ui/interactive/agent-scan.ts)"
+    },
+    {
+      "id": "T061",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/dashboard/agent-badge.ts"
+      ],
+      "pathIssue": null,
+      "description": "AgentBadge + PresenceLabel (unicode/nerd/ascii, detected `~`, glyph-only narrow, generic) (src/cli/ui/dashboard/agent-badge.ts)"
+    },
+    {
+      "id": "T062",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/worktrees-panel.ts"
+      ],
+      "pathIssue": null,
+      "description": "WorktreesPanel agent/phase/presence columns, ordering, unlocated rows, empty state; agent column in feature chart (src/cli/ui/dashboard/worktrees-panel.ts)"
+    },
+    {
+      "id": "T063",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": false,
+      "paths": [
+        "src/cli/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "One-shot reads markers; interactive heartbeat runs scanner; `--icons=` flag (src/cli/dashboard.ts)"
+    },
+    {
+      "id": "T064",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/ui/dashboard-agents.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Renderer tests for badges/presence in every icon mode and layout (test/ui/dashboard-agents.test.ts)"
+    },
+    {
+      "id": "T065",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "docs/tool-compatibility.md"
+      ],
+      "pathIssue": null,
+      "description": "\"Agent detection\" section with C-2/C-3 sources (docs/tool-compatibility.md)"
+    },
+    {
+      "id": "T070",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/story-detail.ts"
+      ],
+      "pathIssue": null,
+      "description": "StoryDetail screen: TASKS (scroll, elision), RELATIONS (incl. reverse `blocks`), CHECKOUT & AGENT panels (src/cli/ui/dashboard/story-detail.ts)"
+    },
+    {
+      "id": "T071",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/interactive/dashboard.ts"
+      ],
+      "pathIssue": null,
+      "description": "Route detail mode to StoryDetail; remove 006 `detailView`/`listView`; add `detailScroll` (src/cli/ui/interactive/dashboard.ts)"
+    },
+    {
+      "id": "T072",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/dashboard/feature-view.ts"
+      ],
+      "pathIssue": null,
+      "description": "Feature view: CHECKOUT & AGENT panel replaces clarifications slot; one-line clarifications when 0 (src/cli/ui/dashboard/feature-view.ts)"
+    },
+    {
+      "id": "T073",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "src/cli/ui/interactive/overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "4-panel focus cycle with Worktrees & agents; ⏎ opens feature; cursor skips unlocated rows (src/cli/ui/interactive/overview.ts)"
+    },
+    {
+      "id": "T074",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/dashboard/help-overlay.ts"
+      ],
+      "pathIssue": null,
+      "description": "HelpOverlay per screen with glyph legend, dimmed backdrop, swallow closing key (src/cli/ui/dashboard/help-overlay.ts)"
+    },
+    {
+      "id": "T075",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/interactive/overview.ts"
+      ],
+      "pathIssue": null,
+      "description": "FilterInput restyle in the hint row (src/cli/ui/interactive/overview.ts)"
+    },
+    {
+      "id": "T076",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "src/cli/ui/dashboard/empty-state.ts"
+      ],
+      "pathIssue": null,
+      "description": "EmptyState block + no-features / no-match / parse-issue summary states (src/cli/ui/dashboard/empty-state.ts)"
+    },
+    {
+      "id": "T077",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": false,
+      "paths": [
+        "test/ui/dashboard-screens.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Renderer + reducer tests for every screen in wide/narrow/plain, NO_COLOR, ASCII — SC-005 (test/ui/dashboard-screens.test.ts)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "docs/cli-reference.md"
+      ],
+      "pathIssue": null,
+      "description": "Dashboard docs: `--icons`, live mode, worktrees, `activity` verb (docs/cli-reference.md)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "test/cli/dashboard-live.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Long-run test: 30-min simulated heartbeat, no leaked watchers/timers — SC-006 (test/cli/dashboard-live.test.ts)"
+    },
+    {
+      "id": "T092",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "package.json"
+      ],
+      "pathIssue": null,
+      "description": "`npm run typecheck`, `npm test`, `ambykit sync` produces no diff (package.json)"
+    },
+    {
+      "id": "T093",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "specs/017-live-dashboard/tasks.md"
+      ],
+      "pathIssue": null,
+      "description": "Manual hallway test on Windows: worktree + Claude/Codex session visible live (specs/017-live-dashboard/tasks.md)"
+    }
+  ],
+  "018-antigravity-skills-surface": [
+    {
+      "id": "T001",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "specs/018-antigravity-skills-surface"
+      ],
+      "pathIssue": null,
+      "description": "Rebase this branch onto `016-agent-surface-expansion` (R1); confirm `SkillsEmitter` and the guard are present (specs/018-antigravity-skills-surface/)"
+    },
+    {
+      "id": "T002",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "specs/018-antigravity-skills-surface/research.md"
+      ],
+      "pathIssue": null,
+      "description": "Phase 0 research: verify skill frontmatter keys, the CLI slash name a skill gets, and the CLI cutoff scope against Antigravity's docs or a live install (specs/018-antigravity-skills-surface/research.md)"
+    },
+    {
+      "id": "T003",
+      "done": true,
+      "story": null,
+      "phase": 1,
+      "parallel": false,
+      "paths": [
+        "docs/tool-compatibility.md"
+      ],
+      "pathIssue": null,
+      "description": "Update the compatibility matrix first (P4): Antigravity rows to skills, retired workflows and cutoff, the shared-file identity rule, the stale-file opt-in, sources (docs/tool-compatibility.md)"
+    },
+    {
+      "id": "T010",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/emit.ts"
+      ],
+      "pathIssue": null,
+      "description": "Rank shared-file self-report ids `codex` > `antigravity` > `antigravity-cli` in the collision guard, order-independent; unlisted ids keep last-writer-wins (FR-010) (src/core/emit.ts)"
+    },
+    {
+      "id": "T011",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/types.ts",
+        "src/cli/io/fsops.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `protectForeign` to `EmittedFile`, skip existing files lacking the generated notice into `WriteResult.skippedForeign`, export `backupFile` (FR-016) (src/core/types.ts, src/cli/io/fsops.ts)"
+    },
+    {
+      "id": "T012",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/emitters/index.ts"
+      ],
+      "pathIssue": null,
+      "description": "Group `sharedOutputs` by command directory instead of emitter so Antigravity and Codex list as co-owners (FR-008) (src/emitters/index.ts)"
+    },
+    {
+      "id": "T013",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "src/core/legacy.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add pure `legacyWorkflowFiles(root, config)`: known-phase `.agents/workflows/amby.<id>.md` with the generated notice, only when an Antigravity target is selected (FR-005, FR-006) (src/core/legacy.ts)"
+    },
+    {
+      "id": "T014",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": false,
+      "paths": [
+        "src/emitters/skills-emitter.ts"
+      ],
+      "pathIssue": null,
+      "description": "Make `SkillsEmitter` set `protectForeign` on its command files (after T011) (src/emitters/skills-emitter.ts)"
+    },
+    {
+      "id": "T015",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/emit-collision.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test the priority rule: both config orders, codex+antigravity, IDE+CLI, and a real content difference still throws (test/emit-collision.test.ts)"
+    },
+    {
+      "id": "T016",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/apply-foreign.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test the foreign-file guard: foreign file kept and reported, generated file overwritten, dry-run safe (test/apply-foreign.test.ts)"
+    },
+    {
+      "id": "T017",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/shared-outputs.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test `sharedOutputs` by directory, including antigravity with codex and with pi (test/shared-outputs.test.ts)"
+    },
+    {
+      "id": "T018",
+      "done": true,
+      "story": null,
+      "phase": 2,
+      "parallel": true,
+      "paths": [
+        "test/legacy.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test `legacyWorkflowFiles`: generated files found, user workflow and non-phase names ignored, nothing without an Antigravity target (test/legacy.test.ts)"
+    },
+    {
+      "id": "T020",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": false,
+      "paths": [
+        "src/emitters/antigravity.ts",
+        "src/emitters/antigravity-cli.ts"
+      ],
+      "pathIssue": null,
+      "description": "Make `AntigravityEmitter` extend `SkillsEmitter` with `.agents/skills`; no workflow output; update the doc comments (FR-001, FR-002, FR-003) (src/emitters/antigravity.ts, src/emitters/antigravity-cli.ts)"
+    },
+    {
+      "id": "T021",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "test/fixtures/emitters-golden/antigravity.json",
+        "test/fixtures/emitters-golden/antigravity-cli.json"
+      ],
+      "pathIssue": null,
+      "description": "Regenerate the two Antigravity golden fixtures and review the diff is only workflows to skills (test/fixtures/emitters-golden/antigravity.json, test/fixtures/emitters-golden/antigravity-cli.json)"
+    },
+    {
+      "id": "T022",
+      "done": true,
+      "story": "US1",
+      "phase": 3,
+      "parallel": true,
+      "paths": [
+        "test/antigravity-skills-018.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Snapshot test per Antigravity target: paths, `name`/`description` frontmatter, no `$ARGUMENTS`, edit-a-prompt-and-resync (FR-014) (test/antigravity-skills-018.test.ts)"
+    },
+    {
+      "id": "T030",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": false,
+      "paths": [
+        "src/cli/sync.ts"
+      ],
+      "pathIssue": null,
+      "description": "Add `sync --prune-legacy` (back up each stale generated workflow, then delete it), print the stale notice by default, warn on `skippedForeign`, update usage (FR-005, FR-016) (src/cli/sync.ts)"
+    },
+    {
+      "id": "T031",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "src/cli/check.ts"
+      ],
+      "pathIssue": null,
+      "description": "Make `check` report stale generated workflows with the opt-in and foreign-file collisions, without counting stale files as drift (FR-007) (src/cli/check.ts)"
+    },
+    {
+      "id": "T032",
+      "done": true,
+      "story": "US2",
+      "phase": 4,
+      "parallel": true,
+      "paths": [
+        "test/antigravity-migration-018.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "E2E over a project synced with the old release: default keeps files, opt-in removes only generated ones, restore brings one back, a clean project prints nothing (SC-002) (test/antigravity-migration-018.test.ts)"
+    },
+    {
+      "id": "T040",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/antigravity-shared-018.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test shared skills with Codex and Pi: written once, correct identity, deselecting Antigravity keeps the files (FR-008, FR-009, SC-003) (test/antigravity-shared-018.test.ts)"
+    },
+    {
+      "id": "T041",
+      "done": true,
+      "story": "US3",
+      "phase": 5,
+      "parallel": true,
+      "paths": [
+        "test/antigravity-shared-018.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test `check` names every owner of `.agents/skills/` (test/antigravity-shared-018.test.ts)"
+    },
+    {
+      "id": "T050",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "test/emitters-golden.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Assert every non-Antigravity golden fixture is unchanged in `git diff` and the golden suite passes (FR-011, SC-004) (test/emitters-golden.test.ts)"
+    },
+    {
+      "id": "T051",
+      "done": true,
+      "story": "US4",
+      "phase": 6,
+      "parallel": true,
+      "paths": [
+        "test/core/antigravity-identity-018.test.ts"
+      ],
+      "pathIssue": null,
+      "description": "Test both Antigravity ids still resolve to the antigravity family in the dashboard (FR-012) (test/core/antigravity-identity-018.test.ts)"
+    },
+    {
+      "id": "T090",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "readme.md"
+      ],
+      "pathIssue": null,
+      "description": "Antigravity wording in the README (FR-013) (README.md)"
+    },
+    {
+      "id": "T091",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "docs/cli-reference.md"
+      ],
+      "pathIssue": null,
+      "description": "Document `sync --prune-legacy` and the skills surface (FR-013) (docs/cli-reference.md)"
+    },
+    {
+      "id": "T092",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "docs/workflow.md"
+      ],
+      "pathIssue": null,
+      "description": "Update the workflow guide (FR-013) (docs/workflow.md)"
+    },
+    {
+      "id": "T093",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "agents.md"
+      ],
+      "pathIssue": null,
+      "description": "Fix the command-surface line: workflows now only Windsurf (AGENTS.md)"
+    },
+    {
+      "id": "T094",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "site/src/content/docs/cli/compatibility.mdx"
+      ],
+      "pathIssue": null,
+      "description": "Update the site compatibility page (site/src/content/docs/cli/compatibility.mdx)"
+    },
+    {
+      "id": "T095",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": true,
+      "paths": [
+        "changelog.md"
+      ],
+      "pathIssue": null,
+      "description": "CHANGELOG: Changed (Antigravity now skills, guard, shared-id rule) and Added (`--prune-legacy`) (CHANGELOG.md)"
+    },
+    {
+      "id": "T096",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "test"
+      ],
+      "pathIssue": null,
+      "description": "Run `ambykit sync --check`, `npm run typecheck`, full `npm test`, docs-sync; fix drift (SC-006) (test/)"
+    },
+    {
+      "id": "T097",
+      "done": true,
+      "story": null,
+      "phase": 7,
+      "parallel": false,
+      "paths": [
+        "specs/018-antigravity-skills-surface/research.md"
+      ],
+      "pathIssue": null,
+      "description": "(waived 2026-11-04, see research.md) Live check SC-001 on a current Antigravity IDE and CLI, or waive it in writing with the date (specs/018-antigravity-skills-surface/research.md)"
+    }
+  ]
+}

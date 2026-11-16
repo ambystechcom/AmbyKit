@@ -19,9 +19,9 @@ created: 2026-11-16
 
 ## Phase 1 — Setup
 
-- [ ] [T001] Add the baseline test and record its fixture from the UNCHANGED parser: id, done, story, phase, parallel and paths of every task in every repo `specs/*/tasks.md` (SC-002, FR-012); record with `UPDATE_BASELINE=1` before any other task starts (test/tasks-baseline-020.test.ts, test/fixtures/tasks-baseline-020.json)
+- [x] [T001] Add the baseline test and record its fixture from the UNCHANGED parser: id, done, story, phase, parallel and paths of every task in every repo `specs/*/tasks.md` (SC-002, FR-012); record with `UPDATE_BASELINE=1` before any other task starts (test/tasks-baseline-020.test.ts, test/fixtures/tasks-baseline-020.json)
 - **Checkpoint:** the baseline fixture is committed and the test passes on the untouched parser.
-- **Verify:** `npx vitest run test/tasks-baseline-020.test.ts`
+- **Verify:** `npx vitest run test/tasks-baseline-020.test.ts` ✓ passed
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
