@@ -2,7 +2,7 @@
 feature: 024-trace          # NNN-slug
 title: Requirement traceability (trace)
 branch: 024-trace
-status: ready                     # draft | ready | in-progress | blocked | done
+status: in-progress                   # draft | ready | in-progress | blocked | done
 created: 2026-11-12
 ---
 
@@ -33,7 +33,7 @@ As a developer, I want to run one command and see which requirements are covered
   confirm the uncovered one is listed.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a feature whose tests cite requirement IDs in their names (for example `019:FR-004: …`), When
@@ -59,7 +59,7 @@ read without understanding my code.
   is matched.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a test whose name begins with a qualified ID such as `019:FR-004:`, When `trace` reads it, Then
@@ -84,7 +84,7 @@ a change that leaves requirements uncovered.
   exit when a requirement is uncovered and zero when none is.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given `--json`, When `trace` runs, Then the output has a stable, documented shape with covered
@@ -107,7 +107,7 @@ As a team lead, I want coverage per feature shown next to task progress, so that
   fraction and uncovered requirements appear.
 - **depends-on:** [US-1, US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given the dashboard, When a feature has requirements, Then it shows covered over total next to task
@@ -130,7 +130,7 @@ on what the matrix cannot answer, so that gap checks get cheaper and more consis
   begins from the matrix and does not re-derive coverage by reading all tests.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** in-progress
 
 **Acceptance criteria**
 - Given a feature, When `/amby.converge` starts, Then it reads the `trace` result and treats uncovered
@@ -152,7 +152,7 @@ tests, so that planned automated cases that were never written show up.
   missing; one without test design is unaffected.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a feature with test design, When `trace` runs, Then each designed automated case is reported
@@ -170,7 +170,7 @@ changes nothing until I use it.
 - **Independent test:** run every existing command on this repo before and after and compare outputs.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a project that never runs `trace`, When any existing command runs, Then its behavior and output
