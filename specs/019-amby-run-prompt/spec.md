@@ -2,7 +2,7 @@
 feature: 019-amby-run-prompt          # NNN-slug
 title: Amby run (prompt-level pipeline and team protocol)
 branch: 019-amby-run-prompt
-status: ready                     # draft | ready | in-progress | blocked | done
+status: in-progress                     # draft | ready | in-progress | blocked | done
 created: 2026-11-12
 ---
 
@@ -35,7 +35,7 @@ incomplete phase, so that I do not chain phases by hand or restate where I left 
   starts at planning; on one with a half-checked task list, confirm it resumes implementation.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a feature whose spec is `ready` and which has no plan, When the run starts, Then it begins at
@@ -58,7 +58,7 @@ stays focused on coordination and my main context stays small.
   off its own task and reports back a short summary to the lead.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a phase with unblocked tasks, When the lead delegates, Then each worker receives only the task
@@ -89,7 +89,7 @@ Verify line and acceptance criteria actually pass.
   checkpoint and returns the failure to the worker.
 - **depends-on:** [US-2, 020:US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given all tasks in a phase are checked, When QA runs, Then it runs the phase's Verify line and checks
@@ -112,7 +112,7 @@ improves without burning tokens forever.
   IDs, and that after the round limit the run stops and asks a person.
 - **depends-on:** [US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a phase passes QA, When architect review runs, Then it reports findings by stable ID or
@@ -135,7 +135,7 @@ happened and continue, in this assistant or another host.
   resumes the same run with no repeated work.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a run in progress, When a person inspects `.amby/fleet/<run>/`, Then the run's phase, task
@@ -164,7 +164,7 @@ workers avoid stepping on each other and share what matters.
   confirm a note is one line with task ID, files and text.
 - **depends-on:** [US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a worker is about to edit files, When it claims them, Then the claim records the worker, task ID
@@ -187,7 +187,7 @@ without stalling the whole run.
   or forms a squad with one writer per file and a fixed merge order.
 - **depends-on:** [US-6]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given two workers whose claims overlap, When the lead decides, Then it either serializes them or forms
@@ -208,7 +208,7 @@ gracefully, so that I am never blocked by missing features of my assistant.
   roles itself in sequence and says so.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** in-progress
 
 **Acceptance criteria**
 - Given the MCP server is absent, When a run executes, Then every step works from files.
