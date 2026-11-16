@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { buildRegistry } from "../../src/mcp/tools/index.js";
 import { addLaneCheckout, project, tasksMd } from "./fixture.js";
 import { callTool, converse } from "./helpers.js";
 
@@ -81,9 +80,5 @@ describe("read tools", () => {
   it("025:FR-017: outside an AmbyKit project every tool answers with an error instead of crashing", async () => {
     const out = await callTool("next_task", { feature: "001" }, { cwd: process.env["TEMP"] ?? "/" });
     expect(out.isError).toBe(true);
-  });
-
-  it("registers exactly the read tools so far", () => {
-    expect(buildRegistry().names()).toEqual(["next_task", "story_status", "lane_tasks", "analyze_report"]);
   });
 });

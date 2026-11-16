@@ -45,11 +45,11 @@ created: 2026-11-16
 
 ## Phase 4 — User story US-2: change state through one validated path  (priority: P1)
 
-- [ ] [T030] [US2] In-place `tickTask` and `setStoryStatus` that change only the target line under the lock, with tests incl. concurrent writers and re-parse after every write (src/core/tasks-edit.ts, test/core/tasks-edit.test.ts)
-- [ ] [T031] [US2] Write tools `tick_task` and `set_story_status`, with tests (src/mcp/tools/write.ts, src/mcp/tools/index.ts, test/mcp/write-tools.test.ts)
+- [x] [T030] [US2] In-place `tickTask` and `setStoryStatus` that change only the target line under the lock, with tests incl. concurrent writers and re-parse after every write (src/core/tasks-edit.ts, test/core/tasks-edit.test.ts)
+- [x] [T031] [US2] Write tools `tick_task` and `set_story_status`, with tests (src/mcp/tools/write.ts, src/mcp/tools/index.ts, test/mcp/write-tools.test.ts)
 - **Checkpoint:** US-2 is demoable: tick a task and set a status through the tools; an invalid status is refused with the allowed values.
 
-**Verify:** `npx vitest run test/core/tasks-edit.test.ts test/mcp/write-tools.test.ts` passes; a diff of `tasks.md` before and after a tick shows exactly one changed line.
+**Verify:** `npx vitest run test/core/tasks-edit.test.ts test/mcp/write-tools.test.ts` passes; a diff of `tasks.md` before and after a tick shows exactly one changed line. ✓ passed
 
 ## Phase 5 — User story US-3: report activity and receive a directive  (priority: P1)
 
