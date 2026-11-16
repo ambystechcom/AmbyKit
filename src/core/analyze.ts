@@ -12,6 +12,7 @@ import { readFeatures } from "./features.js";
 import type { PhaseVerify } from "./markers.js";
 import { declarations, laneConflicts, type Declaration, type LaneConflict } from "./lanes.js";
 import { checkTestDesign, parseTestDesign, type DesignFinding } from "./test-design.js";
+import { analyzeDecisions, loadDecisions, type DecisionIssue } from "./decisions.js";
 
 export interface GraphIssue {
   kind: "cycle" | "dangling-reference";
@@ -73,6 +74,13 @@ export interface TestDesignReport {
   missing: string[];
 }
 
+/** Feature 022: what `analyze` knows about the decision records (`.amby/decisions/`). */
+export interface DecisionsReport {
+  records: { id: string; title: string; status: string }[];
+  /** Errors (dangling citation, supersede problems, accepted-with-conflict) fail the exit status; warnings do not. */
+  issues: DecisionIssue[];
+}
+
 export interface AnalysisReport {
   total: number;
   issues: GraphIssue[]; // structural errors (cycles, dangling refs)
@@ -94,6 +102,16 @@ export interface AnalysisReport {
    * feature has a `tests.md`, so a project without test design reports exactly what it did before.
    */
   testDesign?: TestDesignReport;
+  /**
+   * Feature 022: decision records and their issues. Present only when records or `ADR-###` citations
+   * exist, so a project without decisions reports exactly what it did before.
+   */
+  decisions?: DecisionsReport;
+}
+
+/** Feature 022: true when decision records have an error-level issue (it joins the exit status). */
+export function hasDecisionErrors(report: AnalysisReport): boolean {
+  return (report.decisions?.issues ?? []).some((i) => i.level === "error");
 }
 
 /** Combined hard dependencies of a story (depends-on ∪ blocked-by), deduped, as local ids. */
@@ -312,5 +330,12 @@ export function analyzeProject(projectRoot: string): AnalysisReport {
   if (markerIssues.length > 0) report.markerIssues = markerIssues;
   if (verifyIssues.length > 0) report.verifyIssues = verifyIssues;
   if (designed > 0) report.testDesign = { findings: designFindings, missing: designMissing };
+  const decisions = loadDecisions(projectRoot);
+  if (decisions.records.length > 0 || decisions.invalid.length > 0 || decisions.citations.length > 0) {
+    report.decisions = {
+      records: decisions.records.map((r) => ({ id: r.id, title: r.title, status: r.status })),
+      issues: analyzeDecisions(decisions),
+    };
+  }
   return report;
 }

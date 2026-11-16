@@ -1,5 +1,5 @@
 import { BaseCommand, flag, type CliOptions } from "./base-command.js";
-import { analyzeProject } from "../core/analyze.js";
+import { analyzeProject, hasDecisionErrors } from "../core/analyze.js";
 import { describeConflict } from "../core/lanes.js";
 
 /**
@@ -18,11 +18,11 @@ export class AnalyzeCommand extends BaseCommand {
 
     if (flag(opts, "json")) {
       this.info(JSON.stringify(report, null, 2));
-      return report.issues.length > 0 || report.lanes.conflicts.length > 0 ? 1 : 0;
+      return report.issues.length > 0 || report.lanes.conflicts.length > 0 || hasDecisionErrors(report) ? 1 : 0;
     }
 
     const conflicts = report.lanes.conflicts;
-    if (report.total === 0 && conflicts.length === 0) {
+    if (report.total === 0 && conflicts.length === 0 && !report.decisions) {
       this.info("No user stories found.");
       return 0;
     }
@@ -100,6 +100,16 @@ export class AnalyzeCommand extends BaseCommand {
       this.info("");
     }
 
+    // Feature 022: decision-record issues. Errors fail the exit status; the section is absent without decisions.
+    if (report.decisions && report.decisions.issues.length > 0) {
+      this.info("Decision records (.amby/decisions/):");
+      for (const i of report.decisions.issues) {
+        if (i.level === "error") this.error(`  [${i.kind}] ${i.message}`);
+        else this.warn(`  [${i.kind}] ${i.message}`);
+      }
+      this.info("");
+    }
+
     this.info(
       report.buildable.length > 0
         ? `Buildable now: ${report.buildable.join(", ")}`
@@ -115,7 +125,7 @@ export class AnalyzeCommand extends BaseCommand {
       this.warn(`Tasks without a usable file path: ${decl.map(label).join(", ")}`);
     }
 
-    if (report.issues.length > 0 || conflicts.length > 0) return 1;
+    if (report.issues.length > 0 || conflicts.length > 0 || hasDecisionErrors(report)) return 1;
     this.success("No cycles, dangling references, or lane conflicts.");
     return 0;
   }
