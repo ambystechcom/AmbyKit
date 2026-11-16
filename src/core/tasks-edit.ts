@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { canonicalStoryId, featureRefOf, parseStories, parseTasks } from "./dashboard.js";
+import { releaseTaskClaims } from "./fleet/claims.js";
 import { withLock, writeFileAtomic } from "./fleet/lock.js";
 import { featureIds } from "./worktree.js";
 
@@ -38,10 +39,10 @@ export interface TickResult {
 
 /**
  * Check off one task: flips `[ ]` to `[x]` on that task's line and nothing else. Unknown and already-checked
- * tasks are refused (FR-003). `afterTick` runs inside the lock once the write has landed (claims are released
- * there, FR-015).
+ * tasks are refused (FR-003). Once the write has landed, the task's file claims are released in the feature's
+ * unfinished runs (FR-015); that never fails the tick.
  */
-export function tickTask(root: string, featureRef: string, taskId: string, afterTick?: (feature: string, task: string) => void): EditResult<TickResult> {
+export function tickTask(root: string, featureRef: string, taskId: string): EditResult<TickResult> {
   const feature = featureDirOf(root, featureRef);
   if (!feature) return fail(`feature '${featureRef}' not found`);
   const file = join(root, "specs", feature, "tasks.md");
@@ -70,7 +71,7 @@ export function tickTask(root: string, featureRef: string, taskId: string, after
     if (!same) return fail(`refused: ticking ${id} would change how ${feature}/tasks.md parses`);
 
     writeFileAtomic(file, next);
-    afterTick?.(feature, id);
+    releaseTaskClaims(root, feature, id);
     return { ok: true, ticked: id, feature };
   });
   return locked.ok ? locked.value : fail(locked.warning);

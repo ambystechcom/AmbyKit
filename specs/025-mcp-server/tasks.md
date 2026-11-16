@@ -89,13 +89,13 @@ created: 2026-11-16
 
 ## Phase 8 — User story US-4: claim files and share notes  (priority: P2)
 
-- [ ] [T080] [P] [US4] Claims store `claims.json` `{path:{worker,task,at}}`: overlap-aware claim, refusal naming the owner, release by task, lock-guarded; 019's `fleet claim|release` wrap it (batch B step 1), with tests (src/core/fleet/claims.ts, test/core/fleet-claims.test.ts)
-- [ ] [T081] [P] [US4] Notes board `notes.log`: one-line `T### | files | text` append, refuse anything else; 019's `fleet note` wraps it (batch B step 1), with tests (src/core/fleet/notes.ts, test/core/fleet-notes.test.ts)
-- [ ] [T082] [US4] `tickTask` releases that task's claims, with tests (src/core/tasks-edit.ts, test/core/tasks-edit.test.ts)
-- [ ] [T083] [US4] Fleet tools `claim_file` and `post_note`, with tests (src/mcp/tools/fleet.ts, src/mcp/tools/index.ts, test/mcp/claim-note-tools.test.ts)
+- [x] [T080] [P] [US4] Claims store `claims.json` `{path:{worker,task,at}}`: overlap-aware claim, refusal naming the owner, release by task, lock-guarded; 019's `fleet claim|release` wrap it (batch B step 1), with tests (src/core/fleet/claims.ts, test/core/fleet-claims.test.ts)
+- [x] [T081] [P] [US4] Notes board `notes.log`: one-line `T### | files | text` append, refuse anything else; 019's `fleet note` wraps it (batch B step 1), with tests (src/core/fleet/notes.ts, test/core/fleet-notes.test.ts)
+- [x] [T082] [US4] `tickTask` releases that task's claims, with tests (src/core/tasks-edit.ts, test/core/tasks-edit.test.ts)
+- [x] [T083] [US4] Fleet tools `claim_file` and `post_note`, with tests (src/mcp/tools/fleet.ts, src/mcp/tools/index.ts, test/mcp/claim-note-tools.test.ts)
 - **Checkpoint:** US-4 is demoable: a second claim on a file is refused with the owner's name; ticking the task frees it.
 
-**Verify:** `npx vitest run test/core/fleet-claims.test.ts test/core/fleet-notes.test.ts test/core/tasks-edit.test.ts test/mcp/claim-note-tools.test.ts` passes.
+**Verify:** `npx vitest run test/core/fleet-claims.test.ts test/core/fleet-notes.test.ts test/core/tasks-edit.test.ts test/mcp/claim-note-tools.test.ts` passes. ✓ passed
 
 ## Phase 9 — User story US-5: know when a lane has stalled  (priority: P2)
 

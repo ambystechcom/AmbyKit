@@ -149,3 +149,33 @@ describe("setStoryStatus", () => {
     expect(setStoryStatus(make(), "001", "US1", "ready")).toMatchObject({ ok: true });
   });
 });
+
+describe("tickTask releases claims (feature 025, FR-015)", () => {
+  it("025:FR-015: ticking a task frees its claims in the feature's unfinished run, and no one else's", async () => {
+    const { createRun } = await import("../../src/core/fleet/runs.js");
+    const { claimFiles, readClaims } = await import("../../src/core/fleet/claims.js");
+    const root = make();
+    const out = createRun(root, "001-alpha");
+    if (!out.ok) throw new Error(out.warning);
+    const run = out.run.run;
+    claimFiles(root, run, { task: "T002", files: ["src/a.ts", "src/b.ts"], worker: "lane-1-1" });
+    claimFiles(root, run, { task: "T003", files: ["src/c.ts"], worker: "lane-1-2" });
+    expect(tickTask(root, "001", "T002")).toMatchObject({ ok: true });
+    expect(Object.keys(readClaims(root, run))).toEqual(["src/c.ts"]);
+  });
+
+  it("025:FR-015: with no run at all the tick still succeeds", () => {
+    expect(tickTask(make(), "001", "T002")).toMatchObject({ ok: true });
+  });
+
+  it("025:FR-015: a refused tick (already checked) leaves the claims alone", async () => {
+    const { createRun } = await import("../../src/core/fleet/runs.js");
+    const { claimFiles, readClaims } = await import("../../src/core/fleet/claims.js");
+    const root = make();
+    const out = createRun(root, "001-alpha");
+    if (!out.ok) throw new Error(out.warning);
+    claimFiles(root, out.run.run, { task: "T001", files: ["src/a.ts"], worker: "w" });
+    expect(tickTask(root, "001", "T001")).toMatchObject({ ok: false }); // T001 is already checked in the fixture
+    expect(Object.keys(readClaims(root, out.run.run))).toEqual(["src/a.ts"]);
+  });
+});
