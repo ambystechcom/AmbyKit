@@ -37,11 +37,11 @@ created: 2026-11-16
 
 ## Phase 3 — User story US-1: ask for state, not files  (priority: P1)
 
-- [ ] [T020] [US1] Query model: next unblocked task, story status with blockers, lane task slice, analyze slice, all capped; "unblocked" and blockers come from `buildable` and `blockersOf` of spec 023's `buildGraph` (023 builds first), with `analyzeGraph` kept only as the interim fallback inside this task; with tests incl. the SC-001 size bound (src/core/query.ts, test/core/query.test.ts)
-- [ ] [T021] [US1] Read tools `next_task`, `story_status`, `lane_tasks`, `analyze_report` registered in the server, with tests (src/mcp/tools/read.ts, src/mcp/tools/index.ts, test/mcp/read-tools.test.ts)
+- [x] [T020] [US1] Query model: next unblocked task, story status with blockers, lane task slice, analyze slice, all capped; "unblocked" and blockers come from `buildable` and `blockersOf` of spec 023's `buildGraph` (023 builds first), with `analyzeGraph` kept only as the interim fallback inside this task; with tests incl. the SC-001 size bound (src/core/query.ts, test/core/query.test.ts)
+- [x] [T021] [US1] Read tools `next_task`, `story_status`, `lane_tasks`, `analyze_report` registered in the server, with tests (src/mcp/tools/read.ts, src/mcp/tools/index.ts, test/mcp/read-tools.test.ts)
 - **Checkpoint:** US-1 is demoable: an assistant gets the next task in under 1 KB without reading `tasks.md`.
 
-**Verify:** `npx vitest run test/core/query.test.ts test/mcp/read-tools.test.ts` passes, including unknown feature, story and lane errors and the "no unblocked task" answer.
+**Verify:** `npx vitest run test/core/query.test.ts test/mcp/read-tools.test.ts` passes, including unknown feature, story and lane errors and the "no unblocked task" answer. ✓ passed
 
 ## Phase 4 — User story US-2: change state through one validated path  (priority: P1)
 
