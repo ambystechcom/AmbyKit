@@ -47,7 +47,7 @@ created: 2026-11-16
 - [ ] [T030] [P] [US2] Report blocked tasks, deviations and marker issues in `AnalysisReport` (new keys only, exit status unchanged) and print them in `ambykit analyze` text and `--json` (FR-009, FR-013) (src/core/analyze.ts, src/cli/analyze.ts)
 - [ ] [T031] [P] [US2] Add `task-blocked` attention items, exclude blocked tasks from *Up next*, and fill `FeatureRow.blocked` (omitted when zero) (FR-010, FR-011) (src/core/overview.ts)
 - [ ] [T032] [P] [US2] Add token entries for the `task-blocked` and `verify-failed` attention kinds in both theme tables, with ASCII symbols (FR-014) (src/cli/ui/dashboard/tokens.ts)
-- [ ] [T033] [P] [US2] Show the blocked count as text in the feature chart row, only when greater than zero (FR-010, FR-014) (src/cli/ui/dashboard/feature-chart.ts)
+- [x] [T033] [P] [US2] Show the blocked count as text in the feature chart row, only when greater than zero (FR-010, FR-014) (src/cli/ui/dashboard/feature-chart.ts)
 - [ ] [T034] [P] [US2] Show a task's BLOCKED reason and DEVIATION note as text in the story detail, no glyph needed (FR-010, FR-014) (src/cli/ui/dashboard/story-detail.ts)
 - [ ] [T035] [US2] Test `analyzeProject`: blocked and deviation findings, markerIssues, exit status unchanged, no new keys populated when there are no markers (FR-009, FR-011) (test/core/analyze-markers.test.ts)
 - [ ] [T036] [US2] Test overview: attention item, Up next exclusion, `FeatureRow.blocked` omitted when zero, filters (FR-010) (test/core/overview-markers.test.ts)
