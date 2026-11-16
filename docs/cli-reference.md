@@ -173,25 +173,31 @@ Detection reads the process list only, never sends anything, and stops when you 
     it reads without color);
   - **Attention** — dependency cycles and unknown references first, then blocked stories (status
     `blocked`, or a `blocked-by` story that is not done), then stories waiting on an unfinished
-    `depends-on`;
+    `depends-on`; then open tasks that carry a `BLOCKED` marker (kind `task-blocked`) and phases
+    whose last recorded Verify result failed (kind `verify-failed`, keyed `<feature>:phase-N`);
   - **Up next** — the next undone tasks whose story is not in Attention (`--next=N`, default 5);
+    tasks carrying a `BLOCKED` marker are left out;
   - **burndown** — remaining vs. done tasks per day/week/month from the git history of `tasks.md`
     (the last column is your working tree); shows "No history available" outside a git repo;
   - **feature completion** — one row per feature with its bar, workflow phase (specified → designed →
     planned → tasked → implementing → done) and open `[NEEDS CLARIFICATION]` count. A feature with no
-    `tasks.md` reads "not planned".
+    `tasks.md` reads "not planned". A feature with open `BLOCKED` tasks shows `N blocked` on its row
+    as plain text, only when N is above zero.
 
   Unreadable files are skipped and named in a notice line. Off a TTY (pipes, CI) the same content is
   printed as plain text.
 - **`--feature=X`** — the feature view for one feature (`X` is its number, e.g. `014`, or its
   directory name): artifacts present, open clarifications, status, the story table with a
-  `Waiting on` column, and Attention / Up next / burndown scoped to the feature.
+  `Waiting on` column, and Attention / Up next / burndown scoped to the feature. The `tasks.md`
+  artifact line ends with `verify <passed>/<total>` when phases carry a `**Verify:**` line, plus
+  `, FAILED phase N` for each phase whose last result failed.
 - **`--status=X`** — narrow every widget to stories with that status.
 - **`--stories`** — the previous story table (`Feat | Story | description | progress | status |
   priority | blocked-by`) with an overall roll-up.
 - **`story-id`** — detail for one story. Story ids **restart per feature**, so a bare `US-3` may
   match several; qualify it with the feature ref as `NNN:US-3` (also accepts `NNN/US-3`). A bare id
-  that matches more than one feature prints the matches so you can pick.
+  that matches more than one feature prints the matches so you can pick. A task row ends with
+  `BLOCKED: <reason>` and `DEVIATION: <note>` when the task line carries those markers.
 - **`--interactive`** — the overview full screen (TTY only): `tab` moves focus between Attention, Up
   next, Worktrees & agents and Feature completion, `↑`/`↓` move, `enter` opens the feature view and,
   from there, the story detail (tasks, relations, checkout and agent). `esc` goes back (on the
@@ -208,7 +214,12 @@ Detection reads the process list only, never sends anything, and stops when you 
 - **`--json --overview`** — one object: `stories` (exactly the `--json` list) plus `summary`,
   `statusCounts`, `features`, `attention`, `upNext`, `burndown`, `issues` and the applied `filters`.
   Each feature has a `checkout`: `{ "kind": "main" }`, or
-  `{ "kind": "worktree", "branch", "dirty", "stale" }`.
+  `{ "kind": "worktree", "branch", "dirty", "stale" }`. A feature also has `blocked` (number of
+  open tasks with a `BLOCKED` marker) and `verify` (`{ "verified", "failed", "missing" }` counts of
+  phases); each key is omitted when it does not apply (`blocked` when zero, `verify` when the
+  feature has no Verify lines). `attention` may contain items of kind `task-blocked` (key
+  `<feature>:<task id>`) and `verify-failed` (key `<feature>:phase-N`, reason `verify failed: <why>`).
+  Bare `--json` is unchanged.
 
 ```bash
 ambykit dashboard
@@ -248,9 +259,25 @@ where at least one is `[P]`, are reported as **Lane conflicts** (by task id and 
 non-zero. Open tasks with no usable path, or a glob, are listed as warnings and do not affect the
 exit code.
 
+Also reports, as warnings only (the exit code never changes), what the task file says about itself:
+
+- **Blocked tasks** — open tasks with a `BLOCKED: <reason>` marker, and **Deviations** — tasks with
+  a `DEVIATION: <note>` marker. A `BLOCKED` marker with no reason, or on a checked task, is a
+  **marker issue**.
+- **Verify** — phases whose last recorded Verify result failed, and phases with no `**Verify:**`
+  line (only for features that still have open tasks, grouped per feature in text). Phases are named
+  `<feature>:phase-N`.
+
+In `--json` these are the keys `blockedTasks` (`feature`, `task`, `story`, `reason`), `deviations`
+(`feature`, `task`, `note`), `markerIssues` (`feature`, `task`, `kind` `missing-reason` or
+`checked-but-blocked`, `message`) and `verifyIssues` (`feature`, `phase`, `title`, `kind` `missing`
+or `failed`, `why` for failed). Each key is absent when it has no entries, so output for a project
+without markers is unchanged.
+
 ```bash
 ambykit analyze
 ambykit analyze --json   # includes lanes.conflicts and lanes.declarations
+                         # plus blockedTasks, deviations, markerIssues, verifyIssues when present
 ```
 
 ## `ambykit check`
