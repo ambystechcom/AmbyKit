@@ -31,15 +31,15 @@ created: 2026-11-16
 
 ## Phase 3 — User stories US-1, US-2, US-3  (priority: P1)
 
-- [ ] [T020] [US1] Extend `/amby.tasks`: write `tests.md` in the same phase, ready-spec gate, one case per criterion incl. negative, vague criteria to `## Flags`, max 15 cases per story (src/prompts/tasks.md)
-- [ ] [T021] [US2] Add the decision rule to the tasks prompt: `auto` by default, `manual:<reason>` only from the fixed list with `verify:` and `record:` (src/prompts/tasks.md)
-- [ ] [T022] [US3] Add ID rules to the tasks prompt: cite `US-n#k` and `FR-###`, `TC-###` max+1 never reused, `## Uncovered` with a reason (either `- FR-###: deliberately uncovered — reason` or `uncovered: FR-### — reason`) (src/prompts/tasks.md)
-- [ ] [T023] [US3] Read each feature's `tests.md` in `analyzeProject` and add `testDesign: { findings, missing }` to the report (src/core/analyze.ts)
-- [ ] [T024] [US3] Print test-design findings only for features that have `tests.md`; keep the exit code unchanged (src/cli/analyze.ts)
-- [ ] [T025] [US3] Test the checker against fixture specs: uncovered FR, unknown ID, more than 15 cases (test/core/test-design-check.test.ts)
-- [ ] [T026] [US3] Test the analyze command output and `--json` shape with a designed feature (test/cli/analyze-test-design.test.ts)
+- [x] [T020] [US1] Extend `/amby.tasks`: write `tests.md` in the same phase, ready-spec gate, one case per criterion incl. negative, vague criteria to `## Flags`, max 15 cases per story (src/prompts/tasks.md)
+- [x] [T021] [US2] Add the decision rule to the tasks prompt: `auto` by default, `manual:<reason>` only from the fixed list with `verify:` and `record:` (src/prompts/tasks.md)
+- [x] [T022] [US3] Add ID rules to the tasks prompt: cite `US-n#k` and `FR-###`, `TC-###` max+1 never reused, `## Uncovered` with a reason (either `- FR-###: deliberately uncovered — reason` or `uncovered: FR-### — reason`) (src/prompts/tasks.md)
+- [x] [T023] [US3] Read each feature's `tests.md` in `analyzeProject` and add `testDesign: { findings, missing }` to the report (src/core/analyze.ts)
+- [x] [T024] [US3] Print test-design findings only for features that have `tests.md`; keep the exit code unchanged (src/cli/analyze.ts)
+- [x] [T025] [US3] Test the checker against fixture specs: uncovered FR, unknown ID, more than 15 cases (test/core/test-design-check.test.ts)
+- [x] [T026] [US3] Test the analyze command output and `--json` shape with a designed feature (test/cli/analyze-test-design.test.ts)
 - **Checkpoint:** US-1, US-2 and US-3 are demoable: tasks prompt produces cases, `analyze` reports coverage.
-- **Verify:** `npx vitest run test/core/test-design-check.test.ts test/cli/analyze-test-design.test.ts` pass and `ambykit analyze` on this worktree reports no findings for `specs/021-test-design/tests.md`.
+- **Verify:** `npx vitest run test/core/test-design-check.test.ts test/cli/analyze-test-design.test.ts` pass and `ambykit analyze` on this worktree reports no findings for `specs/021-test-design/tests.md`. ✓ passed
 
 ## Phase 4 — User story US-7  (priority: P1)
 

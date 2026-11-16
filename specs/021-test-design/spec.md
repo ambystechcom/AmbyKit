@@ -33,7 +33,7 @@ that I know what "done" is checked against and tests are designed, not improvise
   criterion has at least one case.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a spec with acceptance criteria, When test design runs, Then each criterion yields at least one
@@ -56,7 +56,7 @@ automated checks where they pay off and manual checks are explicit instead of fo
   cases say how they are verified.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a test case, When it is designed, Then it is marked either automate or manual, with a one-line
@@ -79,7 +79,7 @@ coverage can be checked without reading prose.
   at least one case or listed as deliberately uncovered.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a test case, When it is written, Then it cites the story ID and, where applicable, the FR ID(s)

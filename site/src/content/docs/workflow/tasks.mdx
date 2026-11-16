@@ -7,7 +7,7 @@ phase: tasks
 order: 7
 command: amby.tasks
 reads: [specs/NNN-slug/plan.md, specs/NNN-slug/spec.md]
-writes: [specs/NNN-slug/tasks.md]
+writes: [specs/NNN-slug/tasks.md, specs/NNN-slug/tests.md]
 ---
 
 import PhaseBadge from "../../../components/PhaseBadge.astro";
@@ -18,7 +18,8 @@ import Artifacts from "../../../components/Artifacts.astro";
 **Tasks** breaks the plan into an ordered checklist grouped **Setup → Foundational → user stories →
 Polish**, gated so no story task starts before Foundational completes. Tasks are ordered by the story
 dependency graph, tagged with their `US-#`, marked `[P]` when parallelizable, and each carries a
-stable `T###` id and a concrete file path.
+stable `T###` id and a concrete file path. In the same phase it also writes `tests.md`, the test design:
+one case per acceptance criterion, decided before any code is written.
 
 ## File ownership
 
@@ -37,7 +38,7 @@ may share or nest one of its paths. `ambykit analyze` checks this and exits non-
 
 <Artifacts
   reads={["specs/NNN-slug/plan.md", "specs/NNN-slug/spec.md"]}
-  writes={["specs/NNN-slug/tasks.md"]}
+  writes={["specs/NNN-slug/tasks.md", "specs/NNN-slug/tests.md"]}
 />
 
 Checked boxes (`- [x]`) are the source of truth for `ambykit dashboard`.

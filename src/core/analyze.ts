@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import {
   computeDashboard,
   displayKey,
@@ -9,6 +11,7 @@ import {
 import { readFeatures } from "./features.js";
 import type { PhaseVerify } from "./markers.js";
 import { declarations, laneConflicts, type Declaration, type LaneConflict } from "./lanes.js";
+import { checkTestDesign, parseTestDesign, type DesignFinding } from "./test-design.js";
 
 export interface GraphIssue {
   kind: "cycle" | "dangling-reference";
@@ -57,6 +60,19 @@ export interface VerifyIssue {
   why?: string;
 }
 
+/** Feature 021: a test-design finding with the feature it belongs to. */
+export interface TestDesignFinding extends DesignFinding {
+  feature: string; // display ref of the feature
+}
+
+/** Feature 021: what `analyze` knows about the features' `tests.md` files. */
+export interface TestDesignReport {
+  /** Findings per feature that has a `tests.md` (non-blocking: they never change the exit status). */
+  findings: TestDesignFinding[];
+  /** Display refs of features with a `spec.md` but no `tests.md`. JSON only; never printed. */
+  missing: string[];
+}
+
 export interface AnalysisReport {
   total: number;
   issues: GraphIssue[]; // structural errors (cycles, dangling refs)
@@ -73,6 +89,11 @@ export interface AnalysisReport {
   markerIssues?: MarkerIssue[];
   /** Feature 020: phases with no Verify line (features not yet done) or a failed last Verify. Present only when any (warnings only). */
   verifyIssues?: VerifyIssue[];
+  /**
+   * Feature 021: test-design findings and the features that have none. Present only when at least one
+   * feature has a `tests.md`, so a project without test design reports exactly what it did before.
+   */
+  testDesign?: TestDesignReport;
 }
 
 /** Combined hard dependencies of a story (depends-on ∪ blocked-by), deduped, as local ids. */
@@ -249,6 +270,23 @@ function collectVerifyIssues(feature: string, tasks: TaskLine[], verify: PhaseVe
   }
 }
 
+/**
+ * Feature 021: check one feature's `tests.md` against its `spec.md`. Returns false when the feature has no
+ * `tests.md` (nothing is reported for it here). A file that cannot be read counts as absent.
+ */
+function collectTestDesign(root: string, dir: string, ref: string, out: TestDesignFinding[]): boolean {
+  const designPath = join(root, "specs", dir, "tests.md");
+  if (!existsSync(designPath)) return false;
+  try {
+    const design = parseTestDesign(readFileSync(designPath, "utf8"));
+    const spec = readFileSync(join(root, "specs", dir, "spec.md"), "utf8");
+    for (const f of checkTestDesign(spec, design)) out.push({ feature: ref, ...f });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** Convenience: analyze a project by reading its specs/. */
 export function analyzeProject(projectRoot: string): AnalysisReport {
   const report = analyzeGraph(computeDashboard(projectRoot));
@@ -256,7 +294,12 @@ export function analyzeProject(projectRoot: string): AnalysisReport {
   const deviations: DeviationNote[] = [];
   const markerIssues: MarkerIssue[] = [];
   const verifyIssues: VerifyIssue[] = [];
+  const designFindings: TestDesignFinding[] = [];
+  const designMissing: string[] = [];
+  let designed = 0;
   for (const f of readFeatures(projectRoot).features) {
+    if (collectTestDesign(projectRoot, f.dir, f.displayRef, designFindings)) designed += 1;
+    else designMissing.push(f.displayRef);
     if (f.tasks === null) continue;
     report.lanes.conflicts.push(...laneConflicts(f.dir, f.tasks));
     report.lanes.declarations.push(...declarations(f.dir, f.tasks));
@@ -268,5 +311,6 @@ export function analyzeProject(projectRoot: string): AnalysisReport {
   if (deviations.length > 0) report.deviations = deviations;
   if (markerIssues.length > 0) report.markerIssues = markerIssues;
   if (verifyIssues.length > 0) report.verifyIssues = verifyIssues;
+  if (designed > 0) report.testDesign = { findings: designFindings, missing: designMissing };
   return report;
 }

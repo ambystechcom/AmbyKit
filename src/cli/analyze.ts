@@ -90,6 +90,16 @@ export class AnalyzeCommand extends BaseCommand {
       }
     }
 
+    // Feature 021: test-design findings, only for features that have a tests.md. Non-blocking (exit
+    // status unchanged); features without one are listed only under `testDesign.missing` in --json.
+    if (report.testDesign && report.testDesign.findings.length > 0) {
+      this.info("Test design findings (tests.md):");
+      for (const f of report.testDesign.findings) {
+        this.warn(`  ${f.feature} — ${f.kind}${f.line ? ` (line ${f.line})` : ""}: ${f.message}`);
+      }
+      this.info("");
+    }
+
     this.info(
       report.buildable.length > 0
         ? `Buildable now: ${report.buildable.join(", ")}`

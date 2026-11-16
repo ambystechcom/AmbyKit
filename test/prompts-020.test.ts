@@ -70,7 +70,8 @@ describe("spec 020 prompt contract: implement", () => {
 describe("spec 020 prompt contract: tasks prompt and template", () => {
   it("FR-005, FR-015: /amby.tasks emits exactly one plain-text Verify line per phase", () => {
     expect(tasksPrompt).toMatch(/exactly ONE `\*\*Verify:\*\*` line/);
-    expect(tasksPrompt.length).toBeLessThan(2200);
+    // 2200 until spec 021 added its test-design steps (about 700 characters); still a cap, so growth stays visible.
+    expect(tasksPrompt.length).toBeLessThan(3000);
   });
 
   it("FR-005, FR-015: the template ends every phase with a Verify line and documents the markers and result suffix", () => {

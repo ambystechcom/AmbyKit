@@ -6,7 +6,7 @@ argument-hint: "[feature id, defaults to current]"
 phase: tasks
 role: tech-lead
 reads: [specs/NNN-slug/plan.md, specs/NNN-slug/spec.md]
-writes: [specs/NNN-slug/tasks.md]
+writes: [specs/NNN-slug/tasks.md, specs/NNN-slug/tests.md]
 allowedTools: [read, write, edit]
 ---
 
@@ -27,5 +27,10 @@ Run `ambykit activity <feature> --agent=$AGENT --phase=tasks` first, with that f
    same phase shares or nests a path.
 5. End every phase with exactly ONE `**Verify:**` line, plain text after its tasks: a runnable check
    or observable condition that proves the phase works (e.g. a test command). Never more than one.
+6. Also write `tests.md` (the test design) in this phase per `@.amby/templates/tests.md`, touching only `tasks.md`
+   and `tests.md`. If `spec.md` is not `status: ready`, skip it and say the spec must be ready first. One case per
+   acceptance criterion (negative and edge ones too, max 15 per story); one too vague to test goes under `## Flags`.
+7. Cases are `auto` unless a fixed-list reason makes them manual (add `verify:` and `record:`). Each cites its `US-n#k`
+   and `FR-###`s; `TC-###` is highest + 1, never reused. An FR with no case goes under `## Uncovered` with a reason.
 
 Do not start implementing. Keep descriptions to one line each.
