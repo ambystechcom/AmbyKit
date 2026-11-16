@@ -91,10 +91,10 @@ created: 2026-11-16
 
 ## Phase 8 — User story US-8  Existing projects keep working (priority: P1)
 
-- [ ] [T080] [US8] BATCH STEP (run after merging, not in a lane branch): test that a project with no `plugins` key produces byte-identical `sync` output and never imports the loader (test/plugins/no-plugins-regression.test.ts)
+- [x] [T080] [US8] BATCH STEP (run after merging, not in a lane branch): test that a project with no `plugins` key produces byte-identical `sync` output and never imports the loader (test/plugins/no-plugins-regression.test.ts)
 - **Checkpoint:** US-8 holds.
 
-**Verify:** `npm test` passes in full, and `ambykit sync --check` reports no diff for this repo's own tool files.
+**Verify:** `npm test` passes in full, and `ambykit sync --check` reports no diff for this repo's own tool files. ? unverified: npm test passes except the 10 emitters-golden tests, which fail only on 019's pending re-record; sync --check differs by 019's three files. Emitted bytes for all 18 targets (183 files, MCP on) are identical to 019's tip when both commits are built from git archive. Rerun both in the integration batch
 
 ## Phase 9 — User story US-5  Keep the core lean (priority: P2)
 
