@@ -44,13 +44,13 @@ created: 2026-11-16
 
 ## Phase 4 — User story US-3  (priority: P1)
 
-- [ ] [T040] [US3] `runnable()`, runner listing with capabilities, refusal reasons (Principle 4) (src/core/runners.ts, test/core/runners.test.ts)
-- [ ] [T041] [US3] Headless-runner section in the compatibility matrix: claude and codex rows, all `unverified` (docs/tool-compatibility.md)
-- [ ] [T042] [US3] Doc-sync test: registry and matrix rows agree; an unverified row is never runnable (test/runners-doc-sync.test.ts)
-- [ ] [T043] [US3] Wire `--runners` listing and refusal; report a version mismatch and stop the lane when a verified runner fails immediately (src/cli/run.ts, test/cli/run-runners.test.ts)
+- [x] [T040] [US3] `runnable()`, runner listing with capabilities, refusal reasons (Principle 4) (src/core/runners.ts, test/core/runners.test.ts)
+- [x] [T041] [US3] Headless-runner section in the compatibility matrix: claude and codex rows, all `unverified` (docs/tool-compatibility.md)
+- [x] [T042] [US3] Doc-sync test: registry and matrix rows agree; an unverified row is never runnable (test/runners-doc-sync.test.ts)
+- [x] [T043] [US3] Wire `--runners` listing and refusal; report a version mismatch and stop the lane when a verified runner fails immediately (src/cli/run.ts, test/cli/run-runners.test.ts)
 - [ ] [T044] [US3] MANUAL: verify Claude Code headless invocation, prompt delivery, exit behaviour and usage reporting on a live install; record version; mark verified (src/core/runners.ts, docs/tool-compatibility.md)
 - [ ] [T045] [US3] MANUAL: same for Codex (src/core/runners.ts, docs/tool-compatibility.md)
-- **Verify:** `npm run typecheck && npx vitest run test/core/runners.test.ts test/runners-doc-sync.test.ts test/cli/run-runners.test.ts && node scripts/check-docs-sync.mjs`; T044/T045 pass only when each runner's recorded command ran a real lane task on this machine.
+- **Verify:** `npm run typecheck && npx vitest run test/core/runners.test.ts test/runners-doc-sync.test.ts test/cli/run-runners.test.ts && node scripts/check-docs-sync.mjs`; T044/T045 pass only when each runner's recorded command ran a real lane task on this machine. ? unverified: the tests pass, but T044 and T045 need a live install and the docs-sync check needs the polish tasks (T120-T123).
 - **Checkpoint:** US-3 is demoable; the 1.6 runnable list is exactly Claude Code and Codex, and only after T044/T045 (SC-006).
 
 ## Phase 5 — User story US-2  (priority: P1)

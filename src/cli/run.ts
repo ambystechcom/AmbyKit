@@ -7,7 +7,7 @@ import { fleetSettings, loadConfig, type FleetSettings } from "../core/config.js
 import { primaryRoot } from "../core/checkouts.js";
 import { refusals, type LaunchEntry } from "../core/run-launch-plan.js";
 import { laneRefs, type LaneRef } from "../core/query.js";
-import { RUNNERS, type RunnerSpec } from "../core/runners.js";
+import { RUNNERS, listRunners, type RunnerSpec } from "../core/runners.js";
 import { resolveBudgets, type Budgets } from "../core/run-supervise.js";
 import { featureDirOf } from "../core/tasks-edit.js";
 
@@ -180,8 +180,19 @@ export class RunCommand extends BaseCommand {
     };
   }
 
-  protected listRunnerRows(_opts: CliOptions): number {
-    for (const r of this.deps.registry) this.info(`${r.id}\t${r.verified ? "verified" : "unverified"}`);
+  /** `--runners`: the headless runners, what each can do and why a refused one is refused (FR-006, FR-007). */
+  protected listRunnerRows(opts: CliOptions): number {
+    const rows = listRunners(this.deps.registry);
+    if (flag(opts, "json")) {
+      console.log(JSON.stringify(rows));
+      return 0;
+    }
+    this.info("Headless runners (experimental). Only a verified runner can be launched.");
+    for (const r of rows) {
+      const status = r.verified ? `verified${r.verifiedVersion ? ` (${r.verifiedVersion})` : ""}` : "unverified";
+      this.info(`  ${r.id}  ${r.label}  ${status}  usage ${r.reportsUsage ? "reported" : "not reported"}  ${r.runnable ? "runnable" : "not runnable"}`);
+      if (r.reason) this.info(`    ${r.reason}`);
+    }
     return 0;
   }
 

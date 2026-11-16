@@ -195,6 +195,23 @@ currently affect only the worktree tag, which uses Octicons `oct-git_branch` U+F
 Unicode in every mode: the brand glyphs (`cod-claude` U+EC82, `cod-openai` U+EC81) only arrived in
 recent Nerd Fonts (present in v3.5.1), and older installs render them as empty boxes.
 
+## Headless runners (`ambykit run`, feature 028, experimental)
+
+`ambykit run` launches one assistant per lane without a person at the keyboard. Only a **verified** runner is
+ever launched (Principle 4); the registry in `src/core/runners.ts` and this table carry the same rows, and a
+test keeps them equal. A row becomes `verified` only after its command has run a real lane task on a live
+install (the manual tasks T044 and T045 of spec 028), with the CLI version recorded.
+
+| Runner | Command (prompt on stdin) | Exit behaviour | Reports usage | Status | Version |
+| --- | --- | --- | --- | --- | --- |
+| `claude` | `claude -p` | 0 = finished its turn; non-zero = failed | no | unverified | — |
+| `codex` | `codex exec -` | 0 = finished; non-zero = failed | no | unverified | — |
+
+To confirm on a live install, per runner: the non-interactive flag, how the prompt is delivered (stdin, an
+argument or a file), the permission or sandbox flags a headless edit needs, the exit codes, and whether usage
+is reported (a token ceiling is enforced only for runners that report it). Until then `ambykit run --runners`
+lists the runner as not runnable and `ambykit run <feature> --yes` refuses it with this reason.
+
 ## To verify against a live install
 
 Docs conflicted on a couple of points; confirm before shipping those emitters:

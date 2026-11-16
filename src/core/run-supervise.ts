@@ -93,3 +93,13 @@ export function mustTerminate(input: { stopRequestedAt: number; lastReportAt: nu
   const last = Math.max(input.stopRequestedAt, input.lastReportAt ?? 0);
   return input.now - last > input.graceMinutes * 60_000;
 }
+
+// --- immediate failure (US-3 AC3) ---------------------------------------------------------
+
+/** A verified runner that exits non-zero within this many seconds of starting is a command/version mismatch. */
+export const FAST_FAILURE_SECONDS = 15;
+
+/** True when a lane's process died at once with an error: the runner's recorded command no longer works. */
+export function isImmediateFailure(input: { code: number | null; ranMs: number }): boolean {
+  return input.code !== 0 && input.ranMs < FAST_FAILURE_SECONDS * 1000;
+}
