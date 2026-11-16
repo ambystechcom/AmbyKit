@@ -27,4 +27,8 @@ Run `ambykit activity <feature> --agent=$AGENT --phase=implement` first, with th
    story's tasks are done, set that story's `status: done` in `spec.md` (or `in-progress` while
    partway). Don't rewrite untouched sections. After each checked task, run
    `ambykit activity <feature> --agent=$AGENT --phase=implement --task=T###` (ignore errors).
-5. Report what you did and the next unblocked task. Stop at a story checkpoint for review.
+5. At a phase checkpoint, run that phase's `**Verify:**` check before passing it (no Verify line: say so
+   and continue). Write the result at the end of that line, replacing any earlier one: `✓ passed`,
+   `✗ failed: <why>` or `? unverified`. Never pass the checkpoint on a failure: fix it and run again. If
+   you cannot run the check, ask a person to run or confirm it and record `? unverified`.
+6. Report what you did and the next unblocked task. Stop at a story checkpoint for review.
