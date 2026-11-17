@@ -2,7 +2,7 @@
 feature: 028-ambykit-run          # NNN-slug
 title: ambykit run (headless lane orchestration)
 branch: 028-ambykit-run
-status: ready                     # draft | ready | in-progress | blocked | done
+status: in-progress                   # draft | ready | in-progress | blocked | done
 created: 2026-11-12
 ---
 
@@ -39,7 +39,7 @@ without my approval.
   commands and exits without starting anything.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a feature with prepared lanes, When `ambykit run` is invoked without `--yes`, Then it prints the
@@ -60,7 +60,7 @@ configured targets, so that lanes progress in parallel without my attention.
   runs in its own worktree and checks off its own tasks.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a feature with N lanes and configured targets, When the run starts, Then one headless assistant
@@ -84,7 +84,7 @@ changed flag in an upstream tool cannot cause a silent misrun.
   and names why.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** in-progress
 
 **Acceptance criteria**
 - Given an assistant with a verified runner recorded in the compatibility matrix, When a lane is
@@ -109,7 +109,7 @@ assistant does not stall the whole feature.
   and restarted.
 - **depends-on:** [US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a lane in state working, When it has no activity report and no change in its task list for the
@@ -134,7 +134,7 @@ conflicts reach me only when real.
   and the second pauses for a person.
 - **depends-on:** [US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a lane whose tasks are all checked off, When it finishes, Then it is merged using the existing
@@ -154,7 +154,7 @@ As a developer, I want limits on time, tasks and tokens, so that an unattended r
 - **Independent test:** set a very low wall-clock budget and confirm the run stops and reports it.
 - **depends-on:** [US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a wall-clock budget, When it is exceeded, Then the run stops launching work, asks running lanes
@@ -178,7 +178,7 @@ work before the next story starts.
   it is approved.
 - **depends-on:** [US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a story whose tasks and verification pass, When its checkpoint is reached, Then the run stops
@@ -200,7 +200,7 @@ processes by hand.
   request.
 - **depends-on:** [US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a running lane, When a person pauses it (through spec 025's directive writer or CLI verb), Then
@@ -220,7 +220,7 @@ As a developer, I want headless lanes to get the same QA, architect review, revi
   the bounded review loop exactly as in spec 019.
 - **depends-on:** [US-2, 019:US-3, 019:US-4]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a headless lane whose phase finishes, When QA runs, Then it runs the phase's Verify line and
