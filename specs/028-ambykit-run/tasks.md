@@ -63,9 +63,9 @@ created: 2026-11-16
 
 ## Phase 6 — User story US-4  (priority: P1)
 
-- [ ] [T060] [US4] Supervisor: read markers, `tasks.md` mtime and liveness through spec 025's `laneStatus`; stop and restart with work preserved; pause at the restart limit; reassign only on approval (src/cli/run-supervisor.ts, test/cli/run-supervisor.test.ts)
-- [ ] [T061] [US4] Wire the supervisor into the tick loop; keep the stall limit separate from the dashboard idle limit (src/cli/run.ts, test/cli/run-stall.test.ts)
-- **Verify:** `npm run typecheck && npx vitest run test/cli/run-supervisor.test.ts test/cli/run-stall.test.ts` — a hanging fake lane is restarted within stall limit plus one tick (SC-003), paused after two restarts.
+- [x] [T060] [US4] Supervisor: read markers, `tasks.md` mtime and liveness through spec 025's `laneStatus`; stop and restart with work preserved; pause at the restart limit; reassign only on approval (src/cli/run-supervisor.ts, test/cli/run-supervisor.test.ts)
+- [x] [T061] [US4] Wire the supervisor into the tick loop; keep the stall limit separate from the dashboard idle limit (src/cli/run.ts, test/cli/run-stall.test.ts)
+- **Verify:** `npm run typecheck && npx vitest run test/cli/run-supervisor.test.ts test/cli/run-stall.test.ts` — a hanging fake lane is restarted within stall limit plus one tick (SC-003), paused after two restarts. ✓ passed
 - **Checkpoint:** US-4 is demoable.
 
 ## Phase 7 — User story US-5  (priority: P1)

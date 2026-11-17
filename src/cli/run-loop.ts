@@ -1,6 +1,6 @@
 import { updateRun } from "../core/fleet/index.js";
 import { enforceBudgets, meter, stopAll } from "./run-budget.js";
-import { applyDirectives, heldByDirective } from "./run-control.js";
+import { applyDirectives, applyReassignments, heldByDirective } from "./run-control.js";
 import { afterPhase } from "./run-gates.js";
 import { launchQueued, running } from "./run-launch.js";
 import { mergeReady } from "./run-merger.js";
@@ -55,6 +55,7 @@ export class Supervisor {
     noteAdoptedExits(s);
     collectExits(s);
     applyDirectives(s);
+    applyReassignments(s);
     superviseStalls(s);
     enforceStopGrace(s);
     advanceReviews(s, this.review);

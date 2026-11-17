@@ -5,7 +5,7 @@ import { buildLaunchPlan, laneOpenTasks, nextRunId } from "./run-plan.js";
 import { emitScripts } from "./run-script.js";
 import { fleetSettings, loadConfig, type FleetSettings } from "../core/config.js";
 import { readRun, updateRun, type RunLane } from "../core/fleet/index.js";
-import { approveGate, rejectGate } from "../core/run-gate-actions.js";
+import { approveGate, approveReassign, rejectGate } from "../core/run-gate-actions.js";
 import { acquireRunLock, bootstrapRun, openRun, readLaneFile, releaseRunLock, writeLaneFile, type LaneFile } from "./run-files.js";
 import { Supervisor, superviseRun, type Outcome } from "./run-loop.js";
 import type { LaneRuntime, Session } from "./run-session.js";
@@ -69,7 +69,7 @@ export class RunCommand extends BaseCommand {
   readonly name = "run";
   readonly summary = "(experimental) Run a feature's prepared lanes headless: print, launch, supervise, merge.";
   readonly usage =
-    "ambykit run <feature> [--yes] [--emit-script] [--assistant=<id,id>] [--unattended] [--max-minutes=N] [--max-tasks=N] [--max-tokens=N] [--continue-run=<run>] [--json] | --runners | approve|reject <run> [--reason=<text>]";
+    "ambykit run <feature> [--yes] [--emit-script] [--assistant=<id,id>] [--unattended] [--max-minutes=N] [--max-tasks=N] [--max-tokens=N] [--continue-run=<run>] [--json] | --runners | approve|reject <run> [--gate=<id>] [--reason=<text>] | approve <run> --reassign=<lane>:<assistant>";
 
   protected readonly deps: RunDeps;
 
@@ -320,6 +320,22 @@ export class RunCommand extends BaseCommand {
       return 1;
     }
     const reason = stringFlag(opts, "reason");
+    const reassign = stringFlag(opts, "reassign");
+    if (reassign) {
+      // FR-009: a lane moves to another assistant only with a person's approval, recorded here.
+      const [lane, to] = reassign.split(":");
+      if (verb !== "approve" || !lane || !to) {
+        this.error("Use: ambykit run approve <run> --reassign=<lane>:<assistant>");
+        return 1;
+      }
+      const moved = approveReassign(root, run, lane, to, "person");
+      if (!moved.ok) {
+        this.error(moved.error);
+        return 1;
+      }
+      this.success(`Approved moving ${lane} of ${run} to ${to}; the run applies it on its next check.`);
+      return 0;
+    }
     const gate = stringFlag(opts, "gate");
     const input = { ...(gate ? { gate } : {}), ...(reason ? { reason } : {}), by: "person" };
     const out = verb === "approve" ? approveGate(root, run, input) : rejectGate(root, run, input);

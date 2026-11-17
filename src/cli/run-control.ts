@@ -1,4 +1,6 @@
-import { laneStatus, readDirective } from "../core/fleet/index.js";
+import { laneStatus, readDirective, readRun, updateRun } from "../core/fleet/index.js";
+import { reassignGate } from "../core/run-supervise.js";
+import { runnable } from "../core/runners.js";
 import { isFailed } from "../core/query.js";
 import { event, isRunning, save, type Session } from "./run-session.js";
 
@@ -47,6 +49,43 @@ export function applyDirectives(s: Session): void {
       event(s, "resumed", rt, "continue directive");
       s.say(`${rt.file.lane}: resumed`);
     }
+  }
+}
+
+/**
+ * FR-009: a lane moves to a different assistant only when a person approved it. A paused lane with a
+ * `reassign` approval newer than its pause goes back in the queue on the approved assistant (if that assistant
+ * has a verified runner), with its restarts reset. Without an approval nothing here ever changes an assistant.
+ */
+export function applyReassignments(s: Session): void {
+  const rec = readRun(s.root, s.run);
+  if (!rec) return;
+  for (const rt of s.lanes) {
+    if (rt.file.status !== "paused") continue;
+    const approval = [...rec.approvals]
+      .reverse()
+      .map((a) => a as { kind?: string; lane?: string; to?: string; at?: string } | null)
+      .find((a) => a?.kind === "reassign" && a.lane === rt.file.lane && a.to && a.at && (!rt.file.pausedAt || Date.parse(a.at) > Date.parse(rt.file.pausedAt)));
+    if (!approval?.to) continue;
+    const gate = reassignGate(rec.approvals, rt.file.lane, approval.to);
+    if (!gate.allowed) continue;
+    const can = runnable(approval.to, s.registry);
+    if (!can.ok) {
+      s.say(`${rt.file.lane}: cannot move to ${approval.to}: ${can.reason}`);
+      continue;
+    }
+    const from = rt.assistant;
+    rt.assistant = approval.to;
+    rt.file.assistant = approval.to;
+    rt.file.restarts = 0;
+    rt.file.status = "queued";
+    delete rt.file.reason;
+    delete rt.file.pausedAt;
+    save(s, rt);
+    const lanes = rec.lanes.map((l) => (l.lane === rt.ref.name ? { ...l, assistant: approval.to!, restarts: 0 } : l));
+    updateRun(s.root, s.run, { lanes, status: "active", needsDecision: false });
+    event(s, "reassigned", rt, `${from} to ${approval.to}, approved by a person`);
+    s.say(`${rt.file.lane}: moved from ${from} to ${approval.to} (approved)`);
   }
 }
 

@@ -56,7 +56,14 @@ export function superviseStalls(s: Session): void {
     if (rt.stopAskedMs !== undefined) continue; // stopping: the stop grace handles it
     const st = laneStatus(s.root, { feature: s.feature, lane: rt.file.lane, run: s.run, now: s.now() });
     if (isFailed(st)) continue;
-    const decision = restartDecision({ stalled: st.stalled, restarts: rt.file.restarts, limit: s.settings.restartLimit });
+    // 025's `laneStatus` is the one idle measure. Two things it cannot know: a lane that never reported is
+    // `unreported` (never stalled there), and a lane's files may be older than this process. So a lane is
+    // stalled here when 025 says so, or has never reported and is idle past the same limit, and only once this
+    // process has itself been running that long.
+    const idleStalled = st.stalled || (st.state === "unreported" && (st.idleMinutes ?? 0) >= st.stallMinutes);
+    const sinceStart = rt.startedMs === undefined ? Infinity : (s.now() - rt.startedMs) / 60_000;
+    const stalled = idleStalled && sinceStart >= st.stallMinutes;
+    const decision = restartDecision({ stalled, restarts: rt.file.restarts, limit: s.settings.restartLimit });
     if (decision === "none") continue;
     stopProcess(s, rt, "SIGTERM");
     if (decision === "restart") {

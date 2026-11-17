@@ -93,6 +93,17 @@ export function lastDecision(rec: RunRecord, gateId: string): { decision: "appro
   return null;
 }
 
+/** FR-009: a person approves moving a lane to another assistant. Recorded in `approvals[]`; the loop acts on it. */
+export function approveReassign(root: string, run: string, lane: string, to: string, by = "person", now = new Date()): GateResult | { ok: true; run: RunRecord } | { ok: false; error: string } {
+  const rec = readRun(root, run);
+  if (!rec) return { ok: false, error: `run '${run}' not found` };
+  const short = lane.slice(lane.lastIndexOf(".lane-") + 1).replace(/^(\d)/, "lane-$1");
+  const known = rec.lanes.find((l) => l.lane.slice(l.lane.lastIndexOf(".lane-") + 1) === short);
+  if (!known) return { ok: false, error: `run ${run} has no lane '${lane}'; lanes: ${rec.lanes.map((l) => l.lane.slice(l.lane.lastIndexOf(".lane-") + 1)).join(", ") || "none"}` };
+  const out = updateRun(root, run, { approvals: [...rec.approvals, { kind: "reassign", lane: short, to, by, at: now.toISOString() }] });
+  return out.ok ? { ok: true, run: out.run } : { ok: false, error: out.warning };
+}
+
 /** Record that a run needs a person (a conflict, a restart limit, a review that never converged). */
 export function escalate(root: string, run: string, record: Record<string, unknown>): void {
   const rec = readRun(root, run);
