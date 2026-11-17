@@ -40,8 +40,15 @@ export function applyDirectives(s: Session): void {
       continue;
     }
 
-    // continue: a lane paused earlier than this directive goes back in the queue (no restart is counted)
-    if (rt.file.status === "paused" && (!rt.file.pausedAt || Date.parse(directive.at) > Date.parse(rt.file.pausedAt))) {
+    // continue: a lane paused earlier than this directive goes back in the queue (no restart is counted). A
+    // lane whose review never converged (`escalated`) is a person's decision too: `resume` gives it a fresh
+    // set of review rounds.
+    const waiting = rt.file.status === "paused" || rt.file.status === "escalated";
+    if (waiting && (!rt.file.pausedAt || Date.parse(directive.at) > Date.parse(rt.file.pausedAt))) {
+      if (rt.file.status === "escalated") {
+        rt.file.failedRounds = 0;
+        rt.round = 1;
+      }
       rt.file.status = "queued";
       delete rt.file.reason;
       delete rt.file.pausedAt;

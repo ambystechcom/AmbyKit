@@ -86,6 +86,7 @@ function judge(s: Session, rt: LaneRuntime): void {
     s.say(`${rt.file.lane}: ${role} review failed (${step.findings.join(", ")}); back to the worker`);
   } else if (step.kind === "escalate") {
     rt.file.status = "escalated";
+    rt.file.pausedAt = new Date(s.now()).toISOString();
     rt.file.failedRounds = step.failedRounds;
     rt.file.reason = step.reason;
     save(s, rt);

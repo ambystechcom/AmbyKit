@@ -98,11 +98,11 @@ created: 2026-11-16
 
 ## Phase 11 — User story US-9  (priority: P2)
 
-- [ ] [T110] [P] [US9] Review-loop state machine: rounds from `fleet.roundLimit`, spec 019's verdict contract (`verdicts/<lane>.<role>.<round>.json`, `{verdict: pass|fail, findings: [{id, severity, finding, fix}]}`), escalation at the limit (src/core/run-review.ts, test/core/run-review.test.ts)
-- [ ] [T111] [P] [US9] Role-job prompts for QA and architect: role file by `@` reference plus the phase's `Verify:` line (src/core/run-prompt.ts, test/core/run-prompt.test.ts)
-- [ ] [T112] [US9] Protocol runner: launch QA and architect jobs as processes, return finding IDs to the same lane's worker, release claims at check-off through spec 025's claim helpers (src/cli/run-protocol.ts, test/cli/run-protocol.test.ts)
-- [ ] [T113] [US9] Wire the protocol before merge so a failing Verify never merges (src/cli/run.ts, test/cli/run-team.test.ts)
-- **Verify:** `npm run typecheck && npx vitest run test/core/run-review.test.ts test/core/run-prompt.test.ts test/cli/run-protocol.test.ts test/cli/run-team.test.ts` — a failing Verify line is never merged and the loop ends within the round limit (SC-009).
+- [x] [T110] [P] [US9] Review-loop state machine: rounds from `fleet.roundLimit`, spec 019's verdict contract (`verdicts/<lane>.<role>.<round>.json`, `{verdict: pass|fail, findings: [{id, severity, finding, fix}]}`), escalation at the limit (src/core/run-review.ts, test/core/run-review.test.ts)
+- [x] [T111] [P] [US9] Role-job prompts for QA and architect: role file by `@` reference plus the phase's `Verify:` line (src/core/run-prompt.ts, test/core/run-prompt.test.ts)
+- [x] [T112] [US9] Protocol runner: launch QA and architect jobs as processes, return finding IDs to the same lane's worker, release claims at check-off through spec 025's claim helpers (src/cli/run-protocol.ts, test/cli/run-protocol.test.ts)
+- [x] [T113] [US9] Wire the protocol before merge so a failing Verify never merges (src/cli/run.ts, test/cli/run-team.test.ts)
+- **Verify:** `npm run typecheck && npx vitest run test/core/run-review.test.ts test/core/run-prompt.test.ts test/cli/run-protocol.test.ts test/cli/run-team.test.ts` — a failing Verify line is never merged and the loop ends within the round limit (SC-009). ✓ passed
 - **Checkpoint:** US-9 is demoable.
 
 ## Phase 12 — Polish

@@ -257,3 +257,10 @@ export async function phasedProject(feature: string, phases: PhasePlan[]): Promi
   }
   return p;
 }
+
+/** Merge `patch` into `.amby/config.json` (before a run is created, so the run record picks it up). */
+export function configure(root: string, patch: Record<string, unknown>): void {
+  const file = join(root, ".amby", "config.json");
+  const cfg = JSON.parse(readFileSync(file, "utf8")) as Record<string, unknown>;
+  writeFileSync(file, JSON.stringify({ ...cfg, ...patch }) + "\n");
+}
