@@ -39,11 +39,10 @@ describe("plugin API versioning (feature 027)", () => {
     expect(readFileSync(join(ROOT, "docs", "plugin-api.md"), "utf8")).toMatch(/Experimental in 1\.6/);
   });
 
-  it("027:FR-012: the changelog carries the [plugin-api] convention and an unreleased entry", () => {
+  it("027:FR-012: the changelog carries the [plugin-api] convention and a [plugin-api] entry", () => {
     const log = readFileSync(join(ROOT, "CHANGELOG.md"), "utf8");
-    const unreleased = log.slice(log.indexOf("## [Unreleased]"), log.indexOf("\n## [", log.indexOf("## [Unreleased]") + 1));
-    expect(unreleased).toMatch(/^- `\[plugin-api\]`/m);
-    expect(log.slice(0, log.indexOf("## [Unreleased]"))).toMatch(/\[plugin-api\]/);
+    expect(log).toMatch(/^- `\[plugin-api\]`/m);
+    expect(log.slice(0, log.indexOf("## ["))).toMatch(/\[plugin-api\]/);
   });
 
   it("027:FR-012: the release checklist asks whether plugins are affected", () => {

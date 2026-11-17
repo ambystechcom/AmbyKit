@@ -14,6 +14,8 @@ Every release states whether plugins are affected, with such a line or with "Plu
 
 ## [Unreleased]
 
+## [1.5.0] — 2026-11-16
+
 ### Added
 
 - `[plugin-api]` Emitter plugins (feature 027, **experimental** until 2.0): list a package named
@@ -51,6 +53,8 @@ Every release states whether plugins are affected, with such a line or with "Plu
   two lanes of one assistant no longer overwrite each other. Without the flags the marker is unchanged.
 
 ## [1.4.0] — 2026-11-16
+
+Plugins: not affected.
 
 ### Added
 
