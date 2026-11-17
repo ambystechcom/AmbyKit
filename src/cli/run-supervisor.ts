@@ -1,4 +1,4 @@
-import { laneStatus, readRun, updateRun, type RunLane } from "../core/fleet/index.js";
+import { laneStatus, readDirective, readRun, updateRun, type RunLane } from "../core/fleet/index.js";
 import { isFailed } from "../core/query.js";
 import { escalate } from "../core/run-gate-actions.js";
 import { isImmediateFailure, mustTerminate, restartDecision } from "../core/run-supervise.js";
@@ -34,6 +34,12 @@ export function collectExits(s: Session): void {
       // asked to stop (a directive or a budget): the exit is the obeying, not a failure
       rt.file.status = "stopped";
       event(s, "stopped", rt, `${open.length} task(s) left open`);
+    } else if (pauseOrStop(s, rt)) {
+      // a worker that ends its turn after a pause or stop directive is obeying it, not failing (FR-016)
+      const d = pauseOrStop(s, rt)!;
+      rt.file.status = d.action === "stop" ? "stopped" : "paused";
+      rt.file.pausedAt = d.at;
+      event(s, "exited", rt, `after a ${d.action} directive, ${open.length} task(s) open`);
     } else if (isImmediateFailure({ code: exit.code, ranMs })) {
       rt.file.status = "failed";
       rt.file.reason = `the ${rt.assistant} command exited at once with code ${exit.code ?? "none"}; its recorded command may no longer match the installed version (see docs/tool-compatibility.md)`;
@@ -47,6 +53,12 @@ export function collectExits(s: Session): void {
     }
     save(s, rt);
   }
+}
+
+/** The lane's pause or stop directive, when it has one: the reason its process ending is not a failure. */
+function pauseOrStop(s: Session, rt: LaneRuntime): { action: "pause" | "stop"; at: string } | null {
+  const d = readDirective(s.root, s.run, rt.file.lane);
+  return d && (d.action === "pause" || d.action === "stop") ? { action: d.action, at: d.at } : null;
 }
 
 /** Detect stalled workers and restart them or pause them at the restart limit (FR-008, FR-009, FR-010). */

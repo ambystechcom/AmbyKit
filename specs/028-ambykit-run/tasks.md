@@ -91,9 +91,9 @@ created: 2026-11-16
 
 ## Phase 10 — User story US-8  (priority: P2)
 
-- [ ] [T100] [US8] Control: read directives each tick through spec 025's directive reader and write pause/resume/stop only through its `writeDirective` / `ambykit directive` (short lane form in file names), apply at the lane's next report (finish the current task first), record obeyed (src/cli/run-control.ts, test/cli/run-control.test.ts)
-- [ ] [T101] [US8] `--continue-run <run>` (not `--resume`, which clashes with the `resume` directive), SIGINT/SIGTERM save-and-exit, and a test that a second host (the `/amby.run` prompt of spec 019 or the dashboard) reads the same pause/resume/stop state (src/cli/run.ts, test/cli/run-resume.test.ts)
-- **Verify:** `npm run typecheck && npx vitest run test/cli/run-control.test.ts test/cli/run-resume.test.ts` — pause then resume from a new process repeats no completed task (SC-005).
+- [x] [T100] [US8] Control: read directives each tick through spec 025's directive reader and write pause/resume/stop only through its `writeDirective` / `ambykit directive` (short lane form in file names), apply at the lane's next report (finish the current task first), record obeyed (src/cli/run-control.ts, test/cli/run-control.test.ts)
+- [x] [T101] [US8] `--continue-run <run>` (not `--resume`, which clashes with the `resume` directive), SIGINT/SIGTERM save-and-exit, and a test that a second host (the `/amby.run` prompt of spec 019 or the dashboard) reads the same pause/resume/stop state (src/cli/run.ts, test/cli/run-resume.test.ts)
+- **Verify:** `npm run typecheck && npx vitest run test/cli/run-control.test.ts test/cli/run-resume.test.ts` — pause then resume from a new process repeats no completed task (SC-005). ✓ passed
 - **Checkpoint:** US-8 is demoable; all directive writes go through spec 025's writer.
 
 ## Phase 11 — User story US-9  (priority: P2)

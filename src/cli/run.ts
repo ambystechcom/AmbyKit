@@ -270,7 +270,7 @@ export class RunCommand extends BaseCommand {
 
   private printPlan(ctx: RunContext): void {
     const { settings, budgets } = ctx;
-    this.info(`Run plan for ${ctx.feature} — run ${ctx.run} (experimental)`);
+    this.info(ctx.continueRun ? `Continuing run ${ctx.run} of ${ctx.feature} (experimental)` : `Run plan for ${ctx.feature} — run ${ctx.run} (experimental)`);
     this.info(
       `Lanes: ${ctx.lanes.length} · assistants: ${[...new Set(ctx.plan.map((e) => e.assistant))].join(", ")} · caps: ${settings.concurrency.total} at once, ${settings.concurrency.perType} per assistant`,
     );
