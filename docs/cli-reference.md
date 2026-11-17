@@ -94,6 +94,26 @@ your edits are kept), warns when a role in `.amby/roles/` exceeds 150 words, and
 when two roles share an id. Projects with roles get one native sub-agent per role for Claude Code,
 OpenCode, and Copilot.
 
+**Plugins (experimental).** `plugins` in `.amby/config.json` maps an `ambykit-emitter-*` package to the exact
+version installed in the project's own `node_modules`; `sync` (and `check` and `add`) load only those, then
+emit their targets like built-in ones:
+
+```json
+{ "tools": ["claude", "mytool"], "plugins": { "ambykit-emitter-mytool": "1.0.0" } }
+```
+
+`sync` prints each loaded plugin as `name@version` and an experimental note. A plugin that is missing,
+mis-pinned, outside the plugin-API range, malformed, or that clashes with another target is reported by name
+and skipped; the other targets still sync and `sync` exits **1**. A plugin file outside the project is refused;
+a file in the home directory needs `--include-user` and is never part of `--check`. Without a `plugins` key
+nothing is loaded and output is unchanged. A configured target that moved to a plugin gets a notice naming the
+package (none have moved yet). See [`plugin-api.md`](./plugin-api.md), [`plugin-trust.md`](./plugin-trust.md)
+and [`plugin-split.md`](./plugin-split.md).
+
+Plugin authors test with `@ambystech/ambykit/testkit` (`checkEmitterContract`, `assertEmitterContract`, and the
+`createPluginApi` helper), which checks an emitter's paths and frontmatter keys against a matrix row; a missing
+row fails. The plugin API itself is `@ambystech/ambykit/plugin`.
+
 ## `ambykit restore [file]`
 
 Recover an agent-doc file (`AGENTS.md`, `CLAUDE.md`, a tool's rules file) from the timestamped backup

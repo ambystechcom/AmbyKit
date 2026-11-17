@@ -7,6 +7,11 @@ import { buildEmittedFiles, mcpUnwritten } from "../core/emit.js";
 import { loadConfig } from "../core/config.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
 import { loadRoles, validateRoles } from "../core/roles.js";
+import type { TargetRegistry } from "../plugins/registry.js";
+import { movedTargetNotices } from "../core/moved-targets.js";
+import { getTarget } from "../emitters/index.js";
+import { loadPluginSession } from "../plugins/session.js";
+import { reportPlugins } from "../plugins/report.js";
 
 export class SyncCommand extends BaseCommand {
   readonly name = "sync";
@@ -38,9 +43,19 @@ export class SyncCommand extends BaseCommand {
       return 1;
     }
 
+    // Plugins (feature 027): only the packages listed in config are loaded, and never when none are listed.
+    // A plugin that fails is reported and the other targets still sync, but the run exits 1 (FR-004).
+    const session = await loadPluginSession(root, config);
+    const plugins = reportPlugins(session);
+    for (const line of plugins.info) this.info(line);
+    for (const line of plugins.errors) this.error(line);
+    const pluginStatus = plugins.errors.length > 0 ? 1 : 0;
+    // A configured target that moved to a plugin: say which package to install; remove nothing (FR-014).
+    for (const notice of movedTargetNotices(config.tools, (id) => getTarget(id, session?.registry) !== undefined)) this.warn(notice);
+
     const spin = this.spinner();
     spin.start(this.dryRun || checkOnly ? "Checking what would change…" : "Emitting tool files…");
-    const files = buildEmittedFiles(root, config);
+    const files = buildEmittedFiles(root, config, session?.registry);
     const result = applyFiles(root, files, {
       dryRun: this.dryRun || checkOnly,
       includeUser: includeUser && !checkOnly, // user-level files never take part in the in-sync check (025 FR-018)
@@ -57,20 +72,20 @@ export class SyncCommand extends BaseCommand {
         return 1;
       }
       this.success(`In sync (${result.unchanged.length} file(s) checked).`);
-      return 0;
+      return pluginStatus;
     }
 
     const changed = this.dryRun ? result.wouldChange : result.written;
     this.success(`${this.dryRun ? "Would sync" : "Synced"} ${changed.length} file(s).`);
     this.printSummary(result);
-    this.printMcpGaps(config);
+    this.printMcpGaps(config, session?.registry);
     this.handleLegacyWorkflows(root, legacyWorkflowFiles(root, config), flag(opts, "prune-legacy"));
-    return 0;
+    return pluginStatus;
   }
 
   /** With `mcp.enabled`, say which enabled targets get no MCP config and why (feature 025, FR-018). */
-  private printMcpGaps(config: ReturnType<typeof loadConfig>): void {
-    const gaps = mcpUnwritten(config);
+  private printMcpGaps(config: ReturnType<typeof loadConfig>, registry?: TargetRegistry): void {
+    const gaps = mcpUnwritten(config, registry);
     if (gaps.length === 0) return;
     this.warn(`MCP server config not written for ${gaps.length} enabled target(s):`);
     for (const g of gaps) this.info(`  ~ ${g.tool}: ${g.reason}`);

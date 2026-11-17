@@ -1,0 +1,26 @@
+[
+  {
+    "target": "example",
+    "commandSurface": "commands",
+    "commandDir": ".example/commands",
+    "fileTemplate": "amby.<phase>.md",
+    "frontmatterKeys": ["description"],
+    "sourceUrl": "https://example.invalid/docs/commands (invented for this example)"
+  },
+  {
+    "target": "example-skills",
+    "commandSurface": "skills",
+    "commandDir": ".example/skills",
+    "fileTemplate": "amby-<phase>/SKILL.md",
+    "frontmatterKeys": ["name", "description"],
+    "sourceUrl": "https://example.invalid/docs/skills (invented for this example)"
+  },
+  {
+    "target": "example-toml",
+    "commandSurface": "commands",
+    "commandDir": ".example/toml",
+    "fileTemplate": "amby.<phase>.toml",
+    "frontmatterKeys": ["description", "prompt"],
+    "sourceUrl": "https://example.invalid/docs/toml (invented for this example)"
+  }
+]

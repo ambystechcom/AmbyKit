@@ -8,10 +8,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Release notes with full detail live on the
 [GitHub releases page](https://github.com/ambystechcom/AmbyKit/releases).
 
+Plugin authors: a line that starts with `[plugin-api]` changes the plugin API or something plugins depend on.
+Every release states whether plugins are affected, with such a line or with "Plugins: not affected."
+(see `docs/plugin-api.md`).
+
 ## [Unreleased]
 
 ### Added
 
+- `[plugin-api]` Emitter plugins (feature 027, **experimental** until 2.0): list a package named
+  `ambykit-emitter-<name>` with an exact version under `plugins` in `.amby/config.json`, and `ambykit sync`
+  loads it from the project's own `node_modules` and emits its targets like built-in ones. Nothing unlisted,
+  unpinned or version-mismatched is ever loaded; a plugin that fails is reported by name, the other targets
+  still sync, and `sync` exits 1. Plugin files must stay inside the project; files in the home directory need
+  `--include-user`. Authors import `BaseEmitter`, `SkillsEmitter` and `TomlCommandEmitter` from
+  `@ambystech/ambykit/plugin`, declare `"ambykit": { "pluginApi": "^1" }`, and test against their host's
+  matrix row with `@ambystech/ambykit/testkit`. Projects with no `plugins` key behave exactly as before. No
+  built-in target moves to a plugin in this release. Plugins: this is the first release of the API.
 - `/amby.run` (feature 019): the 13th phase. The assistant you call it from is the lead: it starts worker
   subagents (`amby-worker`, write-capable; the review roles stay read-only), gives each only its task IDs, file
   ownership and artifacts by reference, then runs QA (the phase's Verify line, acceptance criteria and the

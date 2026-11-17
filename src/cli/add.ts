@@ -5,6 +5,8 @@ import { loadConfig, saveConfig } from "../core/config.js";
 import { getTarget, TARGETS } from "../emitters/index.js";
 import { multiSelect } from "./ui/interactive/prompt.js";
 import { toolOptions } from "./ui/tool-options.js";
+import { loadPluginSession } from "../plugins/session.js";
+import { reportPlugins } from "../plugins/report.js";
 
 export class AddCommand extends BaseCommand {
   readonly name = "add";
@@ -13,7 +15,12 @@ export class AddCommand extends BaseCommand {
 
   protected async execute(opts: CliOptions): Promise<number> {
     const root = this.projectRoot(opts.cwd);
-    const available = `Available: ${TARGETS.map((t) => t.id).join(", ")}`;
+    // A plugin target is accepted only when its plugin loads (feature 027, FR-003, FR-006).
+    const config = loadConfig(root);
+    const session = await loadPluginSession(root, config);
+    const registry = session?.registry;
+    for (const line of reportPlugins(session).errors) this.warn(line);
+    const available = `Available: ${(registry?.targets ?? TARGETS).map((t) => t.id).join(", ")}`;
     let targets = opts.positionals;
     if (targets.length === 0) {
       if (!this.caps.isTTY) {
@@ -23,7 +30,7 @@ export class AddCommand extends BaseCommand {
       }
       const picked = await multiSelect(this.caps, {
         message: "Select tools to add",
-        options: toolOptions(),
+        options: toolOptions(registry),
       });
       if (picked === null || picked.length === 0) {
         this.warn("Nothing selected.");
@@ -31,20 +38,19 @@ export class AddCommand extends BaseCommand {
       }
       targets = picked;
     }
-    const unknown = targets.filter((t) => !getTarget(t));
+    const unknown = targets.filter((t) => !getTarget(t, registry));
     if (unknown.length > 0) {
       this.error(`Unknown target(s): ${unknown.join(", ")}`, available);
       return 1;
     }
 
-    const config = loadConfig(root);
     const merged = Array.from(new Set([...config.tools, ...targets]));
     config.tools = merged;
     if (!this.dryRun) saveConfig(root, config);
 
     const spin = this.spinner();
     spin.start(this.dryRun ? "Checking what would change…" : "Emitting tool files…");
-    const files = buildEmittedFiles(root, config);
+    const files = buildEmittedFiles(root, config, registry);
     const result = applyFiles(root, files, { dryRun: this.dryRun, includeUser: false });
     spin.stop();
 

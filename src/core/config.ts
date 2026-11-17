@@ -28,6 +28,7 @@ const configSchema = z.object({
       workerModel: z.string().optional(),
     })
     .optional(),
+  plugins: z.record(z.string(), z.string()).optional(),
   trace: z
     .object({
       roots: z.array(z.string()).optional(),

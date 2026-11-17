@@ -4,14 +4,16 @@ import { loadCommandSpecs } from "./command-spec.js";
 import { buildAgentsMd } from "./rules.js";
 import { loadRoles } from "./roles.js";
 import { loadWorkerAgent } from "./subagents.js";
-import { emittersForTargets } from "../emitters/index.js";
+import { emittersForTargets, type TargetSource } from "../emitters/index.js";
+import type { TargetRegistry } from "../plugins/registry.js";
+import { escapesProject } from "./path-guard.js";
 
 /**
  * Build the full set of files to emit for a project's configured tools. The shared AGENTS.md is
  * added once here; each emitter contributes its own commands and tool-specific rules (e.g. Claude's
  * CLAUDE.md bridge). When `manageRules` is false, only command files are produced.
  */
-export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): EmittedFile[] {
+export function buildEmittedFiles(projectRoot: string, config: AmbyConfig, registry?: TargetRegistry): EmittedFile[] {
   const specs = loadCommandSpecs();
   const manageRules = config.manageRules !== false;
   const projectName = basename(projectRoot);
@@ -40,10 +42,11 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
   // real conflict and fails loudly, naming both tools.
   const owners = new Map<string, { owner: string; index: number }>();
   files.forEach((f, index) => owners.set(f.path, { owner: "rules", index }));
-  for (const emitter of emittersForTargets(config.tools)) {
+  for (const emitter of emittersForTargets(config.tools, registry)) {
     // MCP setup is opt-in (feature 025): without `mcp.enabled` nothing is asked of the emitter, so output is unchanged.
-    const emitted = config.mcp?.enabled ? [...emitter.emit(specs, ctx), ...emitter.mcpFiles(ctx)] : emitter.emit(specs, ctx);
+    const emitted = config.mcp?.enabled && typeof emitter.mcpFiles === "function" ? [...emitter.emit(specs, ctx), ...emitter.mcpFiles(ctx)] : emitter.emit(specs, ctx);
     for (const file of emitted) {
+      assertInsideProject(file, emitter.toolId, registry);
       const seen = owners.get(file.path);
       if (!seen) {
         owners.set(file.path, { owner: emitter.toolId, index: files.length });
@@ -62,7 +65,7 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
         continue;
       }
       throw new Error(
-        `Output collision at ${file.path}: '${seen.owner}' and '${emitter.toolId}' emit different contents.`,
+        `Output collision at ${file.path}: ${label(seen.owner, registry)} and ${label(emitter.toolId, registry)} emit different contents.`,
       );
     }
   }
@@ -73,11 +76,11 @@ export function buildEmittedFiles(projectRoot: string, config: AmbyConfig): Emit
  * Enabled targets that get no MCP config, and why (feature 025, FR-018). Empty unless `mcp.enabled`.
  * `sync` prints these so a missing config is never silent.
  */
-export function mcpUnwritten(config: AmbyConfig): { tool: string; reason: string }[] {
+export function mcpUnwritten(config: AmbyConfig, registry?: TargetSource): { tool: string; reason: string }[] {
   if (!config.mcp?.enabled) return [];
   const out: { tool: string; reason: string }[] = [];
-  for (const emitter of emittersForTargets(config.tools)) {
-    const reason = emitter.mcpSkipReason();
+  for (const emitter of emittersForTargets(config.tools, registry)) {
+    const reason = typeof emitter.mcpSkipReason === "function" ? emitter.mcpSkipReason() : "no verified MCP config format (plugin target)";
     if (reason) out.push({ tool: emitter.toolId, reason });
   }
   return out;
@@ -101,4 +104,21 @@ function sameOutput(a: EmittedFile, b: EmittedFile, ids?: [string, string]): boo
   const longestFirst = [...ids].sort((x, y) => y.length - x.length); // `antigravity-cli` before `antigravity`
   const strip = (text: string): string => longestFirst.reduce((t, id) => t.replaceAll(`--agent=${id}`, "--agent=@"), text);
   return strip(a.contents) === strip(b.contents);
+}
+
+/** `'id'`, or `'id' (plugin name@version)` when a plugin owns the emitter, so a collision or escape is traceable. */
+function label(toolId: string, registry?: TargetRegistry): string {
+  const plugin = registry?.pluginOfTool(toolId);
+  return plugin ? `'${toolId}' (plugin ${plugin.name}@${plugin.version})` : `'${toolId}'`;
+}
+
+/**
+ * A project-scope file must stay inside the project root (feature 027, FR-007): no absolute path, no drive
+ * letter, no `..` segment. User-scope files are rooted at the home directory and need `--include-user`.
+ */
+export function assertInsideProject(file: EmittedFile, toolId: string, registry?: TargetRegistry): void {
+  if (file.scope !== "project") return;
+  if (escapesProject(file.path)) {
+    throw new Error(`${label(toolId, registry)} tried to write outside the project: ${file.path}. Project-scope paths must be relative and stay inside the project.`);
+  }
 }

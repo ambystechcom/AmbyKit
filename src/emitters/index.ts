@@ -89,8 +89,16 @@ export const TARGETS: TargetDef[] = [
   { id: "pi", displayName: "Pi", emitter: codex, alias: true },
 ];
 
-export function getTarget(id: string): TargetDef | undefined {
-  return TARGETS.find((t) => t.id === id);
+/**
+ * Where targets are looked up. Callers that load plugins (feature 027) pass the registry they built;
+ * every other caller gets the built-in `TARGETS`, so nothing changes when no plugin is listed.
+ */
+export interface TargetSource {
+  readonly targets: readonly TargetDef[];
+}
+
+export function getTarget(id: string, source?: TargetSource): TargetDef | undefined {
+  return (source?.targets ?? TARGETS).find((t) => t.id === id);
 }
 
 /**
@@ -99,10 +107,10 @@ export function getTarget(id: string): TargetDef | undefined {
  * co-owners): one entry per directory with two or more configured owners, e.g. `pi` + `codex` +
  * `antigravity` → `.agents/skills`. Files are written once; removing one owner leaves them for the rest.
  */
-export function sharedOutputs(ids: string[]): { dir: string; owners: string[] }[] {
+export function sharedOutputs(ids: string[], source?: TargetSource): { dir: string; owners: string[] }[] {
   const byDir = new Map<string, { dir: string; owners: string[] }>();
   for (const id of ids) {
-    const target = getTarget(id);
+    const target = getTarget(id, source);
     if (!target || target.emitter.commandSurface === "none") continue; // rules-only targets own no command dir
     const dir = target.emitter.commandDir;
     const entry = byDir.get(dir) ?? { dir, owners: [] };
@@ -113,11 +121,11 @@ export function sharedOutputs(ids: string[]): { dir: string; owners: string[] }[
 }
 
 /** Distinct emitters for a set of target ids (deduped, so shared emitters emit once). */
-export function emittersForTargets(ids: string[]): BaseEmitter[] {
+export function emittersForTargets(ids: string[], source?: TargetSource): BaseEmitter[] {
   const seen = new Set<string>();
   const out: BaseEmitter[] = [];
   for (const id of ids) {
-    const target = getTarget(id);
+    const target = getTarget(id, source);
     if (!target) continue;
     if (seen.has(target.emitter.toolId)) continue;
     seen.add(target.emitter.toolId);
