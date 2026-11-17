@@ -34,14 +34,19 @@ export function meter(s: Session, dtMs: number): void {
       releaseTaskClaims(s.root, s.feature, t.id);
     }
   }
-  writeBudget(s.root, s.run, { elapsedMs: b.elapsedMs + Math.max(0, dtMs), tasksUsed: b.tasksUsed + added, counted: [...counted] });
+  writeBudget(s.root, s.run, { ...b, elapsedMs: b.elapsedMs + Math.max(0, dtMs), tasksUsed: b.tasksUsed + added, counted: [...counted] });
 }
 
 /** Check the budgets; on the first overrun, begin the stop. Returns the reason once, then `undefined`. */
 export function enforceBudgets(s: Session): string | undefined {
   if (s.stopReason) return undefined;
   const b = readBudget(s.root, s.run);
-  const d = budgetDecision(s.budgets, { elapsedMs: b.elapsedMs, tasksUsed: b.tasksUsed, reportsUsage: s.reportsUsage });
+  const d = budgetDecision(s.budgets, {
+    elapsedMs: b.elapsedMs,
+    tasksUsed: b.tasksUsed,
+    reportsUsage: s.reportsUsage,
+    ...(b.tokensUsed !== undefined ? { tokensUsed: b.tokensUsed } : {}),
+  });
   if (!d.exceeded || !d.reason) return undefined;
   s.stopReason = d.reason;
   const note = d.unenforced.length > 0 ? ` (${d.unenforced.join("; ")})` : "";

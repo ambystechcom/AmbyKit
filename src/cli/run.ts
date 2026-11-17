@@ -271,6 +271,10 @@ export class RunCommand extends BaseCommand {
     );
     const tokens = budgets.maxTokens !== undefined ? `, ${budgets.maxTokens} tokens` : "";
     this.info(`Budgets: ${budgets.wallClockMinutes} minutes wall-clock, ${budgets.maxTasks} task events${tokens}`);
+    const reports = ctx.plan.every((e) => this.deps.registry.find((r) => r.id === e.assistant)?.reportsUsage === true);
+    if (budgets.maxTokens !== undefined && !reports) {
+      this.info("Token ceiling: not enforceable for this runner (it does not report usage); the wall-clock and task budgets still apply.");
+    }
     this.info(
       ctx.unattended
         ? "Mode: UNATTENDED — story checkpoints are approved automatically. A person is not asked."

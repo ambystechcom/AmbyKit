@@ -106,6 +106,8 @@ export class Supervisor {
   private stopping(): Outcome | null {
     const s = this.s;
     if (running(s).length > 0) return null;
+    // a process just ended: let its exit be recorded (next tick) before the run reports it stopped
+    if (s.lanes.some((l) => l.file.status === "running" || l.file.status === "reviewing")) return null;
     updateRun(s.root, s.run, { status: "paused" });
     return { kind: "budget", message: `Stopped: ${s.stopReason}. State is saved; continue with --continue-run=${s.run} after raising the budget.` };
   }

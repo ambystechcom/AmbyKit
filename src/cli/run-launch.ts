@@ -18,6 +18,7 @@ export function running(s: Session): LaneRuntime[] {
 
 /** Start one process for a lane: its worker, or a review job. Returns false when it could not start. */
 export function startJob(s: Session, rt: LaneRuntime, job: JobKind, opts: { findings?: string[]; restart?: boolean } = {}): boolean {
+  if (s.stopReason) return false; // a budget stop is in force: nothing new starts (FR-014)
   const can = runnable(rt.assistant, s.registry);
   if (!can.ok) {
     rt.file.status = "failed";

@@ -77,9 +77,9 @@ created: 2026-11-16
 
 ## Phase 8 — User story US-6  (priority: P1)
 
-- [ ] [T080] [US6] Budget guard: wall-clock and task-count always, token ceiling only where the runner reports usage; stop launching, write stop directives, terminate after the stop grace (src/cli/run-budget.ts, test/cli/run-budget.test.ts)
-- [ ] [T081] [US6] Wire budgets: defaults shown at start, "ceiling not enforceable for this runner" notice, reason recorded in the run state (src/cli/run.ts, test/cli/run-budget-flow.test.ts)
-- **Verify:** `npm run typecheck && npx vitest run test/cli/run-budget.test.ts test/cli/run-budget-flow.test.ts` — a tiny wall-clock budget stops the run and records why (SC-004).
+- [x] [T080] [US6] Budget guard: wall-clock and task-count always, token ceiling only where the runner reports usage; stop launching, write stop directives, terminate after the stop grace (src/cli/run-budget.ts, test/cli/run-budget.test.ts)
+- [x] [T081] [US6] Wire budgets: defaults shown at start, "ceiling not enforceable for this runner" notice, reason recorded in the run state (src/cli/run.ts, test/cli/run-budget-flow.test.ts)
+- **Verify:** `npm run typecheck && npx vitest run test/cli/run-budget.test.ts test/cli/run-budget-flow.test.ts` — a tiny wall-clock budget stops the run and records why (SC-004). ✓ passed
 - **Checkpoint:** US-6 is demoable; all P1 stories done.
 
 ## Phase 9 — User story US-7  (priority: P2)

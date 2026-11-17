@@ -46,6 +46,15 @@ function recordStage(s: Session, rt: LaneRuntime): void {
 }
 
 function judge(s: Session, rt: LaneRuntime): void {
+  if (s.stopReason) {
+    // the reviewer was stopped, not finished: review this lane again when the run is continued
+    delete rt.exit;
+    delete rt.handle;
+    delete rt.file.pid;
+    rt.file.status = "finished";
+    save(s, rt);
+    return;
+  }
   const role = rt.stage ?? "qa";
   const limit = readRun(s.root, s.run)?.limit || s.settings.roundLimit;
   const path = join(runDir(s.root, s.run), verdictFile(rt, role, rt.round));
