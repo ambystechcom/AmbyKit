@@ -7,6 +7,7 @@ import { fleetSettings, loadConfig, type FleetSettings } from "../core/config.js
 import { readRun, updateRun, type RunLane } from "../core/fleet/index.js";
 import { approveGate, approveReassign, rejectGate } from "../core/run-gate-actions.js";
 import { acquireRunLock, bootstrapRun, openRun, readLaneFile, releaseRunLock, writeLaneFile, type LaneFile } from "./run-files.js";
+import { reviveForContinue } from "./run-control.js";
 import { Supervisor, superviseRun, type Outcome } from "./run-loop.js";
 import type { LaneRuntime, Session } from "./run-session.js";
 import { primaryRoot } from "../core/checkouts.js";
@@ -185,6 +186,10 @@ export class RunCommand extends BaseCommand {
     try {
       if (ctx.continueRun) updateRun(root, runId, { status: "active", needsDecision: false });
       const session = this.session(ctx, runId);
+      if (ctx.continueRun) {
+        const back = reviveForContinue(session);
+        if (back.length > 0 && !flag(ctx.opts, "json")) this.info(`Continuing ${runId}: ${back.join(", ")} will start again with their unchecked tasks only.`);
+      }
       const sup = new Supervisor(session);
       let interrupted = false;
       const stop = (): void => {

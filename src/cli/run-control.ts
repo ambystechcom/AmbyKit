@@ -1,4 +1,4 @@
-import { laneStatus, readDirective, readRun, updateRun } from "../core/fleet/index.js";
+import { laneStatus, readDirective, readRun, updateRun, writeDirective } from "../core/fleet/index.js";
 import { reassignGate } from "../core/run-supervise.js";
 import { runnable } from "../core/runners.js";
 import { isFailed } from "../core/query.js";
@@ -50,6 +50,35 @@ export function applyDirectives(s: Session): void {
       s.say(`${rt.file.lane}: resumed`);
     }
   }
+}
+
+/**
+ * `--continue-run` (FR-016, SC-005): bring a run back from where it stopped. Lanes that were stopped (a budget,
+ * a stop directive), ended with tasks open, failed to start, or were running when the supervisor died go back
+ * in the queue; a lane whose process is still alive from the earlier session is adopted as it is. Lanes
+ * waiting for a person (paused, merge conflict, escalated review) stay as they are. A `continue` directive is
+ * written (through spec 025's writer) for any lane that still carries a pause or stop, so the first tick does
+ * not obey a stale one. The prompt of a restarted lane lists only unchecked tasks, so no completed task repeats.
+ */
+export function reviveForContinue(s: Session): string[] {
+  const revived: string[] = [];
+  for (const rt of s.lanes) {
+    const st = rt.file.status;
+    const alive = rt.file.pid !== undefined && s.port.isAlive(rt.file.pid);
+    const requeue = st === "stopped" || st === "unfinished" || st === "failed" || ((st === "running" || st === "reviewing") && !alive);
+    if (!requeue) continue;
+    rt.file.status = "queued";
+    delete rt.file.reason;
+    delete rt.file.pid;
+    delete rt.file.pausedAt;
+    delete rt.stopAskedMs;
+    save(s, rt);
+    const d = readDirective(s.root, s.run, rt.file.lane);
+    if (d && d.action !== "continue") writeDirective(s.root, { feature: s.feature, lane: rt.file.lane, action: "continue", run: s.run, now: new Date(s.now()) });
+    event(s, "revived", rt, `was ${st}`);
+    revived.push(rt.file.lane);
+  }
+  return revived;
 }
 
 /**

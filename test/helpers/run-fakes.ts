@@ -226,3 +226,34 @@ export function script(h: Pick<Harness, "port">, p: LaneProject, how: Script | (
 }
 
 export { readLaneFile };
+
+/** One phase of a multi-phase project: `tasks` parallel tasks tagged with `story`, plus `stays` non-parallel ones. */
+export interface PhasePlan {
+  story?: number;
+  tasks: number;
+  lanes?: number;
+  stays?: number;
+}
+
+/** A project with prepared lanes for several phases (one `ambykit lane --phase=N` per phase). */
+export async function phasedProject(feature: string, phases: PhasePlan[]): Promise<LaneProject> {
+  let n = 0;
+  const defs = phases.map((ph, i) => {
+    const tasks: TaskDef[] = [];
+    for (let k = 0; k < ph.tasks; k++) {
+      n += 1;
+      tasks.push({ id: `T${String(n).padStart(3, "0")}`, parallel: true, ...(ph.story ? { story: ph.story } : {}), paths: [`src/p${i + 1}f${k + 1}.ts`] });
+    }
+    for (let k = 0; k < (ph.stays ?? 0); k++) {
+      n += 1;
+      tasks.push({ id: `T${String(n).padStart(3, "0")}`, ...(ph.story ? { story: ph.story } : {}), paths: [`src/stay${i + 1}${k + 1}.ts`] });
+    }
+    return phase(i + 1, tasks);
+  });
+  const p = laneProject(feature, tasksMd(defs, { feature }));
+  for (const [i, ph] of phases.entries()) {
+    const r = await runCommand(new LaneCommand(), p.root, [feature], { phase: String(i + 1), lanes: String(ph.lanes ?? 1) });
+    if (r.code !== 0) throw new Error(`could not prepare phase ${i + 1}: ${r.err}`);
+  }
+  return p;
+}

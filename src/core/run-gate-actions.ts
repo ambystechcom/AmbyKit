@@ -16,7 +16,8 @@ export const phaseGateId = (phase: number): string => `phase-${phase}`;
  */
 export function completedStories(tasks: TaskLine[], phase: number): string[] {
   const inPhase = new Set(tasks.filter((t) => t.phase === phase && t.story).map((t) => t.story as string));
-  return [...inPhase].filter((story) => tasks.filter((t) => t.story === story).every((t) => t.done)).sort();
+  const done = [...inPhase].filter((story) => tasks.filter((t) => t.story === story).every((t) => t.done)).sort();
+  return done.map((id) => id.replace(/^US(\d+)$/, "US-$1")); // the spec form, `US-1`
 }
 
 export type GateResult = { ok: true; run: RunRecord; gate: RunGate } | { ok: false; error: string };

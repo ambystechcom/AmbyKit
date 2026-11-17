@@ -84,9 +84,9 @@ created: 2026-11-16
 
 ## Phase 9 — User story US-7  (priority: P2)
 
-- [ ] [T090] [US7] Gates (028 is the single gate owner): detect a completed story checkpoint, wait on `gates[]` in run.json (TTY prompt or recorded decision); `approveGate`/`rejectGate` update it through spec 025's `updateRun` with the reason, and are the one function the dashboard (spec 029 T092) also calls (src/core/run-gate-actions.ts, src/cli/run-gates.ts, test/core/run-gate-actions.test.ts, test/cli/run-gates.test.ts)
-- [ ] [T091] [US7] `approve` and `reject` subcommands calling the same `approveGate`/`rejectGate`, `--unattended` shown at start, gate wiring (src/cli/run.ts, test/cli/run-approve.test.ts)
-- **Verify:** `npm run typecheck && npx vitest run test/cli/run-gates.test.ts test/cli/run-approve.test.ts` — the run does not start the next prepared lane set until approval is recorded.
+- [x] [T090] [US7] Gates (028 is the single gate owner): detect a completed story checkpoint, wait on `gates[]` in run.json (TTY prompt or recorded decision); `approveGate`/`rejectGate` update it through spec 025's `updateRun` with the reason, and are the one function the dashboard (spec 029 T092) also calls (src/core/run-gate-actions.ts, src/cli/run-gates.ts, test/core/run-gate-actions.test.ts, test/cli/run-gates.test.ts)
+- [x] [T091] [US7] `approve` and `reject` subcommands calling the same `approveGate`/`rejectGate`, `--unattended` shown at start, gate wiring (src/cli/run.ts, test/cli/run-approve.test.ts)
+- **Verify:** `npm run typecheck && npx vitest run test/cli/run-gates.test.ts test/cli/run-approve.test.ts` — the run does not start the next prepared lane set until approval is recorded. ✓ passed
 - **Checkpoint:** US-7 is demoable.
 
 ## Phase 10 — User story US-8  (priority: P2)
