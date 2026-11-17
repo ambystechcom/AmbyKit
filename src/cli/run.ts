@@ -4,6 +4,11 @@ import { nodeProcessPort, type ProcessPort } from "./run-process.js";
 import { buildLaunchPlan, laneOpenTasks, nextRunId } from "./run-plan.js";
 import { emitScripts } from "./run-script.js";
 import { fleetSettings, loadConfig, type FleetSettings } from "../core/config.js";
+import { readRun, updateRun, type RunLane } from "../core/fleet/index.js";
+import { approveGate, rejectGate } from "../core/run-gate-actions.js";
+import { acquireRunLock, bootstrapRun, openRun, readLaneFile, releaseRunLock, writeLaneFile, type LaneFile } from "./run-files.js";
+import { Supervisor, superviseRun, type Outcome } from "./run-loop.js";
+import type { LaneRuntime, Session } from "./run-session.js";
 import { primaryRoot } from "../core/checkouts.js";
 import { refusals, type LaunchEntry } from "../core/run-launch-plan.js";
 import { laneRefs, type LaneRef } from "../core/query.js";
@@ -56,6 +61,8 @@ export interface RunContext {
   unattended: boolean;
   plan: LaunchEntry[];
   opts: CliOptions;
+  /** Set by `--continue-run`: the existing run this invocation continues. */
+  continueRun?: string;
 }
 
 export class RunCommand extends BaseCommand {
@@ -74,17 +81,19 @@ export class RunCommand extends BaseCommand {
   protected async execute(opts: CliOptions): Promise<number> {
     const root = this.projectRoot(opts.cwd);
     const [first, second] = opts.positionals;
+    const cont = stringFlag(opts, "continue-run");
 
     if (flag(opts, "runners")) return this.listRunnerRows(opts);
     if (first && (SUBCOMMANDS as readonly string[]).includes(first)) return this.gate(root, first as (typeof SUBCOMMANDS)[number], second, opts);
 
-    if (!first) {
+    const featureArg = first ?? (cont ? cont.slice(0, cont.lastIndexOf(".")) : undefined);
+    if (!featureArg) {
       this.error("Missing feature.", `Usage: ${this.usage}`);
       return 1;
     }
-    const feature = featureDirOf(root, first);
+    const feature = featureDirOf(root, featureArg);
     if (!feature) {
-      this.error(`Feature '${first}' not found.`, "Use a feature number or directory name from specs/.");
+      this.error(`Feature '${featureArg}' not found.`, "Use a feature number or directory name from specs/.");
       return 1;
     }
     if (!flag(opts, "json")) this.warn(EXPERIMENTAL_NOTE);
@@ -108,14 +117,26 @@ export class RunCommand extends BaseCommand {
       this.error("No assistants to run lanes on.", "Set `tools` in .amby/config.json or pass --assistant=<id>.");
       return 1;
     }
-    const run = nextRunId(root, feature);
+    const cont = stringFlag(opts, "continue-run");
+    let run = nextRunId(root, feature);
+    let assignment: Map<string, string> | undefined;
+    if (cont) {
+      const opened = openRun(root, cont);
+      if (!opened.ok) {
+        this.error(opened.reason);
+        return 1;
+      }
+      run = cont;
+      assignment = new Map(opened.record.lanes.map((l) => [l.lane.slice(l.lane.lastIndexOf(".lane-") + 1), l.assistant]));
+      if (opened.rebuilt && !json) this.warn(`Run ${cont} had missing state and was rebuilt from tasks.md; checked tasks stay checked.`);
+    }
     const budgets = resolveBudgets({
       openTasks: lanes.reduce((n, l) => n + laneOpenTasks(l).length, 0),
       config: settings.budgets,
       flags: budgetFlags(opts),
     });
-    const plan = buildLaunchPlan({ root, feature, lanes, assistants, run, settings, registry: this.deps.registry });
-    const ctx: RunContext = { root, feature, lanes, assistants, run, settings, budgets, unattended: flag(opts, "unattended"), plan, opts };
+    const plan = buildLaunchPlan({ root, feature, lanes, assistants, run, settings, registry: this.deps.registry, ...(assignment ? { assignment } : {}) });
+    const ctx: RunContext = { root, feature, lanes, assistants, run, settings, budgets, unattended: flag(opts, "unattended"), plan, opts, ...(cont ? { continueRun: cont } : {}) };
     const refused = refusals(plan);
 
     if (json) console.log(JSON.stringify(this.planJson(ctx, flag(opts, "yes") && refused.length === 0)));
@@ -135,9 +156,105 @@ export class RunCommand extends BaseCommand {
     return this.launch(ctx);
   }
 
-  /** Filled in by US-2: create the run, start the lanes and supervise them. */
-  protected async launch(_ctx: RunContext): Promise<number> {
-    return 0;
+  // --- US-2: launch and supervise (FR-004, FR-005, FR-008..FR-018) --------------------------
+
+  /** Create (or continue) the run, start the lanes under the caps and supervise until it ends. */
+  protected async launch(ctx: RunContext): Promise<number> {
+    const { root, feature } = ctx;
+    const port = this.deps.port;
+    let run = ctx.continueRun;
+    if (!run) {
+      const lanes: RunLane[] = ctx.plan.map((e) => ({
+        lane: e.full,
+        assistant: e.assistant,
+        tasks: ctx.lanes.find((l) => l.short === e.lane)!.manifest.tasks.map((t) => t.id),
+      }));
+      const boot = bootstrapRun(root, feature, lanes, (pid) => port.isAlive(pid), Math.min(...ctx.lanes.map((l) => l.manifest.phase)));
+      if (!boot.ok) {
+        this.error(boot.warning);
+        return 1;
+      }
+      run = boot.run.run;
+    }
+    const runId = run;
+    const lock = acquireRunLock(root, runId, process.pid, (pid) => port.isAlive(pid));
+    if (!lock.ok) {
+      this.error(lock.reason);
+      return 1;
+    }
+    try {
+      if (ctx.continueRun) updateRun(root, runId, { status: "active", needsDecision: false });
+      const session = this.session(ctx, runId);
+      const sup = new Supervisor(session);
+      let interrupted = false;
+      const stop = (): void => {
+        interrupted = true;
+      };
+      process.once("SIGINT", stop);
+      process.once("SIGTERM", stop);
+      let outcome: Outcome;
+      try {
+        outcome = await superviseRun(sup, session, {
+          sleep: this.deps.sleep,
+          interrupted: () => interrupted,
+          onGate: (gate) => this.askGate(ctx, runId, gate),
+        });
+      } finally {
+        process.off("SIGINT", stop);
+        process.off("SIGTERM", stop);
+      }
+      if (flag(ctx.opts, "json")) console.log(JSON.stringify({ run: runId, outcome: outcome.kind, message: outcome.message }));
+      else if (outcome.kind === "done" || outcome.kind === "interrupted") this.success(outcome.message);
+      else this.warn(outcome.message);
+      return outcome.kind === "done" || outcome.kind === "interrupted" ? 0 : 1;
+    } finally {
+      releaseRunLock(root, runId, process.pid);
+    }
+  }
+
+  /** Build the session from the run's saved lane files, so a continued run picks up where it was. */
+  protected session(ctx: RunContext, run: string): Session {
+    const rec = readRun(ctx.root, run);
+    const lanes: LaneRuntime[] = ctx.lanes.map((ref, i) => {
+      const assistant = ctx.plan.find((e) => e.lane === ref.short)?.assistant ?? ctx.assistants[i % ctx.assistants.length]!;
+      const saved = readLaneFile(ctx.root, run, ref.short);
+      const file: LaneFile = saved ?? {
+        lane: ref.short,
+        full: ref.name,
+        assistant,
+        status: "queued",
+        restarts: rec?.lanes.find((l) => l.lane === ref.name)?.restarts ?? 0,
+      };
+      if (!saved) writeLaneFile(ctx.root, run, file);
+      return { ref, assistant: file.assistant, file, job: "worker", round: 1 };
+    });
+    return {
+      root: ctx.root,
+      feature: ctx.feature,
+      run,
+      settings: ctx.settings,
+      budgets: ctx.budgets,
+      registry: this.deps.registry,
+      port: this.deps.port,
+      now: this.deps.now,
+      say: (line) => {
+        if (!flag(ctx.opts, "json")) this.info(line);
+      },
+      lanes,
+      unattended: ctx.unattended,
+      reportsUsage: lanes.every((l) => this.deps.registry.find((r) => r.id === l.assistant)?.reportsUsage === true),
+      ...(this.deps.ask ? { ask: this.deps.ask } : {}),
+    };
+  }
+
+  /** The foreground prompt for a checkpoint; without a terminal the run just waits for `ambykit run approve`. */
+  private readonly asked = new Set<string>();
+  private async askGate(ctx: RunContext, run: string, gate: string): Promise<void> {
+    if (!this.deps.interactive || !this.deps.ask || this.asked.has(`${run}:${gate}`)) return;
+    this.asked.add(`${run}:${gate}`);
+    const yes = await this.deps.ask(`Checkpoint ${gate} reached. Approve and start the next set?`);
+    if (yes === true) approveGate(ctx.root, run, { gate, by: "person (terminal)" });
+    else if (yes === false) rejectGate(ctx.root, run, { gate, by: "person (terminal)" });
   }
 
   private refuse(refused: { lane: string; assistant: string; reason: string }[], json: boolean): number {
@@ -196,7 +313,23 @@ export class RunCommand extends BaseCommand {
     return 0;
   }
 
-  protected async gate(_root: string, _verb: (typeof SUBCOMMANDS)[number], _run: string | undefined, _opts: CliOptions): Promise<number> {
+  /** `ambykit run approve|reject <run>`: the one pair of gate functions the dashboard calls too (FR-015). */
+  protected async gate(root: string, verb: (typeof SUBCOMMANDS)[number], run: string | undefined, opts: CliOptions): Promise<number> {
+    if (!run) {
+      this.error("Missing run.", `Usage: ambykit run ${verb} <run> [--gate=<id>] [--reason=<text>]`);
+      return 1;
+    }
+    const reason = stringFlag(opts, "reason");
+    const gate = stringFlag(opts, "gate");
+    const input = { ...(gate ? { gate } : {}), ...(reason ? { reason } : {}), by: "person" };
+    const out = verb === "approve" ? approveGate(root, run, input) : rejectGate(root, run, input);
+    if (!out.ok) {
+      this.error(out.error);
+      return 1;
+    }
+    if (flag(opts, "json")) console.log(JSON.stringify({ run, gate: out.gate.id, decision: verb === "approve" ? "approved" : "rejected", status: out.run.status }));
+    else if (verb === "approve") this.success(`Approved ${out.gate.id} of ${run}; the run starts the next set.`);
+    else this.success(`Rejected ${out.gate.id} of ${run}${reason ? `: ${reason}` : ""}; the run is paused.`);
     return 0;
   }
 }

@@ -55,10 +55,10 @@ created: 2026-11-16
 
 ## Phase 5 — User story US-2  (priority: P1)
 
-- [ ] [T050] [P] [US2] Launch queue: one process per lane in its lane worktree under the caps, record exit status, assistant chosen from configured tools (src/cli/run-launch.ts, test/cli/run-launch.test.ts)
-- [ ] [T051] [P] [US2] Run lock and active-run guard: a second run on the same feature refuses (src/cli/run-files.ts, test/cli/run-files.test.ts)
-- [ ] [T052] [US2] Wire run creation, state init, the tick loop and resolved caps shown at start (src/cli/run.ts, test/cli/run-launch-flow.test.ts)
-- **Verify:** `npm run typecheck && npx vitest run test/cli/run-launch.test.ts test/cli/run-files.test.ts test/cli/run-launch-flow.test.ts` — two lanes on two fake assistants run in separate worktrees, extra lanes wait for a slot.
+- [x] [T050] [P] [US2] Launch queue: one process per lane in its lane worktree under the caps, record exit status, assistant chosen from configured tools (src/cli/run-launch.ts, test/cli/run-launch.test.ts)
+- [x] [T051] [P] [US2] Run lock and active-run guard: a second run on the same feature refuses (src/cli/run-files.ts, test/cli/run-files.test.ts)
+- [x] [T052] [US2] Wire run creation, state init, the tick loop and resolved caps shown at start (src/cli/run.ts, test/cli/run-launch-flow.test.ts)
+- **Verify:** `npm run typecheck && npx vitest run test/cli/run-launch.test.ts test/cli/run-files.test.ts test/cli/run-launch-flow.test.ts` — two lanes on two fake assistants run in separate worktrees, extra lanes wait for a slot. ✓ passed
 - **Checkpoint:** US-2 is demoable.
 
 ## Phase 6 — User story US-4  (priority: P1)

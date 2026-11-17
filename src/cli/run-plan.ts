@@ -42,6 +42,8 @@ export interface PlanContext {
   registry?: RunnerSpec[];
   /** Run in the preview and script paths: where prompt files will be, even when nothing is written yet. */
   promptDir?: string;
+  /** Lane (short) -> assistant, fixed by an earlier session of the same run (`--continue-run`). */
+  assignment?: Map<string, string>;
 }
 
 export function lanePromptText(lane: LaneRef, run: string, open?: string[], findings?: string[]): string {
@@ -53,13 +55,13 @@ export function lanePromptText(lane: LaneRef, run: string, open?: string[], find
 
 /** One plan used by the preview, `--emit-script` and the launch: what is printed is exactly what runs. */
 export function buildLaunchPlan(ctx: PlanContext): LaunchEntry[] {
-  const assign = assignAssistants(ctx.lanes.map((l) => l.short), ctx.assistants.length > 0 ? ctx.assistants : ["claude"]);
+  const assign = ctx.assignment ?? assignAssistants(ctx.lanes.map((l) => l.short), ctx.assistants.length > 0 ? ctx.assistants : ["claude"]);
   const promptDir = ctx.promptDir ?? join(runDir(ctx.root, ctx.run), "prompts");
   const lanes = ctx.lanes.map((l) => ({
     lane: l.short,
     full: l.name,
     cwd: l.root,
-    assistant: assign.get(l.short)!,
+    assistant: assign.get(l.short) ?? ctx.assistants[0] ?? "claude",
     prompt: lanePromptText(l, ctx.run),
   }));
   return launchPlan(lanes, {

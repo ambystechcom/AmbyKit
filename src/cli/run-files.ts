@@ -35,7 +35,9 @@ export type LaneRunStatus =
   | "failed" // exited at once with an error (a version mismatch)
   | "unfinished" // exited with tasks still open; never merged
   | "stopped"
-  | "conflict"; // merge conflict, waiting for a person
+  | "conflict" // merge conflict, waiting for a person
+  | "ready" // reviews passed; waiting to merge
+  | "escalated"; // the review loop ended without agreement; a person decides
 
 export interface LaneFile {
   /** Short lane name `lane-p-k`. */
@@ -50,6 +52,8 @@ export interface LaneFile {
   exitedAt?: string;
   exit?: { code: number | null; signal: string | null };
   reason?: string;
+  /** When the lane was paused, so a later `continue` directive can be told from an earlier one. */
+  pausedAt?: string;
   /** Review rounds that failed so far (the loop's counter). */
   failedRounds?: number;
 }
