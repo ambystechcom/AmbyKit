@@ -1,0 +1,29 @@
+identical  001-core-and-claude-emitter              spec.md=v1, tasks.md=v1  3 stories 17 tasks
+identical  002-copilot-emitters                     spec.md=v1, tasks.md=v1  2 stories 7 tasks
+identical  003-opencode-cursor-antigravity          spec.md=v1, tasks.md=v1  3 stories 9 tasks
+identical  004-templates-and-ui-depth               spec.md=v1, tasks.md=v1  2 stories 9 tasks
+identical  005-analyze-and-release                  spec.md=v1, tasks.md=v1  3 stories 8 tasks
+identical  006-enhanced-tui                         spec.md=v1, tasks.md=v1  7 stories 40 tasks
+identical  007-documentation-site                   spec.md=v1, tasks.md=v1  6 stories 37 tasks
+identical  008-brownfield-support                   spec.md=v1, tasks.md=v1  5 stories 41 tasks
+identical  008-codex-integration                    spec.md=v1, tasks.md=v1  4 stories 15 tasks
+identical  009-continue-spec                        spec.md=v1, tasks.md=v1  4 stories 16 tasks
+identical  010-version-update                       spec.md=v1, tasks.md=v1  4 stories 28 tasks
+identical  011-converge                             spec.md=v1, tasks.md=v1  5 stories 23 tasks
+identical  012-worktree-isolation                   spec.md=v1, tasks.md=v1  5 stories 31 tasks
+identical  013-multi-agent-roles                    spec.md=v1, tasks.md=v1  5 stories 35 tasks
+identical  014-enhanced-dashboard                   spec.md=v1, tasks.md=v1  7 stories 67 tasks
+identical  015-parallel-lanes                       spec.md=v1, tasks.md=v1  4 stories 44 tasks
+identical  016-agent-surface-expansion              spec.md=v1, tasks.md=v1  5 stories 38 tasks
+identical  017-live-dashboard                       spec.md=v1, tasks.md=v1  4 stories 59 tasks
+identical  018-antigravity-skills-surface           spec.md=v1, tasks.md=v1  4 stories 30 tasks
+identical  019-amby-run-prompt                      spec.md=v1, tasks.md=v1  8 stories 58 tasks
+identical  020-blocked-and-verify                   spec.md=v1, tasks.md=v1  5 stories 43 tasks
+identical  021-test-design                          spec.md=v1, tasks.md=v1  7 stories 26 tasks
+identical  022-amby-decide                          spec.md=v1, tasks.md=v1  7 stories 35 tasks
+identical  023-dependency-graph                     spec.md=v1, tasks.md=v1  6 stories 32 tasks
+identical  024-trace                                spec.md=v1, tasks.md=v1  7 stories 44 tasks
+identical  026-spec-format-v2-spike                 spec.md=v1, tasks.md=v1  4 stories 25 tasks
+
+format detection: {"spec=v1 tasks=v1":26}
+ALL REAL v1 SPECS IDENTICAL TO BASELINE

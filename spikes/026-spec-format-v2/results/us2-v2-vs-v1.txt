@@ -1,0 +1,31 @@
+PASS  layout=phase: 26 features identical to baseline, 0 differ, 0 errors, 9 warnings; 26 features carry v2 data
+PASS  layout=task: 26 features identical to baseline, 0 differ, 0 errors, 9 warnings; 26 features carry v2 data
+PASS  layout=phase-dual: 26 features identical to baseline, 0 differ, 0 errors, 0 warnings; 26 features carry v2 data
+
+format of each file after migration (phase layout):
+  001-core-and-claude-emitter              spec=v2   tasks=v2  
+  002-copilot-emitters                     spec=v2   tasks=v2  
+  003-opencode-cursor-antigravity          spec=v2   tasks=v2  
+  004-templates-and-ui-depth               spec=v2   tasks=v2  
+  005-analyze-and-release                  spec=v2   tasks=v2  
+  006-enhanced-tui                         spec=v2   tasks=v2  
+  007-documentation-site                   spec=v2   tasks=v2  
+  008-brownfield-support                   spec=v2   tasks=v2  
+  008-codex-integration                    spec=v2   tasks=v2  
+  009-continue-spec                        spec=v2   tasks=v2  
+  010-version-update                       spec=v2   tasks=v2  
+  011-converge                             spec=v2   tasks=v2  
+  012-worktree-isolation                   spec=v2   tasks=v2  
+  013-multi-agent-roles                    spec=v2   tasks=v2  
+  014-enhanced-dashboard                   spec=v2   tasks=v2  
+  015-parallel-lanes                       spec=v2   tasks=v2  
+  016-agent-surface-expansion              spec=v2   tasks=v2  
+  017-live-dashboard                       spec=v2   tasks=v2  
+  018-antigravity-skills-surface           spec=v2   tasks=v2  
+  019-amby-run-prompt                      spec=v2   tasks=v2  
+  020-blocked-and-verify                   spec=v2   tasks=v2  
+  021-test-design                          spec=v2   tasks=v2  
+  022-amby-decide                          spec=v2   tasks=v2  
+  023-dependency-graph                     spec=v2   tasks=v2  
+  024-trace                                spec=v2   tasks=v2  
+  026-spec-format-v2-spike                 spec=v2   tasks=v2  
