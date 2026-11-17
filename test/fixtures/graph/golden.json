@@ -1,0 +1,273 @@
+{
+  "repo-001-018": {
+    "analyze": {
+      "total": 82,
+      "issues": [],
+      "blocked": [],
+      "buildable": [],
+      "orphans": [],
+      "lanes": {
+        "conflicts": [],
+        "declarations": []
+      }
+    },
+    "attention": []
+  },
+  "cycle": {
+    "analyze": {
+      "total": 2,
+      "issues": [
+        {
+          "kind": "cycle",
+          "message": "Dependency cycle among 901:US-1, 901:US-2",
+          "stories": [
+            "901:US1",
+            "901:US2"
+          ]
+        }
+      ],
+      "blocked": [
+        {
+          "key": "901:US1",
+          "displayId": "901:US-1",
+          "feature": "901-cycle",
+          "on": [
+            "901:US-2"
+          ]
+        },
+        {
+          "key": "901:US2",
+          "displayId": "901:US-2",
+          "feature": "901-cycle",
+          "on": [
+            "901:US-1"
+          ]
+        }
+      ],
+      "buildable": [],
+      "orphans": [],
+      "lanes": {
+        "conflicts": [],
+        "declarations": []
+      }
+    },
+    "attention": [
+      {
+        "key": "901:US-1",
+        "kind": "graph-problem",
+        "refs": [
+          "US-2"
+        ],
+        "reason": "dependency cycle with US-2"
+      },
+      {
+        "key": "901:US-2",
+        "kind": "graph-problem",
+        "refs": [
+          "US-1"
+        ],
+        "reason": "dependency cycle with US-1"
+      }
+    ]
+  },
+  "self-dependency": {
+    "analyze": {
+      "total": 1,
+      "issues": [
+        {
+          "kind": "cycle",
+          "message": "Dependency cycle among 902:US-1",
+          "stories": [
+            "902:US1"
+          ]
+        }
+      ],
+      "blocked": [
+        {
+          "key": "902:US1",
+          "displayId": "902:US-1",
+          "feature": "902-self",
+          "on": [
+            "902:US-1"
+          ]
+        }
+      ],
+      "buildable": [],
+      "orphans": [],
+      "lanes": {
+        "conflicts": [],
+        "declarations": []
+      }
+    },
+    "attention": [
+      {
+        "key": "902:US-1",
+        "kind": "graph-problem",
+        "refs": [
+          "US-1"
+        ],
+        "reason": "dependency cycle with US-1"
+      }
+    ]
+  },
+  "dangling": {
+    "analyze": {
+      "total": 2,
+      "issues": [
+        {
+          "kind": "dangling-reference",
+          "message": "903:US-1 references unknown story US9",
+          "stories": [
+            "903:US1",
+            "903:US9"
+          ]
+        },
+        {
+          "kind": "dangling-reference",
+          "message": "903:US-2 references unknown story 999US1",
+          "stories": [
+            "903:US2",
+            "999:US1"
+          ]
+        }
+      ],
+      "blocked": [
+        {
+          "key": "903:US1",
+          "displayId": "903:US-1",
+          "feature": "903-dangling",
+          "on": [
+            "903:US9"
+          ]
+        },
+        {
+          "key": "903:US2",
+          "displayId": "903:US-2",
+          "feature": "903-dangling",
+          "on": [
+            "999:US1"
+          ]
+        }
+      ],
+      "buildable": [],
+      "orphans": [],
+      "lanes": {
+        "conflicts": [],
+        "declarations": []
+      }
+    },
+    "attention": [
+      {
+        "key": "903:US-1",
+        "kind": "graph-problem",
+        "refs": [
+          "US-9"
+        ],
+        "reason": "blocked-by US-9 — unknown story"
+      },
+      {
+        "key": "903:US-2",
+        "kind": "graph-problem",
+        "refs": [
+          "999:US-1"
+        ],
+        "reason": "depends-on 999:US-1 — unknown story"
+      }
+    ]
+  },
+  "cross-feature": {
+    "analyze": {
+      "total": 8,
+      "issues": [],
+      "blocked": [
+        {
+          "key": "905:US2",
+          "displayId": "905:US-2",
+          "feature": "905-top",
+          "on": [
+            "904:US-2"
+          ]
+        },
+        {
+          "key": "905:US4",
+          "displayId": "905:US-4",
+          "feature": "905-top",
+          "on": [
+            "904:US-2"
+          ]
+        },
+        {
+          "key": "905:US6",
+          "displayId": "905:US-6",
+          "feature": "905-top",
+          "on": [
+            "905:US-1",
+            "905:US-2"
+          ]
+        }
+      ],
+      "buildable": [
+        "904:US-2",
+        "905:US-1",
+        "905:US-3",
+        "905:US-5"
+      ],
+      "orphans": [],
+      "lanes": {
+        "conflicts": [],
+        "declarations": []
+      }
+    },
+    "attention": [
+      {
+        "key": "905:US-4",
+        "kind": "blocked",
+        "refs": [
+          "904:US-2"
+        ],
+        "reason": "blocked-by 904:US-2"
+      },
+      {
+        "key": "905:US-5",
+        "kind": "blocked",
+        "refs": [],
+        "reason": "status: blocked"
+      },
+      {
+        "key": "905:US-6",
+        "kind": "blocked",
+        "refs": [
+          "US-1"
+        ],
+        "reason": "blocked-by US-1"
+      },
+      {
+        "key": "905:US-2",
+        "kind": "waiting",
+        "refs": [
+          "904:US-2"
+        ],
+        "reason": "waiting on 904:US-2"
+      }
+    ]
+  },
+  "no-dependencies": {
+    "analyze": {
+      "total": 2,
+      "issues": [],
+      "blocked": [],
+      "buildable": [
+        "906:US-1",
+        "906:US-2"
+      ],
+      "orphans": [
+        "906:US-2"
+      ],
+      "lanes": {
+        "conflicts": [],
+        "declarations": []
+      }
+    },
+    "attention": []
+  }
+}

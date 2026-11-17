@@ -33,18 +33,34 @@ templates and can customize them.
 An abstract class holding all shared state and behavior; each tool is a thin subclass.
 
 - **Properties:** `toolId`, `displayName`, `commandDir`, `rulesFile`, `commandSurface`
-  (`'commands' | 'skills' | 'workflows' | 'none'`), `supportsAgents`, `mcpConfigPath`,
-  `mcpConfigScope` (`'project' | 'user'`), `mcpTopLevelKey`.
+  (`'commands' | 'skills' | 'workflows' | 'none'`), `supportsAgents`.
 - **Template method** `emit(specs, ctx): EmittedFile[]` — orchestrates: resolve target dir → render
-  rules file → render each phase prompt **via `commandSurface`** → render MCP config → collect files.
-  Subclasses don't re-implement orchestration.
+  rules file → render each phase prompt **via `commandSurface`** → collect files. Subclasses don't
+  re-implement orchestration. MCP setup is a separate, opt-in hook (below), so `emit` is unchanged.
 - **Overridable hooks:** `commandFrontmatter(spec)`, `commandPath(spec)`, `rulesContent(ctx)`,
-  `mcpConfig(servers)`. Defaults live in the base; a subclass overrides only its differences.
+  `mcpFiles(ctx)` and `mcpSkipReason()`. Defaults live in the base; a subclass overrides only its
+  differences. `buildEmittedFiles` calls `mcpFiles` only when `config.mcp.enabled`; a target whose per-server
+  entry shape is not verified in the compatibility matrix returns no files and a reason, which `sync`
+  prints. The files use `merge: "json"`, which splices the single `ambykit` server entry into the tool's JSON
+  config and leaves every other key as written (`src/core/merge-json.ts`).
 - **Reuse subclasses:** `CursorCliEmitter` (`commandSurface: 'none'`) and `AntigravityCliEmitter`
   reuse a sibling's output; VS Code extension targets resolve to their base tool's emitter unchanged
   via the **target→emitter map** in the registry.
 
 Adding a tool = one subclass + a compatibility-matrix row + a snapshot test.
+
+## Plugins
+
+`src/plugins/` lets a project add targets without changing the core (feature 027, experimental). Config lists
+`plugins: { "<package>": "<exact version>" }`; `sync`, `check` and `add` call `loadPluginSession`, which returns
+`undefined` without importing anything when no plugin is listed. With plugins, `loader.ts` (the only side-effecting
+module) reads `<project>/node_modules/<package>/package.json`, requires the installed version to equal the pin
+and the declared `ambykit.pluginApi` range (`semver.ts`) to contain `PLUGIN_API_VERSION`, imports the entry, calls
+it with the extension points if it is a factory, and validates the shape (never `instanceof`). `registry.ts` merges
+the plugin targets after the built-in `TARGETS`; a clashing id is reported, never overridden. The registry is passed
+to `getTarget`, `emittersForTargets`, `sharedOutputs` and `buildEmittedFiles`, which also refuses any project-scope
+path that leaves the project. `src/testkit/` is the published contract kit (`@ambystech/ambykit/testkit`).
+See [`plugin-api.md`](./plugin-api.md) and [`plugin-trust.md`](./plugin-trust.md).
 
 ## `BaseCommand`
 
@@ -53,6 +69,18 @@ config load/save, emitter resolution, tool detection, logging, error handling, a
 `--yes`. Its template method `run()` validates context then calls each subclass's `execute()`.
 Subclasses: `InitCommand`, `AddCommand`, `SyncCommand`, `CheckCommand`, `RestoreCommand`,
 `UpgradeCommand`, `DashboardCommand`.
+
+## One dependency graph
+
+Story and feature dependencies are read once and resolved once. `parseStories` reads the `depends-on` and
+`blocked-by` lines; `buildGraph` (`src/core/graph.ts`) turns every feature's stories into one pure,
+deterministic graph of story nodes, story edges (`depends-on` and `blocked-by` kept apart), feature edges
+derived from them, broken edges and cycles. `analyze`, the dashboard's attention list and story detail,
+`ambykit graph`, and later the run scheduler and the MCP server all read dependencies from that graph and
+never parse specs themselves; a guard test keeps it that way. Questions asked of the graph (which stories
+are buildable, what blocks a story, the critical path) live in `graph-paths.ts`, and the text, JSON and
+Mermaid formats in `graph-format.ts`. The interactive graph view loads only on the interactive dashboard,
+through a dynamic import, so one-shot and `--json` output stay inside the 1-second budget.
 
 ## Non-destructive rules merge (brownfield)
 

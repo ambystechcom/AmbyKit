@@ -29,6 +29,7 @@ describe("role binding on emitted commands (feature 013, US-1)", () => {
       clarify: "pm",
       constitution: undefined,
       converge: "qa",
+      decide: undefined,
       design: "ux",
       implement: "developer",
       plan: "architect",
@@ -43,7 +44,9 @@ describe("role binding on emitted commands (feature 013, US-1)", () => {
     mkdirSync(join(root, ".amby"), { recursive: true });
     const files = buildEmittedFiles(root, { version: "0.0.0", tools: ["claude"], manageRules: false });
     const direct = new ClaudeEmitter().emit(specs, noRoles);
-    expect(files.map((f) => f.contents)).toEqual(direct.map((f) => f.contents));
+    // The worker persona (feature 019) is not a command: compare the commands and rules files only.
+    const commands = files.filter((f) => f.path !== ".claude/agents/amby-worker.md");
+    expect(commands.map((f) => f.contents)).toEqual(direct.map((f) => f.contents));
     for (const f of files) expect(f.contents).not.toContain("say so in your first line");
   });
 
@@ -102,7 +105,7 @@ describe("native persona files (feature 013, US-5, FR-009)", () => {
     const expectPersonas = (files: { path: string }[], prefix: string, suffix: string) => {
       const personas = files.filter((f) => f.path.startsWith(prefix)).map((f) => f.path).sort();
       expect(personas).toEqual(
-        ["architect", "developer", "pm", "qa", "tech-lead", "ux"].map((id) => `${prefix}amby-${id}${suffix}`),
+        ["architect", "developer", "pm", "qa", "security", "tech-lead", "ux"].map((id) => `${prefix}amby-${id}${suffix}`),
       );
     };
     expectPersonas(new ClaudeEmitter().emit(specs, ctx), ".claude/agents/", ".md");

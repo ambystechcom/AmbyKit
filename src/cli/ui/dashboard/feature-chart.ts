@@ -65,7 +65,19 @@ function row(caps: Capabilities, r: FeatureRow, nameWidth: number, barWidth: num
   const agent = cols.agents
     ? fitVisible(caps, p ? agentBadge(caps, p, "glyph") : paintToken(caps, f["phase-fg"], glyph(caps, f["clarif-none"])), 3) + " "
     : "";
-  return `${cursor ?? ""}${nameCell} ${bar}   ${agent}${phase}${clarif}`;
+  return `${cursor ?? ""}${nameCell} ${bar}   ${agent}${phase}${clarif}${blockedCell(caps, r)}${coverageCell(caps, r)}`;
+}
+
+/** Feature 020 (FR-010, FR-014): ` 2 blocked` as plain text, only when a feature has blocked tasks. */
+function blockedCell(caps: Capabilities, r: FeatureRow): string {
+  if (!r.blocked || r.blocked <= 0) return "";
+  return paintToken(caps, TOKENS.component["feature-row"]["clarif-fg"], `  ${r.blocked} blocked`);
+}
+
+/** Feature 024 (FR-012, FR-014): ` cov 3/5` as plain text, only when a feature has requirements. */
+function coverageCell(caps: Capabilities, r: FeatureRow): string {
+  if (!r.coverage) return "";
+  return paintToken(caps, TOKENS.component["feature-row"]["phase-fg"], `  cov ${r.coverage.covered}/${r.coverage.total}`);
 }
 
 /**
@@ -111,7 +123,8 @@ export function plainFeatureChart(caps: Capabilities, rows: FeatureRow[], extras
     const wt = c ? `  wt${c.dirty ? "*" : ""}${c.stale ? " merged" : ""}` : "";
     const p = extras.agents?.get(r.name);
     const agent = p ? `  ${p.source === "detected" ? "~" : ""}${agentBadge({ ...caps, unicode: false, color: false }, { agent: p.agent, source: "reported" }, "glyph")}` : "";
-    lines.push(`${fitVisible(caps, featureLabel(r), 27)} ${bar.padEnd(27)} ${r.phase.padEnd(PHASE_WIDTH)}${clarif}${wt}${agent}`);
+    const blocked = r.blocked && r.blocked > 0 ? `  ${r.blocked} blocked` : "";
+    lines.push(`${fitVisible(caps, featureLabel(r), 27)} ${bar.padEnd(27)} ${r.phase.padEnd(PHASE_WIDTH)}${clarif}${wt}${agent}${blocked}${r.coverage ? `  cov ${r.coverage.covered}/${r.coverage.total}` : ""}`);
   }
   return lines;
 }

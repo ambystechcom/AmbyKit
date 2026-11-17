@@ -13,4 +13,13 @@ export class AntigravityEmitter extends SkillsEmitter {
   readonly toolId: string = "antigravity";
   readonly displayName: string = "Antigravity (IDE)";
   readonly commandDir: string = join(".agents", "skills");
+
+  /**
+   * Not written for the IDE. Antigravity's documented project file `.agents/mcp_config.json` is confirmed for
+   * the CLI only, and the IDE's own documented config is user-level with conflicting paths in other guides
+   * (`specs/025-mcp-server/research.md`).
+   */
+  override mcpSkipReason(): string | null {
+    return "the Antigravity IDE's MCP config location is unconfirmed (the CLI's project file is verified); add the server by hand";
+  }
 }

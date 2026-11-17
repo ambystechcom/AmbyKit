@@ -716,6 +716,32 @@ export const TOKENS = {
           "ansi16": "31"
         }
       },
+      "task-blocked": {
+        "symbol": {
+          "u": "⊘",
+          "a": "[b]"
+        },
+        "fg": {
+          "truecolor": {
+            "dark": "#ff5c5c",
+            "light": "#c62828"
+          },
+          "ansi16": "31"
+        }
+      },
+      "verify-failed": {
+        "symbol": {
+          "u": "⊗",
+          "a": "[v]"
+        },
+        "fg": {
+          "truecolor": {
+            "dark": "#f5b400",
+            "light": "#9a6700"
+          },
+          "ansi16": "33"
+        }
+      },
       "waiting": {
         "symbol": {
           "u": "→",

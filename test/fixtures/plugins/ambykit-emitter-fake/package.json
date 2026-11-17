@@ -1,0 +1,6 @@
+{
+  "name": "ambykit-emitter-fake",
+  "version": "1.2.3",
+  "type": "module",
+  "main": "index.js", "ambykit": { "pluginApi": "^1" }
+}

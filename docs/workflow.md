@@ -1,8 +1,8 @@
 # The AmbyKit workflow
 
-Eleven phases, each a slash command in your assistant, each producing or updating one artifact. The
+Thirteen phases, each a slash command in your assistant, each producing or updating one artifact. The
 happy path is **specify → design → plan → tasks → implement**, with `constitution` once up front and
-`clarify`/`revise`/`analyze`/`converge`/`review` when you need them.
+`clarify`/`revise`/`analyze`/`converge`/`review`/`decide`/`run` when you need them.
 
 | Phase | Command | Reads | Writes |
 |---|---|---|---|
@@ -12,11 +12,13 @@ happy path is **specify → design → plan → tasks → implement**, with `con
 | Revise | `/amby.revise` | spec, ui | spec / ui (continues in place) |
 | Design (UI) | `/amby.design` | spec | `ui.md`, `design-tokens.json` |
 | Plan (HOW) | `/amby.plan` | spec, ui | `plan.md` (+ `data-model.md`, `contracts/`) |
-| Tasks | `/amby.tasks` | plan | `tasks.md` |
+| Tasks | `/amby.tasks` | plan | `tasks.md` + `tests.md` (test design) |
 | Analyze | `/amby.analyze` | all | consistency report |
 | Implement | `/amby.implement` | tasks (one slice) | code + task/status updates |
 | Converge | `/amby.converge` | spec, plan, tasks + code | `tasks.md` (appends gap tasks), story status |
 | Review | `/amby.review` | any artifact + a role | findings (advisory); the artifact only with `--apply` |
+| Decide | `/amby.decide` | decision index | `.amby/decisions/ADR-###.md` + the index |
+| Run | `/amby.run` | spec, plan, tasks, `tests.md` | `tasks.md` check-offs + `.amby/fleet/<run>/` |
 
 ## 1. Constitution
 
@@ -59,7 +61,9 @@ needed. See [the plan artifact](./artifacts/plan.md).
 
 Turns the plan into an ordered, dependency-aware checklist: stable `T###` IDs, `[P]` parallel
 markers, `[US#]` story tags, and file paths, grouped so foundational work precedes feature work. See
-[the tasks artifact](./artifacts/tasks.md).
+[the tasks artifact](./artifacts/tasks.md). The same phase also writes `tests.md`, the test design: one case per
+acceptance criterion with an automate-or-manual decision, decided before any code. See
+[the tests artifact](./artifacts/tests.md).
 
 ## 8. Analyze
 
@@ -71,12 +75,20 @@ Cross-checks spec ↔ plan ↔ tasks for coverage gaps and inconsistencies, and 
 Executes tasks one slice at a time, checking off `tasks.md` checkboxes and updating each story's
 `status:` as it goes — which is what `ambykit dashboard` reports on.
 
+A task that cannot proceed gets a trailing `⚠ BLOCKED: <reason>` marker (and `↪ DEVIATION: <note>` when it
+was done differently than planned); the implementer moves on to another unblocked task. Each phase ends
+with one `**Verify:**` line that is run before the checkpoint, and its result (`✓ passed`,
+`✗ failed: <why>`, `? unverified`) is written back on that line; a failed Verify keeps the checkpoint
+closed. `ambykit dashboard` and `ambykit analyze` surface both at zero model tokens. Syntax:
+[tasks artifact](./artifacts/tasks.md).
+
 ## 10. Converge
 
 Closes the loop after implementation: checks the code against every `FR-###`/`SC-###`, plan
 decision, and checked task; appends one unchecked task per gap under `## Convergence` in `tasks.md`
 (`[VERIFY]` for inconclusive items); marks fully covered stories `done`. Append-only and idempotent —
-it never edits source. Loop `implement → converge` until it reports **converged**.
+it never edits source. It starts from `ambykit trace <feature> --json` (which requirements have tests),
+so it spends effort only on what the matrix cannot answer. Loop `implement → converge` until it reports **converged**.
 
 ## 11. Review
 
@@ -84,6 +96,26 @@ Asks a *different* role to critique an artifact — QA on a spec or task list, t
 plan, the PM on a UI design, or any role via `--as <id>`. Findings are one per line, each tied to a
 stable ID with severity and a suggested fix; nothing is modified. `--apply` patches the artifact in
 place (IDs are never renumbered) and appends a `## Reviews` record. Advisory, like `analyze`.
+
+## 12. Decide
+
+Records a durable decision as `.amby/decisions/ADR-###.md` (context, decision, alternatives, consequences)
+and patches the index. Callable from any phase; it has no role. It points to an existing record instead of
+duplicating one, keeps a decision that conflicts with a constitution principle `proposed` for a person to
+settle, and `--supersede ADR-###` marks the old record superseded on both sides. Cite records elsewhere as
+`ADR-###`; `ambykit analyze` flags a citation with no record. See `docs/artifacts/decision-record.md`.
+
+## 13. Run
+
+`/amby.run <feature>` works a feature through its tasks as a team. The assistant you call it from is the
+**lead**: it gives worker subagents only their task IDs, file ownership and artifact references, then runs a
+QA step (the phase's `**Verify:**` line and acceptance criteria, with the `tests.md` cases when present) and an
+architect review before a phase passes. A failing Verify never passes a checkpoint; a failed review returns only
+finding IDs to the same worker, and at the round limit (default 3) the lead stops and asks you. State lives in
+`.amby/fleet/<feature>.<n>/`, so a run resumes in a new session; pause, resume and stop are directives that
+workers obey at their next report. Defaults (`stallMinutes`, `restartLimit`, `concurrency`, `roundLimit`,
+`workerModel`) are the `fleet` object in `.amby/config.json`. Without verified subagent support the lead does
+every step itself, in sequence. `ambykit fleet` is the helper the prompt calls; see `docs/cli-reference.md`.
 
 ## Roles
 

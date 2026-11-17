@@ -1,0 +1,16 @@
+  converted  912-no-frontmatter/spec.md  +6 -1  (added minimal frontmatter)
+  converted  915-dup-verify/spec.md  +2 -0
+  converted  916-dup-id/spec.md  +2 -0
+  SKIPPED    910-prose-meta/spec.md  untouched: story metadata inside prose, not a bullet (line 7): moving it would change the sentence
+  SKIPPED    911-two-status/spec.md  untouched: US-1 has two status bullets (line 8); the v1 reader keeps the last, which a move would hide
+  SKIPPED    913-mixed-eol/spec.md  untouched: mixed line endings (CRLF and LF)
+  SKIPPED    914-fenced/spec.md  untouched: story metadata inside a code fence (line 8)
+  SKIPPED    914-fenced/tasks.md  untouched: task, phase or Verify markup inside a code fence (line 4)
+  SKIPPED    915-dup-verify/tasks.md  untouched: phase 1 has 2 Verify lines; migrating would have to pick one
+  SKIPPED    916-dup-id/tasks.md  untouched: phase 1 repeats a task id; ownership keyed by id would be ambiguous
+  SKIPPED    917-bom/spec.md  untouched: file starts with a byte-order mark
+  3 converted, 0 unchanged, 8 skipped (left untouched)
+PASS  7 unsafe specs (8 files) skipped, each listed with its reason
+PASS  a spec with no frontmatter gets minimal frontmatter (converted, and noted in the report)
+PASS  every skipped file is byte-identical to what it was (left untouched)
+PASS  a rerun converts nothing new (idempotent, skips stay skipped)

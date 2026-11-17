@@ -5,8 +5,8 @@ description: Continue an existing feature's spec (or design) — add and refine 
 argument-hint: "[feature id, defaults to current] + what to add or refine"
 phase: revise
 role: pm
-reads: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md]
-writes: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md]
+reads: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md, specs/NNN-slug/tests.md]
+writes: [specs/NNN-slug/spec.md, specs/NNN-slug/ui.md, specs/NNN-slug/tests.md]
 allowedTools: [read, edit]
 ---
 
@@ -27,6 +27,8 @@ of `@.amby/templates/spec.md`. This command **extends** an existing feature — 
    - New requirements use EARS (SHALL / WHEN / WHILE / IF-THEN / WHERE); new acceptance criteria use
      Given/When/Then — consistent with `specify`.
    - Leave any story already marked `status: done` untouched; you may still add new stories.
+   - If `tests.md` exists, mark each case citing a changed criterion `[stale]` and each citing a removed one
+     `[obsolete]` (never delete); change nothing else there.
 4. Set the `spec.md` frontmatter `status:` to `in-progress`.
 5. **Design (optional).** If the author is continuing the UI/design and `ui.md` exists, extend it in
    place, preserving existing sections. If `ui.md` does **not** exist, do not create it here — direct

@@ -1,4 +1,6 @@
-import { canonicalStoryId, type StoryProgress, type TaskLine } from "./dashboard.js";
+import type { StoryProgress, TaskLine } from "./dashboard.js";
+import { buildGraph, nodeKey } from "./graph.js";
+import type { StoryEdge } from "./graph-types.js";
 import {
   STATUS_ORDER,
   type AttentionItem,
@@ -127,66 +129,44 @@ export function featureRow(f: FeatureSnapshot): FeatureRow {
   // Only worktree rows carry their source, so output without worktrees is unchanged (017 FR-007/FR-008).
   if (f.checkout?.kind === "worktree") row.checkout = f.checkout;
   if (f.lanes && f.lanes.length > 0) row.lanes = f.lanes;
+  // Feature 020: undone tasks carrying a BLOCKED marker; omitted when zero so existing output is unchanged.
+  const blockedTasks = openBlockedTasks(f).length;
+  if (blockedTasks > 0) row.blocked = blockedTasks;
+  // Feature 020: Verify lines by state; omitted when the feature has no Verify lines at all.
+  const verify = verifyCounts(f);
+  if (verify) row.verify = verify;
+  // Feature 024: covered/total requirements; omitted without requirements so existing output is unchanged.
+  if (f.coverage) row.coverage = { covered: f.coverage.covered, total: f.coverage.total };
   return row;
+}
+
+/**
+ * Feature 020 (FR-010): count the verifiable phases (at least one task) by Verify state. `verified` has a
+ * last result of passed, `failed` has a last result of failed, `missing` has no Verify line. A phase with a
+ * Verify line but no result yet (or `? unverified`) is in none of the three. Undefined when no phase has a
+ * Verify line, so features without any keep their existing output.
+ */
+function verifyCounts(f: FeatureSnapshot): { verified: number; failed: number; missing: number } | undefined {
+  const phases = (f.verify ?? []).filter((p) => p.tasks > 0);
+  if (!phases.some((p) => p.check !== undefined)) return undefined;
+  return {
+    verified: phases.filter((p) => p.check !== undefined && p.result === "passed").length,
+    failed: phases.filter((p) => p.check !== undefined && p.result === "failed").length,
+    missing: phases.filter((p) => p.check === undefined).length,
+  };
+}
+
+/**
+ * Feature 020: tasks still open that carry a BLOCKED marker. A checked task with a leftover marker is an
+ * inconsistency (FR-004), reported by `analyze`, and never counts as blocked here.
+ */
+function openBlockedTasks(f: FeatureSnapshot): TaskLine[] {
+  return (f.tasks ?? []).filter((t) => !t.done && t.blocked !== undefined);
 }
 
 /** Feature-qualified, unambiguous story key for display, e.g. `014:US-3` or `008-alpha:US-1`. */
 export function storyLabel(f: FeatureSnapshot, s: StoryProgress): string {
   return `${f.displayRef}:${s.displayId}`;
-}
-
-interface Node {
-  feature: FeatureSnapshot;
-  story: StoryProgress;
-}
-
-/**
- * Index stories by a collision-safe key (`dir:id`). `StoryProgress.key` uses the feature number,
- * which two `008-*` features share, so the overview keys by directory instead.
- */
-function indexStories(features: FeatureSnapshot[]): Map<string, Node> {
-  const index = new Map<string, Node>();
-  for (const feature of features) {
-    for (const story of feature.stories) index.set(`${feature.dir}:${story.id}`, { feature, story });
-  }
-  return index;
-}
-
-/** Resolve a dependency to a node key: bare ids stay in the story's feature; `NNN:US-1` targets NNN. */
-function resolveDep(features: FeatureSnapshot[], from: FeatureSnapshot, dep: string): string {
-  const qualified = /^(\d+)[:/]?(US\d+)$/.exec(canonicalStoryId(dep));
-  if (qualified) {
-    const target = features.find((f) => f.ref === qualified[1]);
-    return `${target?.dir ?? qualified[1]}:${qualified[2]}`;
-  }
-  return `${from.dir}:${canonicalStoryId(dep)}`;
-}
-
-/** How a dependency target reads from the referencing story: local id, or qualified when cross-feature. */
-function depLabel(from: FeatureSnapshot, target: Node | undefined, dep: string): string {
-  if (!target) return prettyId(dep);
-  return target.feature.dir === from.dir ? target.story.displayId : storyLabel(target.feature, target.story);
-}
-
-/** Keys of every node that sits on a dependency cycle (DFS with coloring). */
-function cycleKeys(index: Map<string, Node>, edges: (n: Node) => string[]): Set<string> {
-  const color = new Map<string, number>();
-  const stack: string[] = [];
-  const onCycle = new Set<string>();
-  const visit = (key: string): void => {
-    color.set(key, 1);
-    stack.push(key);
-    for (const next of edges(index.get(key)!)) {
-      if (!index.has(next)) continue;
-      const c = color.get(next) ?? 0;
-      if (c === 1) for (const k of stack.slice(stack.indexOf(next))) onCycle.add(k);
-      else if (c === 0) visit(next);
-    }
-    stack.pop();
-    color.set(key, 2);
-  };
-  for (const key of index.keys()) if (!color.has(key)) visit(key);
-  return onCycle;
 }
 
 /**
@@ -195,44 +175,71 @@ function cycleKeys(index: Map<string, Node>, edges: (n: Node) => string[]): Set<
  * `depends-on` target not done). Each story appears once, in its highest-ranked kind.
  */
 export function attentionItems(all: FeatureSnapshot[], scoped: FeatureSnapshot[]): AttentionItem[] {
-  const index = indexStories(all);
-  const deps = (n: Node, list: string[]): string[] => list.map((d) => resolveDep(all, n.feature, d));
-  const onCycle = cycleKeys(index, (n) => deps(n, [...n.story.dependsOn, ...n.story.blockedBy]));
-  const isDone = (key: string): boolean => index.get(key)?.story.status === "done";
+  // Dependencies come from the shared graph (feature 023): this function only ranks them.
+  const graph = buildGraph(all);
+  const nodes = new Map(graph.nodes.map((n) => [n.key, n]));
+  const edgesFrom = new Map<string, StoryEdge[]>();
+  for (const e of graph.edges) edgesFrom.set(e.from, [...(edgesFrom.get(e.from) ?? []), e]);
+  const brokenFrom = new Map<string, typeof graph.broken>();
+  for (const b of graph.broken) brokenFrom.set(b.from, [...(brokenFrom.get(b.from) ?? []), b]);
+  const onCycle = new Set(graph.cycles.flatMap((c) => c.stories));
+  const isDone = (key: string): boolean => nodes.get(key)?.status === "done";
+  /** How a dependency target reads from the referencing story: local id, or qualified when cross-feature. */
+  const labelOf = (from: FeatureSnapshot, key: string): string => {
+    const n = nodes.get(key);
+    if (!n) return key;
+    return n.feature === from.dir ? n.story : n.id;
+  };
 
   const problems: AttentionItem[] = [];
   const blocked: AttentionItem[] = [];
   const waiting: AttentionItem[] = [];
+  const taskBlocked: AttentionItem[] = [];
+  const verifyFailed: AttentionItem[] = [];
   for (const feature of scoped) {
+    // Feature 020 (FR-010): one item per phase whose last recorded Verify failed; a phase is named `phase-N`.
+    for (const phase of feature.verify ?? []) {
+      if (phase.tasks === 0 || phase.check === undefined || phase.result !== "failed") continue;
+      verifyFailed.push({
+        key: `${feature.displayRef}:phase-${phase.phase}`,
+        kind: "verify-failed",
+        refs: [`phase-${phase.phase}`],
+        reason: phase.why ? `verify failed: ${phase.why}` : "verify failed",
+      });
+    }
+    // Feature 020 (FR-010): one item per open task with a BLOCKED marker, keyed by feature and task id.
+    for (const task of openBlockedTasks(feature)) {
+      taskBlocked.push({
+        key: `${feature.displayRef}:${task.id}`,
+        kind: "task-blocked",
+        refs: [task.id],
+        reason: task.blocked ? `BLOCKED: ${task.blocked}` : "BLOCKED (no reason given)",
+      });
+    }
     for (const story of feature.stories) {
       if (story.status === "done") continue;
       const key = storyLabel(feature, story);
-      const node = { feature, story };
-      const label = (dep: string): string => depLabel(feature, index.get(resolveDep(all, feature, dep)), dep);
+      const self = nodeKey(feature.dir, story.id);
+      const edges = edgesFrom.get(self) ?? [];
 
-      const refs = [
-        ...story.dependsOn.map((dep) => ({ field: "depends-on", dep })),
-        ...story.blockedBy.map((dep) => ({ field: "blocked-by", dep })),
-      ];
-      const unknown = refs.filter((r) => !index.has(resolveDep(all, feature, r.dep)));
+      const unknown = brokenFrom.get(self) ?? [];
       if (unknown.length > 0) {
         problems.push({
           key,
           kind: "graph-problem",
-          refs: unknown.map((r) => prettyId(r.dep)),
-          reason: `${unknown.map((r) => `${r.field} ${prettyId(r.dep)}`).join(", ")} — unknown story`,
+          refs: unknown.map((b) => prettyId(b.to)),
+          reason: `${unknown.map((b) => `${b.kind} ${prettyId(b.to)}`).join(", ")} — unknown story`,
         });
         continue;
       }
-      const selfKey = `${feature.dir}:${story.id}`;
-      if (onCycle.has(selfKey)) {
-        const refs = deps(node, [...story.dependsOn, ...story.blockedBy])
-          .filter((k) => onCycle.has(k))
-          .map((k) => depLabel(feature, index.get(k), k));
+      if (onCycle.has(self)) {
+        const refs = edges.filter((e) => onCycle.has(e.to)).map((e) => labelOf(feature, e.to));
         problems.push({ key, kind: "graph-problem", refs, reason: `dependency cycle with ${refs.join(", ")}` });
         continue;
       }
-      const openBlockers = story.blockedBy.filter((d) => !isDone(resolveDep(all, feature, d))).map(label);
+      const openBlockers = edges
+        .filter((e) => e.kind === "blocked-by" && !isDone(e.to))
+        .map((e) => labelOf(feature, e.to));
       if (story.status === "blocked" || openBlockers.length > 0) {
         blocked.push({
           key,
@@ -242,13 +249,15 @@ export function attentionItems(all: FeatureSnapshot[], scoped: FeatureSnapshot[]
         });
         continue;
       }
-      const openDeps = story.dependsOn.filter((d) => !isDone(resolveDep(all, feature, d))).map(label);
+      const openDeps = edges
+        .filter((e) => e.kind === "depends-on" && !isDone(e.to))
+        .map((e) => labelOf(feature, e.to));
       if (openDeps.length > 0) {
         waiting.push({ key, kind: "waiting", refs: openDeps, reason: `waiting on ${openDeps.join(", ")}` });
       }
     }
   }
-  return [...problems, ...blocked, ...waiting];
+  return [...problems, ...blocked, ...waiting, ...taskBlocked, ...verifyFailed];
 }
 
 /**
@@ -269,6 +278,8 @@ export function upNext(
     for (const t of tasks) {
       if (t.done) continue;
       open += 1;
+      // Feature 020: a task marked BLOCKED is not offered as ready work; lane planning is unchanged.
+      if (t.blocked !== undefined) continue;
       const story = t.story ? byId.get(t.story) : undefined;
       const storyKey = story ? storyLabel(feature, story) : null;
       if (storyKey && held.has(storyKey)) continue;

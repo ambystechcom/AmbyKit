@@ -94,6 +94,26 @@ your edits are kept), warns when a role in `.amby/roles/` exceeds 150 words, and
 when two roles share an id. Projects with roles get one native sub-agent per role for Claude Code,
 OpenCode, and Copilot.
 
+**Plugins (experimental).** `plugins` in `.amby/config.json` maps an `ambykit-emitter-*` package to the exact
+version installed in the project's own `node_modules`; `sync` (and `check` and `add`) load only those, then
+emit their targets like built-in ones:
+
+```json
+{ "tools": ["claude", "mytool"], "plugins": { "ambykit-emitter-mytool": "1.0.0" } }
+```
+
+`sync` prints each loaded plugin as `name@version` and an experimental note. A plugin that is missing,
+mis-pinned, outside the plugin-API range, malformed, or that clashes with another target is reported by name
+and skipped; the other targets still sync and `sync` exits **1**. A plugin file outside the project is refused;
+a file in the home directory needs `--include-user` and is never part of `--check`. Without a `plugins` key
+nothing is loaded and output is unchanged. A configured target that moved to a plugin gets a notice naming the
+package (none have moved yet). See [`plugin-api.md`](./plugin-api.md), [`plugin-trust.md`](./plugin-trust.md)
+and [`plugin-split.md`](./plugin-split.md).
+
+Plugin authors test with `@ambystech/ambykit/testkit` (`checkEmitterContract`, `assertEmitterContract`, and the
+`createPluginApi` helper), which checks an emitter's paths and frontmatter keys against a matrix row; a missing
+row fails. The plugin API itself is `@ambystech/ambykit/plugin`.
+
 ## `ambykit restore [file]`
 
 Recover an agent-doc file (`AGENTS.md`, `CLAUDE.md`, a tool's rules file) from the timestamped backup
@@ -173,25 +193,31 @@ Detection reads the process list only, never sends anything, and stops when you 
     it reads without color);
   - **Attention** — dependency cycles and unknown references first, then blocked stories (status
     `blocked`, or a `blocked-by` story that is not done), then stories waiting on an unfinished
-    `depends-on`;
+    `depends-on`; then open tasks that carry a `BLOCKED` marker (kind `task-blocked`) and phases
+    whose last recorded Verify result failed (kind `verify-failed`, keyed `<feature>:phase-N`);
   - **Up next** — the next undone tasks whose story is not in Attention (`--next=N`, default 5);
+    tasks carrying a `BLOCKED` marker are left out;
   - **burndown** — remaining vs. done tasks per day/week/month from the git history of `tasks.md`
     (the last column is your working tree); shows "No history available" outside a git repo;
   - **feature completion** — one row per feature with its bar, workflow phase (specified → designed →
     planned → tasked → implementing → done) and open `[NEEDS CLARIFICATION]` count. A feature with no
-    `tasks.md` reads "not planned".
+    `tasks.md` reads "not planned". A feature with open `BLOCKED` tasks shows `N blocked` on its row
+    as plain text, only when N is above zero.
 
   Unreadable files are skipped and named in a notice line. Off a TTY (pipes, CI) the same content is
   printed as plain text.
 - **`--feature=X`** — the feature view for one feature (`X` is its number, e.g. `014`, or its
   directory name): artifacts present, open clarifications, status, the story table with a
-  `Waiting on` column, and Attention / Up next / burndown scoped to the feature.
+  `Waiting on` column, and Attention / Up next / burndown scoped to the feature. The `tasks.md`
+  artifact line ends with `verify <passed>/<total>` when phases carry a `**Verify:**` line, plus
+  `, FAILED phase N` for each phase whose last result failed.
 - **`--status=X`** — narrow every widget to stories with that status.
 - **`--stories`** — the previous story table (`Feat | Story | description | progress | status |
   priority | blocked-by`) with an overall roll-up.
 - **`story-id`** — detail for one story. Story ids **restart per feature**, so a bare `US-3` may
   match several; qualify it with the feature ref as `NNN:US-3` (also accepts `NNN/US-3`). A bare id
-  that matches more than one feature prints the matches so you can pick.
+  that matches more than one feature prints the matches so you can pick. A task row ends with
+  `BLOCKED: <reason>` and `DEVIATION: <note>` when the task line carries those markers.
 - **`--interactive`** — the overview full screen (TTY only): `tab` moves focus between Attention, Up
   next, Worktrees & agents and Feature completion, `↑`/`↓` move, `enter` opens the feature view and,
   from there, the story detail (tasks, relations, checkout and agent). `esc` goes back (on the
@@ -208,7 +234,12 @@ Detection reads the process list only, never sends anything, and stops when you 
 - **`--json --overview`** — one object: `stories` (exactly the `--json` list) plus `summary`,
   `statusCounts`, `features`, `attention`, `upNext`, `burndown`, `issues` and the applied `filters`.
   Each feature has a `checkout`: `{ "kind": "main" }`, or
-  `{ "kind": "worktree", "branch", "dirty", "stale" }`.
+  `{ "kind": "worktree", "branch", "dirty", "stale" }`. A feature also has `blocked` (number of
+  open tasks with a `BLOCKED` marker) and `verify` (`{ "verified", "failed", "missing" }` counts of
+  phases); each key is omitted when it does not apply (`blocked` when zero, `verify` when the
+  feature has no Verify lines). `attention` may contain items of kind `task-blocked` (key
+  `<feature>:<task id>`) and `verify-failed` (key `<feature>:phase-N`, reason `verify failed: <why>`).
+  Bare `--json` is unchanged.
 
 ```bash
 ambykit dashboard
@@ -236,6 +267,54 @@ missing flag is a warning, and the exit code is always 0.
 ambykit activity 017 --agent=claude --phase=implement --task=T014
 ```
 
+For a fleet lane (feature 025) add `--lane=<lane>` (`lane-1-2`, `1-2` or the full name), `--state=working|waiting|blocked|paused|done`
+and `--run=<id>`. A lane puts its short name in the marker's file name, `<feature>.<agent>~lane-1-2.json`, so two lanes of one
+assistant never overwrite each other; the marker body gains `lane`, `state` and `run`. Without these flags the marker is
+byte-for-byte what it was. It is the same core writer the `report_activity` MCP tool calls.
+
+## `ambykit mcp`
+
+Serves AmbyKit's state tools to an assistant over MCP on stdio (see [the MCP server](./concepts/mcp-server.md)). The assistant
+starts it from the project root or a lane worktree; you do not run it by hand. stdout carries protocol messages only. Set
+`"mcp": { "enabled": true }` in `.amby/config.json` and run `ambykit sync` to write each verified assistant's MCP config.
+
+## `ambykit directive <feature> <lane> pause|resume|stop`
+
+Tells a fleet lane to pause, resume (writes `continue`) or stop. The worker finishes its current task and obeys at its next
+report. `--run=<id>` picks the run when several are unfinished. An unknown lane is refused by name. This is the one writer that
+the prompts, the terminal and the dashboard all call.
+
+```bash
+ambykit directive 025 lane-1-1 pause
+```
+
+## `ambykit fleet <start|status|update|claim|release|note|directive> <feature>`
+
+The helper `/amby.run` and its workers call, so every change to a run goes through one validated path. It
+keeps no state of its own: runs, claims, notes and directives are the fleet state under `.amby/fleet/<run>/`,
+and stall detection is the same one the dashboard uses.
+
+```bash
+ambykit fleet start 019 [--new]          # create run 019-...N; refuses when one is unfinished unless --new
+ambykit fleet status 019 [--run=<id>] [--json] [--rebuild]
+ambykit fleet update 019 --worker-start=lane-1-1 --assistant=claude --tasks=T001,T002
+ambykit fleet update 019 --stage=qa | --phase=2 | --round=2 | --decision="<text>" | --done
+ambykit fleet update 019 --pause[=<lane>] | --resume[=<lane>] | --stop[=<lane>]
+ambykit fleet update 019 --overlap=squad --lanes=a,b --shared=<path> --writer=<path>:<lane> --order=a,b
+ambykit fleet claim 019 T012 src/a.ts [--worker=<id>]   # refused, naming the owner, when held
+ambykit fleet release 019 T012
+ambykit fleet note 019 T012 --files=src/a.ts "one-line note"
+ambykit fleet directive 019 lane-1-1     # prints continue, pause or stop
+```
+
+`start` creates nothing for a feature that is already done or whose spec, plan or tasks are missing or draft.
+`status` prints the run, the next phase, each lane (state, idle time, directive, restarts left), free slots
+under `fleet.concurrency`, and warnings: damaged state, a checked task that still holds claims, a lane edit
+with no claim. `--rebuild` rewrites a missing or corrupt `run.json` from `tasks.md` and never touches checked
+tasks. `--worker-start` is refused when no slot is free; `--restart` is refused after `fleet.restartLimit`
+restarts, pausing the lane and asking a person. `--round` prints `retry` or `escalate` and, on `escalate`,
+waits for a decision. Pause, resume and stop go through the same writer as `ambykit directive`.
+
 ## `ambykit analyze`
 
 Validate the story dependency graph, computed locally from `specs/` (no model tokens): detects
@@ -248,10 +327,104 @@ where at least one is `[P]`, are reported as **Lane conflicts** (by task id and 
 non-zero. Open tasks with no usable path, or a glob, are listed as warnings and do not affect the
 exit code.
 
+Also reports, as warnings only (the exit code never changes), what the task file says about itself:
+
+- **Blocked tasks** — open tasks with a `BLOCKED: <reason>` marker, and **Deviations** — tasks with
+  a `DEVIATION: <note>` marker. A `BLOCKED` marker with no reason, or on a checked task, is a
+  **marker issue**.
+- **Verify** — phases whose last recorded Verify result failed, and phases with no `**Verify:**`
+  line (only for features that still have open tasks, grouped per feature in text). Phases are named
+  `<feature>:phase-N`.
+
+- **Test design** — for every feature that has a [`tests.md`](./artifacts/tests.md): unknown ids, requirements with no
+  case and no reason, criteria with neither case nor flag, duplicate case ids, bad or missing manual reasons, more
+  than 15 cases for a story and `[stale]` cases. Features without a `tests.md` print nothing.
+
+In `--json` these are the keys `blockedTasks` (`feature`, `task`, `story`, `reason`), `deviations`
+(`feature`, `task`, `note`), `markerIssues` (`feature`, `task`, `kind` `missing-reason` or
+`checked-but-blocked` or `path-after-marker` (a `(file/path)` group after the marker), `message`) and `verifyIssues` (`feature`, `phase`, `title`, `kind` `missing`
+or `failed`, `why` for failed). Each key is absent when it has no entries, so output for a project
+without markers is unchanged.
+
+Test design adds one more key, `testDesign`: `findings` (`feature`, `kind`, `message`, optional `ref` and `line`) and
+`missing` (the features that have no `tests.md`). It is present only when at least one feature has a `tests.md`,
+so a project without test design reports exactly what it did before.
+
 ```bash
 ambykit analyze
 ambykit analyze --json   # includes lanes.conflicts and lanes.declarations
+                         # plus blockedTasks, deviations, markerIssues, verifyIssues, testDesign when present
 ```
+
+## `ambykit graph [feature]`
+
+Print the story and feature dependency graph, built once from `specs/` by the same code that `analyze`
+and the dashboard use (no model tokens). A story's `depends-on`, `blocked-by` and `NNN:US-#`
+references become **story edges** (kept as separate kinds); a story in feature A that depends on a story
+in feature B gives a **feature edge** from A to B that records the story edges causing it. Dependencies
+that name something that does not exist are **broken edges**; a dependency loop is a **cycle**. Both are
+listed first and make the command exit **1**; otherwise it exits 0. With a feature (its number or
+directory name) it shows only that feature and its direct neighbours, in both directions.
+
+```bash
+ambykit graph                # readable text
+ambykit graph 023            # one feature and its direct neighbours
+ambykit graph --json         # versioned machine shape (below)
+ambykit graph --mermaid      # Mermaid flowchart: one subgraph per feature
+```
+
+`--mermaid`: `A --> B` means A depends on B, a dashed `A -.-> B` means A is blocked by B, and a thick
+arrow joins two feature subgraphs for each feature edge. The syntax is checked structurally; paste it
+into a Mermaid renderer to view it.
+
+`--json` has `version` (`1`) and the keys below. Fields are only ever added, never removed or renamed
+(see `specs/023-dependency-graph/contracts/graph-json.md`).
+
+| Key | Contents |
+| --- | --- |
+| `nodes[]` | `id` (`NNN:US-#`), `feature` (directory), `story`, `title`, `status`, `priority` |
+| `edges[]` | `from`, `to` (node ids), `kind` (`depends-on` or `blocked-by`) |
+| `featureEdges[]` | `from`, `to` (feature directories), `via[]` (the causing story edges) |
+| `broken[]` | `from`, `to` (as written), `kind`, `reason` (`unknown-story` or `unknown-feature`) |
+| `cycles[]` | each cycle as an ordered list of node ids; a self-dependency is a cycle of one |
+
+Output is the same for the same files whatever the directory order.
+
+## `ambykit trace [feature] [--json] [--gate]`
+
+Shows which requirements have tests, computed locally from `specs/` and your test files (no model
+tokens, read-only). For each feature it lists every `FR-###` as covered (with the tests that cite it),
+uncovered (with its text), or deliberately uncovered. It also lists **orphans** (tests citing an id that
+exists in no spec), **ambiguous** bare ids, **skipped** tests that cite a requirement, and **uncited**
+tests (no id in the name; the first 20 are shown, all are in `--json`). A feature argument is a number
+or directory name and limits the report to that feature.
+
+- `--json` prints the versioned shape in `specs/024-trace/contracts/trace-json.md`; fields are only
+  ever added.
+- `--gate` exits 1 when any requirement is uncovered, else 0. Without it `trace` always exits 0.
+- A requirement left without a test on purpose is not counted uncovered by the gate. Record it as one
+  line, `uncovered: FR-### — reason`, in the feature's `tests.md` (or, without a test design, in
+  `spec.md`).
+- If a feature has a `tests.md` (spec 021), each designed `auto` case is reported `matched` or
+  `missing` and each `manual` case is listed as `manual`.
+- Tests are found as `*.test.*` / `*.spec.*` files under the project, skipping `node_modules`, `dist`,
+  `coverage`, `.git`, `.worktrees`, `.amby` and `specs`. Override with
+  `"trace": { "roots": ["src"], "ignore": ["fixtures"] }` in `.amby/config.json`.
+
+### Citing requirements
+
+A test covers a requirement when its name **begins** with the qualified id and a colon:
+
+```ts
+it("019:FR-004: rejects an empty name", () => { … });
+it("019:FR-004, 020:FR-001: shared behavior", () => { … });   // several ids
+```
+
+- Use `NNN:FR-###` (feature number, then requirement). A bare `FR-004` never matches: it is reported
+  ambiguous when several features define it, otherwise unqualified.
+- An id anywhere but the start (`… (FR-004)`) does not cite. `skip`/`todo` tests never cover.
+- Only `it`/`test` titles are read: an id in a `describe(...)` name does not cite the tests beneath it,
+  and `.each` titles are not expanded.
 
 ## `ambykit check`
 

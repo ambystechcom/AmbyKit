@@ -46,6 +46,11 @@ export function rolesDir(): string {
   return join(packageRoot(), "src", "roles");
 }
 
+/** Directory containing the shipped neutral subagent prompts, e.g. the fleet worker (feature 019). */
+export function agentsDir(): string {
+  return join(packageRoot(), "src", "agents");
+}
+
 /** Directory containing on-demand reference docs (loaded by phases when needed). */
 export function referenceDir(): string {
   return join(packageRoot(), "src", "reference");

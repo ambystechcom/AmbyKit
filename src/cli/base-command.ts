@@ -132,6 +132,11 @@ export abstract class BaseCommand {
       for (const p of result.skippedForeign) this.info(`  ~ ${p}`);
       this.info("  Rename or move them (the path is an AmbyKit skill name) and re-run to let AmbyKit write its own.");
     }
+    if (result.skippedJson.length > 0) {
+      this.warn(`Left ${result.skippedJson.length} MCP config file(s) untouched:`);
+      for (const s of result.skippedJson) this.info(`  ~ ${s.path}: ${s.reason}`);
+      this.info("  Add the ambykit server by hand, or make the file plain JSON and re-run.");
+    }
     if (result.aborted.length > 0) {
       this.warn(`Could not safely update ${result.aborted.length} file(s):`);
       for (const p of result.aborted) this.info(`  ! ${p}`);

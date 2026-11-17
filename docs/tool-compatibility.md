@@ -40,8 +40,10 @@ Several targets share one emitter's output (why `BaseEmitter` + thin subclasses 
 | Args placeholder | `$ARGUMENTS`, `$N`, `$name` | `$ARGUMENTS`, `$1` | `${input:x}` | — | prompt text | — | none — reworded as prose (as Codex) | none — trailing free text only (AmbyKit reworks `$ARGUMENTS` into prose) |
 | Agents | `.claude/agents/*.md` | `.opencode/agents/*.md` | `.github/agents/*.agent.md` | `.github/agents/*.agent.md` | UI modes (no file) | — | none (SDK only) | none (skills only) |
 | Agent frontmatter | `name`*, `description`*, `tools`, `model` (body = system prompt) | `description`* (+`mode`, `permission`; filename = id) | `description`*, `name`, `tools` | same as Copilot VS Code | — | — | — | — |
-| MCP file | `.mcp.json` | `opencode.json` → `mcp` | `.vscode/mcp.json` | `~/.copilot/mcp-config.json` (user) | `.cursor/mcp.json` | reads `.cursor/mcp.json` | `mcp_config.json` (user) | `.codex/config.toml` (TOML) — **out of scope**, AmbyKit does not write it |
-| MCP top-level key | (per-server `type`) | `mcp` | `servers` | `mcpServers` | `mcpServers` | — | `mcpServers` | `mcp_servers.<id>` (not written) |
+| Subagents for `/amby.run` (019) | **confirmed**: the emitted `amby-*` agents are spawnable in a live Claude Code session (checked 2026-11-16); `amby-worker` is emitted at `.claude/agents/amby-worker.md` with `tools` incl. Write/Edit/Bash and `model` from `fleet.workerModel` | unconfirmed: format documented, `amby-worker` emitted at `.opencode/agents/` (no `model`), not run live | unconfirmed: `amby-worker` emitted at `.github/agents/amby-worker.agent.md`, not run live | unconfirmed (shares the Copilot file) | none (UI modes only) | none | none (SDK only) | none (skills only) |
+| MCP file | `.mcp.json` | `opencode.json` — **not written** (two incompatible schemas; see `specs/025-mcp-server/research.md`) | `.vscode/mcp.json` | `~/.copilot/mcp-config.json` (user) | `.cursor/mcp.json` | reads `.cursor/mcp.json` | **not written** for the IDE (the CLI uses `.agents/mcp_config.json`, project) | `.codex/config.toml` (TOML) — **out of scope**, AmbyKit does not write it |
+| MCP top-level key | `mcpServers` | `mcp` or `mcp.servers` (by version) | `servers` | `mcpServers` | `mcpServers` | `mcpServers` (shared file) | `mcpServers` | `mcp_servers.<id>` (not written) |
+| MCP entry shape | `{type:"stdio",command,args}` | — | `{type:"stdio",command,args}` | `{type:"local",command,args,tools:["*"]}` (`tools` required) | `{type:"stdio",command,args}` | same as Cursor | `{command,args}` | — |
 | AGENTS.md native | No (bridge) | Yes | Yes (opt-in) | Yes | Yes | Yes | Yes | Yes |
 
 ## Matrix — additional targets (feature 016)
@@ -58,6 +60,7 @@ documented surfaces are emitted (Principle 4).
 | Command name | path under the dir, `/` ⇒ `:`; dots kept | as Gemini | as Gemini; dots kept | filename | filename; subdir ⇒ `:` | filename | directory name | invoked `/skill:<name>` |
 | AGENTS.md native | No (opt-in via `context.fileName`) | No (`contextFileName`) | Yes per source; the docs page still says `QWEN.md` only | Yes | Yes | Yes | Yes | Yes (also `CLAUDE.md`) |
 | Agents/personas | not emitted | not emitted | not emitted | not emitted | not emitted | not emitted | not emitted | not emitted |
+| Subagents for `/amby.run` (019) | none (no documented file format) | none (`/subagent save` only) | none | none | none | none | none | none (shares the Codex output) |
 | Sources | github.com/google-gemini/gemini-cli (docs/cli/custom-commands.md, gemini-md.md) | github.com/vybestack/llxprt-code (docs/cli/commands.md, configuration.md) | qwenlm.github.io/qwen-code-docs (features/commands); github.com/QwenLM/qwen-code | kilo.ai/docs (customize/workflows, agents-md) | docs.augmentcode.com/cli (custom-commands, rules) | docs.devin.ai/desktop/cascade (workflows, memories) | kiro.dev/docs (skills, steering) | github.com/earendil-works/pi (packages/coding-agent/docs/skills.md) |
 
 **Gemini and LLxprt (TOML).** The prompt is a TOML literal multi-line string (`'''…'''`), so
@@ -77,6 +80,15 @@ identical and written once. Its activity self-report says `codex`.
 `.agents/skills/`. With Codex selected they can see each phase twice (once as a command, once as a
 skill). This is documented, not suppressed. Augment also reads `.claude/commands/`; the names are
 identical and `.augment/` takes precedence, so Claude plus Augment yields no duplicates.
+
+**Subagents (feature 019).** `/amby.run` delegates to a write-capable `amby-worker` and to the read-only
+`amby-qa` and `amby-architect` personas. The per-target table is `src/core/subagents.ts`; only a target
+confirmed on a live install counts as supported (Principle 4), every other target gets the same prompt with
+`$SUBAGENTS` = `no`, so the lead does the worker, QA and review steps itself in sequence from the same state
+files. Claude Code is confirmed (the `amby-*` agents from feature 013 are spawnable in a live session, and the
+worker uses the same documented frontmatter plus write tools); the first live run of `amby-worker` from
+`/amby.run` is the 019 dogfood gate. Only Claude documents a `model` key for agent files, so
+`fleet.workerModel` is applied there and ignored elsewhere.
 
 ### Status notes (checked 2026-11-04)
 
@@ -119,10 +131,14 @@ identical and `.augment/` takes precedence, so Claude plus Augment yields no dup
 - **Rules files are merged, not overwritten.** Every rules file wraps AmbyKit's content in a
   `### AmbyKit usage` section so it can be spliced into a file the user already authored; only that
   section is AmbyKit's. (Command/prompt/skill/workflow files remain fully generated and overwritten.)
-- **MCP top-level key differs**: `servers` (Copilot VS Code) vs `mcpServers` (Cursor, Copilot CLI,
-  Antigravity) vs `mcp` (OpenCode) vs per-server `type` blocks (Claude `.mcp.json`).
-- **MCP scope differs**: Copilot CLI and Antigravity use **user-level** files outside the repo — AmbyKit
-  writes these only with explicit consent and excludes them from the "repo in sync" check.
+- **MCP top-level key differs**: `servers` (Copilot VS Code) vs `mcpServers` (Claude `.mcp.json`, Cursor,
+  Copilot CLI, Antigravity) vs `mcp` / `mcp.servers` (OpenCode, version-dependent, not written). Copilot CLI's
+  entry needs `type: "local"` and `tools`; the others use `type: "stdio"` (Antigravity has none).
+- **MCP scope differs**: Copilot CLI uses a **user-level** file outside the repo, and the Antigravity IDE's
+  documented global file is user-level too. AmbyKit writes the Copilot CLI file only with explicit consent
+  (`--include-user`), never writes the Antigravity IDE's, and excludes user files from the "repo in sync"
+  check. Antigravity CLI has a project file, `.agents/mcp_config.json`. Verified shapes and sources are in
+  `specs/025-mcp-server/research.md`.
 - **Scoped-instruction key differs**: Copilot `applyTo` vs Cursor `globs` (+ `alwaysApply`).
 - **Command surface differs**: Copilot CLI has no `.prompt.md`; phases map to `SKILL.md`. Antigravity
   now uses skills (`.agents/skills/<name>/SKILL.md`); workflows (`.agents/workflows/*.md`, with a
@@ -198,3 +214,35 @@ and docs.github.com/copilot · Cursor: cursor.com/docs · Antigravity: antigravi
 Google Cloud blog. Codex CLI: developers.openai.com/codex (skills, custom prompts, config reference,
 AGENTS.md guide). Gemini CLI, LLxprt, Qwen Code, Kilo, Augment, Windsurf, Kiro and Pi: see the
 "Sources" row of the additional-targets matrix. AGENTS.md standard: agents.md.
+
+## Matrix rows for plugins
+
+The matrix above is prose for people. A plugin (feature 027, experimental) records the same facts as
+**data**, so the test kit in `@ambystech/ambykit/testkit` can check an emitter against them. One row
+describes one target:
+
+```json
+{
+  "target": "mytool",
+  "commandSurface": "commands",
+  "commandDir": ".mytool/commands",
+  "fileTemplate": "amby.<phase>.md",
+  "frontmatterKeys": ["description"],
+  "sourceUrl": "https://example.com/docs/custom-commands"
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `target` | The target id the row describes. |
+| `commandSurface` | `commands`, `skills`, `workflows` or `none` (rules-only: no command files). |
+| `commandDir` | Directory holding the command files, relative to the project root. |
+| `fileTemplate` | One command file's path under `commandDir`. `<phase>` is replaced by each phase id (`specify`, `plan`, …); a skills layout is `amby-<phase>/SKILL.md`. |
+| `frontmatterKeys` | The exact, ordered keys the host documents: YAML `key:` lines, or TOML `key =` lines for `.toml` files. |
+| `sourceUrl` | Where the row was verified. Principle 4: no row, no emit; a row without a source is a guess. |
+
+`checkEmitterContract(target, row)` emits every phase and lists each difference: a wrong `commandSurface`
+or `commandDir`, a missing or unexpected file, frontmatter keys that differ (grouped when many files
+share the difference), a path outside the project, or `emit()` throwing. **A missing row fails.** An
+official plugin ships its row as `matrix-rows.json` in its own repository; this document keeps only the
+human-readable summary.

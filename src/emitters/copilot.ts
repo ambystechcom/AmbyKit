@@ -1,7 +1,7 @@
 import { join } from "node:path/posix";
 import type { CommandSpec, CommandSurface, EmittedFile, Role, RulesContext } from "../core/types.js";
 import { buildPointerRegion } from "../core/rules.js";
-import { BaseEmitter } from "./base-emitter.js";
+import { BaseEmitter, MCP_COMMAND } from "./base-emitter.js";
 
 /**
  * GitHub Copilot (VS Code) emitter. Phase prompts become prompt files at
@@ -43,6 +43,31 @@ export class CopilotEmitter extends BaseEmitter {
         ])}\n${this.personaBody(role)}\n`,
       scope: "project",
     }));
+  }
+
+  /** The worker at `.github/agents/amby-worker.agent.md` (no `tools` key: the agent keeps the default tools; inherited by Copilot CLI). */
+  protected override workerFiles(worker: NonNullable<RulesContext["worker"]>, _ctx: RulesContext): EmittedFile[] {
+    return [
+      {
+        path: join(".github", "agents", `amby-${worker.id}.agent.md`),
+        contents: `${this.renderFrontmatter([
+          ["name", `amby-${worker.id}`],
+          ["description", this.yamlQuote(worker.description)],
+        ])}
+${this.workerBody(worker)}
+`,
+        scope: "project",
+      },
+    ];
+  }
+
+  /** Workspace `.vscode/mcp.json`, `servers.ambykit` (verified in `specs/025-mcp-server/research.md`). */
+  override mcpFiles(_ctx: RulesContext): EmittedFile[] {
+    return [this.mcpFile(join(".vscode", "mcp.json"), "servers", { type: "stdio", ...MCP_COMMAND })];
+  }
+
+  override mcpSkipReason(): string | null {
+    return null;
   }
 
   protected override rulesFiles(_ctx: RulesContext): EmittedFile[] {

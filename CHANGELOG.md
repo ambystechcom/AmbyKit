@@ -8,7 +8,98 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Release notes with full detail live on the
 [GitHub releases page](https://github.com/ambystechcom/AmbyKit/releases).
 
+Plugin authors: a line that starts with `[plugin-api]` changes the plugin API or something plugins depend on.
+Every release states whether plugins are affected, with such a line or with "Plugins: not affected."
+(see `docs/plugin-api.md`).
+
 ## [Unreleased]
+
+## [1.5.0] — 2026-11-16
+
+### Added
+
+- `[plugin-api]` Emitter plugins (feature 027, **experimental** until 2.0): list a package named
+  `ambykit-emitter-<name>` with an exact version under `plugins` in `.amby/config.json`, and `ambykit sync`
+  loads it from the project's own `node_modules` and emits its targets like built-in ones. Nothing unlisted,
+  unpinned or version-mismatched is ever loaded; a plugin that fails is reported by name, the other targets
+  still sync, and `sync` exits 1. Plugin files must stay inside the project; files in the home directory need
+  `--include-user`. Authors import `BaseEmitter`, `SkillsEmitter` and `TomlCommandEmitter` from
+  `@ambystech/ambykit/plugin`, declare `"ambykit": { "pluginApi": "^1" }`, and test against their host's
+  matrix row with `@ambystech/ambykit/testkit`. Projects with no `plugins` key behave exactly as before. No
+  built-in target moves to a plugin in this release. Plugins: this is the first release of the API.
+- `/amby.run` (feature 019): the 13th phase. The assistant you call it from is the lead: it starts worker
+  subagents (`amby-worker`, write-capable; the review roles stay read-only), gives each only its task IDs, file
+  ownership and artifacts by reference, then runs QA (the phase's Verify line, acceptance criteria and the
+  `tests.md` cases) and an architect review before a phase passes. A failed review returns only finding IDs to
+  the same worker; at the round limit (default 3) the lead stops and asks. State is plain files under
+  `.amby/fleet/<feature>.<n>/`, so a run resumes in a new session, and pause, resume and stop are directives
+  workers obey at their next report. Assistants without verified subagent support get the same prompt and the
+  lead does every step in sequence. `ambykit fleet start|status|update|claim|release|note|directive` is the thin
+  helper the prompt calls. Worker files are emitted for Claude Code, OpenCode and Copilot.
+- AmbyKit as an MCP server (feature 025): `ambykit mcp` serves state tools over stdio so an assistant asks for
+  state instead of reading files: `next_task`, `story_status`, `lane_tasks`, `lane_status`, `analyze_report`,
+  validated one-line writes `tick_task` and `set_story_status`, and `report_activity`, `claim_file` and
+  `post_note` for fleets. Opt-in with `"mcp": { "enabled": true }`; `ambykit sync` then adds an `ambykit` entry
+  to Claude Code (`.mcp.json`), Copilot (`.vscode/mcp.json`), Cursor and Cursor CLI (`.cursor/mcp.json`) and
+  Antigravity CLI (`.agents/mcp_config.json`), and, only with `--include-user`, the Copilot CLI's user-level file.
+  Existing keys are preserved and a file with comments is left alone. OpenCode, the Antigravity IDE and the other
+  targets are not written (their MCP format is unconfirmed); `sync` says which and why. Every phase still works from
+  files when the server is absent.
+- Fleet state foundation (feature 025): a `fleet` config object (`stallMinutes` 15, `restartLimit` 2,
+  `concurrency`, `roundLimit`), the run record `.amby/fleet/<run>/run.json`, per-lane directives, file claims and a
+  notes board in the primary checkout, and a single stall check for lanes. `ambykit directive <feature> <lane>
+  pause|resume|stop` steers a lane from any host; the worker obeys at its next report.
+- `ambykit activity` gains `--lane`, `--state` and `--run`: a lane's marker is `<feature>.<agent>~lane-p-k.json`, so
+  two lanes of one assistant no longer overwrite each other. Without the flags the marker is unchanged.
+
+## [1.4.0] — 2026-11-16
+
+Plugins: not affected.
+
+### Added
+
+- `ambykit trace [feature] [--json] [--gate]` (feature 024): a local, read-only matrix from each `FR-###` to
+  the tests that cite it. A test cites a requirement by starting its name with `NNN:FR-###:`; the report
+  lists uncovered requirements, orphans, ambiguous bare ids, skipped and uncited tests, designed cases
+  from `tests.md`, and `uncovered: FR-### — reason` notes. `--gate` exits 1 on uncovered requirements.
+  `/amby.converge` now starts from the trace matrix, and Claude Code grants prompts a scoped shell for
+  each `ambykit <verb>` they run. The dashboard shows coverage per feature next to task progress.
+- Blocked markers and Verify lines (feature 020): a task line can end with `⚠ BLOCKED: <reason>` and an
+  optional `↪ DEVIATION: <note>` (the glyph-less `BLOCKED:` and `DEVIATION:` forms are read the same),
+  and each `tasks.md` phase ends with one `**Verify:**` line that `/amby.implement` runs before the
+  checkpoint and marks with a result suffix: `✓ passed`, `✗ failed: <why>` or `? unverified`. The tasks
+  template and `/amby.tasks` now emit a Verify line per phase.
+- `ambykit dashboard` and `ambykit analyze` surface blocked tasks, deviations, marker problems, and
+  phases that lack a Verify line or whose last Verify failed, at zero model tokens. Blocked tasks leave
+  the dashboard's "Up next" list, the feature chart and feature view show plain-text counts, and
+  `analyze` reports the new findings as warnings that never change its exit status.
+
+- Test design before code (feature 021): `/amby.tasks` also writes `tests.md` in the same phase, one case per
+  acceptance criterion with an automate-or-manual decision (manual only for a reason from a fixed list), each
+  citing its criterion `US-n#k` and `FR-###`, with a one-line `skipped: <reason>` form (`--skip-tests`).
+  `/amby.implement` builds to the cases and names tests `NNN:FR-###`, `/amby.converge` treats them as the
+  expected tests, and `/amby.revise` marks cases `[stale]` or `[obsolete]`. `ambykit analyze` checks each
+  feature's `tests.md` at zero model tokens (warnings only).
+- `ambykit graph [feature] [--json] [--mermaid]` (feature 023): one story and feature dependency graph built from
+  `specs/`, shared by `analyze` and the dashboard so all three name the same blockers. Broken references and
+  cycles are listed first and exit 1. The interactive dashboard opens a graph view with `g`.
+- Decision records (feature 022): `/amby.decide` writes a numbered record `.amby/decisions/ADR-###.md`
+  (context, decision, alternatives, consequences) and patches the index, from any phase. It points to an
+  existing record instead of duplicating one, keeps a decision that conflicts with a constitution principle
+  `proposed`, and `--supersede ADR-###` marks the old record superseded on both sides. Cite decisions as
+  `ADR-###`. A seventh read-only role, `security`, is installed for `/amby.review --as security`.
+
+### Changed
+
+- `ambykit analyze` checks decision records at zero model tokens and adds a `decisions` key to `--json`, only
+  when records or `ADR-###` citations exist. A citation with no record, a supersede mismatch or loop, and an
+  accepted record with a conflict are errors (exit status 1); a record missing from the index is a warning.
+
+- `ambykit analyze --json` gains `testDesign` (`findings` and `missing`), present only when a feature has a
+  `tests.md`. The `tests.md` template is installed into `.amby/templates/` by `ambykit sync`.
+- The `--json` output of `dashboard --overview` and `analyze` gains new optional keys (`blockedTasks`,
+  `deviations`, `markerIssues`, `verifyIssues`, and per-feature `blocked` and `verify`), present only when
+  they have content. Existing keys are unchanged, and every existing `tasks.md` is read exactly as before.
 
 ## [1.3.1] — 2026-11-04
 

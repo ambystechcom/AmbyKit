@@ -1,0 +1,42 @@
+== Twins: v1 vs v2 give an identical model ==
+v1 baseline: spec.md=v1, tasks.md=v1; 4 stories, 11 tasks, 4 phases
+PASS  v2 phase layout, LF == v1 (spec.md=v2, tasks.md=v2)
+      warning tasks.md:19 T007: trailing group on the line disagrees with the block; block wins
+PASS  v2 task layout, LF == v1 (spec.md=v2, tasks.md=v2)
+      warning tasks.md:31 T007: trailing group on the line disagrees with the block; block wins
+PASS  v2 phase layout, CRLF == v1 (spec.md=v2, tasks.md=v2)
+      warning tasks.md:19 T007: trailing group on the line disagrees with the block; block wins
+PASS  v2 task layout, CRLF == v1 (spec.md=v2, tasks.md=v2)
+      warning tasks.md:31 T007: trailing group on the line disagrees with the block; block wins
+PASS  v1 CRLF == v1 LF
+
+== Spot checks of the edge cases the twins carry ==
+PASS  unusual path characters (non-ASCII kept, spaced item dropped by v1 rule)
+PASS  glob ownership is flagged as glob
+PASS  BLOCKED + DEVIATION marker text survives, path before the marker is ownership
+PASS  prose parenthetical is not ownership
+PASS  prose (x.y) kept in description, ownership is the last group
+PASS  cross-feature depends-on 019:US-1 canonicalizes the same way as v1
+PASS  Verify results failed/unverified survive
+
+== Malformed v2: every error carries file:line, nothing is guessed ==
+PASS  bad-frontmatter.spec.md: spec.md:6 frontmatter: invalid YAML (unexpected end of the stream within a flow collection)
+PASS  orphan-story.spec.md: spec.md:6 frontmatter story US-9 has no heading in the body
+PASS  deps-not-list.spec.md: spec.md:4 US-1: `depends-on` must be a list
+PASS  bad-yaml.tasks.md: tasks.md:7 tasks block: invalid YAML (missed comma between flow collection entries)
+PASS  unknown-key.tasks.md: tasks.md:4 unknown key `owner` in tasks block (allowed: files, verify)
+PASS  unclosed.tasks.md: tasks.md:4 fenced yaml block is not closed
+PASS  bad-result.tasks.md: tasks.md:5 verify.result must be passed|failed|unverified, got "maybe"
+PASS  wrong-phase.tasks.md: tasks.md:9 files lists T001, which is not a task of this phase
+PASS  detached-task-block.tasks.md: tasks.md:6 a task block must directly follow a task line
+PASS  status v2 does not list is a warning at spec.md:7
+PASS  file in neither format: reported as format `none`, no stories invented
+
+== Mixed features state which part used which format ==
+PASS  spec v1 + tasks v2: spec.md=v1, tasks.md=v2  (MIXED feature), same model
+PASS  spec v2 + tasks v1: spec.md=v2, tasks.md=v1  (MIXED feature), same model
+
+== Duplicate Verify lines (v1) ==
+PASS  v1 reader counts the second Verify line as a duplicate (migrate must not guess which one wins)
+
+ALL PASS

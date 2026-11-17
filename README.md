@@ -49,6 +49,8 @@ Then, inside your AI assistant, walk the workflow:
 /amby.implement      # build it
 /amby.converge       # verify the code against the spec; append gap tasks, repeat until converged
 /amby.review         # have another role (QA, Architect, PM…) critique an artifact, findings by ID
+/amby.decide         # record a decision as ADR-###, cited by ID, checked by analyze
+/amby.run            # build a feature as a team: workers, QA and architect review, resumable
 ```
 
 Track progress from the terminal:
@@ -117,6 +119,8 @@ install that's one `npx` away instead of a Python toolchain.
 | Implement | `/amby.implement` | executes `tasks.md` |
 | Converge | `/amby.converge` | checks code vs spec/plan/tasks; appends gap tasks to `tasks.md` |
 | Review | `/amby.review` | cross-role critique of any artifact; `--apply` patches in place |
+| Decide | `/amby.decide` | numbered decision records in `.amby/decisions/`, cited as `ADR-###` |
+| Run | `/amby.run` | worker subagents, QA and architect review; run state in `.amby/fleet/` (helper: `ambykit fleet`) |
 
 Requirements use **user stories** (`US-#`) + **EARS** functional requirements (`FR-###`) +
 **Given/When/Then** acceptance criteria. Stories carry `priority` and `depends-on`/`blocked-by` so
@@ -143,12 +147,16 @@ target is a thin `BaseEmitter` subclass.
 | `ambykit sync` | Re-emit all configured tools from the neutral source |
 | `ambykit dashboard [story-id]` | Progress view over the story/task graph |
 | `ambykit analyze` | Validate the dependency graph (cycles, blockers, orphans) and lane file ownership |
+| `ambykit graph [feature]` | Print the story and feature dependency graph (`--json`, `--mermaid`); broken edges and cycles exit 1 |
 | `ambykit check` | Doctor: verify integrations |
 | `ambykit restore [file]` | Restore an agent-doc file from its `.amby/backups/` backup |
 | `ambykit update` | Update the CLI to the latest, then refresh this project's prompts |
 | `ambykit worktree <feature>` | Isolated working copy per feature (`list`, `remove`) for parallel work |
 | `ambykit lane <feature>` | Split a phase's `[P]` tasks into conflict-free parallel lanes (`list`, `merge`, `remove`) |
 | `ambykit activity <feature>` | Record which assistant works on a feature (run by the phase prompts) |
+| `ambykit trace [feature]` | Show which requirements have tests (tests cite `NNN:FR-###`); `--json`, `--gate` |
+| `ambykit mcp` | Serve state tools (next task, story status, tick, report, claim) to an assistant over MCP; opt-in with `mcp.enabled` |
+| `ambykit directive <feature> <lane>` | Tell a fleet lane to `pause`, `resume` or `stop` (obeyed at its next report) |
 
 See [`docs/cli-reference.md`](./docs/cli-reference.md).
 

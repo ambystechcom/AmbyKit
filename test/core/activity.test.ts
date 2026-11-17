@@ -127,3 +127,35 @@ describe("marker files (FR-018/FR-019)", () => {
     expect(existsSync(join(root, ".gitignore"))).toBe(false);
   });
 });
+
+describe("lane-aware markers (feature 025)", () => {
+  const root = () => mkdtempSync(join(tmpdir(), "ambykit-act-"));
+
+  it("025:FR-008: a lane names the file <feature>.<agent>~<lane>.json in the short lane form", () => {
+    const r = root();
+    const p = writeMarker(r, marker("codex", 1, { lane: "017-live.lane-2-1", state: "working", run: "017-live.1" }));
+    expect(p.endsWith("017-live.codex~lane-2-1.json")).toBe(true);
+    expect(JSON.parse(readFileSync(p, "utf8"))).toMatchObject({ agent: "codex", lane: "017-live.lane-2-1", state: "working", run: "017-live.1" });
+  });
+
+  it("025:SC-005: two lanes of the same agent leave two markers, and readers take the agent from the body", () => {
+    const r = root();
+    writeMarker(r, marker("codex", 1, { lane: "017-live.lane-2-1" }));
+    writeMarker(r, marker("codex", 2, { lane: "017-live.lane-2-2" }));
+    const read = readMarkers(r);
+    expect(read).toHaveLength(2);
+    expect(read.every((m) => m.agent === "codex" && m.feature === "017-live")).toBe(true);
+  });
+
+  it("025:FR-007: a marker without the new fields is byte-identical to today's, at today's file name", () => {
+    const r = root();
+    const p = writeMarker(r, { feature: "017-live", agent: "codex", phase: "implement", task: "T001", at: ago(1), pid: 7 });
+    expect(p.endsWith("017-live.codex.json")).toBe(true);
+    expect(readFileSync(p, "utf8")).toBe(`{"agent":"codex","phase":"implement","task":"T001","at":"${ago(1)}","pid":7}\n`);
+  });
+
+  it("025:FR-007: parseMarker keeps unknown or invalid new fields out and still reads the old marker", () => {
+    expect(parseMarker(JSON.stringify({ agent: "a", phase: "p", at: ago(1), state: "sleeping" }), "f")?.state).toBeUndefined();
+    expect(parseMarker(JSON.stringify({ agent: "a", phase: "p", at: ago(1), state: "blocked", lane: "f.lane-1-1" }), "f")).toMatchObject({ state: "blocked", lane: "f.lane-1-1" });
+  });
+});

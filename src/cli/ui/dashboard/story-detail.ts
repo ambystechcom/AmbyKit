@@ -1,5 +1,6 @@
 import type { Presence } from "../../../core/activity.js";
 import type { StoryProgress, TaskLine } from "../../../core/dashboard.js";
+import { buildGraph, nodeKey } from "../../../core/graph.js";
 import type { FeatureSnapshot } from "../../../core/overview-types.js";
 import { featureRow, statusOf } from "../../../core/overview.js";
 import { paintToken } from "../theme.js";
@@ -38,9 +39,12 @@ const RIGHT_WIDTH = 36;
 /** Task rows the detail shows before scrolling (elision markers count as rows). */
 export const DETAIL_MAX_TASKS = 12;
 
-/** Stories in the same feature that list `story` in their depends-on (the reverse edge). */
+/** Stories in the same feature that depend on `story` (the reverse edge), read from the shared graph (feature 023). */
 export function blocksOf(feature: FeatureSnapshot, story: StoryProgress): string[] {
-  return feature.stories.filter((s) => s.dependsOn.includes(story.id) || s.dependsOn.includes(story.displayId)).map((s) => s.displayId);
+  const graph = buildGraph([feature]);
+  const target = nodeKey(feature.dir, story.id);
+  const names = new Map(graph.nodes.map((n) => [n.key, n.story]));
+  return graph.edges.filter((e) => e.kind === "depends-on" && e.to === target).map((e) => names.get(e.from) ?? e.from);
 }
 
 /** Largest valid scroll offset: the list fits, or the last page shows the last task. */
@@ -69,7 +73,10 @@ function taskLines(caps: Capabilities, view: StoryDetailView): string[] {
     const mark = t.done ? paintToken(caps, a.present.fg, glyph(caps, a.present.symbol)) : paintToken(caps, a.pending.fg, glyph(caps, a.pending.symbol));
     const changed = view.changedTasks?.has(t.id);
     const id = changed ? paintToken(caps, LIVE_TOKENS.component.live.changed.fg, t.id, true) : t.id;
-    return `${mark} ${id}  ${t.description}`;
+    // Feature 020: BLOCKED reason and DEVIATION note as plain text (no glyph, readable without color).
+    const blocked = t.blocked !== undefined ? `  BLOCKED: ${t.blocked || "(no reason)"}` : "";
+    const deviation = t.deviation !== undefined && t.deviation !== "" ? `  DEVIATION: ${t.deviation}` : "";
+    return `${mark} ${id}  ${t.description}${blocked}${deviation}`;
   };
   const max = Math.max(2, view.maxTasks);
   if (tasks.length <= max) return tasks.map(line);

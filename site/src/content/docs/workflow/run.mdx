@@ -1,0 +1,44 @@
+---
+title: Run
+description: Run a feature's tasks as a team — workers build, QA and architect review, state kept in files, resumable.
+sidebar:
+  order: 13
+phase: run
+order: 13
+command: amby.run
+reads: [specs/<feature>/spec.md, specs/<feature>/plan.md, specs/<feature>/tasks.md, specs/<feature>/tests.md, .amby/fleet/<run>/run.json]
+writes: [specs/<feature>/tasks.md, .amby/fleet/<run>/]
+---
+
+import PhaseBadge from "../../../components/PhaseBadge.astro";
+import Artifacts from "../../../components/Artifacts.astro";
+
+<PhaseBadge n={13} name="Run" />
+
+**Run** works a feature through its tasks as a team. The assistant you call it from is the **lead**: it
+starts workers, gives each only its task IDs, file ownership and the artifacts it needs by reference, then
+runs QA and an architect review before a phase may pass. Workers check tasks off and answer in one line.
+
+It stops before a phase whose artifact is missing or still a draft, and names it. A failing `Verify:` line
+never passes a checkpoint. When a review fails, only the finding IDs go back to the same worker; after
+the round limit (default 3) it stops and asks you to decide, and records your answer.
+
+Everything the run knows is in plain files under `.amby/fleet/<run>/`, so you can stop, start a new
+session and resume with no repeated work, or read the state yourself. Several runs of one feature are
+allowed (`<feature>.1`, `<feature>.2`); a new one starts only when you ask. On an assistant without
+verified subagent support the lead does the worker, QA and review steps itself, in sequence, with the
+same files. The review roles, including `security`, stay read-only.
+
+`ambykit fleet` is the thin helper the prompt and workers call to start, inspect and update a run; see
+the CLI reference.
+
+## Command
+
+```bash
+/amby.run 019
+/amby.run 019 --new
+```
+
+## Artifacts read & written
+
+<Artifacts reads={["specs/<feature>/spec.md", "specs/<feature>/plan.md", "specs/<feature>/tasks.md", "specs/<feature>/tests.md", ".amby/fleet/<run>/run.json"]} writes={["specs/<feature>/tasks.md", ".amby/fleet/<run>/"]} />

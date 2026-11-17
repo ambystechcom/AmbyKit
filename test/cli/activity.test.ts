@@ -66,3 +66,37 @@ describe("ambykit activity (feature 017)", () => {
     expect(outside.warnings).toContain("not inside an AmbyKit project");
   });
 });
+
+describe("ambykit activity: lane, state and run flags (feature 025, FR-021)", () => {
+  it("025:FR-021: --lane names the marker file and --state/--run land in the body", async () => {
+    const root = dashboardFixture();
+    const { code } = await run(root, ["001"], { agent: "claude", phase: "implement", lane: "1-2", state: "blocked", task: "T003" });
+    expect(code).toBe(0);
+    const [m] = readMarkers(root);
+    expect(m).toMatchObject({ agent: "claude", lane: "001-core.lane-1-2", state: "blocked", task: "T003" });
+    expect(existsSync(join(root, ".amby", "activity", "001-core.claude~lane-1-2.json"))).toBe(true);
+  });
+
+  it("025:FR-021: invocations without the new flags write exactly today's marker", async () => {
+    const root = dashboardFixture();
+    await run(root, ["001"], { agent: "claude", phase: "plan", task: "T001" });
+    const body = JSON.parse(readFileSync(join(root, ".amby", "activity", "001-core.claude.json"), "utf8"));
+    expect(Object.keys(body)).toEqual(["agent", "phase", "task", "at", "pid"]);
+  });
+
+  it("025:FR-021: a bad --state warns, exits 0 and writes nothing", async () => {
+    const root = dashboardFixture();
+    const r = await run(root, ["001"], { agent: "claude", phase: "plan", state: "sleeping" });
+    expect(r.code).toBe(0);
+    expect(r.warnings).toMatch(/invalid state/);
+    expect(readMarkers(root)).toEqual([]);
+  });
+
+  it("025:FR-012: with no run to resolve it still exits 0, warning", async () => {
+    const root = dashboardFixture();
+    const r = await run(root, ["001"], { agent: "claude", phase: "plan", lane: "1-1", state: "working" });
+    expect(r.code).toBe(0);
+    expect(r.warnings).toMatch(/no unfinished run/);
+    expect(readMarkers(root)).toHaveLength(1);
+  });
+});

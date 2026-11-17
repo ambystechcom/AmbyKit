@@ -1,5 +1,5 @@
 import { BaseCommand, flag, type CliOptions } from "./base-command.js";
-import { analyzeProject } from "../core/analyze.js";
+import { analyzeProject, hasDecisionErrors } from "../core/analyze.js";
 import { describeConflict } from "../core/lanes.js";
 
 /**
@@ -18,11 +18,11 @@ export class AnalyzeCommand extends BaseCommand {
 
     if (flag(opts, "json")) {
       this.info(JSON.stringify(report, null, 2));
-      return report.issues.length > 0 || report.lanes.conflicts.length > 0 ? 1 : 0;
+      return report.issues.length > 0 || report.lanes.conflicts.length > 0 || hasDecisionErrors(report) ? 1 : 0;
     }
 
     const conflicts = report.lanes.conflicts;
-    if (report.total === 0 && conflicts.length === 0) {
+    if (report.total === 0 && conflicts.length === 0 && !report.decisions) {
       this.info("No user stories found.");
       return 0;
     }
@@ -47,6 +47,69 @@ export class AnalyzeCommand extends BaseCommand {
       this.info("");
     }
 
+    // Feature 020: BLOCKED markers and DEVIATION notes on task lines. Warnings only: they never
+    // change the exit status. Plain words, so the lines read the same without color or glyphs.
+    if (report.blockedTasks && report.blockedTasks.length > 0) {
+      this.info("Blocked tasks (BLOCKED markers):");
+      for (const b of report.blockedTasks) {
+        this.info(`  ${b.feature}:${b.task} — BLOCKED: ${b.reason === "" ? "(no reason given)" : b.reason}`);
+      }
+      this.info("");
+    }
+    if (report.deviations && report.deviations.length > 0) {
+      this.info("Deviations (DEVIATION notes):");
+      for (const d of report.deviations) this.info(`  ${d.feature}:${d.task} — DEVIATION: ${d.note}`);
+      this.info("");
+    }
+    if (report.markerIssues && report.markerIssues.length > 0) {
+      for (const m of report.markerIssues) this.warn(`Marker issue: ${m.message}`);
+      this.info("");
+    }
+
+    // Feature 020 (FR-009): Verify findings. Warnings only (exit status unchanged). Missing Verify
+    // lines are grouped per feature in text (one line each), listed per phase in --json.
+    if (report.verifyIssues && report.verifyIssues.length > 0) {
+      const failed = report.verifyIssues.filter((v) => v.kind === "failed");
+      const missing = report.verifyIssues.filter((v) => v.kind === "missing");
+      if (failed.length > 0) {
+        this.info("Verify failed (last recorded result):");
+        for (const v of failed) this.warn(`  ${v.phase} — Verify FAILED${v.why ? `: ${v.why}` : ""}`);
+        this.info("");
+      }
+      if (missing.length > 0) {
+        this.info("Phases with no Verify line:");
+        const byFeature = new Map<string, number[]>();
+        for (const v of missing) {
+          const n = Number(v.phase.slice(v.phase.lastIndexOf("-") + 1));
+          byFeature.set(v.feature, [...(byFeature.get(v.feature) ?? []), n]);
+        }
+        for (const [feature, phases] of byFeature) {
+          this.warn(`  ${feature} — phase ${phases.join(", ")} (add a **Verify:** line per phase)`);
+        }
+        this.info("");
+      }
+    }
+
+    // Feature 021: test-design findings, only for features that have a tests.md. Non-blocking (exit
+    // status unchanged); features without one are listed only under `testDesign.missing` in --json.
+    if (report.testDesign && report.testDesign.findings.length > 0) {
+      this.info("Test design findings (tests.md):");
+      for (const f of report.testDesign.findings) {
+        this.warn(`  ${f.feature} — ${f.kind}${f.line ? ` (line ${f.line})` : ""}: ${f.message}`);
+      }
+      this.info("");
+    }
+
+    // Feature 022: decision-record issues. Errors fail the exit status; the section is absent without decisions.
+    if (report.decisions && report.decisions.issues.length > 0) {
+      this.info("Decision records (.amby/decisions/):");
+      for (const i of report.decisions.issues) {
+        if (i.level === "error") this.error(`  [${i.kind}] ${i.message}`);
+        else this.warn(`  [${i.kind}] ${i.message}`);
+      }
+      this.info("");
+    }
+
     this.info(
       report.buildable.length > 0
         ? `Buildable now: ${report.buildable.join(", ")}`
@@ -62,7 +125,7 @@ export class AnalyzeCommand extends BaseCommand {
       this.warn(`Tasks without a usable file path: ${decl.map(label).join(", ")}`);
     }
 
-    if (report.issues.length > 0 || conflicts.length > 0) return 1;
+    if (report.issues.length > 0 || conflicts.length > 0 || hasDecisionErrors(report)) return 1;
     this.success("No cycles, dangling references, or lane conflicts.");
     return 0;
   }

@@ -7,7 +7,7 @@ import type {
   RulesContext,
 } from "../core/types.js";
 import { buildPointerRegion } from "../core/rules.js";
-import { BaseEmitter } from "./base-emitter.js";
+import { BaseEmitter, MCP_COMMAND } from "./base-emitter.js";
 
 /**
  * Claude Code emitter. Emits slash commands to `.claude/commands/amby.*.md` and a `CLAUDE.md`
@@ -36,13 +36,25 @@ export class ClaudeEmitter extends BaseEmitter {
   }
 
   /**
-   * Phases without shell access still self-report activity (feature 017, FR-020), so they get only
-   * that command, scoped with Claude's `Bash(prefix:*)` rule — no prompt, and no other shell use.
+   * Phases without shell access still run the `ambykit <verb>` lines their prompt names (the activity
+   * self-report, feature 017 FR-020; `trace`, feature 024 FR-021), so they get only those verbs, each
+   * scoped with Claude's `Bash(prefix:*)` rule — no prompt, and no other shell use. A verb counts only
+   * when the body invokes it inside a code span, so a prose mention grants nothing.
    */
   protected override mappedTools(spec: CommandSpec): string {
     const tools = super.mappedTools(spec);
-    const reports = spec.body.includes("ambykit activity ");
-    return reports && !spec.allowedTools.includes("bash") ? `${tools}, Bash(ambykit activity:*)` : tools;
+    if (spec.allowedTools.includes("bash")) return tools;
+    const verbs = [...new Set([...spec.body.matchAll(/`ambykit ([a-z][a-z-]*)[ `]/g)].map((m) => m[1]!))];
+    return verbs.length ? `${tools}, ${verbs.map((v) => `Bash(ambykit ${v}:*)`).join(", ")}` : tools;
+  }
+
+  /** Project `.mcp.json`, `mcpServers.ambykit` (verified in `specs/025-mcp-server/research.md`). */
+  override mcpFiles(_ctx: RulesContext): EmittedFile[] {
+    return [this.mcpFile(".mcp.json", "mcpServers", { type: "stdio", ...MCP_COMMAND })];
+  }
+
+  override mcpSkipReason(): string | null {
+    return null;
   }
 
   /** Sub-agents at `.claude/agents/<name>.md` — `name` + `description` required (verified, feature 013). */
@@ -57,6 +69,24 @@ export class ClaudeEmitter extends BaseEmitter {
         ])}\n${this.personaBody(role)}\n`,
       scope: "project",
     }));
+  }
+
+  /**
+   * The write-capable worker at `.claude/agents/amby-worker.md` (feature 019). Same verified frontmatter as the
+   * review roles, but with write tools; `model` is emitted only when `fleet.workerModel` is set (FR-005).
+   */
+  protected override workerFiles(worker: NonNullable<RulesContext["worker"]>, ctx: RulesContext): EmittedFile[] {
+    const pairs: Array<[string, string]> = [
+      ["name", `amby-${worker.id}`],
+      ["description", this.yamlQuote(worker.description)],
+      ["tools", "Read, Write, Edit, Bash, Grep, Glob"],
+    ];
+    if (ctx.workerModel) pairs.push(["model", this.yamlQuote(ctx.workerModel)]);
+    return [
+      { path: `.claude/agents/amby-${worker.id}.md`, contents: `${this.renderFrontmatter(pairs)}
+${this.workerBody(worker)}
+`, scope: "project" },
+    ];
   }
 
   protected override rulesFiles(_ctx: RulesContext): EmittedFile[] {

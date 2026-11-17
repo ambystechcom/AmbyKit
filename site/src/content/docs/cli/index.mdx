@@ -100,6 +100,17 @@ ambykit analyze [--json]
 
 Cross-check spec ↔ plan ↔ tasks for coverage, consistency, and dependency-graph health. Read-only.
 
+## `ambykit graph`
+
+```text
+ambykit graph [feature] [--json | --mermaid]
+```
+
+Print the story and feature dependency graph, built locally from `specs/` (no model tokens). Shows
+what depends on or is blocked by what, the feature dependencies that follow from it, and any broken
+references or cycles, which are listed first and make the command exit non-zero. Give a feature to see
+it and its direct neighbours. `--json` is a versioned machine shape; `--mermaid` prints a flowchart.
+
 ## `ambykit check`
 
 ```text
@@ -148,15 +159,77 @@ Parallel lanes split one phase's `[P]` tasks into isolated worktrees named
 automatically and aborts on any other conflict. `ambykit analyze` also reports **lane conflicts**:
 overlapping task paths in a phase where one of the tasks is `[P]`.
 
+## `ambykit trace`
+
+```text
+ambykit trace [feature] [--json] [--gate]
+```
+
+Shows which requirements have tests, at zero model tokens and without editing anything. A test covers
+a requirement when its name begins with the qualified id: `it("019:FR-004: …")` (several ids may be
+listed). The report lists covered and uncovered requirements, orphans (tests citing an unknown id) and
+uncited tests. `--json` prints a versioned shape; `--gate` exits 1 when a requirement is uncovered. A
+requirement left untested on purpose is recorded as `uncovered: FR-### — reason` in `tests.md`.
+
 ## `ambykit activity`
 
 ```text
-ambykit activity <feature> --agent=<tool-id> --phase=<phase> [--task=T###]
+ambykit activity <feature> --agent=<tool-id> --phase=<phase> [--task=T###] [--lane=<lane>] [--state=<state>] [--run=<id>]
 ```
 
 Records that an assistant started a phase on a feature, for the dashboard's agent presence. The
 phase prompts run it for you; it writes `.amby/activity/<feature>.<agent>.json` (git-ignored) and
-never fails: problems are warnings and it always exits 0.
+never fails: problems are warnings and it always exits 0. For a fleet lane, `--lane`, `--state`
+(`working`, `waiting`, `blocked`, `paused` or `done`) and `--run` add the lane to the file name and
+the fleet fields to the marker; without them the marker is unchanged.
+
+## `ambykit mcp`
+
+```text
+ambykit mcp
+```
+
+Serves AmbyKit's state tools to an assistant over MCP on stdio: the next unblocked task, a story's
+blockers, a validated tick, a report that returns a pause or stop directive, file claims and notes.
+The assistant starts it; you do not run it by hand. It is opt-in: set `"mcp": { "enabled": true }` in
+`.amby/config.json`, then `ambykit sync` writes the verified assistants' MCP config. Every phase still
+works from files when the server is absent.
+
+## `ambykit directive`
+
+```text
+ambykit directive <feature> <lane> pause|resume|stop [--run=<id>]
+```
+
+Tells a fleet lane to pause, resume or stop. The worker finishes its current task and obeys at its next
+report. An unknown lane is refused by name.
+
+## `ambykit fleet`
+
+The helper `/amby.run` and its workers call, so every change to a run goes through one validated path. It
+keeps no state of its own: runs, claims, notes and directives are the fleet state under `.amby/fleet/<run>/`,
+and stall detection is the same one the dashboard uses.
+
+```text
+ambykit fleet start 019 [--new]          # create run 019-...N; refuses when one is unfinished unless --new
+ambykit fleet status 019 [--run=<id>] [--json] [--rebuild]
+ambykit fleet update 019 --worker-start=lane-1-1 --assistant=claude --tasks=T001,T002
+ambykit fleet update 019 --stage=qa | --phase=2 | --round=2 | --decision="<text>" | --done
+ambykit fleet update 019 --pause[=<lane>] | --resume[=<lane>] | --stop[=<lane>]
+ambykit fleet update 019 --overlap=squad --lanes=a,b --shared=<path> --writer=<path>:<lane> --order=a,b
+ambykit fleet claim 019 T012 src/a.ts [--worker=<id>]   # refused, naming the owner, when held
+ambykit fleet release 019 T012
+ambykit fleet note 019 T012 --files=src/a.ts "one-line note"
+ambykit fleet directive 019 lane-1-1     # prints continue, pause or stop
+```
+
+`start` creates nothing for a feature that is already done or whose spec, plan or tasks are missing or draft.
+`status` prints the run, the next phase, each lane (state, idle time, directive, restarts left), free slots
+under `fleet.concurrency`, and warnings: damaged state, a checked task that still holds claims, a lane edit
+with no claim. `--rebuild` rewrites a missing or corrupt `run.json` from `tasks.md` and never touches checked
+tasks. `--worker-start` is refused when no slot is free; `--restart` is refused after `fleet.restartLimit`
+restarts, pausing the lane and asking a person. `--round` prints `retry` or `escalate` and, on `escalate`,
+waits for a decision. Pause, resume and stop go through the same writer as `ambykit directive`.
 
 ## `ambykit update`
 

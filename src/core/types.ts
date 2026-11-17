@@ -53,7 +53,8 @@ export interface EmittedFile {
   protectForeign?: boolean;
 }
 
-export type MergeStrategy = "overwrite" | "region";
+/** `"json"` splices one named server entry into a JSON file's top-level object (feature 025); see `merge-json.ts`. */
+export type MergeStrategy = "overwrite" | "region" | "json";
 
 export type FileScope = "project" | "user";
 
@@ -117,6 +118,10 @@ export interface RulesContext {
   manageRules: boolean;
   /** Roles installed in the project; empty/absent means phases run without a role (feature 013). */
   roles?: Role[];
+  /** The write-capable fleet worker persona (feature 019); emitted only by targets with a verified agent format. */
+  worker?: { id: string; name: string; description: string; body: string };
+  /** `fleet.workerModel` from the project config; applied only where the target documents a `model` key. */
+  workerModel?: string;
 }
 
 /** Persisted project configuration at .amby/config.json. */
@@ -130,6 +135,31 @@ export interface AmbyConfig {
   worktrees?: boolean;
   /** Dashboard tuning (feature 017): agent-presence thresholds in minutes. */
   dashboard?: { activeMinutes?: number; idleMinutes?: number };
+  /** Requirement traceability (feature 024): where to look for tests, and extra directory names to skip. */
+  trace?: { roots?: string[]; ignore?: string[] };
+  /** MCP server setup (feature 025): opt-in; `sync` writes each verified target's MCP config only when enabled. */
+  mcp?: { enabled: boolean };
+  /** Fleet settings (features 019, 025, 028): one object for the whole family; defaults in `fleetSettings`. */
+  fleet?: FleetConfig;
+  /** Emitter plugins (feature 027): package name → exact version. Only these are ever loaded; absent means none. */
+  plugins?: Record<string, string>;
+}
+
+/** Every key optional; `fleetSettings` fills the defaults. 025 owns the schema, 028 extends it. */
+export interface FleetConfig {
+  /** Minutes without a report or a `tasks.md` change before a working lane counts as stalled. Default 15. */
+  stallMinutes?: number;
+  /** Automatic restarts of a stalled lane before it pauses. Default 2. */
+  restartLimit?: number;
+  concurrency?: { total?: number; perType?: number };
+  /** Review rounds before a person must decide. Default 3. */
+  roundLimit?: number;
+  /** Seconds between supervisor ticks. Default 30. */
+  tickSeconds?: number;
+  /** Per-run limits, keyed by name (028 defines the keys). */
+  budgets?: Record<string, number>;
+  /** Model a worker runs with, when the host lets the run choose. */
+  workerModel?: string;
 }
 
 /** How a tool materializes phase prompts. */

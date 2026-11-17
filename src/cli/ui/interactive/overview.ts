@@ -4,6 +4,8 @@ import { applyFilters, computeOverview } from "../../../core/overview.js";
 import type { BurndownState } from "../dashboard/burndown-chart.js";
 import type { HeaderMeta } from "../dashboard/cards.js";
 import { emptyState, noMatchLine } from "../dashboard/empty-state.js";
+import type { GraphViewApi } from "../dashboard/graph-view.js";
+import { renderQualityView } from "../dashboard/quality-view.js";
 import { renderHelp, type HelpScreen } from "../dashboard/help-overlay.js";
 import { liveIndicator, type LiveStatus } from "../dashboard/live-indicator.js";
 import { LIVE_TOKENS } from "../dashboard/live-tokens.js";
@@ -31,6 +33,11 @@ export interface OverviewTuiData {
   burndownFor: (filters: Filters) => BurndownState;
   /** Agent presence (feature 017); absent ⇒ no agent columns. */
   presence?: PresenceView;
+  /**
+   * Feature 023: the dependency-graph view, injected by the command after a dynamic import so the one-shot
+   * path never loads it (FR-015). Absent ⇒ `g` does nothing.
+   */
+  graphView?: GraphViewApi;
 }
 
 export type Panel = 0 | 1 | 2 | 3;
@@ -46,7 +53,7 @@ export interface StoryNav {
 }
 
 export interface OverviewTuiState {
-  view: "overview" | "feature";
+  view: "overview" | "feature" | "graph";
   focus: Panel;
   cursors: [number, number, number, number];
   filters: Filters;
@@ -54,8 +61,12 @@ export interface OverviewTuiState {
   input: string | null;
   feature: string | null; // dir, in feature view
   story: StoryNav | null;
+  /** Feature 023: the graph view's cursor over the open stories; null outside the graph view. */
+  graph: { cursor: number } | null;
   /** Help overlay open (FR-030). */
   help: boolean;
+  /** Quality view open (feature 024, FR-013): uncovered requirements and analyze findings. */
+  quality: boolean;
   burndownReady: boolean;
   done: boolean;
   /** Live-update status (feature 017); absent outside live mode. */
@@ -80,7 +91,9 @@ export function initOverviewTui(filters: Filters = {}): OverviewTuiState {
     input: null,
     feature: null,
     story: null,
+    graph: null,
     help: false,
+    quality: false,
     burndownReady: false,
     done: false,
     changed: new Set(),
@@ -203,6 +216,10 @@ export function applyData(state: OverviewTuiState, prev: OverviewTuiData, next: 
     changed: changedFeatures(prev.features, next.features),
     changedTasks: checkedTasks(prev.features, next.features),
   };
+  if (state.view === "graph" && state.graph) {
+    const n = next.graphView?.build(next.features).rows.length ?? 0;
+    return { ...out, graph: { cursor: Math.max(0, Math.min(state.graph.cursor, n - 1)) } };
+  }
   if (state.view !== "feature" || !state.feature) return out;
   const feature = featureInView(next.features, state.filters, state.feature);
   if (!feature) return { ...out, view: "overview", feature: null, story: null };
@@ -217,12 +234,16 @@ export function applyData(state: OverviewTuiState, prev: OverviewTuiData, next: 
 export function reduceOverviewTui(data: OverviewTuiData, state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
   if (state.help) return { ...state, help: false }; // any key closes help and is not passed on
   if (state.input !== null) return reduceInput(state, key);
+  if (state.quality) return key.name === "q" ? { ...state, done: true } : { ...state, quality: false };
   if (key.sequence === "?") return { ...state, help: true };
   if (state.view === "feature") return reduceFeature(data, state, key);
+  if (state.view === "graph") return reduceGraph(data, state, key);
 
   switch (key.name) {
     case "q":
       return { ...state, done: true };
+    case "g":
+      return data.graphView ? { ...state, view: "graph", graph: { cursor: 0 } } : state;
     case "tab": {
       const step = key.shift ? PANELS - 1 : 1;
       return { ...state, focus: ((state.focus + step) % PANELS) as Panel };
@@ -240,6 +261,8 @@ export function reduceOverviewTui(data: OverviewTuiData, state: OverviewTuiState
       return openSelected(data, state);
     case "escape":
       return state.filters.feature || state.filters.status ? { ...state, filters: {}, cursors: NO_CURSORS } : state;
+    case "c":
+      return { ...state, quality: true };
     case "f":
       return { ...state, input: state.filters.feature ?? "" };
     case "s": {
@@ -262,6 +285,34 @@ function reduceInput(state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
   const ch = key.sequence ?? "";
   if (!key.ctrl && ch.length === 1 && ch >= " " && ch <= "~") return { ...state, input: text + ch };
   return state;
+}
+
+/** Graph view (feature 023): `↑↓` move over the open stories, `⏎` jumps to the story's feature, `esc` returns. */
+function reduceGraph(data: OverviewTuiData, state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
+  if (key.name === "q") return { ...state, done: true };
+  const toOverview = { ...state, view: "overview" as const, graph: null };
+  const model = data.graphView?.build(data.features);
+  if (!model) return toOverview;
+  if (key.name === "escape" || key.name === "backspace" || key.name === "left") return toOverview;
+  const n = model.rows.length;
+  if (n === 0) return state;
+  const cursor = Math.min(state.graph?.cursor ?? 0, n - 1);
+  switch (key.name) {
+    case "up":
+      return { ...state, graph: { cursor: (cursor - 1 + n) % n } };
+    case "down":
+      return { ...state, graph: { cursor: (cursor + 1) % n } };
+    case "return":
+    case "enter": {
+      const row = model.rows[cursor]!;
+      // The graph shows every feature, so clear a filter that would hide the target rather than do nothing.
+      const jump = openFeature(data, { ...state, graph: null }, row.feature, row.story);
+      if (jump.view === "feature") return jump;
+      return openFeature(data, { ...state, graph: null, filters: {}, cursors: NO_CURSORS }, row.feature, row.story);
+    }
+    default:
+      return state;
+  }
 }
 
 function reduceFeature(data: OverviewTuiData, state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
@@ -371,6 +422,12 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
       return { frame: `${body}\n\n${hints}`, screen: "feature" };
     }
   }
+  if (state.view === "graph" && data.graphView) {
+    const model = data.graphView.build(data.features);
+    const body = data.graphView.render(caps, model, state.graph?.cursor ?? 0);
+    const hints = keyHints(caps, [["esc", "back"], [move, "move"], [enter, "open feature"], ["?", "help"], ["q", "quit"]]);
+    return { frame: `${body}\n\n${hints}`, screen: "graph" };
+  }
   const overview = overviewOf(data, state.filters);
   const body = renderOverview(caps, {
     overview,
@@ -391,6 +448,8 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
           [enter, "open"],
           ["f", "filter"],
           ["s", "status"],
+          ...(data.graphView ? ([["g", "graph"]] as [string, string][]) : []),
+          ["c", "quality"],
           ["?", "help"],
           ["q", "quit"],
         ]) + filterNote(state.filters);
@@ -399,6 +458,13 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
 
 /** Render the current frame, with the help overlay on top when it is open. */
 export function renderOverviewTui(caps: Capabilities, data: OverviewTuiData, state: OverviewTuiState): string {
+  if (state.quality && state.view === "overview") {
+    const o = overviewOf(data, state.filters);
+    const hints = keyHints(caps, [["any key", "back"], ["q", "quit"]]);
+    return `${renderQualityView(caps, applyFilters(data.features, state.filters), o.attention)}
+
+${hints}`;
+  }
   const { frame, screen } = renderScreen(caps, data, state);
   if (!state.help) return frame;
   return renderHelp(caps, frame, screen, data.issues.map((i) => `${i.file}: ${i.reason}`));

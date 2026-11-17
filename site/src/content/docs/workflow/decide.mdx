@@ -1,0 +1,42 @@
+---
+title: Decide
+description: Record a decision as a numbered record — cited by ID, supersedable, checked by analyze.
+sidebar:
+  order: 12
+phase: decide
+order: 12
+command: amby.decide
+reads: [.amby/decisions/README.md, .amby/templates/adr.md, .amby/constitution.md]
+writes: [.amby/decisions/ADR-###.md, .amby/decisions/README.md]
+---
+
+import PhaseBadge from "../../../components/PhaseBadge.astro";
+import Artifacts from "../../../components/Artifacts.astro";
+
+<PhaseBadge n={12} name="Decide" />
+
+**Decide** writes down a decision that outlives one feature: what was decided, why, and what was
+rejected. Each one is a small record, `.amby/decisions/ADR-###.md`, so any later phase can cite it as
+`ADR-###` instead of restating it, and load only the records it cites plus the index.
+
+It has no role of its own and can be called from any phase. It checks the index first and points to an
+existing record rather than writing a duplicate. A decision that conflicts with a constitution
+principle stays `proposed` with `conflicts` filled, and needs a person's call before it is accepted.
+`--supersede ADR-###` marks the old record superseded on both sides and leaves its body untouched.
+
+`ambykit analyze` checks the records at zero model tokens: a cited `ADR-###` with no record, a
+supersede link that does not agree on both sides, a loop, or an accepted decision with a conflict are
+errors; a record missing from the index is a warning. A project with no decisions sees no change.
+
+## Command
+
+```bash
+/amby.decide "Store the fleet state as files, not a database"
+/amby.decide "Use SQLite for the index" --supersede ADR-001
+```
+
+## Artifacts read & written
+
+<Artifacts reads={[".amby/decisions/README.md", ".amby/templates/adr.md", ".amby/constitution.md"]} writes={[".amby/decisions/ADR-###.md", ".amby/decisions/README.md"]} />
+
+The record format is described in `docs/artifacts/decision-record.md` in the repository.
