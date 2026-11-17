@@ -70,9 +70,9 @@ created: 2026-11-16
 
 ## Phase 7 — User story US-5  (priority: P1)
 
-- [ ] [T070] [US5] Merger: merge a finished lane with core lane-merge, one at a time in name order; conflict aborts the merge, leaves the lane intact and pauses; blocked or unchecked lanes are not merged (src/cli/run-merger.ts, test/cli/run-merger.test.ts)
-- [ ] [T071] [US5] Wire merges into the loop, resume after a person resolves a conflict, report unfinished lanes (src/cli/run.ts, test/cli/run-merge.test.ts)
-- **Verify:** `npm run typecheck && npx vitest run test/cli/run-merger.test.ts test/cli/run-merge.test.ts test/cli/lane-merge.test.ts` — one clean and one conflicting lane: the first merges, the second pauses.
+- [x] [T070] [US5] Merger: merge a finished lane with core lane-merge, one at a time in name order; conflict aborts the merge, leaves the lane intact and pauses; blocked or unchecked lanes are not merged (src/cli/run-merger.ts, test/cli/run-merger.test.ts)
+- [x] [T071] [US5] Wire merges into the loop, resume after a person resolves a conflict, report unfinished lanes (src/cli/run.ts, test/cli/run-merge.test.ts)
+- **Verify:** `npm run typecheck && npx vitest run test/cli/run-merger.test.ts test/cli/run-merge.test.ts test/cli/lane-merge.test.ts` — one clean and one conflicting lane: the first merges, the second pauses. ✓ passed
 - **Checkpoint:** US-5 is demoable.
 
 ## Phase 8 — User story US-6  (priority: P1)
