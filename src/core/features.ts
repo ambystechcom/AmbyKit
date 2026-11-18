@@ -41,16 +41,19 @@ export function readFeatures(projectRoot: string, opts: { only?: string } = {}):
 
     const spec = read("spec.md");
     if (spec === null) continue;
-    const stories = readSpec(dir, spec).stories;
+    const specRead = readSpec(dir, spec, { file: rel("spec.md") });
+    const stories = specRead.stories;
+    const formatIssues = [...specRead.issues];
 
     let tasks: TaskLine[] | null = null;
     let verify: PhaseVerify[] | undefined;
     if (existsSync(join(specsRoot, dir, "tasks.md"))) {
       const body = read("tasks.md");
       if (body !== null) {
-        const read = readTasks(body);
+        const read = readTasks(body, { file: rel("tasks.md") });
         tasks = read.tasks;
         verify = read.phases;
+        formatIssues.push(...read.issues);
       }
     }
     applyTasks(stories, tasks ?? []);
@@ -76,6 +79,7 @@ export function readFeatures(projectRoot: string, opts: { only?: string } = {}):
       stories,
       tasks,
       ...(verify ? { verify } : {}),
+      ...(formatIssues.length > 0 ? { formatIssues } : {}),
       artifacts: {
         spec: true,
         ui: hasUi,

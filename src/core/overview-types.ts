@@ -1,5 +1,6 @@
 import type { StoryProgress, TaskLine } from "./dashboard.js";
 import type { PhaseVerify } from "./markers.js";
+import type { FormatIssue } from "./spec-format/model.js";
 
 export type { PhaseVerify };
 
@@ -74,6 +75,8 @@ export interface FeatureSnapshot {
   clarifications: Clarification[];
   /** Feature 015: parallel lanes of this feature; absent when it has none. */
   lanes?: LaneView[];
+  /** Feature 030: located problems found reading this feature's spec.md or tasks.md (v2 data). Absent when there are none. */
+  formatIssues?: FormatIssue[];
   /** Feature 024: requirement coverage; absent when the feature has no requirements. `uncovered` feeds the quality view. */
   coverage?: { covered: number; total: number; uncovered: { id: string; text: string }[] };
 }

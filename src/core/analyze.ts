@@ -16,6 +16,7 @@ import { declarations, laneConflicts, type Declaration, type LaneConflict } from
 import { checkTestDesign, parseTestDesign, type DesignFinding } from "./test-design.js";
 import { analyzeDecisions, loadDecisions, type DecisionIssue } from "./decisions.js";
 import type { FeatureSnapshot } from "./overview-types.js";
+import type { FormatIssue } from "./spec-format/model.js";
 
 export interface GraphIssue {
   kind: "cycle" | "dangling-reference";
@@ -105,6 +106,8 @@ export interface AnalysisReport {
    * feature has a `tests.md`, so a project without test design reports exactly what it did before.
    */
   testDesign?: TestDesignReport;
+  /** Feature 030: located problems in v2 spec or task data (errors fail the exit status, warnings never do). Present only when any. */
+  formatIssues?: FormatIssue[];
   /**
    * Feature 022: decision records and their issues. Present only when records or `ADR-###` citations
    * exist, so a project without decisions reports exactly what it did before.
@@ -115,6 +118,11 @@ export interface AnalysisReport {
 /** Feature 022: true when decision records have an error-level issue (it joins the exit status). */
 export function hasDecisionErrors(report: AnalysisReport): boolean {
   return (report.decisions?.issues ?? []).some((i) => i.level === "error");
+}
+
+/** Feature 030: true when a v2 spec or task file has an error-level problem (it joins the exit status). */
+export function hasFormatErrors(report: AnalysisReport): boolean {
+  return (report.formatIssues ?? []).some((i) => i.severity === "error");
 }
 
 /** Combined hard dependencies of a story (depends-on ∪ blocked-by), deduped, as local ids. */
@@ -326,10 +334,12 @@ export function analyzeProject(projectRoot: string): AnalysisReport {
   const deviations: DeviationNote[] = [];
   const markerIssues: MarkerIssue[] = [];
   const verifyIssues: VerifyIssue[] = [];
+  const formatIssues: FormatIssue[] = [];
   const designFindings: TestDesignFinding[] = [];
   const designMissing: string[] = [];
   let designed = 0;
   for (const f of readFeatures(projectRoot).features) {
+    if (f.formatIssues) formatIssues.push(...f.formatIssues);
     if (collectTestDesign(projectRoot, f.dir, f.displayRef, designFindings)) designed += 1;
     else designMissing.push(f.displayRef);
     if (f.tasks === null) continue;
@@ -343,6 +353,7 @@ export function analyzeProject(projectRoot: string): AnalysisReport {
   if (deviations.length > 0) report.deviations = deviations;
   if (markerIssues.length > 0) report.markerIssues = markerIssues;
   if (verifyIssues.length > 0) report.verifyIssues = verifyIssues;
+  if (formatIssues.length > 0) report.formatIssues = formatIssues;
   if (designed > 0) report.testDesign = { findings: designFindings, missing: designMissing };
   const decisions = loadDecisions(projectRoot);
   if (decisions.records.length > 0 || decisions.invalid.length > 0 || decisions.citations.length > 0) {

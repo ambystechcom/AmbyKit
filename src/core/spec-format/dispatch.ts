@@ -3,13 +3,21 @@
 // content of each file, never from the project.
 import { parseStories, parseTasks } from "../dashboard.js";
 import { parsePhases } from "../markers.js";
+import { detectSpecFormat } from "./detect.js";
 import type { FormatIssue, ReadCtx, SpecRead, TasksRead } from "./model.js";
 import { readSpecMeta } from "./meta.js";
+import { readSpecV2 } from "./read-spec.js";
 
 const fileOf = (ctx: ReadCtx | undefined, fallback: string): string => ctx?.file ?? fallback;
 
 /** Read a spec.md: stories, feature meta, feature-level depends-on and the issues found. */
 export function readSpec(feature: string, text: string, ctx?: ReadCtx): SpecRead {
+  const detected = detectSpecFormat(text);
+  if (detected.format === 2) {
+    const v2 = readSpecV2(feature, text, fileOf(ctx, "spec.md"), detected.marker);
+    ctx?.tally?.record(fileOf(ctx, `${feature}/spec.md`), 2);
+    return v2;
+  }
   const issues: FormatIssue[] = [];
   const out: SpecRead = {
     format: 1,

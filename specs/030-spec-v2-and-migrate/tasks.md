@@ -45,11 +45,11 @@ created: 2026-11-18
 
 ## Phase 3 — US-1 v2 spec reader
 
-- [ ] [T020] [US1] `readSpecV2`: `stories:` to `StoryProgress` (id, priority, status, depends-on, blocked-by), titles from the headings, feature-level `depends-on`, any-string status with a warning on unknown values, located errors for broken YAML, non-list dependencies and unknown fields, structured-wins with a disagreement warning (stale `(priority: Pn)`), story data without `format: 2` read as v2 with a warning (src/core/spec-format/read-spec.ts)
-- [ ] [T021] [US1] Tests: edge-rich v1 and v2 give equal models; each malformed fixture gives file, line and problem; broken YAML under `stories:` is an error and not a v1 fallback; unusual status warns; disagreement reported — 030:FR-001, FR-003, FR-004, FR-019 (test/core/spec-format-read-spec.test.ts)
-- [ ] [T022] [US1] Dispatcher uses `readSpecV2` when detected; `analyze` lists `FormatIssue`s (errors exit 1, warnings never change the exit) and adds an additive `formatIssues` key to `--json`, absent when empty (src/core/spec-format/dispatch.ts, src/core/analyze.ts, src/cli/analyze.ts)
-- [ ] [T023] [US1] Tests: `analyze` text and `--json` show the issues; a 1.x-only project's output is unchanged — 030:FR-003, FR-018 (test/cli/analyze-format.test.ts)
-- **Verify:** `npx vitest run test/core/spec-format-read-spec.test.ts test/cli/analyze-format.test.ts test/cli/unchanged-output-030.test.ts` passes.
+- [x] [T020] [US1] `readSpecV2`: `stories:` to `StoryProgress` (id, priority, status, depends-on, blocked-by), titles from the headings, feature-level `depends-on`, any-string status with a warning on unknown values, located errors for broken YAML, non-list dependencies and unknown fields, structured-wins with a disagreement warning (stale `(priority: Pn)`), story data without `format: 2` read as v2 with a warning (src/core/spec-format/read-spec.ts)
+- [x] [T021] [US1] Tests: edge-rich v1 and v2 give equal models; each malformed fixture gives file, line and problem; broken YAML under `stories:` is an error and not a v1 fallback; unusual status warns; disagreement reported — 030:FR-001, FR-003, FR-004, FR-019 (test/core/spec-format-read-spec.test.ts)
+- [x] [T022] [US1] Dispatcher uses `readSpecV2` when detected; `analyze` lists `FormatIssue`s (errors exit 1, warnings never change the exit) and adds an additive `formatIssues` key to `--json`, absent when empty (src/core/spec-format/dispatch.ts, src/core/analyze.ts, src/cli/analyze.ts)
+- [x] [T023] [US1] Tests: `analyze` text and `--json` show the issues; a 1.x-only project's output is unchanged — 030:FR-003, FR-018 (test/cli/analyze-format.test.ts)
+- **Verify:** `npx vitest run test/core/spec-format-read-spec.test.ts test/cli/analyze-format.test.ts test/cli/unchanged-output-030.test.ts` passes. ✓ passed
 - **Checkpoint:** v2 specs read; 1.x output unchanged.
 
 ## Phase 4 — US-2 v2 task reader
