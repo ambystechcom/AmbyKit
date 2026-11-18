@@ -4,6 +4,8 @@ import { applyFilters, computeOverview } from "../../../core/overview.js";
 import type { BurndownState } from "../dashboard/burndown-chart.js";
 import type { HeaderMeta } from "../dashboard/cards.js";
 import { emptyState, noMatchLine } from "../dashboard/empty-state.js";
+import type { FleetView } from "../../../core/fleet-view/types.js";
+import type { FleetViewApi } from "../dashboard/fleet-view.js";
 import type { GraphViewApi } from "../dashboard/graph-view.js";
 import { renderQualityView } from "../dashboard/quality-view.js";
 import { renderHelp, type HelpScreen } from "../dashboard/help-overlay.js";
@@ -15,6 +17,7 @@ import { TOKENS } from "../dashboard/tokens.js";
 import { worktreeItems, type PresenceView } from "../dashboard/worktrees-panel.js";
 import { paintToken } from "../theme.js";
 import type { Capabilities } from "../types.js";
+import type { FleetTuiState } from "./fleet.js";
 import type { KeyEvent } from "./fullscreen.js";
 
 /**
@@ -38,6 +41,15 @@ export interface OverviewTuiData {
    * path never loads it (FR-015). Absent ⇒ `g` does nothing.
    */
   graphView?: GraphViewApi;
+  /**
+   * Feature 029: the Fleet view, injected by the command after a dynamic import so the one-shot and `--json` paths
+   * never load it (FR-012). Absent ⇒ `l` does nothing.
+   */
+  fleetView?: FleetViewApi;
+  /** The current fleet run as read from spec 025's files; null/absent ⇒ no run. */
+  fleet?: FleetView | null;
+  /** Terminal rows, for the Fleet view's scroll window (default 24). */
+  rows?: number;
 }
 
 export type Panel = 0 | 1 | 2 | 3;
@@ -53,7 +65,7 @@ export interface StoryNav {
 }
 
 export interface OverviewTuiState {
-  view: "overview" | "feature" | "graph";
+  view: "overview" | "feature" | "graph" | "fleet";
   focus: Panel;
   cursors: [number, number, number, number];
   filters: Filters;
@@ -63,6 +75,8 @@ export interface OverviewTuiState {
   story: StoryNav | null;
   /** Feature 023: the graph view's cursor over the open stories; null outside the graph view. */
   graph: { cursor: number } | null;
+  /** Feature 029: the Fleet view's cursor, scroll, confirm dialog and intended action; null outside it. */
+  fleet: FleetTuiState | null;
   /** Help overlay open (FR-030). */
   help: boolean;
   /** Quality view open (feature 024, FR-013): uncovered requirements and analyze findings. */
@@ -92,6 +106,7 @@ export function initOverviewTui(filters: Filters = {}): OverviewTuiState {
     feature: null,
     story: null,
     graph: null,
+    fleet: null,
     help: false,
     quality: false,
     burndownReady: false,
@@ -216,6 +231,9 @@ export function applyData(state: OverviewTuiState, prev: OverviewTuiData, next: 
     changed: changedFeatures(prev.features, next.features),
     changedTasks: checkedTasks(prev.features, next.features),
   };
+  if (state.view === "fleet" && state.fleet && next.fleetView) {
+    return { ...out, fleet: next.fleetView.clamp(next.fleet ?? null, state.fleet, next.fleetView.windowRows(next.rows ?? 24, next.fleet ?? null)) };
+  }
   if (state.view === "graph" && state.graph) {
     const n = next.graphView?.build(next.features).rows.length ?? 0;
     return { ...out, graph: { cursor: Math.max(0, Math.min(state.graph.cursor, n - 1)) } };
@@ -235,7 +253,10 @@ export function reduceOverviewTui(data: OverviewTuiData, state: OverviewTuiState
   if (state.help) return { ...state, help: false }; // any key closes help and is not passed on
   if (state.input !== null) return reduceInput(state, key);
   if (state.quality) return key.name === "q" ? { ...state, done: true } : { ...state, quality: false };
+  // An open Fleet confirmation owns the next key (even `?`), so a stray key can only cancel it (029 FR-008).
+  if (state.view === "fleet" && state.fleet?.confirm) return reduceFleetView(data, state, key);
   if (key.sequence === "?") return { ...state, help: true };
+  if (state.view === "fleet") return reduceFleetView(data, state, key);
   if (state.view === "feature") return reduceFeature(data, state, key);
   if (state.view === "graph") return reduceGraph(data, state, key);
 
@@ -244,6 +265,8 @@ export function reduceOverviewTui(data: OverviewTuiData, state: OverviewTuiState
       return { ...state, done: true };
     case "g":
       return data.graphView ? { ...state, view: "graph", graph: { cursor: 0 } } : state;
+    case "l":
+      return data.fleetView ? { ...state, view: "fleet", fleet: data.fleetView.init() } : state;
     case "tab": {
       const step = key.shift ? PANELS - 1 : 1;
       return { ...state, focus: ((state.focus + step) % PANELS) as Panel };
@@ -288,6 +311,17 @@ function reduceInput(state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
 }
 
 /** Graph view (feature 023): `↑↓` move over the open stories, `⏎` jumps to the story's feature, `esc` returns. */
+/** Feature 029: the Fleet view's keys. The slice records an intended action; the command performs it (like `r`). */
+function reduceFleetView(data: OverviewTuiData, state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
+  const api = data.fleetView;
+  if (!api || !state.fleet) return { ...state, view: "overview", fleet: null };
+  const rows = api.windowRows(data.rows ?? 24, data.fleet ?? null);
+  const next = api.reduce(data.fleet ?? null, state.fleet, key, rows);
+  if (next.quit) return { ...state, done: true };
+  if (next.back) return { ...state, view: "overview", fleet: null };
+  return { ...state, fleet: next };
+}
+
 function reduceGraph(data: OverviewTuiData, state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
   if (key.name === "q") return { ...state, done: true };
   const toOverview = { ...state, view: "overview" as const, graph: null };
@@ -422,6 +456,30 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
       return { frame: `${body}\n\n${hints}`, screen: "feature" };
     }
   }
+  if (state.view === "fleet" && data.fleetView && state.fleet) {
+    const api = data.fleetView;
+    const body = api.render(caps, {
+      view: data.fleet ?? null,
+      state: state.fleet,
+      ...(state.live ? { live: state.live } : {}),
+      now: state.now,
+      rows: data.rows ?? 24,
+    });
+    const lane = u ? "↑↓" : "up/down";
+    const run = data.fleet ?? null;
+    const hints = keyHints(caps, [
+      ["esc", "back"],
+      [lane, "lane"],
+      ["p", "pause"],
+      ["u", "continue"],
+      ["x", "stop"],
+      [u ? "⇧" : "shift", "whole run"],
+      ...(api.hasGates(run) ? ([["a", "approve"]] as [string, string][]) : []),
+      ["?", "help"],
+      ["q", "quit"],
+    ]);
+    return { frame: `${body}\n\n${hints}`, screen: "fleet" };
+  }
   if (state.view === "graph" && data.graphView) {
     const model = data.graphView.build(data.features);
     const body = data.graphView.render(caps, model, state.graph?.cursor ?? 0);
@@ -449,6 +507,7 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
           ["f", "filter"],
           ["s", "status"],
           ...(data.graphView ? ([["g", "graph"]] as [string, string][]) : []),
+          ...(data.fleetView ? ([["l", "fleet"]] as [string, string][]) : []),
           ["c", "quality"],
           ["?", "help"],
           ["q", "quit"],

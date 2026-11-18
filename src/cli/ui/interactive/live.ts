@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, statSync, watch as fsWatch } from "node:fs";
 import { join } from "node:path";
 import { ACTIVITY_DIR } from "../../../core/activity.js";
+import { FLEET_DIR } from "../../../core/fleet/runs.js";
 import type { ProjectCheckouts } from "../../../core/checkouts.js";
 import { WORKTREES_DIR } from "../../../core/worktree.js";
 import { LIVE_TOKENS } from "../dashboard/live-tokens.js";
@@ -74,6 +75,20 @@ export function watchTargets(c: ProjectCheckouts): WatchTarget[] {
     );
   }
   return targets;
+}
+
+/**
+ * The fleet state directory (feature 029, FR-002): `.amby/fleet` in the primary checkout, recursive, so a run, a
+ * directive or a gate change refreshes the Fleet view without a manual reload. Kept apart from `watchTargets`
+ * so that list (and its tests) stay as they were; `liveTargets` is what the interactive dashboard arms.
+ */
+export function fleetWatchTargets(c: ProjectCheckouts): WatchTarget[] {
+  return [{ path: join(c.primary.root, FLEET_DIR), recursive: true }];
+}
+
+/** Everything the interactive dashboard watches: the 017 targets plus the fleet directory. */
+export function liveTargets(c: ProjectCheckouts): WatchTarget[] {
+  return [...watchTargets(c), ...fleetWatchTargets(c)];
 }
 
 /**

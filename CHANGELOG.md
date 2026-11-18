@@ -14,6 +14,25 @@ Every release states whether plugins are affected, with such a line or with "Plu
 
 ## [Unreleased]
 
+### Added
+
+- Fleet view in the interactive dashboard (feature 029): `l` opens the lanes of the current fleet run, live,
+  with each lane's assistant, state, quiet time and directive status, a `STALLED <n>m` label on a lane that has
+  gone quiet past `fleet.stallMinutes`, the run's review stage and round in the header, and waiting story
+  gates listed below. `p`, `u` and `x` pause, continue and stop a lane (stop asks first), `P`, `U` and `X` do
+  it for the whole run (always with a confirmation), and `a` approves a waiting gate through the same action
+  as `ambykit run approve`. Every state is a word as well as a glyph, and the view works at any width, without
+  color and off a terminal. It reads local files only and loads only under `--interactive`.
+- `dashboard.icons` in `.amby/config.json` (`nerd`, `unicode`, `ascii` or `auto`), with the precedence
+  `--icons`, `AMBYKIT_ICONS`, `dashboard.icons`, auto.
+- `ambykit dashboard --json --overview` gains an optional `fleet` object, only while a fleet run is
+  unfinished.
+
+### Changed
+
+- The full-screen host restores the terminal when the app throws, and when the terminal closes (`SIGHUP` or
+  the input ending), as well as on quit, Ctrl-C and `SIGTERM`.
+
 ## [1.6.0] — 2026-11-18
 
 Plugins: not affected.
