@@ -19,7 +19,7 @@ created: 2026-11-16
 ## Phase 1 — Setup: foundation spike  (US-8, gates Phase 3)
 
 - [x] [T001] [US8] Fleet fixture helper: temp project with a run, N lanes (worktrees), 025-shape markers, directives, and a `run.json` copied exactly from 025's `data-model.md` schema (test/helpers/fleet-fixture.ts)
-- [x] [T002] [P] [US8] Spike A: Fleet view for 10 lanes on the existing layer plus a small internal screen-buffer/layout module (src/cli/ui/interactive/spike/fleet-spike.ts) ↪ DEVIATION: spike code stays in src/cli/ui/interactive/spike/ until T032 promotes its layout helpers (otherwise remove it); measure script is specs/029-fleet-control-room/spike/measure.mjs
+- [x] [T002] [P] [US8] Spike A: Fleet view for 10 lanes on the existing layer plus a small internal screen-buffer/layout module (src/cli/ui/interactive/spike/fleet-spike.ts) ↪ DEVIATION: spike code and its measure script were removed after measuring (T032 wrote the renderer fresh on 014/017's helpers); the numbers are kept in research.md
 - [ ] [T003] [P] [US8] Spike B: same view on Ink 7 in a scratch dir outside `src/`; measure install size, Node 22 need, restore, fallbacks, icon width (specs/029-fleet-control-room/spike/) ⚠ BLOCKED: no network in this build, so Ink 7 could not be installed or measured (research.md records spike B as not measured)
 - [x] [T004] [US8] Write findings: measured effort and trade-offs for both options, recommendation (specs/029-fleet-control-room/research.md)
 - [x] [T005] [US8] Record the foundation decision with the evidence via `/amby.decide` (.amby/decisions/) ↪ DEVIATION: ADR-004 written by hand in the /amby.decide record format (the prompt cannot run inside a worker), index row added in .amby/decisions/README.md

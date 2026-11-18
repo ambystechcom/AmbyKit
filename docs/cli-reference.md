@@ -227,9 +227,27 @@ Detection reads the process list only, never sends anything, and stops when you 
   header shows `● live · 3s ago`; where file watching is unavailable it polls every 2 s
   (`◌ polling`), and if monitoring fails it shows `⚠ live paused` and `r` retries. On a
   non-interactive terminal it prints the plain overview, and nothing is watched.
+- **Fleet view** (`l` in `--interactive`) — the lanes of the current fleet run (`ambykit fleet`,
+  `ambykit run`), live. Each lane is a row with its assistant, state (`working`, `waiting`, `blocked`,
+  `paused`, `done`, `unreported`, `unknown`, always as a word as well as a glyph), quiet time and
+  directive status (`continue pending`, `pause requested`, `paused`, `obeyed`). A working lane with no
+  report and no `tasks.md` change for `fleet.stallMinutes` (default 15) carries the text
+  `STALLED <n>m`. The header shows the run, phase and review stage once (`QA round 1/3`,
+  `architect round 2/3`, `NEEDS A DECISION`) and `+N more runs` when other runs are unfinished; story
+  checkpoint gates waiting for you are listed below the lanes. Keys: `↑`/`↓` select a lane, `p` pause,
+  `u` continue, `x` stop (asks `y`/`n`), `P`/`U`/`X` do the same for every lane of the run (always with
+  a `y`/`n` confirmation), `a` approves a waiting gate (`←`/`→` choose between several), `esc` goes
+  back, `?` lists the keys. Pause, continue and stop are written as directives for the lane's worker,
+  which obeys at its next report; approving a gate is the same action as `ambykit run approve` and
+  writes no directive. Without a run the view says so. It reads local files only (no network, no model
+  tokens) and is loaded only under `--interactive`.
 - **`--icons=nerd|unicode|ascii`** — icon set. `nerd` (also `AMBYKIT_ICONS=nerd`) shows the
   worktree tag as the Nerd Font git-branch icon; agent icons stay Unicode. `ascii` uses tags like
-  `[CC] Claude` and `wt`. The default is unicode when the terminal supports it.
+  `[CC] Claude` and `wt`. The default is unicode when the terminal supports it. The setting can also
+  live in `.amby/config.json` as `"dashboard": { "icons": "nerd" | "unicode" | "ascii" | "auto" }`
+  (hand-edited, never written by the dashboard). Precedence: `--icons`, then `AMBYKIT_ICONS`, then
+  `dashboard.icons`, then auto. A terminal without unicode is always ASCII. In the Fleet view `nerd`
+  draws the same glyphs as `unicode`; every state also has a word.
 - **`--json`** — the story list as JSON, unchanged from earlier releases.
 - **`--json --overview`** — one object: `stories` (exactly the `--json` list) plus `summary`,
   `statusCounts`, `features`, `attention`, `upNext`, `burndown`, `issues` and the applied `filters`.
@@ -239,7 +257,10 @@ Detection reads the process list only, never sends anything, and stops when you 
   phases); each key is omitted when it does not apply (`blocked` when zero, `verify` when the
   feature has no Verify lines). `attention` may contain items of kind `task-blocked` (key
   `<feature>:<task id>`) and `verify-failed` (key `<feature>:phase-N`, reason `verify failed: <why>`).
-  Bare `--json` is unchanged.
+  When a fleet run is unfinished, the object also has `fleet` (run, feature, status, phase, stage,
+  round, limit, needsDecision, `gates[]`, `lanes[]` with state, stalled, lastActivity and directive
+  status, and `others[]`); without a run the key is absent, so the output is byte-identical to before
+  (`specs/029-fleet-control-room/contracts/dashboard-json-fleet.md`). Bare `--json` is unchanged.
 
 ```bash
 ambykit dashboard

@@ -24,8 +24,10 @@ Confirmed against the merged code, and pinned by `test/core/fleet-view-contract.
 
 ## Spike A — hand-rolled on the existing layer (measured)
 
-Code: `src/cli/ui/interactive/spike/fleet-spike.ts` (`displayWidth`, `fit`, `laneRow`, `layoutRows`); measured with
-`specs/029-fleet-control-room/spike/measure.mjs` after `npm run build`, 10 lanes, 2000 frames per cell.
+Measured on a throwaway module (`displayWidth`, `fit`, `laneRow`, `layoutRows`), 10 lanes, 2000 frames per cell. The spike code and its
+measure script were **removed after measuring** (T002); the numbers below are the record. The shipped renderer,
+`src/cli/ui/dashboard/fleet-view.ts` (T032), was written fresh against the signed-off design and reuses 014/017's `panel`,
+`truncateVisible` and `agentBadge` instead of the spike's own width helpers.
 
 | Criterion | Result |
 |---|---|
