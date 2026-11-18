@@ -157,6 +157,7 @@ target is a thin `BaseEmitter` subclass.
 | `ambykit trace [feature]` | Show which requirements have tests (tests cite `NNN:FR-###`); `--json`, `--gate` |
 | `ambykit mcp` | Serve state tools (next task, story status, tick, report, claim) to an assistant over MCP; opt-in with `mcp.enabled` |
 | `ambykit directive <feature> <lane>` | Tell a fleet lane to `pause`, `resume` or `stop` (obeyed at its next report) |
+| `ambykit run <feature>` | (experimental) Run the prepared lanes headless: print the commands, `--yes` to launch, supervise, review and merge |
 
 See [`docs/cli-reference.md`](./docs/cli-reference.md).
 
