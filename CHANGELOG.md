@@ -14,6 +14,10 @@ Every release states whether plugins are affected, with such a line or with "Plu
 
 ## [Unreleased]
 
+## [1.6.0] — 2026-11-18
+
+Plugins: not affected.
+
 ### Added
 
 - Fleet view in the interactive dashboard (feature 029): `l` opens the lanes of the current fleet run, live,
@@ -27,18 +31,6 @@ Every release states whether plugins are affected, with such a line or with "Plu
   `--icons`, `AMBYKIT_ICONS`, `dashboard.icons`, auto.
 - `ambykit dashboard --json --overview` gains an optional `fleet` object, only while a fleet run is
   unfinished.
-
-### Changed
-
-- The full-screen host restores the terminal when the app throws, and when the terminal closes (`SIGHUP` or
-  the input ending), as well as on quit, Ctrl-C and `SIGTERM`.
-
-## [1.6.0] — 2026-11-18
-
-Plugins: not affected.
-
-### Added
-
 - `ambykit run <feature>` (feature 028, **experimental**): run a feature's prepared lanes headless, one
   assistant per lane in its own worktree. Without `--yes` it prints the exact command for each lane and
   launches nothing; `--emit-script` writes `launch.sh` and `launch.ps1`; only a verified runner is ever
@@ -52,6 +44,11 @@ Plugins: not affected.
   usage). `--continue-run` carries on a stopped or interrupted run and repeats no completed task. State is
   `.amby/fleet/<run>/`, shared with `/amby.run`. The check-off-aware lane merge is now a core function shared
   with `ambykit lane merge`, and the `fleet` config gains `stopGraceMinutes` and `runners`.
+
+### Changed
+
+- The full-screen host restores the terminal when the app throws, and when the terminal closes (`SIGHUP` or
+  the input ending), as well as on quit, Ctrl-C and `SIGTERM`.
 
 ## [1.5.0] — 2026-11-16
 
