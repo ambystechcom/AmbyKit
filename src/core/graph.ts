@@ -95,7 +95,46 @@ export function buildGraph(features: FeatureSnapshot[]): DependencyGraph {
     }
   }
 
-  return { nodes, edges, featureEdges: featureEdgesOf(edges, byKey), broken, cycles: cyclesOf(nodes, edges) };
+  const featureEdges = featureEdgesOf(edges, byKey);
+  declaredFeatureEdges(sorted, featureByRef, featureEdges, broken);
+  return { nodes, edges, featureEdges, broken, cycles: cyclesOf(nodes, edges) };
+}
+
+/**
+ * Feature 030 (FR-016): a feature's own `depends-on` (v2 frontmatter) adds a feature edge `{declared: true}`, merged into the
+ * derived edge when both exist. A number matches the first feature with that number (as `NNN:US-#` does), anything else a
+ * directory name; a dependency that matches no feature is a `broken` edge with reason `unknown-feature`. A 1.x feature
+ * declares none, so its graph is exactly what it was.
+ */
+function declaredFeatureEdges(
+  sorted: FeatureSnapshot[],
+  featureByRef: Map<string, FeatureSnapshot>,
+  featureEdges: FeatureEdge[],
+  broken: BrokenEdge[],
+): void {
+  let added = false;
+  for (const f of sorted) {
+    const seen = new Set<string>();
+    for (const dep of f.dependsOn ?? []) {
+      if (seen.has(dep)) continue;
+      seen.add(dep);
+      const target = /^\d+$/.test(dep)
+        ? sorted.find((x) => Number(x.ref) === Number(dep))
+        : (sorted.find((x) => x.dir === dep) ?? featureByRef.get(dep));
+      if (!target) {
+        broken.push({ from: f.dir, to: dep, kind: "depends-on", reason: "unknown-feature", scope: "feature" });
+        continue;
+      }
+      if (target.dir === f.dir) continue; // a feature cannot wait on itself
+      const existing = featureEdges.find((e) => e.from === f.dir && e.to === target.dir);
+      if (existing) existing.declared = true;
+      else {
+        featureEdges.push({ from: f.dir, to: target.dir, via: [], declared: true });
+        added = true;
+      }
+    }
+  }
+  if (added) featureEdges.sort((a, b) => compareFeatureDirs(a.from, b.from) || compareFeatureDirs(a.to, b.to));
 }
 
 /** FR-002: feature A depends on feature B when a story of A has an edge to a story of B; both kinds count. */

@@ -68,6 +68,8 @@ export interface FeatureSnapshot {
   ref: string; // featureRefOf(dir); may collide across features
   displayRef: string; // ref, or dir when ref collides (unique)
   stories: StoryProgress[]; // tasks applied
+  /** Feature 030: feature-level `depends-on` from v2 frontmatter, as written (numbers or directory names). Absent for 1.x features. */
+  dependsOn?: string[];
   tasks: TaskLine[] | null; // null = no tasks.md
   /** Feature 020: the Verify line of each phase of tasks.md; absent when there is no tasks.md. */
   verify?: PhaseVerify[];
