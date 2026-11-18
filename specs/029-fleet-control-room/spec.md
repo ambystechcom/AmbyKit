@@ -37,7 +37,7 @@ who is doing what without opening worktrees or logs.
   assistant, state and last activity.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** in-progress
+- **status:** done
 
 **Acceptance criteria**
 - Given a run, When the Fleet tab is opened, Then its lanes are listed under the run and each shows the
@@ -59,7 +59,7 @@ tell progress from rework.
   current round.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** in-progress
+- **status:** done
 
 **Acceptance criteria**
 - Given a run in the review loop, When shown, Then it displays the run's stage (working, QA, architect
@@ -78,7 +78,7 @@ an hour.
   confirm it is highlighted.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** in-progress
+- **status:** done
 
 **Acceptance criteria**
 - Given a lane in state working that exceeded the stall limit (spec 025) with no report and no
@@ -97,7 +97,7 @@ steer without leaving the terminal or killing processes by hand.
   report, then resume it and confirm it continues.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** in-progress
+- **status:** done
 
 **Acceptance criteria**
 - Given a selected lane, When the person chooses pause, Then a pause directive is written for that lane
@@ -125,7 +125,7 @@ continues as soon as I decide.
   and confirm the lane continues.
 - **depends-on:** [US-4]
 - **blocked-by:** []
-- **status:** in-progress
+- **status:** done
 
 **Acceptance criteria**
 - Given a lane at an approval gate (spec 028), When shown, Then it is marked awaiting approval with the
@@ -148,7 +148,7 @@ that I am never blocked by my terminal.
   every state is readable.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given `--icons=nerd` or `AMBYKIT_ICONS=nerd`, When shown, Then Nerd Font glyphs are used.
