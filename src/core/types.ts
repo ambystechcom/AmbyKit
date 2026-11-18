@@ -127,6 +127,8 @@ export interface RulesContext {
 /** Persisted project configuration at .amby/config.json. */
 export interface AmbyConfig {
   version: string;
+  /** Config schema version (feature 030): absent = 1. Only `migrate` writes it. */
+  schemaVersion?: number;
   /** Enabled target ids (see emitter registry). */
   tools: string[];
   /** When false, `sync` regenerates commands only, not AGENTS.md/CLAUDE.md. Default true. */

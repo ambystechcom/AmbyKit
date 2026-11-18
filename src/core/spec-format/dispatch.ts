@@ -45,6 +45,17 @@ export function readTasks(text: string, ctx?: ReadCtx): TasksRead {
   return out;
 }
 
+/**
+ * The 1.x readers, forced: what the shipped parsers return whatever the file contains. `migrate` uses them to compute the
+ * "before" model it must reproduce (030:FR-024); nothing else should.
+ */
+export function readSpecV1(feature: string, text: string): SpecRead["stories"] {
+  return parseStories(text, feature);
+}
+export function readTasksV1(text: string): Pick<TasksRead, "tasks" | "phases"> {
+  return { tasks: parseTasks(text), phases: parsePhases(text) };
+}
+
 /** Convenience for callers that only need the phases. */
 export function readPhases(text: string, ctx?: ReadCtx): TasksRead["phases"] {
   return readTasks(text, ctx).phases;
