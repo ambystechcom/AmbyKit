@@ -24,8 +24,10 @@ const where = (needle: string | RegExp): string[] =>
 describe("one parser, one resolver (FR-011)", () => {
   it("the `depends-on` / `blocked-by` lines are read only by parseStories", () => {
     expect(where("**depends-on:**")).toEqual([]);
-    expect(where(/\\\*\\\*depends-on:/)).toEqual(["core/dashboard.ts"]);
-    expect(where(/\\\*\\\*blocked-by:/)).toEqual(["core/dashboard.ts"]);
+    // `migrate` (feature 030) reads the 1.x bullet syntax once, to move it into frontmatter; it is not a graph consumer.
+    const outsideMigrate = (files: string[]): string[] => files.filter((f) => !f.startsWith("core/migrate/"));
+    expect(outsideMigrate(where(/\\\*\\\*depends-on:/))).toEqual(["core/dashboard.ts"]);
+    expect(outsideMigrate(where(/\\\*\\\*blocked-by:/))).toEqual(["core/dashboard.ts"]);
   });
 
   it("the cross-feature reference syntax is resolved only in graph.ts", () => {
