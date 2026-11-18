@@ -54,11 +54,11 @@ created: 2026-11-18
 
 ## Phase 4 — US-2 v2 task reader
 
-- [ ] [T030] [US2] `scanBlocks` and `readTasksV2`: per-phase fences (and per-task fences) with top-level `files` and `verify` only; `files` to `paths` and `pathIssue` (absent or `[]` reads `missing`, glob reads `glob`); `verify` to `PhaseVerify` with `passed|failed|unverified` and `why`; foreign fences ignored; mixed-key fences and unclosed or detached blocks are located errors; markers stay on the task line (src/core/spec-format/read-tasks.ts)
-- [ ] [T031] [US2] Tests: edge-rich v1 and both v2 layouts give equal tasks and phases; malformed task fixtures give located errors; absent files is `missing`; two tasks owning one file give the same lane conflict as 1.x; BLOCKED and DEVIATION unchanged — 030:FR-002, FR-003 (test/core/spec-format-read-tasks.test.ts)
-- [ ] [T032] [US2] Dispatcher uses `readTasksV2` and `readPhases` for v2; lane declarations and conflicts, manifest drift and check-off merge read through it (src/core/spec-format/dispatch.ts, test/core/spec-format-lane-parity.test.ts)
-- [ ] [T033] [US2] Test: the latest Verify result drives `verifyIssues` and the dashboard exactly as in 020 for a v2 phase, including a failed then passed sequence — 030:FR-002 (test/cli/verify-v2.test.ts)
-- **Verify:** `npx vitest run test/core/spec-format-read-tasks.test.ts test/core/spec-format-lane-parity.test.ts test/cli/verify-v2.test.ts` passes and the whole suite still passes.
+- [x] [T030] [US2] `scanBlocks` and `readTasksV2`: per-phase fences (and per-task fences) with top-level `files` and `verify` only; `files` to `paths` and `pathIssue` (absent or `[]` reads `missing`, glob reads `glob`); `verify` to `PhaseVerify` with `passed|failed|unverified` and `why`; foreign fences ignored; mixed-key fences and unclosed or detached blocks are located errors; markers stay on the task line (src/core/spec-format/read-tasks.ts)
+- [x] [T031] [US2] Tests: edge-rich v1 and both v2 layouts give equal tasks and phases; malformed task fixtures give located errors; absent files is `missing`; two tasks owning one file give the same lane conflict as 1.x; BLOCKED and DEVIATION unchanged — 030:FR-002, FR-003 (test/core/spec-format-read-tasks.test.ts)
+- [x] [T032] [US2] Dispatcher uses `readTasksV2` and `readPhases` for v2; lane declarations and conflicts, manifest drift and check-off merge read through it (src/core/spec-format/dispatch.ts, test/core/spec-format-lane-parity.test.ts)
+- [x] [T033] [US2] Test: the latest Verify result drives `verifyIssues` and the dashboard exactly as in 020 for a v2 phase, including a failed then passed sequence — 030:FR-002 (test/cli/verify-v2.test.ts)
+- **Verify:** `npx vitest run test/core/spec-format-read-tasks.test.ts test/core/spec-format-lane-parity.test.ts test/cli/verify-v2.test.ts` passes and the whole suite still passes. ✓ passed
 - **Checkpoint:** both formats read to the same model on every fixture.
 
 ## Phase 5 — Parallel lanes: independent modules  (US-3, US-4, US-7, US-8, US-9, US-10)

@@ -28,12 +28,13 @@ export const storyOut = (s: StoryProgress) => ({
   dependsOn: s.dependsOn,
   blockedBy: s.blockedBy,
 });
-export const taskOut = (t: TaskLine) =>
+/** `strip`: 1.x descriptions still carry the trailing ownership group; v2 descriptions never do, so they are final as read. */
+export const taskOut = (t: TaskLine, strip = true) =>
   omit({
     id: t.id,
     done: t.done,
     story: t.story,
-    description: stripOwnerGroup(t.description, t),
+    description: strip ? stripOwnerGroup(t.description, t) : t.description,
     phase: t.phase,
     parallel: t.parallel,
     paths: t.paths,
@@ -56,7 +57,7 @@ export const v1Readers: Readers = { stories: parseStories, tasks: parseTasks, ph
 export function modelOf(feature: string, specText: string | null, tasksText: string | null, r: Readers = v1Readers): FeatureModel {
   return {
     stories: specText === null ? [] : (r.stories(specText, feature).map(storyOut) as FeatureModel["stories"]),
-    tasks: tasksText === null ? [] : r.tasks(tasksText).map(taskOut),
+    tasks: tasksText === null ? [] : r.tasks(tasksText).map((t) => taskOut(t)),
     phases: tasksText === null ? [] : r.phases(tasksText).map(phaseOut),
   };
 }
