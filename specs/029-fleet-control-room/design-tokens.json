@@ -1,0 +1,117 @@
+{
+  "$schema": "https://ambystech.dev/schemas/design-tokens.json",
+  "$note": "Terminal UI tokens for 029-fleet-control-room (DRAFT, not signed off). EXTENDS specs/014-enhanced-dashboard/design-tokens.json and specs/017-live-dashboard/design-tokens.json: every inherited token keeps its name and is cited as-is; only additions are listed here. Same tiers and capability resolution as 014. Colors reuse 014's semantic colors, so the measured 014 contrast applies unchanged. The 'nerd' state glyphs reuse the Unicode glyph: no Nerd Font code points were verified against the glyph-names file in this build (no network), so none are invented (see ui.md, Open questions). Every state carries a word; no state depends on a glyph or a color.",
+  "$extends": [
+    "specs/014-enhanced-dashboard/design-tokens.json",
+    "specs/017-live-dashboard/design-tokens.json"
+  ],
+  "primitive": {
+    "glyph": {
+      "fleet-working": { "u": "▶", "a": "[>]" },
+      "fleet-waiting": { "u": "◷", "a": "[~]" },
+      "fleet-blocked": { "u": "⊘", "a": "[x]" },
+      "fleet-paused": { "u": "‖", "a": "[|]" },
+      "fleet-done": { "u": "✓", "a": "[v]" },
+      "fleet-unreported": { "u": "·", "a": "[.]" },
+      "fleet-unknown": { "u": "?", "a": "[?]" },
+      "fleet-stalled": { "u": "⚠", "a": "[!]" }
+    },
+    "word": {
+      "working": "working",
+      "waiting": "waiting",
+      "blocked": "blocked",
+      "paused": "paused",
+      "done": "done",
+      "unreported": "unreported",
+      "unknown": "unknown",
+      "stalled": "STALLED",
+      "needs-decision": "NEEDS A DECISION",
+      "gate-awaiting": "awaiting approval"
+    },
+    "text": {
+      "directive-none": "—",
+      "directive-none-ascii": "-",
+      "directive-pending": "pending",
+      "directive-pause-requested": "pause requested",
+      "directive-paused": "paused",
+      "directive-obeyed": "obeyed"
+    },
+    "space": {
+      "fleet-lane-col": 9,
+      "fleet-assistant-col": 12,
+      "fleet-state-col": 12,
+      "fleet-quiet-col": 6,
+      "fleet-narrow-max": 60,
+      "fleet-confirm-width": 46
+    },
+    "limit": {
+      "fleet-rows-min": 4
+    }
+  },
+  "semantic": {
+    "symbol": {
+      "fleet-working": "{primitive.glyph.fleet-working}",
+      "fleet-waiting": "{primitive.glyph.fleet-waiting}",
+      "fleet-blocked": "{primitive.glyph.fleet-blocked}",
+      "fleet-paused": "{primitive.glyph.fleet-paused}",
+      "fleet-done": "{primitive.glyph.fleet-done}",
+      "fleet-unreported": "{primitive.glyph.fleet-unreported}",
+      "fleet-unknown": "{primitive.glyph.fleet-unknown}",
+      "fleet-stalled": "{primitive.glyph.fleet-stalled}"
+    },
+    "color": {
+      "fleet-working": "{semantic.color.state-in-progress}",
+      "fleet-waiting": "{semantic.color.muted}",
+      "fleet-blocked": "{semantic.color.state-blocked}",
+      "fleet-paused": "{semantic.color.warn}",
+      "fleet-done": "{semantic.color.state-done}",
+      "fleet-unreported": "{semantic.color.muted}",
+      "fleet-unknown": "{semantic.color.muted}",
+      "fleet-stalled": "{semantic.color.state-blocked}"
+    }
+  },
+  "component": {
+    "fleet-header": {
+      "fg": "{semantic.color.accent}",
+      "needs-decision": { "fg": "{semantic.color.warn}", "weight": "{semantic.weight.heading}", "text": "{primitive.word.needs-decision}" },
+      "more-runs-fg": "{semantic.color.muted}"
+    },
+    "fleet-lane": {
+      "state": {
+        "working": { "glyph": "{semantic.symbol.fleet-working}", "nerd": "{semantic.symbol.fleet-working}", "word": "{primitive.word.working}", "fg": "{semantic.color.fleet-working}" },
+        "waiting": { "glyph": "{semantic.symbol.fleet-waiting}", "nerd": "{semantic.symbol.fleet-waiting}", "word": "{primitive.word.waiting}", "fg": "{semantic.color.fleet-waiting}" },
+        "blocked": { "glyph": "{semantic.symbol.fleet-blocked}", "nerd": "{semantic.symbol.fleet-blocked}", "word": "{primitive.word.blocked}", "fg": "{semantic.color.fleet-blocked}" },
+        "paused": { "glyph": "{semantic.symbol.fleet-paused}", "nerd": "{semantic.symbol.fleet-paused}", "word": "{primitive.word.paused}", "fg": "{semantic.color.fleet-paused}" },
+        "done": { "glyph": "{semantic.symbol.fleet-done}", "nerd": "{semantic.symbol.fleet-done}", "word": "{primitive.word.done}", "fg": "{semantic.color.fleet-done}" },
+        "unreported": { "glyph": "{semantic.symbol.fleet-unreported}", "nerd": "{semantic.symbol.fleet-unreported}", "word": "{primitive.word.unreported}", "fg": "{semantic.color.fleet-unreported}" },
+        "unknown": { "glyph": "{semantic.symbol.fleet-unknown}", "nerd": "{semantic.symbol.fleet-unknown}", "word": "{primitive.word.unknown}", "fg": "{semantic.color.fleet-unknown}" }
+      },
+      "stalled": { "glyph": "{semantic.symbol.fleet-stalled}", "text": "{primitive.word.stalled}", "fg": "{semantic.color.fleet-stalled}", "weight": "{semantic.weight.heading}" },
+      "quiet-fg": "{semantic.color.muted}",
+      "selected": { "cursor": "{semantic.symbol.cursor}", "weight": "{semantic.weight.selected}" }
+    },
+    "fleet-directive": {
+      "none": "{primitive.text.directive-none}",
+      "none-ascii": "{primitive.text.directive-none-ascii}",
+      "pending": "{primitive.text.directive-pending}",
+      "pause-requested": "{primitive.text.directive-pause-requested}",
+      "paused": "{primitive.text.directive-paused}",
+      "obeyed": "{primitive.text.directive-obeyed}",
+      "fg": "{semantic.color.muted}"
+    },
+    "fleet-gate": {
+      "glyph": "{semantic.symbol.waiting}",
+      "text": "{primitive.word.gate-awaiting}",
+      "pending": { "fg": "{semantic.color.warn}" }
+    },
+    "fleet-confirm": {
+      "border": "{primitive.glyph.box-focus-h}",
+      "title-fg": "{semantic.color.warn}",
+      "width": "{primitive.space.fleet-confirm-width}"
+    },
+    "fleet-layout": {
+      "narrow-max": "{primitive.space.fleet-narrow-max}",
+      "rows-min": "{primitive.limit.fleet-rows-min}"
+    }
+  }
+}
