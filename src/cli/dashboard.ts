@@ -26,12 +26,14 @@ import { renderFeatureView, renderOverview } from "./ui/dashboard/render-overvie
 import { TOKENS } from "./ui/dashboard/tokens.js";
 import { progressCell, renderTable, statusCell } from "./ui/table.js";
 import type { Cell } from "./ui/types.js";
+import { iconMode } from "./ui/capabilities.js";
+import { resolveIconMode } from "./ui/icons.js";
 import type { AmbyConfig } from "../core/types.js";
 import { LIVE_TOKENS } from "./ui/dashboard/live-tokens.js";
 import type { PresenceView } from "./ui/dashboard/worktrees-panel.js";
 import { guardedScanner, listAgentProcesses } from "./ui/interactive/agent-scan.js";
 import { runFullscreen } from "./ui/interactive/fullscreen.js";
-import { targetsSignature, watchProject, watchTargets, type ProjectWatcher, type WatchMode } from "./ui/interactive/live.js";
+import { liveTargets, targetsSignature, watchProject, type ProjectWatcher, type WatchMode } from "./ui/interactive/live.js";
 import {
   applyData,
   initOverviewTui,
@@ -55,7 +57,7 @@ export class DashboardCommand extends BaseCommand {
   protected async execute(opts: CliOptions): Promise<number> {
     let root = this.projectRoot(opts.cwd);
     const filters: Filters = { feature: stringFlag(opts, "feature"), status: stringFlag(opts, "status") };
-    if (!this.applyIcons(opts)) return 1;
+    if (!this.applyIcons(opts, root)) return 1;
 
     const storyArg = opts.positionals[0];
     if (storyArg) {
@@ -125,16 +127,20 @@ export class DashboardCommand extends BaseCommand {
     });
   }
 
-  /** `--icons=nerd|unicode|ascii` overrides the detected agent-icon mode (FR-025). */
-  private applyIcons(opts: CliOptions): boolean {
+  /**
+   * Icon set (features 017, 029): `--icons` > `AMBYKIT_ICONS` > `dashboard.icons` > auto-detect (FR-011). The flag is
+   * validated here as before; the rest of the precedence is the pure `resolveIconMode`. Config is only read, never written.
+   */
+  private applyIcons(opts: CliOptions, root: string): boolean {
     const icons = stringFlag(opts, "icons");
-    if (icons === undefined) return true;
-    if (icons !== "nerd" && icons !== "unicode" && icons !== "ascii") {
+    if (icons !== undefined && icons !== "nerd" && icons !== "unicode" && icons !== "ascii") {
       this.error(`--icons expects nerd, unicode or ascii, got '${icons}'.`, "e.g. ambykit dashboard --icons=nerd");
       return false;
     }
+    const { mode } = resolveIconMode({ flag: icons, env: process.env["AMBYKIT_ICONS"], config: readConfig(root)?.dashboard?.icons, caps: this.caps });
+    if (mode === iconMode(this.caps)) return true;
     const { icons: _drop, ...rest } = this.caps;
-    this.caps = icons === "unicode" ? rest : { ...rest, icons };
+    this.caps = mode === "unicode" ? rest : { ...rest, icons: mode };
     return true;
   }
 
@@ -275,12 +281,12 @@ export class DashboardCommand extends BaseCommand {
     let armed = "";
     const arm = (): void => {
       watcher?.stop();
-      const targets = watchTargets(checkouts);
+      const targets = liveTargets(checkouts);
       armed = targetsSignature(targets);
       watcher = watchProject(targets, refresh, undefined, { onMode: setLive });
     };
     // A worktree came or went, or a watched dir appeared after we armed (FR-011).
-    const rearmNeeded = (): boolean => watcher?.mode !== "paused" && targetsSignature(watchTargets(checkouts)) !== armed;
+    const rearmNeeded = (): boolean => watcher?.mode !== "paused" && targetsSignature(liveTargets(checkouts)) !== armed;
 
     // Re-read every checkout and swap the data in, keeping cursors and input (FR-010–FR-012).
     // Reads are async, so overlapping refreshes can finish out of order: only the latest one applies.
