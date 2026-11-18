@@ -24,11 +24,11 @@ created: 2026-11-18
 
 ## Phase 1 — Setup  (baselines and fixtures)
 
-- [ ] [T001] Port the spike fixtures into the repo: edge-rich v1 and v2 twins (phase and task layouts), the malformed set and the unsafe-spec set from `spikes/026-spec-format-v2/fixtures` and `results/us2-skips.txt` (test/fixtures/spec-format/)
-- [ ] [T002] [P] Baseline of the shipped parsers: generator helper and a committed model of every `specs/*/{spec,tasks}.md` (stories, tasks with paths, phases with Verify), plus a test that the shipped parsers still produce it (test/helpers/spec-model.ts, test/fixtures/spec-model-v1.json, test/core/spec-model-baseline.test.ts)
-- [ ] [T003] [P] Baseline of command output on the repo's own specs: `dashboard --json --overview` and `analyze --json` captured once, compared with unchanged-output rules of 020 (test/fixtures/unchanged-output-030.json, test/cli/unchanged-output-030.test.ts)
-- [ ] [T004] [P] Test helpers: temp-project builder from fixtures and `withMigratedCopy` (calls the migrate API once it exists) (test/helpers/spec-project.ts)
-- **Verify:** `npx vitest run test/core/spec-model-baseline.test.ts test/cli/unchanged-output-030.test.ts` passes on the unmodified code, and the fixture folders hold the edge-rich, malformed and unsafe sets.
+- [x] [T001] Port the spike fixtures into the repo: edge-rich v1 and v2 twins (phase and task layouts), the malformed set and the unsafe-spec set from `spikes/026-spec-format-v2/fixtures` and `results/us2-skips.txt` (test/fixtures/spec-format/) ↪ DEVIATION: the unsafe set is built in code (test/helpers/spec-project.ts UNSAFE) because git autocrlf rewrites BOMs and mixed line endings in files
+- [x] [T002] [P] Baseline of the shipped parsers: generator helper and a committed model of every `specs/*/{spec,tasks}.md` (stories, tasks with paths, phases with Verify), plus a test that the shipped parsers still produce it (test/helpers/spec-model.ts, test/fixtures/spec-model-v1.json, test/core/spec-model-baseline.test.ts)
+- [x] [T003] [P] Baseline of command output on the repo's own specs: `dashboard --json --overview` and `analyze --json` captured once, compared with unchanged-output rules of 020 (test/fixtures/unchanged-output-030.json, test/cli/unchanged-output-030.test.ts)
+- [x] [T004] [P] Test helpers: temp-project builder from fixtures and `withMigratedCopy` (calls the migrate API once it exists) (test/helpers/spec-project.ts)
+- **Verify:** `npx vitest run test/core/spec-model-baseline.test.ts test/cli/unchanged-output-030.test.ts` passes on the unmodified code, and the fixture folders hold the edge-rich, malformed and unsafe sets. ✓ passed
 - **Checkpoint:** baselines committed; nothing in `src/` changed.
 
 ## Phase 2 — Foundational  (dispatcher with v1 behavior only; blocks all story work)
