@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { readRun } from "../core/fleet/index.js";
-import { parseTasks } from "../core/dashboard.js";
+import { readTasks } from "../core/spec-format/dispatch.js";
 import { featureBranch } from "../core/lane-merge.js";
 import { approveGate, completedStories, escalate, lastDecision, openGate, phaseGateId } from "../core/run-gate-actions.js";
 import { event, type Session } from "./run-session.js";
@@ -24,7 +24,7 @@ export type GateOutcome =
 function featureTasks(s: Session) {
   const fb = featureBranch(s.root, s.feature);
   const file = fb?.checkout ? join(fb.checkout, "specs", s.feature, "tasks.md") : join(s.root, "specs", s.feature, "tasks.md");
-  return existsSync(file) ? parseTasks(readFileSync(file, "utf8")) : [];
+  return existsSync(file) ? readTasks(readFileSync(file, "utf8")).tasks : [];
 }
 
 /** Decide what follows a phase whose lanes have all merged. */

@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { canonicalStoryId, featureRefOf, parseStories, parseTasks } from "./dashboard.js";
+import { canonicalStoryId, featureRefOf } from "./dashboard.js";
+import { readSpec, readTasks } from "./spec-format/dispatch.js";
 import { releaseTaskClaims } from "./fleet/claims.js";
 import { withLock, writeFileAtomic } from "./fleet/lock.js";
 import { featureIds } from "./worktree.js";
@@ -51,7 +52,7 @@ export function tickTask(root: string, featureRef: string, taskId: string): Edit
 
   const locked = withLock(root, `tasks-${feature}`, (): EditResult<TickResult> => {
     const text = readFileSync(file, "utf8");
-    const before = parseTasks(text);
+    const before = readTasks(text).tasks;
     const target = before.find((t) => t.id === id);
     if (!target) return fail(`task '${taskId}' not found in ${feature}${before.length ? `; it has ${before[0]!.id}..${before[before.length - 1]!.id}` : ""}`);
     if (target.done) return fail(`task ${id} is already checked`);
@@ -64,7 +65,7 @@ export function tickTask(root: string, featureRef: string, taskId: string): Edit
     const next = rows.join(eol);
 
     // Re-parse: the target is now checked and every other task reads exactly as before (SC-002).
-    const after = parseTasks(next);
+    const after = readTasks(next).tasks;
     const same =
       after.length === before.length &&
       after.every((t, i) => (t.id === id ? t.done && JSON.stringify({ ...t, done: false }) === JSON.stringify(before[i]) : JSON.stringify(t) === JSON.stringify(before[i])));
@@ -96,7 +97,7 @@ export function setStoryStatus(root: string, featureRef: string, storyRef: strin
 
   const locked = withLock(root, `spec-${feature}`, (): EditResult<StatusResult> => {
     const text = readFileSync(file, "utf8");
-    const before = parseStories(text, feature);
+    const before = readSpec(feature, text).stories;
     const target = before.find((s) => s.id === wanted);
     if (!target) return fail(`story '${storyRef}' not found in ${feature}${before.length ? `; stories: ${before.map((s) => s.displayId).join(", ")}` : ""}`);
 
@@ -121,7 +122,7 @@ export function setStoryStatus(root: string, featureRef: string, storyRef: strin
     rows[at] = rows[at]!.replace(/(\*\*status:\*\*\s*)[a-z-]+/i, `$1${status}`);
     const next = rows.join(eol);
 
-    const after = parseStories(next, feature);
+    const after = readSpec(feature, next).stories;
     const same =
       after.length === before.length &&
       after.every((s, i) => (s.id === wanted ? s.status === status && JSON.stringify({ ...s, status: "" }) === JSON.stringify({ ...before[i], status: "" }) : JSON.stringify(s) === JSON.stringify(before[i])));

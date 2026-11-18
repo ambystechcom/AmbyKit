@@ -1,4 +1,5 @@
-import { parseTasks, type TaskLine } from "./dashboard.js";
+import type { TaskLine } from "./dashboard.js";
+import { readTasks } from "./spec-format/dispatch.js";
 import { git, gitAvailable, gitWithInput, isRepo } from "./git.js";
 import type { Burndown, BurndownPoint, FeatureSnapshot } from "./overview-types.js";
 
@@ -192,7 +193,7 @@ export function readBurndown(input: BurndownInput): Burndown {
       [...scope.values()].forEach((allowed, j) => {
         const body = blobs[i * pathspecs.length + j];
         if (body == null) return;
-        const n = countTasks(parseTasks(body), allowed);
+        const n = countTasks(readTasks(body).tasks, allowed);
         c.total += n.total;
         c.remaining += n.remaining;
       });

@@ -33,14 +33,14 @@ created: 2026-11-18
 
 ## Phase 2 — Foundational  (dispatcher with v1 behavior only; blocks all story work)
 
-- [ ] [T010] Result types and `FormatIssue {file,line,kind,message}`; re-export `StoryProgress`, `TaskLine`, `PhaseVerify` as the one model (src/core/spec-format/model.ts)
-- [ ] [T011] [P] Frontmatter splitter and YAML parse with 1-based line numbers, using the existing `gray-matter` YAML engine; unclosed or unparseable frontmatter yields an issue, never a throw (src/core/spec-format/frontmatter.ts, test/core/spec-format-frontmatter.test.ts)
-- [ ] [T012] [P] `detectSpecFormat` and `detectTasksFormat` per C-1 and FR-019: `format: 2`, story data without marker, ours-fence in tasks (src/core/spec-format/detect.ts, test/core/spec-format-detect.test.ts)
-- [ ] [T013] Dispatcher `readSpec`, `readTasks`, `readPhases` that for now delegate to the v1 parsers and return `{format:1, issues:[]}`, with a tally hook for later (src/core/spec-format/dispatch.ts, test/core/spec-format-dispatch.test.ts)
-- [ ] [T014] [P] Route the readers through the dispatcher without changing output: features, checkouts, dashboard compute, burndown history blobs, lane `git show` reads, dashboard CLI, fleet flow input and run flow, lane merge helpers (src/core/features.ts, src/core/checkouts.ts, src/core/dashboard.ts, src/core/burndown.ts, src/cli/lane.ts, src/cli/dashboard.ts, src/core/fleet/flow-input.ts, src/core/fleet/run-flow.ts, src/core/lanes.ts)
-- [ ] [T015] [P] Route the MCP read and edit helpers through the dispatcher, same signatures and JSON shapes (src/core/tasks-edit.ts, src/core/query.ts)
-- [ ] [T016] Guard test: no module outside `src/core/spec-format/` and the v1 parser files imports `parseStories`, `parseTasks` or `parsePhases` directly — 030:FR-021 (test/core/spec-format-guard.test.ts)
-- **Verify:** `npm run typecheck && npm test` pass with no snapshot or baseline change, `node dist/cli/index.js analyze` prints exactly what it printed before Phase 2, and the guard test passes.
+- [x] [T010] Result types and `FormatIssue {file,line,kind,message}`; re-export `StoryProgress`, `TaskLine`, `PhaseVerify` as the one model (src/core/spec-format/model.ts)
+- [x] [T011] [P] Frontmatter splitter and YAML parse with 1-based line numbers, using the existing `gray-matter` YAML engine; unclosed or unparseable frontmatter yields an issue, never a throw (src/core/spec-format/frontmatter.ts, test/core/spec-format-frontmatter.test.ts)
+- [x] [T012] [P] `detectSpecFormat` and `detectTasksFormat` per C-1 and FR-019: `format: 2`, story data without marker, ours-fence in tasks (src/core/spec-format/detect.ts, test/core/spec-format-detect.test.ts)
+- [x] [T013] Dispatcher `readSpec`, `readTasks`, `readPhases` that for now delegate to the v1 parsers and return `{format:1, issues:[]}`, with a tally hook for later (src/core/spec-format/dispatch.ts, test/core/spec-format-dispatch.test.ts)
+- [x] [T014] [P] Route the readers through the dispatcher without changing output: features, checkouts, dashboard compute, burndown history blobs, lane `git show` reads, dashboard CLI, fleet flow input and run flow, lane merge helpers (src/core/features.ts, src/core/checkouts.ts, src/core/dashboard.ts, src/core/burndown.ts, src/cli/lane.ts, src/cli/dashboard.ts, src/core/fleet/flow-input.ts, src/core/fleet/run-flow.ts, src/core/lanes.ts)
+- [x] [T015] [P] Route the MCP read and edit helpers through the dispatcher, same signatures and JSON shapes (src/core/tasks-edit.ts, src/core/query.ts)
+- [x] [T016] Guard test: no module outside `src/core/spec-format/` and the v1 parser files imports `parseStories`, `parseTasks` or `parsePhases` directly — 030:FR-021 (test/core/spec-format-guard.test.ts)
+- **Verify:** `npm run typecheck && npm test` pass with no snapshot or baseline change, `node dist/cli/index.js analyze` prints exactly what it printed before Phase 2, and the guard test passes. ✓ passed
 - **Checkpoint:** every reader goes through one dispatcher; behavior unchanged.
 
 ## Phase 3 — US-1 v2 spec reader
