@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
-      # Dev tooling (vitest 5) needs Node >= 22.12, so type-check, test and build run on 22...
+      # AmbyKit 2 supports Node 22 and newer (030:FR-015); type-check, test, build and the self-host checks all run on it.
       - uses: actions/setup-node@v7
         with:
           node-version: 22
@@ -26,13 +26,22 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
-      # ...and the built CLI runs on Node 20, the oldest version package.json `engines` supports.
+      - name: Self-host check (generated files in sync)
+        run: node dist/cli/index.js sync --check
+      - name: Dependency-graph analysis
+        run: node dist/cli/index.js analyze
+      - name: Dashboard smoke test
+        run: node dist/cli/index.js dashboard
+      # An older Node must stop with the required-version message (030:FR-015), not with a stack trace.
       - uses: actions/setup-node@v7
         with:
           node-version: 20
-      - name: Self-host check (generated files in sync, Node 20)
-        run: node dist/cli/index.js sync --check
-      - name: Dependency-graph analysis (Node 20)
-        run: node dist/cli/index.js analyze
-      - name: Dashboard smoke test (Node 20)
-        run: node dist/cli/index.js dashboard
+      - name: Node 20 prints the required-version message and exits non-zero
+        shell: bash
+        run: |
+          set +e
+          out=$(node dist/cli/index.js --version 2>&1)
+          code=$?
+          echo "$out"
+          test "$code" -ne 0
+          echo "$out" | grep -q "Node.js 22 or newer"
