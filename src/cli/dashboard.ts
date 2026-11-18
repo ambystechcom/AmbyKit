@@ -272,7 +272,17 @@ export class DashboardCommand extends BaseCommand {
     });
     // Feature 023 (FR-015): the graph view is loaded only here, on the interactive path, never one-shot or --json.
     const { graphViewApi } = await import("./ui/dashboard/graph-view.js");
-    let data = withBurndown({ ...base, graphView: graphViewApi, presence: presenceOf(base.features, Date.now()) });
+    // Feature 029 (FR-012): the Fleet view is likewise loaded only here, never one-shot or --json.
+    const { fleetViewApi } = await import("./ui/dashboard/fleet-view.js");
+    const terminalRows = (): number => process.stdout.rows ?? 24;
+    let data = withBurndown({
+      ...base,
+      graphView: graphViewApi,
+      fleetView: fleetViewApi,
+      fleet: readFleet(initialCheckouts.primary.root),
+      rows: terminalRows(),
+      presence: presenceOf(base.features, Date.now()),
+    });
 
     let update: ((fn: (s: OverviewTuiState) => OverviewTuiState) => void) | null = null;
     let watcher: ProjectWatcher | null = null;
@@ -306,7 +316,7 @@ export class DashboardCommand extends BaseCommand {
         const prev = data;
         cache.clear();
         const now = Date.now();
-        data = withBurndown({ ...prev, features: read.features, issues: read.issues, presence: presenceOf(read.features, now) });
+        data = withBurndown({ ...prev, features: read.features, issues: read.issues, presence: presenceOf(read.features, now), fleet: readFleet(checkouts.primary.root, now), rows: terminalRows() });
         if (rearmNeeded()) arm();
         update?.((s) => ({ ...applyData(s, prev, data), now, live: { mode: watcher?.mode ?? "paused", lastChange: now } }));
       } catch {
@@ -322,7 +332,8 @@ export class DashboardCommand extends BaseCommand {
         void refresh();
       }
       const now = Date.now();
-      data = withBurndown({ ...data, presence: presenceOf(data.features, now) });
+      // The heartbeat also re-reads the run, so a quiet lane crosses the stall limit on screen without a file change (029 SC-002).
+      data = withBurndown({ ...data, presence: presenceOf(data.features, now), fleet: readFleet(checkouts.primary.root, now), rows: terminalRows() });
       update?.((s) => ({ ...s, now, changed: new Set(), changedTasks: new Set() }));
       void scan().then((found) => {
         if (stopped || found === null) return;
@@ -334,7 +345,7 @@ export class DashboardCommand extends BaseCommand {
 
     await runFullscreen({
       initial: { ...initOverviewTui(filters), live: { mode: "watching", lastChange: Date.now() } },
-      render: (s) => renderOverviewTui(this.caps, data, s),
+      render: (s) => renderOverviewTui(this.caps, { ...data, rows: terminalRows() }, s),
       reduce: (s, key) => {
         // `r` restarts monitoring when it is paused (ui.md LiveIndicator).
         if (key.name === "r" && s.input === null && s.live?.mode === "paused") {
@@ -342,7 +353,15 @@ export class DashboardCommand extends BaseCommand {
           void refresh();
           return { ...s, live: { mode: watcher?.mode ?? "paused", lastChange: Date.now() } };
         }
-        return reduceOverviewTui(data, s, key);
+        const next = reduceOverviewTui({ ...data, rows: terminalRows() }, s, key);
+        // Feature 029 (FR-006, FR-009): the pure reducer only records the confirmed intent; it is performed here, through
+        // 025's directive writer or 028's approveGate, and the run is re-read so the row shows the result at once.
+        if (next.view === "fleet" && next.fleet?.intent && data.fleet) {
+          const out = fleetViewApi.perform(checkouts.primary.root, data.fleet, next.fleet.intent);
+          data = withBurndown({ ...data, fleet: readFleet(checkouts.primary.root) });
+          return { ...next, fleet: { ...next.fleet, intent: null, notice: out.message } };
+        }
+        return next;
       },
       isDone: isOverviewDone,
       start: (u) => {

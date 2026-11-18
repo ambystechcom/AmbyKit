@@ -61,7 +61,7 @@ export function runFullscreen<S>(
   emitKeypressEvents(input);
   const wasRaw = Boolean(input.isRaw);
 
-  return new Promise<S>((resolve) => {
+  return new Promise<S>((resolve, reject) => {
     let finished = false;
     const cleanup = (): void => {
       if (finished) return;
@@ -70,6 +70,8 @@ export function runFullscreen<S>(
       output.off?.("resize", onResize);
       process.off("SIGINT", onSignal);
       process.off("SIGTERM", onSignal);
+      process.off("SIGHUP", onSignal);
+      input.off("end", onSignal);
       input.setRawMode?.(wasRaw);
       input.pause();
       try {
@@ -82,32 +84,52 @@ export function runFullscreen<S>(
       cleanup();
       resolve(state);
     };
-    const onKey = (_s: string, key: KeyEvent = {}): void => {
-      if (key.ctrl && key.name === "c") return finish();
-      state = app.reduce(state, key);
-      if (app.isDone(state)) return finish();
-      frame();
+    // Feature 029 (FR-016, "on error"): a reducer or renderer that throws must not leave the terminal in the alternate
+    // screen with raw mode on. Restore first, then reject with the error.
+    const guarded = (fn: () => void): void => {
+      try {
+        fn();
+      } catch (err) {
+        cleanup();
+        reject(err);
+      }
     };
+    const onKey = (_s: string, key: KeyEvent = {}): void =>
+      guarded(() => {
+        if (key.ctrl && key.name === "c") return finish();
+        state = app.reduce(state, key);
+        if (app.isDone(state)) return finish();
+        frame();
+      });
     const onSignal = (): void => finish();
-    const onResize = (): void => {
-      if (finished) return;
-      app.resize?.(output.columns ?? 80);
-      frame();
-    };
+    const onResize = (): void =>
+      guarded(() => {
+        if (finished) return;
+        app.resize?.(output.columns ?? 80);
+        frame();
+      });
 
     input.setRawMode?.(true);
     input.resume();
     process.on("SIGINT", onSignal);
     process.on("SIGTERM", onSignal);
+    // A closed terminal (feature 029, FR-016): SIGHUP, or the input stream ending, stops the app the same way.
+    process.on("SIGHUP", onSignal);
+    input.on("end", onSignal);
     output.write(ENTER);
-    frame();
+    guarded(() => frame());
+    if (finished) return;
     input.on("keypress", onKey);
     output.on?.("resize", onResize);
-    app.start?.((fn) => {
-      if (finished) return;
-      state = fn(state);
-      if (app.isDone(state)) return finish();
-      frame();
-    });
+    guarded(() =>
+      app.start?.((fn) =>
+        guarded(() => {
+          if (finished) return;
+          state = fn(state);
+          if (app.isDone(state)) return finish();
+          frame();
+        }),
+      ),
+    );
   });
 }

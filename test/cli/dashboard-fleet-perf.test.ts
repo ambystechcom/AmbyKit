@@ -33,11 +33,15 @@ describe("fleet performance and loading (feature 029, SC-005, FR-012)", () => {
     expect(readFleet(f.root, NOW)).toBeNull();
   });
 
-  it("029:FR-012: the non-interactive path does not import the Fleet view, reducer or watcher at module load", () => {
-    const src = readFileSync(join(__dirname, "..", "..", "src", "cli", "dashboard.ts"), "utf8");
-    // The interactive view modules are only loaded under --interactive (none of them is imported statically).
-    for (const name of ["interactive/fleet.js", "interactive/fleet-actions.js", "dashboard/fleet-view.js", "dashboard/fleet-tokens.js"]) {
-      expect(src.split("\n").filter((l) => /^import /.test(l) && l.includes(name))).toEqual([]);
+  it("029:FR-012: the non-interactive path does not import the Fleet view, reducer or actions at module load", () => {
+    // The Fleet modules load only under --interactive, through one dynamic import in dashboard.ts. Neither the command nor the
+    // overview reducer imports them as values (a type-only import is erased and loads nothing).
+    const src = (f: string) => readFileSync(join(__dirname, "..", "..", "src", "cli", f), "utf8");
+    const names = ["interactive/fleet.js", "interactive/fleet-actions.js", "dashboard/fleet-view.js", "dashboard/fleet-tokens.js"];
+    for (const file of ["dashboard.ts", join("ui", "interactive", "overview.ts")]) {
+      const valueImports = src(file).split("\n").filter((l) => /^import (?!type)/.test(l) && names.some((n) => l.includes(n.split("/")[1]!)));
+      expect(valueImports, file).toEqual([]);
     }
+    expect(src("dashboard.ts")).toMatch(/await import\("\.\/ui\/dashboard\/fleet-view\.js"\)/);
   });
 });

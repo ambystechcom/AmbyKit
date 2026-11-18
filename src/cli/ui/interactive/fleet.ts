@@ -70,7 +70,9 @@ export function scrollFor(cursor: number, scroll: number, rows: number, total: n
 
 const isUpper = (ch: string): boolean => ch.length === 1 && ch !== ch.toLowerCase();
 
-export function reduceFleet(view: FleetView | null, state: FleetTuiState, key: KeyEvent, rows = 10): FleetTuiState {
+export function reduceFleet(view: FleetView | null, current: FleetTuiState, key: KeyEvent, rows = 10): FleetTuiState {
+  // The heartbeat swaps the data without going through `applyData`, so keep the cursors inside it here too.
+  const state = clampFleet(view, current, rows);
   const base: FleetTuiState = { ...state, notice: null };
 
   if (state.confirm) {
