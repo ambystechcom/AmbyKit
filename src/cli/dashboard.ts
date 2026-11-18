@@ -18,6 +18,8 @@ import { allCheckouts, readProjectFeatures, type ProjectCheckouts } from "../cor
 import { loadConfig } from "../core/config.js";
 import type { Burndown, Checkout, FeatureSnapshot, Filters, ParseIssue } from "../core/overview-types.js";
 import { applyFilters, computeOverview } from "../core/overview.js";
+import { fleetJson } from "../core/fleet-view/json.js";
+import { readFleet } from "../core/fleet-view/read.js";
 import { packageVersion } from "../core/paths.js";
 import { maxPeriodsFor } from "./ui/dashboard/burndown-chart.js";
 import type { HeaderMeta } from "./ui/dashboard/cards.js";
@@ -193,6 +195,7 @@ export class DashboardCommand extends BaseCommand {
   private async overviewJson(root: string, filters: Filters, upNextCap: number, stories: StoryProgress[]): Promise<unknown> {
     const { features, issues, checkouts } = await readProjectFeatures(root);
     const o = computeOverview(features, filters, { upNextCap }, issues);
+    const fleet = readFleet(checkouts.primary.root);
     return {
       stories,
       summary: o.summary,
@@ -204,6 +207,8 @@ export class DashboardCommand extends BaseCommand {
       burndown: this.burndown(checkouts.primary.root, features, filters, JSON_PERIODS),
       issues: o.issues,
       filters: { feature: filters.feature ?? null, status: filters.status ?? null, next: upNextCap },
+      // Feature 029: only when a fleet run exists, so output without one is byte-identical to before (FR-013).
+      ...(fleet ? { fleet: fleetJson(fleet) } : {}),
     };
   }
 
