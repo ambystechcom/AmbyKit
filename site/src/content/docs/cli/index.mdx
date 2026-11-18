@@ -231,6 +231,24 @@ tasks. `--worker-start` is refused when no slot is free; `--restart` is refused 
 restarts, pausing the lane and asking a person. `--round` prints `retry` or `escalate` and, on `escalate`,
 waits for a decision. Pause, resume and stop go through the same writer as `ambykit directive`.
 
+## `ambykit run` (experimental)
+
+Run a feature's prepared lanes headless, one assistant per lane. Experimental in 1.6. Nothing launches without
+`--yes`, and only a verified runner is ever launched.
+
+```text
+ambykit run 028                         # print the exact command per lane; launch nothing
+ambykit run 028 --yes                   # print, then launch and supervise
+ambykit run 028 --emit-script           # write launch.sh and launch.ps1; launch nothing
+ambykit run --continue-run=<run> --yes  # continue a stopped or interrupted run
+ambykit run --runners                   # which headless runners are verified
+ambykit run approve|reject <run>        # a story checkpoint
+```
+
+Prepare lanes first with `ambykit lane`. The run restarts stalled lanes, reviews each finished lane (QA, then the
+architect) before merging it, merges one at a time, stops at story checkpoints, and enforces wall-clock and task
+budgets. State is `.amby/fleet/<run>/`, shared with `/amby.run`. See the CLI reference for every flag.
+
 ## `ambykit update`
 
 ```text

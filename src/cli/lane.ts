@@ -5,12 +5,12 @@ import { renderTable } from "./ui/table.js";
 import { loadConfig } from "../core/config.js";
 import { parseTasks, type TaskLine } from "../core/dashboard.js";
 import { branchExists, git, gitWithInput, isDirty, isMerged, isRepo, worktreeList } from "../core/git.js";
+import { featureBranch, mergeLanes } from "../core/lane-merge.js";
 import {
   describeConflict,
   laneState,
   manifestDrift,
   matchLane,
-  mergeCheckoffs,
   planLanes,
   readManifest,
   writeManifest,
@@ -274,122 +274,27 @@ export class LaneCommand extends BaseCommand {
 
   // --- merge ---
   private merge(root: string, feature: string, laneArg: string | undefined, json: boolean): number {
-    const worktrees = worktreeList(root);
-    const fb = featureBranch(root, feature);
-    if (!fb || !fb.checkout) {
-      this.error(`${feature} is not checked out anywhere — check out its branch (or \`ambykit worktree ${feature}\`) first.`);
+    const out = mergeLanes(root, feature, laneArg);
+    if (!out.ok) {
+      this.error(out.kind === "dirty-checkout" && out.path ? `${rel(root, out.path)} has uncommitted changes — commit or stash them before merging lanes.` : out.error);
       return 1;
     }
-    const checkout = fb.checkout;
-    if (isDirty(checkout)) {
-      this.error(`${rel(root, checkout)} has uncommitted changes — commit or stash them before merging lanes.`);
-      return 1;
-    }
-    const all = laneWorktrees(root, worktrees)
-      .filter((l) => l.feature === feature)
-      .sort((a, b) => a.name.localeCompare(b.name));
-    let lanes = all;
-    if (laneArg) {
-      const name = matchLane(feature, all.map((l) => l.name), laneArg);
-      if (!name) {
-        this.error(`No lane '${laneArg}' for ${feature}. Lanes: ${all.map((l) => l.name).join(", ") || "(none)"}`);
-        return 1;
-      }
-      lanes = all.filter((l) => l.name === name);
-    }
-    if (lanes.length === 0) {
+    if (out.found === 0) {
       this.info(`No lanes for ${feature}.`);
       return 0;
     }
-
-    const tasksRel = `specs/${feature}/tasks.md`;
-    let code = 0;
-    const report: { lane: string; result: "merged" | "nothing" | "dirty" | "conflict"; detail?: string }[] = [];
-
-    for (const l of lanes) {
-      if (existsSync(l.worktree.path) && isDirty(l.worktree.path)) {
-        report.push({ lane: l.name, result: "dirty", detail: "has uncommitted changes — commit first" });
-        code = 1;
-        continue;
-      }
-      if (isMerged(root, l.name, fb.branch)) {
-        report.push({ lane: l.name, result: "nothing" });
-        continue;
-      }
-      try {
-        git(checkout, ["merge", "--no-ff", "--no-commit", l.name]);
-      } catch {
-        const unmerged = git(checkout, ["diff", "--name-only", "--diff-filter=U"]).split(/\r?\n/).filter(Boolean);
-        const resolved = unmerged.length === 1 && unmerged[0] === tasksRel ? this.resolveCheckoffs(checkout, tasksRel) : false;
-        if (!resolved) {
-          abortMerge(checkout);
-          report.push({
-            lane: l.name,
-            result: "conflict",
-            detail: unmerged.length > 0 ? `conflicts in ${unmerged.join(", ")} — merge it by hand` : "merge failed",
-          });
-          code = 1;
-          continue;
-        }
-      }
-      if (hasMergeHead(checkout)) git(checkout, ["commit", "-q", "-m", `Merge lane ${l.name}`]);
-      report.push({ lane: l.name, result: "merged" });
-    }
-
+    const code = out.lanes.some((r) => r.result === "dirty" || r.result === "conflict") ? 1 : 0;
     if (json) {
-      console.log(JSON.stringify({ feature, lanes: report }));
+      console.log(JSON.stringify({ feature, lanes: out.lanes }));
       return code;
     }
-    for (const r of report) {
+    for (const r of out.lanes) {
       if (r.result === "merged") this.success(`Merged ${r.lane}`);
       else if (r.result === "nothing") this.info(`${r.lane}: nothing to merge`);
       else this.error(`${r.lane}: ${r.detail}`);
     }
     return code;
   }
-
-  /** Auto-resolve a tasks.md conflict that is only about check-offs. False when it is more than that. */
-  private resolveCheckoffs(checkout: string, tasksRel: string): boolean {
-    const stage = (n: number): string => {
-      try {
-        return gitWithInput(checkout, ["show", `:${n}:${tasksRel}`], "").toString("utf8");
-      } catch {
-        return "";
-      }
-    };
-    const merged = mergeCheckoffs(stage(1), stage(2), stage(3));
-    if (merged === null) return false;
-    writeFileSync(join(checkout, tasksRel), merged, "utf8");
-    git(checkout, ["add", tasksRel]);
-    return true;
-  }
-}
-
-function hasMergeHead(cwd: string): boolean {
-  try {
-    git(cwd, ["rev-parse", "-q", "--verify", "MERGE_HEAD"]);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function abortMerge(cwd: string): void {
-  try {
-    git(cwd, ["merge", "--abort"]);
-  } catch {
-    /* nothing to abort */
-  }
-}
-
-/** The feature's branch and (when checked out somewhere) the checkout holding it. */
-function featureBranch(root: string, feature: string): { branch: string; checkout: string | null } | null {
-  const worktrees = worktreeList(root);
-  const wt = findWorktree(root, feature, worktrees);
-  if (wt?.branch) return { branch: wt.branch, checkout: wt.path };
-  if (!branchExists(root, feature)) return null;
-  const holder = worktrees.find((w) => w.branch === feature);
-  return { branch: feature, checkout: holder?.path ?? null };
 }
 
 function readTasksFile(checkout: string, feature: string): TaskLine[] | null {

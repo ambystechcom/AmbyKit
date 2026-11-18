@@ -14,6 +14,26 @@ Every release states whether plugins are affected, with such a line or with "Plu
 
 ## [Unreleased]
 
+## [1.6.0] — 2026-11-18
+
+Plugins: not affected.
+
+### Added
+
+- `ambykit run <feature>` (feature 028, **experimental**): run a feature's prepared lanes headless, one
+  assistant per lane in its own worktree. Without `--yes` it prints the exact command for each lane and
+  launches nothing; `--emit-script` writes `launch.sh` and `launch.ps1`; only a verified runner is ever
+  launched, and both runners start unverified (`ambykit run --runners`, matrix in
+  `docs/tool-compatibility.md`). The run starts lanes under `fleet.concurrency`, restarts stalled lanes
+  (`laneStatus`, up to `fleet.restartLimit`, then asks a person; moving a lane to another assistant needs
+  `approve --reassign`), reviews each finished lane with QA then the architect before merging (the verdict
+  files of `/amby.run`, bounded by `fleet.roundLimit`), merges one lane at a time, pauses on a real conflict,
+  never merges a lane whose Verify line failed, stops at story checkpoints until `ambykit run approve` (or
+  `--unattended`), and enforces wall-clock and task-count budgets (a token ceiling only where the runner reports
+  usage). `--continue-run` carries on a stopped or interrupted run and repeats no completed task. State is
+  `.amby/fleet/<run>/`, shared with `/amby.run`. The check-off-aware lane merge is now a core function shared
+  with `ambykit lane merge`, and the `fleet` config gains `stopGraceMinutes` and `runners`.
+
 ## [1.5.0] — 2026-11-16
 
 ### Added

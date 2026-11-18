@@ -49,3 +49,22 @@ describe("config: mcp and fleet (feature 025)", () => {
     expect(() => loadConfig(project({ tools: [], fleet: { stallMinutes: 0 } }))).toThrow();
   });
 });
+
+describe("config: run extensions (feature 028)", () => {
+  it("028:FR-013: fleetSettings gives stopGraceMinutes 10 and no runners by default", () => {
+    const s = fleetSettings(loadConfig(project({ tools: [] })));
+    expect(s.stopGraceMinutes).toBe(10);
+    expect(s.runners).toEqual([]);
+  });
+
+  it("028:FR-004: stopGraceMinutes and runners extend the single fleet object", () => {
+    const s = fleetSettings(loadConfig(project({ tools: [], fleet: { stopGraceMinutes: 3, runners: ["claude", "codex"] } })));
+    expect(s.stopGraceMinutes).toBe(3);
+    expect(s.runners).toEqual(["claude", "codex"]);
+    expect(s.stallMinutes).toBe(15);
+  });
+
+  it("028:FR-005: a config without the new keys still loads unchanged", () => {
+    expect(loadConfig(project({ tools: ["claude"], fleet: { roundLimit: 2 } })).fleet).toEqual({ roundLimit: 2 });
+  });
+});
