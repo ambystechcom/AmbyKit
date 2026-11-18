@@ -1,13 +1,13 @@
 ---
 feature: 029-fleet-control-room
-signed_off: false                 # set true by /amby.design after review; makes UI binding
-signed_off_by: null
-signed_off_date: null
+signed_off: true                  # set true by /amby.design after review; makes UI binding
+signed_off_by: Gustavo Barrientos
+signed_off_date: 2026-11-18
 ---
 
 # UI Design — Dashboard fleet control room
 
-> **DRAFT for sign-off (T022).** Nothing here is binding until a person reviews it and `/amby.design` flips `signed_off`.
+> **Signed off (T022), 2026-11-18.** Binding for plan/tasks/implement. The decisions are recorded under "Decisions" at the end.
 > First-class artifact. Tokens live in `design-tokens.json` (same folder) and **extend 014's and 017's**
 > (`specs/014-enhanced-dashboard/design-tokens.json`, `specs/017-live-dashboard/design-tokens.json`): every inherited token
 > keeps its name and is cited as-is. Conventions: `@.amby/reference/design-conventions.md`. Terminal-medium rules from 006,
@@ -186,21 +186,22 @@ unchanged. See `contracts/dashboard-json-fleet.md` (T081).
 | `x` / `X` | Fleet | stop the lane / the whole run (asks to confirm) |
 | `a` | Fleet | approve the selected gate |
 
-## Open questions for sign-off
+## Decisions
 
-1. **Key `c`.** In the overview `c` opens the quality view (024); in the Fleet view `c` means continue. Views are separate and the help
-   overlay lists both, but the same letter has two meanings. Alternatives: `u` (un-pause) in the Fleet view, or keep `c`.
-2. **Review stage is run-level.** 025's `run.json` has one stage/round per run, so there is no per-lane review column. Confirm the
-   header-only placement, or ask 025/019 for a per-lane stage.
-3. **Nerd Font glyphs.** The tokens reuse the unicode glyph for Nerd mode because no Codicon/Font Awesome code points were verified
-   against the glyph names file (no network in this build). Candidates to verify: Font Awesome `f04b` play, `f017` clock, `f05e` ban,
-   `f04c` pause, `f00c` check, `f128` question.
-4. **Whole-run actions.** Shift-letter for whole run with a confirm for every whole-run action (D8). Confirm or drop `C` (continue
-   all) from needing a confirm.
-5. **Several runs.** The view shows the newest unfinished run and lists the rest as `+N more runs`; there is no run switcher until 032's
-   tabs. Confirm that is enough for 1.6.
+The five open questions of the draft were answered on 2026-11-18 (recorded by the coordinator on the person's behalf for 1–4):
+
+1. **Continue key: `u` / `U`.** In the Fleet view continue is `u` (lane) and `U` (whole run). `c` stays "quality view" in the overview and is
+   not used for continue anywhere, so no letter has two meanings. Bindings live in `FLEET_KEYS` (`src/cli/ui/interactive/fleet.ts`).
+2. **Review state: header only.** Stage, round and limit appear once in the run header. There is no per-lane review column and no
+   change to 025's or 019's `run.json` schema (the stage is run-level there).
+3. **Whole-run actions always confirm.** Pause all (`P`), continue all (`U`) and stop all (`X`) each open a `y` / `n` confirmation,
+   continue-all included.
+4. **Several runs: newest plus a `+N more runs` line** is enough for 1.6; there is no run switcher until 032's tabs.
+5. **Nerd Font glyphs: plan default kept.** The person was not asked. Nerd mode reuses the Unicode glyph until code points are verified
+   against the glyph-names file; the candidates to verify later are Font Awesome `f04b` play, `f017` clock, `f05e` ban, `f04c` pause,
+   `f00c` check, `f128` question.
 
 ## Sign-off
 
 <!-- /amby.design records approval here and flips `signed_off` in the frontmatter. -->
-- [ ] Reviewed and approved.
+- [x] Reviewed and approved (2026-11-18, Gustavo Barrientos; decisions above).

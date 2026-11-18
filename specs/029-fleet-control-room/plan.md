@@ -144,7 +144,7 @@ src/cli/ui/interactive/fleet-actions.ts edge: pause/resume/stop → 025's `write
 - **D2 — UI design sign-off via `/amby.design`:** produce `ui.md` + `design-tokens.json` for the Fleet view (the
   roadmap's sketch is the starting point). It is the explicit person task **T022**, scheduled before Phase 3.
   View-rendering tasks that depend on layout (T030, T032) are gated on it; model and derivation tasks are not.
-- **D3 — Key bindings:** default `l` open Fleet view, `esc` back, `↑↓` select lane, `p` pause, `c` continue/resume,
+- **D3 — Key bindings:** default `l` open Fleet view, `esc` back, `↑↓` select lane, `p` pause, `u` continue (`U` all),
   `x` stop, `a` approve, `⇧` + action = whole run. Confirm during design sign-off (`r` is already "retry live").
 - **D4 — Run-state contract for review stage/round and gates:** *resolved* — the single `run.json` schema in 025
   `data-model.md`; fixtures copy it exactly and `fleet-view/read.ts` is the only consumer in 029.

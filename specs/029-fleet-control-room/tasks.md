@@ -40,7 +40,7 @@ created: 2026-11-16
 - [x] [T019] [P] Pure `resolveIconMode({flag, env, config, caps})` with precedence flag > env > config > auto (src/cli/ui/icons.ts)
 - [x] [T020] [P] Tests: precedence matrix, invalid config value, non-TTY — 029:FR-011 (test/ui/icons.test.ts, test/core/config-icons.test.ts)
 - [x] [T021] Wire `resolveIconMode` into the dashboard command, keeping `--icons` validation as today (src/cli/dashboard.ts) ↪ DEVIATION: `applyIcons` now takes the project root and leaves caps untouched when the resolved mode equals the detected one, so output without `dashboard.icons` is unchanged
-- [ ] [T022] PERSON: `/amby.design` sign-off for the Fleet view (`ui.md` + `design-tokens.json`, starting from the roadmap sketch); must complete before T030 and T032 (specs/029-fleet-control-room/ui.md)
+- [x] [T022] PERSON: `/amby.design` sign-off for the Fleet view (`ui.md` + `design-tokens.json`, starting from the roadmap sketch); must complete before T030 and T032 (specs/029-fleet-control-room/ui.md) ↪ DEVIATION: signed off 2026-11-18 with five decisions recorded in ui.md (continue is u/U; review state header-only; every whole-run action confirms; newest run plus '+N more runs'; Nerd glyphs keep the plan default, not asked)
 - **Verify:** `npm run typecheck` and `npx vitest run test/core/fleet-derive.test.ts test/core/fleet-read.test.ts test/ui/live-fleet.test.ts test/ui/icons.test.ts test/core/config-icons.test.ts` pass; no existing dashboard test changes. ✓ passed
 - **Checkpoint:** view-model, read edge, watcher and icon resolution done, and the design sign-off (T022) recorded; no UI yet.
 
@@ -78,7 +78,7 @@ created: 2026-11-16
 ## Phase 6 — User story US-4  (priority: P1)
 
 - [x] [T060] [P] [US4] `fleet-actions`: pause/resume/stop → directive writes through spec 025's `writeDirective` (short lane form in file names), per lane or every lane of the run, last write wins; a worker finishes its current task before obeying (src/cli/ui/interactive/fleet-actions.ts)
-- [x] [T061] [P] [US4] Reducer: `p` pause, `c` continue, `x` stop, shifted = whole run, confirm dialog for stop and run-level actions (src/cli/ui/interactive/fleet.ts) ↪ DEVIATION: key letters are the plan's D3 defaults in one `FLEET_KEYS` constant, pending the T022 sign-off
+- [x] [T061] [P] [US4] Reducer: `p` pause, `u` continue, `x` stop, shifted = whole run, confirm dialog for stop and run-level actions (src/cli/ui/interactive/fleet.ts) ↪ DEVIATION: key letters are the plan's D3 defaults in one `FLEET_KEYS` constant, decided at the T022 sign-off: u/U continue, all whole-run actions confirm
 - [ ] [T062] [US4] Render directive status (pending / pause requested / obeyed) and the confirm dialog (src/cli/ui/dashboard/fleet-view.ts)
 - [ ] [T063] [US4] Wrapper executes the intent in `interactive()` reduce, then refreshes (src/cli/dashboard.ts)
 - [x] [T064] [P] [US4] Tests with a fake writer: one lane, run-level, replace pause with continue — 029:FR-006 (test/ui/fleet-actions.test.ts)
