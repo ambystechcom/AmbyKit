@@ -33,7 +33,7 @@ export interface FleetTuiState {
 
 export const FLEET_KEYS = {
   pause: "p",
-  resume: "c",
+  resume: "u",
   stop: "x",
   approve: "a",
   confirm: "y",

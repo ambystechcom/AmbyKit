@@ -62,11 +62,11 @@ tell progress from rework.
 - **status:** in-progress
 
 **Acceptance criteria**
-- Given a lane in the review loop, When shown, Then it displays its stage (working, QA, architect
-  review) and the round number against the limit.
-- Given a lane waiting on a person's decision after the round limit, When shown, Then it is marked as
+- Given a run in the review loop, When shown, Then it displays the run's stage (working, QA, architect
+  review) and the round number against the limit (these are per run in spec 025's `run.json`).
+- Given a run waiting on a person's decision after the round limit, When shown, Then it is marked as
   needing a decision.
-- Given a lane with no review data, When shown, Then the stage is shown as working, not as an error.
+- Given a run with no review data, When shown, Then the stage is shown as working, not as an error.
 
 ### US-3 — Spot stalled lanes  (priority: P1)
 
@@ -130,7 +130,8 @@ continues as soon as I decide.
 **Acceptance criteria**
 - Given a lane at an approval gate (spec 028), When shown, Then it is marked awaiting approval with the
   story it concerns.
-- Given a person approves, When confirmed, Then a continue directive is written and the gate is shown
+- Given a person approves, When confirmed, Then the gate is approved through spec 028's `approveGate`
+  (the same function as `ambykit run approve`), no continue directive is written, and the gate is shown
   as approved.
 - Given a person declines or leaves it, When time passes, Then the lane stays paused at the gate and is
   not silently continued.
@@ -208,8 +209,9 @@ that we do not commit to a dependency or a rewrite on a guess.
   reload.
 - FR-003  IF lane data is missing or unreadable, THEN THE SYSTEM SHALL show that lane as unknown and
   keep the rest of the view.
-- FR-004  THE SYSTEM SHALL show each lane's review-loop stage (working, QA, architect review), round
-  number and whether it awaits a person's decision.
+- FR-004  THE SYSTEM SHALL show the review-loop stage (working, QA, architect review), round number and
+  whether it awaits a person's decision. In spec 025's `run.json` these are recorded once per run, not
+  per lane, so they describe the run's current review.
 - FR-005  WHEN a working lane exceeds the stall limit with no report and no `tasks.md` change, THE
   SYSTEM SHALL highlight it as stalled with the quiet time, and clear it on the next report.
 - FR-006  WHEN a person chooses pause, resume or stop for a lane or run, THE SYSTEM SHALL write a
@@ -220,7 +222,8 @@ that we do not commit to a dependency or a rewrite on a guess.
   requested; a directive is obeyed once the lane's next report is dated after it.
 - FR-008  IF an action is destructive (stop), THEN THE SYSTEM SHALL ask for confirmation first.
 - FR-009  WHEN a lane reaches an approval gate, THE SYSTEM SHALL show it as awaiting approval, and WHEN
-  approved SHALL write a continue directive; IF not approved, THEN THE SYSTEM SHALL leave it paused.
+  approved SHALL approve the gate through spec 028's `approveGate` and SHALL NOT write a continue
+  directive; IF not approved, THEN THE SYSTEM SHALL leave it paused.
 - FR-010  THE SYSTEM SHALL use the three icon modes (Nerd Font, Unicode, ASCII) for every state and
   lane, so that no state depends on a Nerd Font, and keep the narrow-terminal and plain-text fallbacks.
 - FR-011  WHERE `dashboard.icons` is set in `.amby/config.json`, THE SYSTEM SHALL apply it with

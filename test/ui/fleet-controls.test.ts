@@ -10,7 +10,7 @@ const view = () =>
 describe("fleet reducer: controls and confirmation (feature 029, FR-006, FR-008)", () => {
   it("029:FR-006: p and c on a lane record an intent for that lane without asking", () => {
     const paused = fleetView([{ lane: "lane-1-1", state: "paused", directive: { action: "pause", status: "paused" } }]);
-    expect(reduceFleet(paused, initFleetState(), k("c")).intent).toEqual({ kind: "resume", target: { kind: "lane", lane: "lane-1-1" } });
+    expect(reduceFleet(paused, initFleetState(), k("u")).intent).toEqual({ kind: "resume", target: { kind: "lane", lane: "lane-1-1" } });
     expect(reduceFleet(view(), initFleetState(), k("p")).intent).toEqual({ kind: "pause", target: { kind: "lane", lane: "lane-1-1" } });
   });
 
@@ -30,7 +30,7 @@ describe("fleet reducer: controls and confirmation (feature 029, FR-006, FR-008)
   });
 
   it("029:FR-006: shifted keys act on the whole run and always ask first, even pause and continue", () => {
-    for (const [key, kind] of [["P", "pause"], ["C", "resume"], ["X", "stop"]] as const) {
+    for (const [key, kind] of [["P", "pause"], ["U", "resume"], ["X", "stop"]] as const) {
       const s = reduceFleet(view(), initFleetState(), k(key));
       expect(s.intent).toBeNull();
       expect(s.confirm).toEqual({ kind, target: { kind: "run", run: "001-alpha.1" } });
@@ -44,8 +44,8 @@ describe("fleet reducer: controls and confirmation (feature 029, FR-006, FR-008)
   });
 
   it("029:FR-006: continue on a lane that is not paused says so; continue after a pause replaces it", () => {
-    expect(reduceFleet(view(), initFleetState(), k("c")).notice).toMatch(/not paused/);
-    expect(reduceFleet(view(), { ...initFleetState(), cursor: 1 }, k("c")).intent).toEqual({ kind: "resume", target: { kind: "lane", lane: "lane-1-2" } });
+    expect(reduceFleet(view(), initFleetState(), k("u")).notice).toMatch(/not paused/);
+    expect(reduceFleet(view(), { ...initFleetState(), cursor: 1 }, k("u")).intent).toEqual({ kind: "resume", target: { kind: "lane", lane: "lane-1-2" } });
   });
 
   it("029:FR-006: with no lane selected there is no lane action", () => {

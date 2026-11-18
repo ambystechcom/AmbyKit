@@ -48,7 +48,7 @@ Wide, unicode icons (cursor on lane 2):
 ┣━ GATES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
 ┃ phase-2 · after US-3, US-4 · awaiting approval                                                  ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-  ↑↓ lane · p pause · c continue · x stop · P/C/X whole run · a approve · esc back · ? help
+  ↑↓ lane · p pause · u continue · x stop · P/U/X whole run · a approve · esc back · ? help
 ```
 
 Narrow (< 60 columns, compact: state word is never cut; assistant shrinks to its glyph):
@@ -69,7 +69,7 @@ FLEET 019-amby-run-prompt.1  phase 2  stage QA round 1/3  [live]
   lane-2-1  [CC] Claude    [>] working    1m
   lane-2-3  [CC] Claude    [~] waiting    4m
 GATES: phase-2 after US-3, US-4 -- awaiting approval
-keys: up/down lane, p pause, c continue, x stop, a approve, esc back, ? help
+keys: up/down lane, p pause, u continue, x stop, a approve, esc back, ? help
 ```
 
 No run (empty state, FR-013):
@@ -154,7 +154,7 @@ Whole run: `STOP ALL LANES — 6 lanes of 019-amby-run-prompt.1`.
   - Given `x` on a lane, When `y`, Then a `stop` directive is written for that lane; any other key cancels and nothing is written (FR-008).
   - Given `P` (shift-p) on any lane, Then a confirm for the whole run opens; `y` writes one `pause` directive per lane.
   - Given `p` on a lane that is paused or already has a pause directive, Then nothing new is written and the row says so.
-  - Given `c` after `p`, Then the `continue` replaces the pause (last write wins) and the row shows `continue pending`.
+  - Given `u` after `p`, Then the `continue` replaces the pause (last write wins) and the row shows `continue pending`.
 
 ## US-5 — Gates
 
@@ -182,7 +182,7 @@ unchanged. See `contracts/dashboard-json-fleet.md` (T081).
 | `esc` | Fleet | back to the overview |
 | `↑ ↓` | Fleet | select a lane |
 | `p` / `P` | Fleet | pause the lane / the whole run |
-| `c` / `C` | Fleet | continue the lane / the whole run |
+| `u` / `U` | Fleet | continue the lane / the whole run |
 | `x` / `X` | Fleet | stop the lane / the whole run (asks to confirm) |
 | `a` | Fleet | approve the selected gate |
 
