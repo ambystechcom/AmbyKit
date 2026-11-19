@@ -105,11 +105,11 @@ created: 2026-11-18
 
 ## Phase 8 — Docs and polish
 
-- [ ] [T080] [US3] Artifact docs for the v2 format (carriers, per-phase block, marker, writer) (docs/artifacts/spec.md, docs/artifacts/tasks.md)
-- [ ] [T081] [P] [US3] Migration guide: dry run, skips and fixes, dual-write, 1.x tools lose data on v2 files, support ends in 2.1 — 030:FR-025 (docs/migration.md)
-- [ ] [T082] [US3] CLI reference and workflow docs, README and the site CLI page for `migrate` and `edit`, and the `AGENTS.md` structure line (docs/cli-reference.md, docs/workflow.md, README.md, site/src/content/docs/cli/index.mdx, AGENTS.md)
-- [ ] [T083] [US6] Changelog 2.0 entry (breaking format, Node 22, config schema version, "Plugins: not affected") and the release-checklist line for the 2.1 gate (CHANGELOG.md, docs/contributing.md)
-- **Verify:** `node scripts/check-docs-sync.mjs` passes and `npm run typecheck && npm test` pass apart from the golden snapshots.
+- [x] [T080] [US3] Artifact docs for the v2 format (carriers, per-phase block, marker, writer) (docs/artifacts/spec.md, docs/artifacts/tasks.md)
+- [x] [T081] [P] [US3] Migration guide: dry run, skips and fixes, dual-write, 1.x tools lose data on v2 files, support ends in 2.1 — 030:FR-025 (docs/migration.md)
+- [x] [T082] [US3] CLI reference and workflow docs, README and the site CLI page for `migrate` and `edit`, and the `AGENTS.md` structure line (docs/cli-reference.md, docs/workflow.md, README.md, site/src/content/docs/cli/index.mdx, AGENTS.md) ↪ DEVIATION: the verb docs, README rows, the AGENTS.md structure line and the Node 22 mentions were done in phase 6, because registering the verbs makes the docs-sync test fail until they exist
+- [x] [T083] [US6] Changelog 2.0 entry (breaking format, Node 22, config schema version, "Plugins: not affected") and the release-checklist line for the 2.1 gate (CHANGELOG.md, docs/contributing.md)
+- **Verify:** `node scripts/check-docs-sync.mjs` passes and `npm run typecheck && npm test` pass apart from the golden snapshots. ✓ passed
 - **Checkpoint:** docs match the code.
 
 ## Phase 9 — Release gates  (person tasks, integration batch, dogfood; last)
