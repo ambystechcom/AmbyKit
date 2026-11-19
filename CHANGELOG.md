@@ -14,6 +14,42 @@ Every release states whether plugins are affected, with such a line or with "Plu
 
 ## [Unreleased]
 
+## [1.6.0] — 2026-11-18
+
+Plugins: not affected.
+
+### Added
+
+- Fleet view in the interactive dashboard (feature 029): `l` opens the lanes of the current fleet run, live,
+  with each lane's assistant, state, quiet time and directive status, a `STALLED <n>m` label on a lane that has
+  gone quiet past `fleet.stallMinutes`, the run's review stage and round in the header, and waiting story
+  gates listed below. `p`, `u` and `x` pause, continue and stop a lane (stop asks first), `P`, `U` and `X` do
+  it for the whole run (always with a confirmation), and `a` approves a waiting gate through the same action
+  as `ambykit run approve`. Every state is a word as well as a glyph, and the view works at any width, without
+  color and off a terminal. It reads local files only and loads only under `--interactive`.
+- `dashboard.icons` in `.amby/config.json` (`nerd`, `unicode`, `ascii` or `auto`), with the precedence
+  `--icons`, `AMBYKIT_ICONS`, `dashboard.icons`, auto.
+- `ambykit dashboard --json --overview` gains an optional `fleet` object, only while a fleet run is
+  unfinished.
+- `ambykit run <feature>` (feature 028, **experimental**): run a feature's prepared lanes headless, one
+  assistant per lane in its own worktree. Without `--yes` it prints the exact command for each lane and
+  launches nothing; `--emit-script` writes `launch.sh` and `launch.ps1`; only a verified runner is ever
+  launched, and both runners start unverified (`ambykit run --runners`, matrix in
+  `docs/tool-compatibility.md`). The run starts lanes under `fleet.concurrency`, restarts stalled lanes
+  (`laneStatus`, up to `fleet.restartLimit`, then asks a person; moving a lane to another assistant needs
+  `approve --reassign`), reviews each finished lane with QA then the architect before merging (the verdict
+  files of `/amby.run`, bounded by `fleet.roundLimit`), merges one lane at a time, pauses on a real conflict,
+  never merges a lane whose Verify line failed, stops at story checkpoints until `ambykit run approve` (or
+  `--unattended`), and enforces wall-clock and task-count budgets (a token ceiling only where the runner reports
+  usage). `--continue-run` carries on a stopped or interrupted run and repeats no completed task. State is
+  `.amby/fleet/<run>/`, shared with `/amby.run`. The check-off-aware lane merge is now a core function shared
+  with `ambykit lane merge`, and the `fleet` config gains `stopGraceMinutes` and `runners`.
+
+### Changed
+
+- The full-screen host restores the terminal when the app throws, and when the terminal closes (`SIGHUP` or
+  the input ending), as well as on quit, Ctrl-C and `SIGTERM`.
+
 ## [1.5.0] — 2026-11-16
 
 ### Added

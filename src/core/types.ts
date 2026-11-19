@@ -124,6 +124,9 @@ export interface RulesContext {
   workerModel?: string;
 }
 
+/** `dashboard.icons` (feature 029): the icon set, hand-edited; `auto` detects from the terminal. */
+export type DashboardIcons = "nerd" | "unicode" | "ascii" | "auto";
+
 /** Persisted project configuration at .amby/config.json. */
 export interface AmbyConfig {
   version: string;
@@ -134,7 +137,7 @@ export interface AmbyConfig {
   /** When true, `/amby.specify` creates a `.worktrees/<feature>` worktree for each new feature (feature 012). */
   worktrees?: boolean;
   /** Dashboard tuning (feature 017): agent-presence thresholds in minutes. */
-  dashboard?: { activeMinutes?: number; idleMinutes?: number };
+  dashboard?: { activeMinutes?: number; idleMinutes?: number; icons?: DashboardIcons };
   /** Requirement traceability (feature 024): where to look for tests, and extra directory names to skip. */
   trace?: { roots?: string[]; ignore?: string[] };
   /** MCP server setup (feature 025): opt-in; `sync` writes each verified target's MCP config only when enabled. */
@@ -160,6 +163,10 @@ export interface FleetConfig {
   budgets?: Record<string, number>;
   /** Model a worker runs with, when the host lets the run choose. */
   workerModel?: string;
+  /** Minutes a lane's process may stay silent after a stop or budget directive before it is terminated (028). Default 10. */
+  stopGraceMinutes?: number;
+  /** Assistants `ambykit run` may assign lanes to, in order (028). Default: the configured tools that have a runner. */
+  runners?: string[];
 }
 
 /** How a tool materializes phase prompts. */

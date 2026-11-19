@@ -12,6 +12,7 @@ const configSchema = z.object({
     .object({
       activeMinutes: z.number().positive().optional(),
       idleMinutes: z.number().positive().optional(),
+      icons: z.enum(["nerd", "unicode", "ascii", "auto"]).optional(),
     })
     .optional(),
   mcp: z.object({ enabled: z.boolean() }).optional(),
@@ -26,6 +27,8 @@ const configSchema = z.object({
       tickSeconds: z.number().positive().optional(),
       budgets: z.record(z.string(), z.number()).optional(),
       workerModel: z.string().optional(),
+      stopGraceMinutes: z.number().positive().optional(),
+      runners: z.array(z.string()).optional(),
     })
     .optional(),
   plugins: z.record(z.string(), z.string()).optional(),
@@ -46,6 +49,8 @@ export interface FleetSettings {
   tickSeconds: number;
   budgets: Record<string, number>;
   workerModel?: string;
+  stopGraceMinutes: number;
+  runners: string[];
 }
 
 export const FLEET_DEFAULTS = {
@@ -54,6 +59,7 @@ export const FLEET_DEFAULTS = {
   concurrency: { total: 3, perType: 2 },
   roundLimit: 3,
   tickSeconds: 30,
+  stopGraceMinutes: 10,
 } as const;
 
 /** Resolve `config.fleet` against the defaults; the single place those numbers live. */
@@ -70,6 +76,8 @@ export function fleetSettings(config: { fleet?: FleetConfig } | null | undefined
     tickSeconds: f.tickSeconds ?? FLEET_DEFAULTS.tickSeconds,
     budgets: f.budgets ?? {},
     ...(f.workerModel ? { workerModel: f.workerModel } : {}),
+    stopGraceMinutes: f.stopGraceMinutes ?? FLEET_DEFAULTS.stopGraceMinutes,
+    runners: f.runners ?? [],
   };
 }
 

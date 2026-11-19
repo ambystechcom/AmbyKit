@@ -21,6 +21,7 @@ import { TraceCommand } from "./trace.js";
 import { McpCommand } from "./mcp.js";
 import { DirectiveCommand } from "./directive.js";
 import { FleetCommand } from "./fleet.js";
+import { RunCommand } from "./run.js";
 import { outdatedWarning } from "./ui/callout.js";
 import { packageVersion } from "../core/paths.js";
 
@@ -41,6 +42,7 @@ const COMMANDS: BaseCommand[] = [
   new McpCommand(),
   new DirectiveCommand(),
   new FleetCommand(),
+  new RunCommand(),
 ];
 
 /** Parse argv (after the command name) into positionals + flags. */

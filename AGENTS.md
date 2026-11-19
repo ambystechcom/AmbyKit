@@ -34,7 +34,7 @@ prompts) is translated by per-tool **emitters** into each assistant's native com
 ## Project structure
 
 ```
-src/cli/         BaseCommand + activity/add/analyze/check/dashboard/directive/fleet/graph/init/lane/mcp/restore/sync/trace/update/worktree + registry
+src/cli/         BaseCommand + activity/add/analyze/check/dashboard/directive/fleet/graph/init/lane/mcp/restore/run/sync/trace/update/worktree + registry
 src/core/        CommandSpec model, template loader, feature-dir/numbering, dependency graph
 src/emitters/    BaseEmitter + per-tool subclasses + registry (target→emitter map)
 src/plugins/     emitter plugin API, loader, registry (experimental); src/testkit/ = published contract kit

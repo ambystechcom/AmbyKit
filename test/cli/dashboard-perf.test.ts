@@ -66,7 +66,8 @@ describe("the graph view is loaded only by the interactive dashboard (feature 02
       .map(rel)
       .sort();
     // analyze (its own command), the graph view (interactive only), the MCP read queries (feature 025,
-    // reached only from the `mcp` server and `directive`) and the public barrel; never the dashboard.
-    expect(importers).toEqual(["cli/ui/dashboard/graph-view.ts", "core/analyze.ts", "core/index.ts", "core/query.ts"]);
+    // reached only from the `mcp` server and `directive`), the run scheduler (feature 028, reached only from
+    // `ambykit run`) and the public barrel; never the dashboard.
+    expect(importers).toEqual(["cli/ui/dashboard/graph-view.ts", "core/analyze.ts", "core/index.ts", "core/query.ts", "core/run-schedule.ts"]);
   });
 });

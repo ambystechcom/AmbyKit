@@ -22,7 +22,11 @@ class TestUpdate extends UpdateCommand {
   }
 }
 
-async function run(cmd: UpdateCommand, cwd: string = process.cwd()): Promise<{ code: number; out: string }> {
+/** Default cwd is a throwaway folder that is not a project, so the refresh step never rewrites the repo running the tests. */
+async function run(
+  cmd: UpdateCommand,
+  cwd: string = mkdtempSync(join(tmpdir(), "ambykit-update-cwd-")),
+): Promise<{ code: number; out: string }> {
   const out: string[] = [];
   const log = console.log;
   const err = console.error;

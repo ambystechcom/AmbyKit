@@ -63,6 +63,18 @@ model tokens). It reads every feature worktree under `.worktrees/` too, so progr
 worktree shows up from any checkout. `--interactive` opens a full-screen navigable view on a TTY
 that updates live as files change and shows which assistant is working on which feature.
 
+### Fleet view
+
+While a fleet run is unfinished (`ambykit fleet` or `ambykit run`), press `l` in `--interactive` to see its
+lanes live: each lane's assistant, state (always a word as well as a glyph), quiet time and directive
+status, a `STALLED <n>m` label on a lane that has gone quiet past `fleet.stallMinutes` (default 15), the
+run's review stage and round in the header, and any story gate waiting for you. `p` pauses, `u` continues
+and `x` stops the selected lane (stop asks `y`/`n` first); `P`, `U` and `X` do the same for the whole run and
+always ask. `a` approves a waiting gate, the same action as `ambykit run approve`. A pause or stop is a
+directive the worker obeys at its next report. The view reads local files only, works without color and at
+any width, and is not loaded outside `--interactive`. `--json --overview` carries the same data as an
+optional `fleet` object while a run is unfinished.
+
 ### Icons
 
 The dashboard uses Unicode icons by default (`⎇` for a worktree, `✸ Claude`, `◎ Codex`, …) and
@@ -75,9 +87,12 @@ the brand glyphs.
 | --- | --- |
 | `ambykit dashboard --interactive --icons=nerd` | One run |
 | `AMBYKIT_ICONS=nerd` environment variable | Every run where it's set |
+| `"dashboard": { "icons": "nerd" }` in `.amby/config.json` | Everyone who uses the project |
 
-The flag wins over the variable, so `--icons=unicode` turns Nerd icons off for one run, and
-`--icons=ascii` forces ASCII tags. To set the variable permanently:
+The flag wins over the variable, and the variable wins over the config, so `--icons=unicode` turns Nerd
+icons off for one run, and `--icons=ascii` forces ASCII tags. The config value is `nerd`, `unicode`,
+`ascii` or `auto` (the default: Unicode where the terminal supports it); you edit it by hand and the
+dashboard never writes it. A terminal without Unicode is always ASCII. To set the variable permanently:
 
 ```powershell
 # Windows (PowerShell); open a new terminal afterwards
@@ -89,8 +104,9 @@ The flag wins over the variable, so `--icons=unicode` turns Nerd icons off for o
 export AMBYKIT_ICONS=nerd
 ```
 
-There is no project setting for this on purpose: whether Nerd icons render depends on each
-person's terminal font, and `.amby/config.json` is shared through git.
+Whether Nerd icons render depends on each person's terminal font, and `.amby/config.json` is shared
+through git, so set `dashboard.icons` only when the whole team shares a font. Anyone can still override it
+with the variable or the flag.
 
 ## `ambykit analyze`
 
@@ -230,6 +246,24 @@ with no claim. `--rebuild` rewrites a missing or corrupt `run.json` from `tasks.
 tasks. `--worker-start` is refused when no slot is free; `--restart` is refused after `fleet.restartLimit`
 restarts, pausing the lane and asking a person. `--round` prints `retry` or `escalate` and, on `escalate`,
 waits for a decision. Pause, resume and stop go through the same writer as `ambykit directive`.
+
+## `ambykit run` (experimental)
+
+Run a feature's prepared lanes headless, one assistant per lane. Experimental in 1.6. Nothing launches without
+`--yes`, and only a verified runner is ever launched.
+
+```text
+ambykit run 028                         # print the exact command per lane; launch nothing
+ambykit run 028 --yes                   # print, then launch and supervise
+ambykit run 028 --emit-script           # write launch.sh and launch.ps1; launch nothing
+ambykit run --continue-run=<run> --yes  # continue a stopped or interrupted run
+ambykit run --runners                   # which headless runners are verified
+ambykit run approve|reject <run>        # a story checkpoint
+```
+
+Prepare lanes first with `ambykit lane`. The run restarts stalled lanes, reviews each finished lane (QA, then the
+architect) before merging it, merges one at a time, stops at story checkpoints, and enforces wall-clock and task
+budgets. State is `.amby/fleet/<run>/`, shared with `/amby.run`. See the CLI reference for every flag.
 
 ## `ambykit update`
 

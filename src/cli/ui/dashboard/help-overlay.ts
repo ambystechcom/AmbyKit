@@ -10,7 +10,7 @@ import { TOKENS } from "./tokens.js";
  * glyph legend, in a focused frame centered over the dimmed frame beneath. Pure.
  */
 
-export type HelpScreen = "overview" | "feature" | "story" | "graph";
+export type HelpScreen = "overview" | "feature" | "story" | "graph" | "fleet";
 
 const KEYS: Record<HelpScreen, [string, string, string][]> = {
   // [unicode key, ascii key, label]
@@ -21,6 +21,7 @@ const KEYS: Record<HelpScreen, [string, string, string][]> = {
     ["f", "f", "filter by feature"],
     ["s", "s", "cycle status filter"],
     ["g", "g", "dependency graph"],
+    ["l", "l", "fleet view (lanes of a run)"],
     ["c", "c", "quality view (coverage, findings)"],
     ["esc", "esc", "clear filters"],
     ["r", "r", "retry live updates (when paused)"],
@@ -36,6 +37,16 @@ const KEYS: Record<HelpScreen, [string, string, string][]> = {
   graph: [
     ["↑ ↓", "up / down", "move"],
     ["⏎", "enter", "open the story's feature"],
+    ["esc", "esc", "back"],
+    ["r", "r", "retry live updates (when paused)"],
+    ["q", "q", "quit"],
+  ],
+  fleet: [
+    ["↑ ↓", "up / down", "select a lane"],
+    ["p / P", "p / P", "pause the lane / the whole run"],
+    ["u / U", "u / U", "continue the lane / the whole run"],
+    ["x / X", "x / X", "stop the lane / the whole run (asks to confirm)"],
+    ["a", "a", "approve the selected gate"],
     ["esc", "esc", "back"],
     ["r", "r", "retry live updates (when paused)"],
     ["q", "q", "quit"],

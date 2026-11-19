@@ -227,9 +227,27 @@ Detection reads the process list only, never sends anything, and stops when you 
   header shows `● live · 3s ago`; where file watching is unavailable it polls every 2 s
   (`◌ polling`), and if monitoring fails it shows `⚠ live paused` and `r` retries. On a
   non-interactive terminal it prints the plain overview, and nothing is watched.
+- **Fleet view** (`l` in `--interactive`) — the lanes of the current fleet run (`ambykit fleet`,
+  `ambykit run`), live. Each lane is a row with its assistant, state (`working`, `waiting`, `blocked`,
+  `paused`, `done`, `unreported`, `unknown`, always as a word as well as a glyph), quiet time and
+  directive status (`continue pending`, `pause requested`, `paused`, `obeyed`). A working lane with no
+  report and no `tasks.md` change for `fleet.stallMinutes` (default 15) carries the text
+  `STALLED <n>m`. The header shows the run, phase and review stage once (`QA round 1/3`,
+  `architect round 2/3`, `NEEDS A DECISION`) and `+N more runs` when other runs are unfinished; story
+  checkpoint gates waiting for you are listed below the lanes. Keys: `↑`/`↓` select a lane, `p` pause,
+  `u` continue, `x` stop (asks `y`/`n`), `P`/`U`/`X` do the same for every lane of the run (always with
+  a `y`/`n` confirmation), `a` approves a waiting gate (`←`/`→` choose between several), `esc` goes
+  back, `?` lists the keys. Pause, continue and stop are written as directives for the lane's worker,
+  which obeys at its next report; approving a gate is the same action as `ambykit run approve` and
+  writes no directive. Without a run the view says so. It reads local files only (no network, no model
+  tokens) and is loaded only under `--interactive`.
 - **`--icons=nerd|unicode|ascii`** — icon set. `nerd` (also `AMBYKIT_ICONS=nerd`) shows the
   worktree tag as the Nerd Font git-branch icon; agent icons stay Unicode. `ascii` uses tags like
-  `[CC] Claude` and `wt`. The default is unicode when the terminal supports it.
+  `[CC] Claude` and `wt`. The default is unicode when the terminal supports it. The setting can also
+  live in `.amby/config.json` as `"dashboard": { "icons": "nerd" | "unicode" | "ascii" | "auto" }`
+  (hand-edited, never written by the dashboard). Precedence: `--icons`, then `AMBYKIT_ICONS`, then
+  `dashboard.icons`, then auto. A terminal without unicode is always ASCII. In the Fleet view `nerd`
+  draws the same glyphs as `unicode`; every state also has a word.
 - **`--json`** — the story list as JSON, unchanged from earlier releases.
 - **`--json --overview`** — one object: `stories` (exactly the `--json` list) plus `summary`,
   `statusCounts`, `features`, `attention`, `upNext`, `burndown`, `issues` and the applied `filters`.
@@ -239,7 +257,10 @@ Detection reads the process list only, never sends anything, and stops when you 
   phases); each key is omitted when it does not apply (`blocked` when zero, `verify` when the
   feature has no Verify lines). `attention` may contain items of kind `task-blocked` (key
   `<feature>:<task id>`) and `verify-failed` (key `<feature>:phase-N`, reason `verify failed: <why>`).
-  Bare `--json` is unchanged.
+  When a fleet run is unfinished, the object also has `fleet` (run, feature, status, phase, stage,
+  round, limit, needsDecision, `gates[]`, `lanes[]` with state, stalled, lastActivity and directive
+  status, and `others[]`); without a run the key is absent, so the output is byte-identical to before
+  (`specs/029-fleet-control-room/contracts/dashboard-json-fleet.md`). Bare `--json` is unchanged.
 
 ```bash
 ambykit dashboard
@@ -314,6 +335,61 @@ with no claim. `--rebuild` rewrites a missing or corrupt `run.json` from `tasks.
 tasks. `--worker-start` is refused when no slot is free; `--restart` is refused after `fleet.restartLimit`
 restarts, pausing the lane and asking a person. `--round` prints `retry` or `escalate` and, on `escalate`,
 waits for a decision. Pause, resume and stop go through the same writer as `ambykit directive`.
+
+## `ambykit run <feature>` (experimental)
+
+Run a feature's **prepared lanes** headless: one assistant per lane, in that lane's worktree, supervised,
+merged and reviewed, without a person at the keyboard. **Experimental in 1.6** (the flags and the runner
+commands may change before it is stable in 2.0). Launching processes that edit code is the riskiest thing
+AmbyKit does, so nothing starts without `--yes`, and an assistant without a **verified** runner is refused.
+
+```bash
+ambykit run 028                         # print the exact command for each lane, caps, budgets; launch nothing
+ambykit run 028 --yes                   # print, then launch the lanes and supervise them to the end
+ambykit run 028 --emit-script           # write launch.sh and launch.ps1 under .amby/fleet/028-....scripts/; launch nothing
+ambykit run 028 --yes --assistant=claude,codex --unattended --max-minutes=90 --max-tasks=20
+ambykit run --continue-run=028-ambykit-run.1 --yes   # continue a stopped or interrupted run
+ambykit run --runners [--json]          # the headless runners, what each can do, and why one is not runnable
+ambykit run approve|reject <run> [--gate=<id>] [--reason=<text>]
+ambykit run approve <run> --reassign=lane-1-1:codex  # a person's approval to move a lane to another assistant
+```
+
+- **Prepare first.** `ambykit lane <feature>` creates the lanes; `run` never creates or removes them. It runs
+  the prepared sets in ascending phase order and starts a run only on this explicit request, named
+  `<feature>.<n>`. A second `run` on a feature with an unfinished run refuses and points at `--continue-run`.
+- **What a lane gets.** Its task IDs, the artifacts by `@path` reference, the files it owns and the report
+  protocol: nothing else is copied in. A restart lists only the tasks still unchecked.
+- **Caps.** `fleet.concurrency` (default 3 in total, 2 of one assistant). Lanes beyond the cap start as slots free.
+- **Stalls.** A lane with no report and no `tasks.md` change for `fleet.stallMinutes` (15) is stopped and restarted
+  with its work preserved, up to `fleet.restartLimit` (2) times; then it pauses and a person decides. Waiting,
+  blocked and paused lanes are never stalled. A lane moves to another assistant only with
+  `approve --reassign`.
+- **Review before merge.** A finished lane is reviewed by QA, then the architect, each launched as a process of the
+  lane's assistant, using spec 019's verdict files (`verdicts/<lane>.<role>.<round>.json`). A failure goes back to
+  the same lane's worker as finding IDs only; after `fleet.roundLimit` (3) failed rounds a person is asked. A
+  lane whose phase **Verify** line failed is never merged.
+- **Merges.** One lane at a time in name order, with the check-off-aware merge of `ambykit lane merge`. A real
+  conflict pauses that merge and the run waits; resolve it by hand and the run carries on. A lane that ends with
+  tasks open is `unfinished` and never merged.
+- **Checkpoints.** When a prepared set completes a user story the run stops for `approve` (or `reject`) before
+  the next set starts, unless `--unattended` was given (shown at start). The gate lives in `run.json` `gates[]`;
+  the dashboard calls the same function. Non-parallel tasks of a phase are not run headless: the run reports
+  them and pauses.
+- **Budgets.** Wall-clock (default 120 minutes) and task events (twice the open tasks) are always enforced; a
+  token ceiling (`--max-tokens`) only where the runner reports usage, and the run says so when it cannot. Going
+  over stops launching, writes a `stop` directive for each running lane, records why, and terminates a lane that
+  still has not reported after `fleet.stopGraceMinutes` (10).
+- **Directives.** `ambykit directive` (or the dashboard, or `/amby.run`) pauses, resumes or stops a lane from any
+  host; the worker finishes its task and obeys at its next report, and the run records it. Ctrl-C saves and
+  exits; `--continue-run` carries on and repeats no completed task.
+- **State** is `.amby/fleet/<run>/`, the same layout `/amby.run` uses, so either host can inspect, pause or
+  continue the other's run. Nothing is written outside the project.
+
+`run` uses the single `fleet` object in `.amby/config.json` (`stallMinutes`, `restartLimit`, `concurrency`,
+`roundLimit`, `tickSeconds`, `budgets`, `workerModel`) and adds two keys: `stopGraceMinutes` and `runners` (the
+assistants lanes are spread over, in order; default the configured `tools`). Both headless runners start
+**unverified** (see the matrix in `docs/tool-compatibility.md`), so `--yes` refuses them until each has been
+confirmed on a live install.
 
 ## `ambykit analyze`
 
