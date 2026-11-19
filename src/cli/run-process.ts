@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync } from "node:fs";
-import { delimiter, join } from "node:path";
+import { win32 } from "node:path";
 
 /**
  * The process edge (feature 028): the only place `ambykit run` uses `node:child_process`. Everything else
@@ -47,10 +47,10 @@ export function resolveExecutable(
   if (platform !== "win32") return exe;
   if (/[\\/]/.test(exe) && exists(exe)) return exe;
   const exts = (env["PATHEXT"] ?? ".COM;.EXE;.BAT;.CMD").split(";").filter(Boolean);
-  const dirs = (env["PATH"] ?? env["Path"] ?? "").split(delimiter).filter(Boolean);
+  const dirs = (env["PATH"] ?? env["Path"] ?? "").split(win32.delimiter).filter(Boolean);
   for (const dir of dirs) {
     for (const ext of ["", ...exts]) {
-      const candidate = join(dir, exe + ext);
+      const candidate = win32.join(dir, exe + ext);
       if (exists(candidate) && (ext !== "" || /\.[a-z]+$/i.test(exe))) return candidate;
     }
   }
