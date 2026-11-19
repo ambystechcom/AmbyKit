@@ -1,4 +1,4 @@
-import { cpSync, mkdtempSync, readFileSync, readdirSync } from "node:fs";
+import { cpSync, mkdtempSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -43,7 +43,8 @@ const read = (dir: string, f: string, file: string): string | null => {
     return null;
   }
 };
-const normalize = (s: string, dir: string): string => s.split(dir).join("<root>").replace(/\\/g, "/");
+// The temp directory can be printed as given or resolved (macOS: /var is /private/var), so replace both forms.
+const normalize = (s: string, dir: string): string => s.split(realpathSync(dir)).join("<root>").split(dir).join("<root>").replace(/\\/g, "/");
 
 describe("own specs migrate cleanly (030, SC-001, SC-002)", () => {
   it("030:SC-001: every spec and tasks file converts, none is skipped", () => {

@@ -2,7 +2,7 @@
 feature: 030-spec-v2-and-migrate          # NNN-slug
 title: Spec format v2 and migrate
 branch: 030-spec-v2-and-migrate
-status: ready                     # draft | ready | in-progress | blocked | done
+status: in-progress                     # draft | ready | in-progress | blocked | done
 created: 2026-11-12
 ---
 
@@ -42,7 +42,7 @@ structured block, so that tools read it without pattern-matching prose.
   from the structured data, not from prose lines.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a v2 spec (its frontmatter says `format: 2`), When read by a tool, Then feature ID, story IDs,
@@ -71,7 +71,7 @@ so that conflict checks and verification do not parse trailing text.
   from structured data.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a v2 task list, When read, Then each task's ID and files come from the phase's structured block,
@@ -99,7 +99,7 @@ feature.
   v2 with the same meaning.
 - **depends-on:** [US-1, US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** in-progress
 
 **Acceptance criteria**
 - Given a 1.x feature, When `ambykit migrate` runs, Then its spec and tasks are rewritten in place to
@@ -123,7 +123,7 @@ As a maintainer, I want to preview a migration before it writes anything, so tha
 - **Independent test:** run `--dry-run` and confirm no file changes and a summary of what would change.
 - **depends-on:** [US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given `--dry-run`, When migrate runs, Then no file is written and nothing is created, including temporary
@@ -146,7 +146,7 @@ stop halfway without damage.
   further change and no file is half-written.
 - **depends-on:** [US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a migrated project, When migrate runs again, Then no file changes.
@@ -169,7 +169,7 @@ upgrade feature by feature instead of all at once.
   confirm both read correctly, with one warning for the 1.x ones.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a 1.x feature, When any command reads it in 2.0, Then it is read with the same results as in
@@ -197,7 +197,7 @@ automatically.
   run `migrate` and confirm it is upgraded, and a v2 config is untouched.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a config without a schema version, When a command runs, Then it is read as v1 and is not modified.
@@ -218,7 +218,7 @@ that 2.0 can rely on current platform features.
 - **Independent test:** run on an older Node and confirm a clear error naming the required version.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given Node older than 22, When the CLI runs, Then it exits with a message naming the required version
@@ -236,7 +236,7 @@ scheduling reads one reliable source.
   feature edge.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a feature declares it depends on another feature (an optional feature-level depends-on in the
@@ -260,7 +260,7 @@ unreadable.
   file reads back with exactly those changes and nothing else changed.
 - **depends-on:** [US-2]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a v2 task list, When the command sets a task's files, Then only that task's entry in its phase's
@@ -286,7 +286,7 @@ files correctly, so that new features start in v2 and the assistant never writes
   are v2 and the implement phase updates status, ticks and Verify results through the right carriers.
 - **depends-on:** [US-1, US-2, US-10]
 - **blocked-by:** []
-- **status:** draft
+- **status:** in-progress
 
 **Acceptance criteria**
 - Given a new feature, When `/amby.specify` and `/amby.tasks` run, Then `spec.md` and `tasks.md` are v2.
