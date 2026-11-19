@@ -28,7 +28,7 @@ ones truly satisfy their requirement.
    `- [ ] [T###] [US#] … (closes NNN:FR-###)` per gap and `- [ ] [T###] [US#] [VERIFY] …` per unverified
    item. Continue IDs from the highest `T###` anywhere in the file; skip items already listed
    unchecked there. Nothing to add → leave the file untouched.
-4. In `spec.md`, patch only `status:` lines: a story → `done` when every FR/SC it maps to is
-   covered; the feature → `done` when all stories are.
+4. In `spec.md`, change only statuses: a story → `done` (`ambykit edit status <feature> US-# done`) when every
+   FR/SC it maps to is covered; the feature's frontmatter `status:` → `done` when all stories are.
 5. Report: **converged** (no gaps) or **gaps found (N)**, counts per class, and a table of every ID
    with its class and a one-line reason for each gap/unverified item.

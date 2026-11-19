@@ -94,13 +94,13 @@ created: 2026-11-18
 
 ## Phase 7 — US-11 prompts and templates  (disjoint files, sequential tests last)
 
-- [ ] [T070] [P] [US11] Templates to v2: spec with `format: 2` and `stories:` and no metadata bullets or priority in headings; tasks with `format: 2`, no trailing group and one block per phase (src/templates/spec.md, src/templates/tasks.md)
-- [ ] [T071] [P] [US11] `/amby.specify` writes `stories:` and sets `status: draft`; `/amby.tasks` writes tasks without the group and one block per phase with the Verify check in `verify.check` (src/prompts/specify.md, src/prompts/tasks.md)
-- [ ] [T072] [P] [US11] `/amby.implement` ticks the checkbox and uses `ambykit edit status` and `ambykit edit verify` for status and Verify results, then runs `ambykit analyze` and fixes any `file:line` error (src/prompts/implement.md)
-- [ ] [T073] [P] [US11] `/amby.revise` and `/amby.converge` change `status:` and append gap tasks through the same carriers and keep untouched sections as they were (src/prompts/revise.md, src/prompts/converge.md)
-- [ ] [T074] [P] [US11] `/amby.run` and the worker persona record Verify results and statuses through the writer (src/prompts/run.md, src/agents/worker.md)
-- [ ] [T075] [US11] Prompt contract tests: the pinned sentences, each prompt under its size cap, no prompt tells the assistant to edit a block by hand — 030:FR-017 (test/prompts-030.test.ts)
-- **Verify:** `npx vitest run test/prompts-030.test.ts test/prompts-020.test.ts test/prompts-021.test.ts test/templates` passes (golden snapshots stay failing until the integration batch).
+- [x] [T070] [P] [US11] Templates to v2: spec with `format: 2` and `stories:` and no metadata bullets or priority in headings; tasks with `format: 2`, no trailing group and one block per phase (src/templates/spec.md, src/templates/tasks.md)
+- [x] [T071] [P] [US11] `/amby.specify` writes `stories:` and sets `status: draft`; `/amby.tasks` writes tasks without the group and one block per phase with the Verify check in `verify.check` (src/prompts/specify.md, src/prompts/tasks.md)
+- [x] [T072] [P] [US11] `/amby.implement` ticks the checkbox and uses `ambykit edit status` and `ambykit edit verify` for status and Verify results, then runs `ambykit analyze` and fixes any `file:line` error (src/prompts/implement.md)
+- [x] [T073] [P] [US11] `/amby.revise` and `/amby.converge` change `status:` and append gap tasks through the same carriers and keep untouched sections as they were (src/prompts/revise.md, src/prompts/converge.md)
+- [x] [T074] [P] [US11] `/amby.run` and the worker persona record Verify results and statuses through the writer (src/prompts/run.md, src/agents/worker.md)
+- [x] [T075] [US11] Prompt contract tests: the pinned sentences, each prompt under its size cap, no prompt tells the assistant to edit a block by hand — 030:FR-017 (test/prompts-030.test.ts)
+- **Verify:** `npx vitest run test/prompts-030.test.ts test/prompts-020.test.ts test/prompts-021.test.ts test/templates` passes (golden snapshots stay failing until the integration batch). ✓ passed
 - **Checkpoint:** new features start in v2; prompts use the writer.
 
 ## Phase 8 — Docs and polish

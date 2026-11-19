@@ -60,12 +60,15 @@ Run `ambykit fleet status <feature>`; it prints the run, the next phase, lanes, 
 
 When every task of the phase is checked: `ambykit fleet update <feature> --stage=qa`. Ask QA (`@.amby/roles/qa.md`, read-only) to:
 
-1. run the phase's `**Verify:**` line, and check the acceptance criteria of its stories; if `tests.md` exists, its
-   cases for these tasks are the expected tests. No Verify line → check the criteria only and say the phase has none.
+1. run the phase's Verify check (its `**Verify:**` line, or the `verify:` block of a v2 file), and check the acceptance
+   criteria of its stories; if `tests.md` exists, its cases for these tasks are the expected tests. No Verify check →
+   check the criteria only and say the phase has none.
 2. return a verdict. You write it to `.amby/fleet/<run>/verdicts/<lane>.qa.<round>.json`
    (`<round>` = failed rounds so far + 1): `{"verdict":"pass"|"fail","findings":[{"id","severity","finding","fix"}]}`.
-3. record the result on the Verify line, per spec 020: `✓ passed`, `✗ failed: <why>`, or, when the check cannot be
-   run here, tell the person, ask them to confirm and record `? unverified`.
+3. record the result with `ambykit edit verify <feature> <phase> --result=passed|failed|unverified [--why=<why>]` (the file
+   shows `✓ passed`, `✗ failed: <why>` or `? unverified`); when the check cannot be run here, tell the person, ask them to
+   confirm and record `unverified`. Set a finished story with `ambykit edit status <feature> US-# done`; never edit a
+   `files:`/`verify:` block or story data by hand.
 
 A failing Verify never passes the checkpoint. Do not tick the checkpoint or start the next phase until it passes.
 

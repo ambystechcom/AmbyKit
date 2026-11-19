@@ -16,17 +16,17 @@ Context: read that feature's `plan.md` (and `spec.md` for story IDs/priorities/d
 
 Run `ambykit activity <feature> --agent=$AGENT --phase=tasks` first, with that feature's number; ignore any error.
 
-1. Write tasks following `@.amby/templates/tasks.md` as checkbox lines:
-   `- [ ] [T###] [P?] [US#] description (file/path)`.
+1. Write tasks in the v2 form of `@.amby/templates/tasks.md` (even if `spec.md` is 1.x): checkbox lines
+   `- [ ] [T###] [P?] [US#] description`, then each phase's `yaml` block.
 2. Group into phases: **Setup → Foundational → User stories (by priority) → Polish**. Enforce the
    gate: no user-story task before Foundational completes.
 3. Order tasks by the story **dependency graph** (`depends-on`/`blocked-by`) and priority. Mark
    independent tasks `[P]`. Tag each task with its `[US#]`. End each story group with a checkpoint.
-4. Give every task a stable `T###` id and its file paths as the line's last parenthesized group:
-   comma-separated, repo-relative, dirs end `/`, no globs. Mark `[P]` only when no other task in the
-   same phase shares or nests a path.
-5. End every phase with exactly ONE `**Verify:**` line, plain text after its tasks: a runnable check
-   or observable condition that proves the phase works (e.g. a test command). Never more than one.
+4. Give every task a stable `T###` id and list its files in its phase's `files:` block, never on the task
+   line: repo-relative, dirs end `/`, no globs. Mark `[P]` only when no other task in the same phase shares or
+   nests a path.
+5. End every phase with exactly ONE `verify:` in its block, whose `check:` is a runnable check or observable
+   condition that proves the phase works (e.g. a test command). Never more than one.
 6. Also write `tests.md` (the test design) in this phase per `@.amby/templates/tests.md`, touching only `tasks.md`
    and `tests.md`. If `spec.md` is not `status: ready`, skip it and say the spec must be ready first. One case per
    acceptance criterion (negative and edge ones too, max 15 per story); one too vague to test goes under `## Flags`.
@@ -36,4 +36,5 @@ Run `ambykit activity <feature> --agent=$AGENT --phase=tasks` first, with that f
    With an existing `tests.md`, patch only the cases citing changed criteria (keep their ids, clear `[stale]`), mark
    cases whose criterion was removed `[obsolete]` and add new ones; leave the rest untouched.
 
-Do not start implementing. Keep descriptions to one line each.
+Do not start implementing. Keep descriptions to one line each. Then run `ambykit analyze` and fix any
+`file:line` error it reports for this feature.
