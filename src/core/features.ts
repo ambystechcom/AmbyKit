@@ -78,6 +78,7 @@ export function readFeatures(projectRoot: string, opts: { only?: string } = {}):
       displayRef: ref,
       stories,
       tasks,
+      ...(specRead.dependsOn.length > 0 ? { dependsOn: specRead.dependsOn } : {}),
       ...(verify ? { verify } : {}),
       ...(formatIssues.length > 0 ? { formatIssues } : {}),
       artifacts: {

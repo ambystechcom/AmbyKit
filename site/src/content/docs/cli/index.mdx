@@ -171,6 +171,31 @@ listed). The report lists covered and uncovered requirements, orphans (tests cit
 uncited tests. `--json` prints a versioned shape; `--gate` exits 1 when a requirement is uncovered. A
 requirement left untested on purpose is recorded as `uncovered: FR-### — reason` in `tests.md`.
 
+## `ambykit migrate`
+
+```text
+ambykit migrate [feature] [--dry-run] [--diff] [--dual-write]
+```
+
+Converts the 1.x `spec.md` and `tasks.md` files of this checkout to the v2 format: story metadata moves into the spec's
+frontmatter, each phase's file ownership and Verify line move into one `yaml` block, and both files gain `format: 2`. Prose and
+checkboxes are never rewritten. A file that is not provably safe is left untouched and listed with the fix, every conversion is
+read back before it is written, each file is written once, and a second run changes nothing. `--dry-run` writes nothing,
+`--diff` prints each change, `--dual-write` keeps the 1.x lines beside the v2 data. A 1.x AmbyKit loses statuses,
+dependencies, ownership and Verify results on a v2 file without an error, so upgrade your tools first.
+
+## `ambykit edit`
+
+```text
+ambykit edit files <feature> <T###> <path…>
+ambykit edit verify <feature> <phase> --result=passed|failed|unverified [--why=<text>]
+ambykit edit status <feature> <US-#> <status>
+```
+
+Sets a task's files, a phase's Verify result or a story's status in the right place for the file's format, in v2 and 1.x alike,
+so nobody hand-edits YAML. It changes only that one field, reads the file back and refuses (changing nothing) if anything else
+would change, or on an unknown task, story or phase, an invalid status or result, or a glob path.
+
 ## `ambykit activity`
 
 ```text

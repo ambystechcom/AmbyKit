@@ -54,10 +54,11 @@ export interface Readers {
 /** The shipped (1.x) parsers: the baseline is the product's own behavior (Principle 4). */
 export const v1Readers: Readers = { stories: parseStories, tasks: parseTasks, phases: parsePhases };
 
-export function modelOf(feature: string, specText: string | null, tasksText: string | null, r: Readers = v1Readers): FeatureModel {
+/** `stripGroup`: strip the trailing ownership group from task descriptions (1.x readers keep it; v2 readers never have one). */
+export function modelOf(feature: string, specText: string | null, tasksText: string | null, r: Readers = v1Readers, stripGroup = true): FeatureModel {
   return {
     stories: specText === null ? [] : (r.stories(specText, feature).map(storyOut) as FeatureModel["stories"]),
-    tasks: tasksText === null ? [] : r.tasks(tasksText).map((t) => taskOut(t)),
+    tasks: tasksText === null ? [] : r.tasks(tasksText).map((t) => taskOut(t, stripGroup)),
     phases: tasksText === null ? [] : r.phases(tasksText).map(phaseOut),
   };
 }
@@ -72,11 +73,11 @@ export function listFeatures(specsDir: string): string[] {
 const read = (dir: string, f: string): string | null => (existsSync(join(dir, f)) ? readFileSync(join(dir, f), "utf8") : null);
 
 /** Model of every feature under `specsDir`. */
-export function modelOfSpecs(specsDir: string, r: Readers = v1Readers, only?: (f: string) => boolean): Record<string, FeatureModel> {
+export function modelOfSpecs(specsDir: string, r: Readers = v1Readers, only?: (f: string) => boolean, stripGroup = true): Record<string, FeatureModel> {
   const out: Record<string, FeatureModel> = {};
   for (const f of listFeatures(specsDir)) {
     if (only && !only(f)) continue;
-    out[f] = modelOf(f, read(join(specsDir, f), "spec.md"), read(join(specsDir, f), "tasks.md"), r);
+    out[f] = modelOf(f, read(join(specsDir, f), "spec.md"), read(join(specsDir, f), "tasks.md"), r, stripGroup);
   }
   return out;
 }

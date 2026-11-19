@@ -481,6 +481,54 @@ it("019:FR-004, 020:FR-001: shared behavior", () => { … });   // several ids
 - Only `it`/`test` titles are read: an id in a `describe(...)` name does not cite the tests beneath it,
   and `.each` titles are not expanded.
 
+## `ambykit migrate [feature] [--dry-run] [--diff] [--dual-write]`
+
+Convert the 1.x `spec.md` and `tasks.md` files of this checkout to the v2 format (no model tokens). Story status, priority,
+`depends-on` and `blocked-by` move into the spec's frontmatter `stories:` list and `(priority: Pn)` leaves the headings; each
+phase's `(file/path)` groups and its Verify line move into one `yaml` block (`files:` and `verify:`); both files gain
+`format: 2`. Prose, checkboxes, `⚠ BLOCKED:` and `↪ DEVIATION:` markers and every other byte stay as they were, in the file's own
+line endings. A feature argument (number or directory name) limits it to one feature; only this checkout is touched, never
+another worktree.
+
+```bash
+ambykit migrate --dry-run     # write nothing; print what would change
+ambykit migrate --diff        # also print each unified diff
+ambykit migrate               # convert; a second run changes nothing
+ambykit migrate 023           # one feature
+ambykit migrate --dual-write  # keep the 1.x lines beside the v2 data (transitional)
+```
+
+It is non-destructive by construction:
+
+- A file it cannot convert provably is **left untouched and listed** with the reason and the fix: story metadata inside a
+  sentence or a code fence, two status bullets for one story, task or Verify markup inside a code fence, two Verify lines in a
+  phase, a repeated task id, mixed line endings, a byte-order mark.
+- Every conversion is **read back** through the real readers and skipped if its meaning differs from the 1.x reading.
+- Each file is **written once**: to a temp file in the same directory, then renamed over the original, after comparing the
+  file with what was read (skipped if someone edited it meanwhile). An interrupted run leaves every file either old or new.
+- Uncommitted changes in a file it converts are named in a warning before it writes.
+- The config gets `schemaVersion: 2` with every setting kept. A newer or unparseable config is left unmodified and reported.
+
+A 1.x AmbyKit reads a v2 file without an error but loses story statuses, dependencies, file ownership and Verify results, so
+upgrade every tool that reads the specs before committing the migrated files, or use `--dual-write` meanwhile. See
+[Migrating to the v2 spec format](./migration.md).
+
+## `ambykit edit`
+
+```bash
+ambykit edit files <feature> <T###> <path…>
+ambykit edit verify <feature> <phase> --result=passed|failed|unverified [--why=<text>]
+ambykit edit status <feature> <US-#> <status>
+```
+
+Set a task's files, a phase's Verify result or a story's status in the right place for the file's format, so nobody
+hand-edits YAML: a typo in a block can make a whole phase unreadable. In a v2 file it edits the phase block (`files:`,
+`verify:`) or the frontmatter story entry; in a 1.x file the same command edits the trailing group, the result suffix on the
+Verify line or the `**status:**` bullet. It changes only that one field, reads the file back and refuses (writing nothing) if
+anything else would change. It refuses an unknown task, story, phase or feature, an invalid status or result, a glob path, and
+a v2 file that already has a located format error (it names the file and line). Output is one line, e.g.
+`T004 files set: src/a.ts`. The phase prompts use it; it takes the same per-file lock as the MCP tick and status tools.
+
 ## `ambykit check`
 
 Doctor: verify integrations are present and well-formed and that expected assistant CLIs are

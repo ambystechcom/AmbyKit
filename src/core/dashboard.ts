@@ -215,9 +215,9 @@ export function computeDashboard(projectRoot: string, issues: ParseIssue[] = [])
     if (!existsSync(join(dir, "spec.md"))) continue;
     const spec = read(entry.name, "spec.md");
     if (spec === null) continue;
-    const stories = readSpec(entry.name, spec).stories;
+    const stories = readSpec(entry.name, spec, { file: `specs/${entry.name}/spec.md` }).stories;
     const tasksBody = existsSync(join(dir, "tasks.md")) ? read(entry.name, "tasks.md") : null;
-    applyTasks(stories, tasksBody === null ? [] : readTasks(tasksBody).tasks);
+    applyTasks(stories, tasksBody === null ? [] : readTasks(tasksBody, { file: `specs/${entry.name}/tasks.md` }).tasks);
     all.push(...stories);
   }
   return all;

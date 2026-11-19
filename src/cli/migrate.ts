@@ -18,6 +18,11 @@ export class MigrateCommand extends BaseCommand {
   readonly summary = "Convert 1.x specs and task lists to the v2 format, safely (--dry-run, --diff, --dual-write).";
   readonly usage = "ambykit migrate [feature] [--dry-run] [--diff] [--dual-write]";
 
+  /** migrate is the fix for the 1.x warning; it prints its own summary instead. */
+  protected override get showsLegacyWarning(): boolean {
+    return false;
+  }
+
   protected async execute(opts: CliOptions): Promise<number> {
     const root = this.projectRoot(opts.cwd);
     const dryRun = flag(opts, "dry-run");

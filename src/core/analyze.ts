@@ -338,7 +338,8 @@ export function analyzeProject(projectRoot: string): AnalysisReport {
   const designFindings: TestDesignFinding[] = [];
   const designMissing: string[] = [];
   let designed = 0;
-  for (const f of readFeatures(projectRoot).features) {
+  const features = readFeatures(projectRoot).features;
+  for (const f of features) {
     if (f.formatIssues) formatIssues.push(...f.formatIssues);
     if (collectTestDesign(projectRoot, f.dir, f.displayRef, designFindings)) designed += 1;
     else designMissing.push(f.displayRef);
@@ -347,6 +348,18 @@ export function analyzeProject(projectRoot: string): AnalysisReport {
     report.lanes.declarations.push(...declarations(f.dir, f.tasks));
     collectMarkers(f.displayRef, f.tasks, blockedTasks, deviations, markerIssues);
     if (f.verify) collectVerifyIssues(f.displayRef, f.tasks, f.verify, verifyIssues);
+  }
+  // Feature 030 (FR-016): a feature-level `depends-on` that names no feature is a dangling reference, like a story-level one.
+  if (features.some((f) => f.dependsOn !== undefined)) {
+    const refOf = new Map(features.map((f) => [f.dir, f.displayRef]));
+    for (const b of buildGraph(features).broken) {
+      if (b.scope !== "feature") continue;
+      report.issues.push({
+        kind: "dangling-reference",
+        message: `${refOf.get(b.from) ?? b.from} depends-on names unknown feature ${b.to}`,
+        stories: [],
+      });
+    }
   }
   // New keys appear only when there is something to say, so output without markers is unchanged.
   if (blockedTasks.length > 0) report.blockedTasks = blockedTasks;

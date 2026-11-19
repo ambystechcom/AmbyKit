@@ -13,6 +13,11 @@ export class McpCommand extends BaseCommand {
   readonly usage = "ambykit mcp";
   protected override requiresProject = false;
 
+  /** stdout is the protocol; the server reads no specs through a command run. */
+  protected override get showsLegacyWarning(): boolean {
+    return false;
+  }
+
   /** The streams to serve on: the real stdin and stdout unless a test injects its own. */
   constructor(private readonly io: { input: Readable; output: Writable } = { input: process.stdin, output: process.stdout }) {
     super();

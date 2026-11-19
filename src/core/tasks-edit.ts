@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { canonicalStoryId, featureRefOf } from "./dashboard.js";
 import { readSpec, readTasks } from "./spec-format/dispatch.js";
+import { setStoryStatus as writeStoryStatus } from "./spec-format/write.js";
 import { releaseTaskClaims } from "./fleet/claims.js";
 import { withLock, writeFileAtomic } from "./fleet/lock.js";
 import { featureIds } from "./worktree.js";
@@ -84,7 +85,10 @@ export interface StatusResult {
   feature: string;
 }
 
-/** Set one story's `**status:**`; only that story's status value changes (FR-004). */
+/**
+ * Set one story's status; only that story's status value changes (FR-004). A 1.x spec changes its `**status:**` bullet; a v2
+ * spec (feature 030) changes the status in its frontmatter through the writer. The signature and the result shape are the same.
+ */
 export function setStoryStatus(root: string, featureRef: string, storyRef: string, status: string): EditResult<StatusResult> {
   if (!(STORY_STATUSES as readonly string[]).includes(status)) {
     return fail(`invalid status '${status}'; allowed: ${STORY_STATUSES.join(", ")}`);
@@ -97,9 +101,17 @@ export function setStoryStatus(root: string, featureRef: string, storyRef: strin
 
   const locked = withLock(root, `spec-${feature}`, (): EditResult<StatusResult> => {
     const text = readFileSync(file, "utf8");
-    const before = readSpec(feature, text).stories;
+    const read = readSpec(feature, text);
+    const before = read.stories;
     const target = before.find((s) => s.id === wanted);
     if (!target) return fail(`story '${storyRef}' not found in ${feature}${before.length ? `; stories: ${before.map((s) => s.displayId).join(", ")}` : ""}`);
+
+    if (read.format === 2) {
+      const out = writeStoryStatus(text, feature, target.displayId, status);
+      if (!out.ok) return fail(out.error);
+      writeFileAtomic(file, out.text);
+      return { ok: true, story: target.displayId, status: status as StoryStatus, feature };
+    }
 
     const { rows, eol } = lines(text);
     const heading = /^#{2,4}\s+(US-?\d+)\s*[—–-]\s*/;

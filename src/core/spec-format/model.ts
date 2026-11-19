@@ -53,7 +53,10 @@ export class FormatTally {
 }
 
 export interface ReadCtx {
-  /** Project-relative file name, used in issues and the tally. */
+  /** Project-relative file name, used in issues and the tally. Without it a read is not tallied. */
   file?: string;
+  /** Where to record the format; defaults to the tally of the running command (see `beginTally`). */
   tally?: FormatTally;
+  /** The version that decides whether 1.x files are refused (tests inject it); default is the installed version. */
+  version?: string;
 }
