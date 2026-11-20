@@ -65,11 +65,11 @@ created: 2026-11-19
 
 ## Phase 6 — Person gates  (block Phases 7–9 and 11)
 
-- [ ] [T050] Person task: run `/amby.design` for the tab frame, tab bar, metrics panel and state tokens, review and sign off; record `signed_off` (specs/032-dashboard-redesign-and-metrics/ui.md, specs/032-dashboard-redesign-and-metrics/design-tokens.json)
+- [x] [T050] Person task: run `/amby.design` for the tab frame, tab bar, metrics panel and state tokens, review and sign off; record `signed_off` (specs/032-dashboard-redesign-and-metrics/ui.md, specs/032-dashboard-redesign-and-metrics/design-tokens.json)
 - [x] [T051] Gate: spec 030 merged into main (reader and writer available); then switch T023's `readRevisionModel` to the dispatcher (src/core/metrics/index.ts)
 - [x] [T052] Gate: spec 031 merged into main (lane grouping across features available); record its function name (specs/032-dashboard-redesign-and-metrics/research.md)
-- **Verify:** `ui.md` exists with `signed_off` set; `src/core/spec-format/dispatch.ts` is on main; 031's grouping function is exported. ? unverified: T050 (the /amby.design sign-off) is open; T051 and T052 are satisfied
-- **Checkpoint:** design signed off; 030 and 031 available.
+- **Verify:** `ui.md` exists with `signed_off` set; `src/core/spec-format/dispatch.ts` is on main; 031's grouping function is exported. ✓ passed: ui.md and design-tokens.json signed off 2026-11-19; T051 and T052 satisfied
+- **Checkpoint:** design signed off (2026-11-19); 030 and 031 available.
 
 ## Phase 7 — User story US-1  (priority: P1)
 
