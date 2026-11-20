@@ -6,7 +6,7 @@
   <a href="https://www.npmjs.com/package/@ambystech/ambykit"><img src="https://img.shields.io/npm/v/@ambystech/ambykit" alt="npm version"></a>
   <a href="https://github.com/ambystechcom/AmbyKit/actions/workflows/ci.yml"><img src="https://github.com/ambystechcom/AmbyKit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://ambykit.ambystech.io/"><img src="https://img.shields.io/badge/docs-live-EE1199" alt="Docs"></a>
-  <img src="https://img.shields.io/badge/node-%E2%89%A520-5FA04E" alt="Node >= 20">
+  <img src="https://img.shields.io/badge/node-%E2%89%A522-5FA04E" alt="Node >= 22">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license">
 </p>
 
@@ -30,7 +30,7 @@ npm install -g @ambystech/ambykit
 ambykit init
 ```
 
-Node ≥ 20. No Python toolchain, no separate installer — it's an npm package.
+Node ≥ 22. No Python toolchain, no separate installer — it's an npm package.
 
 Already have a project? `init` is **non-destructive** — an existing `CLAUDE.md`/`AGENTS.md` is
 preserved (and backed up); AmbyKit only adds/updates its own `### AmbyKit usage` section. Re-run
@@ -93,7 +93,7 @@ community, use it. AmbyKit is the choice when the UI matters and you live in the
 | Brownfield / revise in place | ✅ `/amby.revise` | ✅ evolving-specs guide | ✅ |
 | EARS requirements | ✅ | ✅ | ✅ |
 | **Assistants supported** | **6 families / 10 targets** | **37 integrations** | self-contained |
-| Runtime | Node ≥ 20, `npx` | Python 3.11+, `uv`/`pipx` | proprietary IDE + CLI |
+| Runtime | Node ≥ 22, `npx` | Python 3.11+, `uv`/`pipx` | proprietary IDE + CLI |
 | License | MIT | MIT | proprietary (Crew is Apache 2.0) |
 | Maturity | young, v1.1 | very large community | AWS-backed, paid tiers |
 
@@ -158,6 +158,8 @@ target is a thin `BaseEmitter` subclass.
 | `ambykit mcp` | Serve state tools (next task, story status, tick, report, claim) to an assistant over MCP; opt-in with `mcp.enabled` |
 | `ambykit directive <feature> <lane>` | Tell a fleet lane to `pause`, `resume` or `stop` (obeyed at its next report) |
 | `ambykit run <feature>` | (experimental) Run the prepared lanes headless: print the commands, `--yes` to launch, supervise, review and merge |
+| `ambykit migrate [feature]` | Convert 1.x specs and task lists to the v2 format, safely (`--dry-run`, `--diff`, `--dual-write`); a second run changes nothing |
+| `ambykit edit <files\|verify\|status> <feature> …` | Set a task's files, a phase's Verify result or a story's status without hand-editing the file (1.x and v2) |
 
 See [`docs/cli-reference.md`](./docs/cli-reference.md).
 

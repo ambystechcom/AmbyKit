@@ -8,11 +8,11 @@ import {
   canonicalStoryId,
   computeDashboard,
   displayKey,
-  parseTasks,
   type StoryProgress,
   type TaskLine,
 } from "../core/dashboard.js";
 import { readProjectPresence, thresholdsFrom, type Thresholds } from "../core/activity.js";
+import { readTasks } from "../core/spec-format/dispatch.js";
 import { matchAgents, type AgentMatch } from "../core/agents.js";
 import { allCheckouts, readProjectFeatures, type ProjectCheckouts } from "../core/checkouts.js";
 import { loadConfig } from "../core/config.js";
@@ -460,7 +460,7 @@ function tasksForStory(root: string, story: StoryProgress): TaskLine[] {
   const tasksPath = join(root, "specs", story.feature, "tasks.md");
   if (!existsSync(tasksPath)) return [];
   try {
-    return parseTasks(readFileSync(tasksPath, "utf8")).filter((t) => t.story === story.id);
+    return readTasks(readFileSync(tasksPath, "utf8")).tasks.filter((t) => t.story === story.id);
   } catch {
     return []; // unreadable: already named by the caller (FR-014)
   }

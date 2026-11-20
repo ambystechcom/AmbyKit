@@ -1,5 +1,6 @@
 import type { StoryProgress, TaskLine } from "./dashboard.js";
 import type { PhaseVerify } from "./markers.js";
+import type { FormatIssue } from "./spec-format/model.js";
 
 export type { PhaseVerify };
 
@@ -67,6 +68,8 @@ export interface FeatureSnapshot {
   ref: string; // featureRefOf(dir); may collide across features
   displayRef: string; // ref, or dir when ref collides (unique)
   stories: StoryProgress[]; // tasks applied
+  /** Feature 030: feature-level `depends-on` from v2 frontmatter, as written (numbers or directory names). Absent for 1.x features. */
+  dependsOn?: string[];
   tasks: TaskLine[] | null; // null = no tasks.md
   /** Feature 020: the Verify line of each phase of tasks.md; absent when there is no tasks.md. */
   verify?: PhaseVerify[];
@@ -74,6 +77,8 @@ export interface FeatureSnapshot {
   clarifications: Clarification[];
   /** Feature 015: parallel lanes of this feature; absent when it has none. */
   lanes?: LaneView[];
+  /** Feature 030: located problems found reading this feature's spec.md or tasks.md (v2 data). Absent when there are none. */
+  formatIssues?: FormatIssue[];
   /** Feature 024: requirement coverage; absent when the feature has no requirements. `uncovered` feeds the quality view. */
   coverage?: { covered: number; total: number; uncovered: { id: string; text: string }[] };
 }

@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { ParseIssue } from "./overview-types.js";
 import { normalizePath } from "./lanes.js";
 import { parseMarkers, phaseNumber } from "./markers.js";
+import { readSpec, readTasks } from "./spec-format/dispatch.js";
 
 export interface StoryProgress {
   id: string; // feature-local canonical, e.g. "US1" (NOT globally unique — restarts per feature)
@@ -214,9 +215,9 @@ export function computeDashboard(projectRoot: string, issues: ParseIssue[] = [])
     if (!existsSync(join(dir, "spec.md"))) continue;
     const spec = read(entry.name, "spec.md");
     if (spec === null) continue;
-    const stories = parseStories(spec, entry.name);
+    const stories = readSpec(entry.name, spec, { file: `specs/${entry.name}/spec.md` }).stories;
     const tasksBody = existsSync(join(dir, "tasks.md")) ? read(entry.name, "tasks.md") : null;
-    applyTasks(stories, tasksBody === null ? [] : parseTasks(tasksBody));
+    applyTasks(stories, tasksBody === null ? [] : readTasks(tasksBody, { file: `specs/${entry.name}/tasks.md` }).tasks);
     all.push(...stories);
   }
   return all;

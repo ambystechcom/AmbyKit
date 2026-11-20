@@ -14,8 +14,9 @@ read other specs.
 1. Create the feature dir `specs/NNN-slug/` (next number, kebab-slug from the title) and write
    `spec.md` following `@.amby/templates/spec.md`. Then run
    `ambykit activity <feature> --agent=codex --phase=specify` with the new number; ignore any error.
-2. Define **user stories** (`US-#`): role / capability / benefit, a priority (P1/P2/P3), why that
-   priority, an independent-test statement, and `depends-on`/`blocked-by` if any. Set `status: draft`.
+2. Define **user stories** (`US-#`): role / capability / benefit, why that priority, and an
+   independent-test statement. Put each story's `priority` (P1/P2/P3), `status: draft` and
+   `depends-on`/`blocked-by` in the frontmatter `stories:` list; the heading carries the title only.
 3. Write **acceptance criteria** in Given/When/Then per story.
 4. Write **functional requirements** (`FR-###`) in EARS notation (SHALL / WHEN / WHILE / IF-THEN /
    WHERE). Each must be testable.
@@ -26,4 +27,5 @@ read other specs.
    `ambykit worktree NNN-slug` (the only command to run) and tell the user to continue in
    `.worktrees/NNN-slug/`. Otherwise skip this step (say why if isolation was enabled but git is absent).
 
-Keep it tight. Reference the constitution by principle number where relevant; don't restate it.
+Keep it tight. Reference the constitution by principle number where relevant; don't restate it. Then run
+`ambykit analyze` and fix any `file:line` error it reports for this spec.

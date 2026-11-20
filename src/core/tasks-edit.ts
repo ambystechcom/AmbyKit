@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { canonicalStoryId, featureRefOf, parseStories, parseTasks } from "./dashboard.js";
+import { canonicalStoryId, featureRefOf } from "./dashboard.js";
+import { readSpec, readTasks } from "./spec-format/dispatch.js";
+import { setStoryStatus as writeStoryStatus } from "./spec-format/write.js";
 import { releaseTaskClaims } from "./fleet/claims.js";
 import { withLock, writeFileAtomic } from "./fleet/lock.js";
 import { featureIds } from "./worktree.js";
@@ -51,7 +53,7 @@ export function tickTask(root: string, featureRef: string, taskId: string): Edit
 
   const locked = withLock(root, `tasks-${feature}`, (): EditResult<TickResult> => {
     const text = readFileSync(file, "utf8");
-    const before = parseTasks(text);
+    const before = readTasks(text).tasks;
     const target = before.find((t) => t.id === id);
     if (!target) return fail(`task '${taskId}' not found in ${feature}${before.length ? `; it has ${before[0]!.id}..${before[before.length - 1]!.id}` : ""}`);
     if (target.done) return fail(`task ${id} is already checked`);
@@ -64,7 +66,7 @@ export function tickTask(root: string, featureRef: string, taskId: string): Edit
     const next = rows.join(eol);
 
     // Re-parse: the target is now checked and every other task reads exactly as before (SC-002).
-    const after = parseTasks(next);
+    const after = readTasks(next).tasks;
     const same =
       after.length === before.length &&
       after.every((t, i) => (t.id === id ? t.done && JSON.stringify({ ...t, done: false }) === JSON.stringify(before[i]) : JSON.stringify(t) === JSON.stringify(before[i])));
@@ -83,7 +85,10 @@ export interface StatusResult {
   feature: string;
 }
 
-/** Set one story's `**status:**`; only that story's status value changes (FR-004). */
+/**
+ * Set one story's status; only that story's status value changes (FR-004). A 1.x spec changes its `**status:**` bullet; a v2
+ * spec (feature 030) changes the status in its frontmatter through the writer. The signature and the result shape are the same.
+ */
 export function setStoryStatus(root: string, featureRef: string, storyRef: string, status: string): EditResult<StatusResult> {
   if (!(STORY_STATUSES as readonly string[]).includes(status)) {
     return fail(`invalid status '${status}'; allowed: ${STORY_STATUSES.join(", ")}`);
@@ -96,9 +101,17 @@ export function setStoryStatus(root: string, featureRef: string, storyRef: strin
 
   const locked = withLock(root, `spec-${feature}`, (): EditResult<StatusResult> => {
     const text = readFileSync(file, "utf8");
-    const before = parseStories(text, feature);
+    const read = readSpec(feature, text);
+    const before = read.stories;
     const target = before.find((s) => s.id === wanted);
     if (!target) return fail(`story '${storyRef}' not found in ${feature}${before.length ? `; stories: ${before.map((s) => s.displayId).join(", ")}` : ""}`);
+
+    if (read.format === 2) {
+      const out = writeStoryStatus(text, feature, target.displayId, status);
+      if (!out.ok) return fail(out.error);
+      writeFileAtomic(file, out.text);
+      return { ok: true, story: target.displayId, status: status as StoryStatus, feature };
+    }
 
     const { rows, eol } = lines(text);
     const heading = /^#{2,4}\s+(US-?\d+)\s*[—–-]\s*/;
@@ -121,7 +134,7 @@ export function setStoryStatus(root: string, featureRef: string, storyRef: strin
     rows[at] = rows[at]!.replace(/(\*\*status:\*\*\s*)[a-z-]+/i, `$1${status}`);
     const next = rows.join(eol);
 
-    const after = parseStories(next, feature);
+    const after = readSpec(feature, next).stories;
     const same =
       after.length === before.length &&
       after.every((s, i) => (s.id === wanted ? s.status === status && JSON.stringify({ ...s, status: "" }) === JSON.stringify({ ...before[i], status: "" }) : JSON.stringify(s) === JSON.stringify(before[i])));

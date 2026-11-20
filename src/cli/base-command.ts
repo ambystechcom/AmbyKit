@@ -1,4 +1,7 @@
 import { findProjectRoot } from "../core/paths.js";
+import { loadConfig } from "../core/config.js";
+import { beginTally, endTally, legacyEnabled, legacyWarningLine } from "../core/spec-format/legacy.js";
+import type { FormatTally } from "../core/spec-format/model.js";
 import { detectCapabilities } from "./ui/capabilities.js";
 import { outdatedWarning } from "./ui/callout.js";
 import * as render from "./ui/render.js";
@@ -46,13 +49,39 @@ export abstract class BaseCommand {
       this.error("Not inside an AmbyKit project (no .amby/ found).", "Run `ambykit init` first.");
       return 1;
     }
+    const tally = beginTally();
     try {
       return await this.execute(opts);
     } catch (err) {
       this.error(err instanceof Error ? err.message : String(err));
       if (this.verbose && err instanceof Error && err.stack) console.error(err.stack);
       return 1;
+    } finally {
+      this.printLegacyWarning(opts, tally);
+      endTally();
     }
+  }
+
+  /** Commands that print their own 1.x notice, or whose output is a protocol, switch the shared warning off (feature 030). */
+  protected get showsLegacyWarning(): boolean {
+    return true;
+  }
+
+  /**
+   * Feature 030 (FR-012, C-5): once per run, one line on stderr when files read through the dispatcher use the 1.x spec
+   * format. Never in `--json`, silenceable by `legacyWarning: false` in the config or `AMBYKIT_LEGACY_WARNING=0`. It is
+   * written straight to the process stream, so it never changes the text a command prints.
+   */
+  private printLegacyWarning(opts: CliOptions, tally: FormatTally): void {
+    if (!this.showsLegacyWarning || flag(opts, "json") || tally.v1.size === 0) return;
+    let config;
+    try {
+      config = loadConfig(findProjectRoot(opts.cwd) ?? opts.cwd);
+    } catch {
+      config = undefined;
+    }
+    if (!legacyEnabled(config)) return;
+    process.stderr.write(legacyWarningLine(tally.v1.size) + "\n");
   }
 
   protected abstract execute(opts: CliOptions): Promise<number>;

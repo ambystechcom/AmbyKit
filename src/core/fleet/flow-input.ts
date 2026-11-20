@@ -1,8 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import matter from "gray-matter";
-import { parseTasks } from "../dashboard.js";
-import { parsePhases } from "../markers.js";
+import { readPhases, readTasks } from "../spec-format/dispatch.js";
 import type { FlowInput } from "./run-flow.js";
 
 /**
@@ -25,8 +24,8 @@ export function readFlowInput(root: string, feature: string): FlowInput {
     specStatus,
     hasPlan: existsSync(join(dir, "plan.md")),
     hasTasks,
-    tasks: parseTasks(text).map((t) => ({ id: t.id, done: t.done, phase: t.phase, ...(t.blocked !== undefined ? { blocked: t.blocked } : {}) })),
-    phases: parsePhases(text).map((p) => ({
+    tasks: readTasks(text).tasks.map((t) => ({ id: t.id, done: t.done, phase: t.phase, ...(t.blocked !== undefined ? { blocked: t.blocked } : {}) })),
+    phases: readPhases(text).map((p) => ({
       phase: p.phase,
       title: p.title,
       ...(p.check !== undefined ? { check: p.check } : {}),

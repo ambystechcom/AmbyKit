@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { mergeLanes } from "../core/lane-merge.js";
 import { escalate } from "../core/run-gate-actions.js";
-import { parsePhases } from "../core/markers.js";
+import { readPhases } from "../core/spec-format/dispatch.js";
 import { event, save, type LaneRuntime, type Session } from "./run-session.js";
 
 /**
@@ -17,7 +17,7 @@ import { event, save, type LaneRuntime, type Session } from "./run-session.js";
 export function mergeBlocker(rt: LaneRuntime): string | null {
   const file = join(rt.ref.root, "specs", rt.ref.manifest.feature, "tasks.md");
   if (!existsSync(file)) return null;
-  const phase = parsePhases(readFileSync(file, "utf8")).find((p) => p.phase === rt.ref.manifest.phase);
+  const phase = readPhases(readFileSync(file, "utf8")).find((p) => p.phase === rt.ref.manifest.phase);
   if (phase?.result === "failed") return `the phase ${phase.phase} Verify line failed${phase.why ? `: ${phase.why}` : ""}`;
   return null;
 }

@@ -130,6 +130,10 @@ export type DashboardIcons = "nerd" | "unicode" | "ascii" | "auto";
 /** Persisted project configuration at .amby/config.json. */
 export interface AmbyConfig {
   version: string;
+  /** Config schema version (feature 030): absent = 1. Only `migrate` writes it. */
+  schemaVersion?: number;
+  /** When false, the one-line "1.x spec format" warning is not printed (feature 030; also `AMBYKIT_LEGACY_WARNING=0`). Default true. */
+  legacyWarning?: boolean;
   /** Enabled target ids (see emitter registry). */
   tools: string[];
   /** When false, `sync` regenerates commands only, not AGENTS.md/CLAUDE.md. Default true. */

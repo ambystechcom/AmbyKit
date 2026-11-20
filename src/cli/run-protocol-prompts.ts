@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parsePhases } from "../core/markers.js";
+import { readPhases } from "../core/spec-format/dispatch.js";
 import { verdictPath } from "../core/fleet/index.js";
 import { buildRolePrompt } from "../core/run-prompt.js";
 import { laneArtifacts } from "./run-plan.js";
@@ -10,7 +10,7 @@ import type { JobKind, LaneRuntime, Session } from "./run-session.js";
 export function laneVerifyLine(rt: LaneRuntime): string | undefined {
   const file = join(rt.ref.root, "specs", rt.ref.manifest.feature, "tasks.md");
   if (!existsSync(file)) return undefined;
-  const phase = parsePhases(readFileSync(file, "utf8")).find((p) => p.phase === rt.ref.manifest.phase);
+  const phase = readPhases(readFileSync(file, "utf8")).find((p) => p.phase === rt.ref.manifest.phase);
   return phase?.check ? `**Verify:** ${phase.check}` : undefined;
 }
 

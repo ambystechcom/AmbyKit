@@ -26,18 +26,18 @@ describe("spec 020 prompt contract: implement", () => {
   it("FR-015, FR-016: tells the implementer to mark a block as the last segment, then stop that task and continue", () => {
     const s = step(3);
     expect(s).toContain("⚠ BLOCKED: <reason>");
-    expect(s).toMatch(/last\s+segment of its line \(after the `\(file\/path\)` group\)/);
+    // feature 030: a v2 task line has no `(file/path)` group, so it is "if it has one"
+    expect(s).toMatch(/last\s+segment of its line \(after its `\(file\/path\)` group, if it has one\)/);
     expect(s).toMatch(/stop that task and continue with another unblocked\s+one/);
     expect(s).toContain("↪ DEVIATION: <note>");
     expect(s).toMatch(/Remove `⚠ BLOCKED:` once resolved/);
   });
 
-  it("FR-006: runs the phase's Verify check before passing the checkpoint and writes the result on that line", () => {
+  it("FR-006: runs the phase's Verify check before passing the checkpoint and records the result through the writer", () => {
     const s = step(5);
-    expect(s).toMatch(/run that phase's `\*\*Verify:\*\*` check before passing it/);
-    expect(s).toContain("`✓ passed`");
-    expect(s).toContain("`✗ failed: <why>`");
-    expect(s).toContain("`? unverified`");
+    // feature 030: the Verify check is a `**Verify:**` line (1.x) or a `verify:` block (v2); the result goes through the writer
+    expect(s).toMatch(/run that phase's Verify check \(its `\*\*Verify:\*\*` line or `verify:` block\) before passing it/);
+    expect(s).toContain("ambykit edit verify <feature> <phase> --result=passed|failed|unverified [--why=<why>]");
     expect(s).toMatch(/replacing any earlier one/);
   });
 
@@ -46,16 +46,16 @@ describe("spec 020 prompt contract: implement", () => {
   });
 
   it("FR-008: a check it cannot run goes to a person and is recorded as unverified", () => {
-    expect(step(5)).toMatch(/cannot run the check, ask a person to run or confirm it and record `\? unverified`/);
+    expect(step(5)).toMatch(/cannot run the check, ask a person to run or\s+confirm it and record `unverified`/);
   });
 
   it("FR-007, SC-003: a story is set to done only after its phase Verify has passed (not at step 4)", () => {
-    expect(step(4)).not.toContain("status: done");
-    expect(step(4)).toContain("status: in-progress");
+    expect(step(4)).not.toMatch(/US-# done/);
+    expect(step(4)).toContain("ambykit edit status <feature> US-# in-progress");
     const five = step(5);
-    expect(five).toContain("`status: done`");
+    expect(five).toContain("ambykit edit status <feature> US-# done");
     expect(five.indexOf("Verify has passed")).toBeGreaterThan(-1);
-    expect(five.indexOf("`status: done`")).toBeGreaterThan(five.indexOf("Verify has passed"));
+    expect(five.indexOf("US-# done")).toBeGreaterThan(five.indexOf("Verify has passed"));
   });
 
   it("SC-005: in a lane, the Verify result is recorded after the phase's lanes are merged", () => {
@@ -68,15 +68,15 @@ describe("spec 020 prompt contract: implement", () => {
 });
 
 describe("spec 020 prompt contract: tasks prompt and template", () => {
-  it("FR-005, FR-015: /amby.tasks emits exactly one plain-text Verify line per phase", () => {
-    expect(tasksPrompt).toMatch(/exactly ONE `\*\*Verify:\*\*` line/);
+  it("FR-005, FR-015: /amby.tasks emits exactly one Verify check per phase (a `verify:` in the phase block since feature 030)", () => {
+    expect(tasksPrompt).toMatch(/exactly ONE `verify:` in its block/);
     // 2200 until spec 021 added its test-design steps (about 700 characters); still a cap, so growth stays visible.
     expect(tasksPrompt.length).toBeLessThan(3000);
   });
 
   it("FR-005, FR-015: the template ends every phase with a Verify line and documents the markers and result suffix", () => {
     const phases = (template.match(/^## /gm) ?? []).length;
-    const verify = (template.match(/^- \*\*Verify:\*\*/gm) ?? []).length;
+    const verify = (template.match(/^verify:/gm) ?? []).length;
     expect(verify).toBeGreaterThan(0);
     expect(verify).toBe(phases);
     expect(template).toContain("`⚠ BLOCKED: <reason>`");

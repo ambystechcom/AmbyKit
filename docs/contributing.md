@@ -56,4 +56,7 @@ run `ambykit sync` and include the regenerated files in your commit.
   [`plugin-api.md`](./plugin-api.md) (extension points, the `PluginApi`, the matrix-row shape, the
   `ambykit.pluginApi` range, `PLUGIN_API_VERSION`) gets a line starting `[plugin-api]`; otherwise write
   "Plugins: not affected." If the API changed incompatibly, bump `PLUGIN_API_VERSION`.
+- **Spec format (2.x):** `ambykit migrate` ships with the reader. Before 2.1 stops reading 1.x files (`refuseLegacy`
+  in `src/core/spec-format/legacy.ts`), confirm that no migration issue has been open for a release and record it
+  in the changelog.
 - Run `npm run typecheck`, `npm test` and `ambykit sync --check`.

@@ -33,7 +33,8 @@ describe("activity self-report in emitted commands (feature 017)", () => {
   it("Claude grants only the scoped activity command to phases without shell access", () => {
     const files = new ClaudeEmitter().emit(specs, ctx);
     const tools = (name: string) => /allowed-tools: (.*)/.exec(files.find((f) => f.path.endsWith(`amby.${name}.md`))!.contents)![1];
-    expect(tools("converge")).toBe("Read, Edit, Bash(ambykit activity:*), Bash(ambykit trace:*)");
+    // converge also runs `ambykit edit status` (feature 030), so that verb is granted too
+    expect(tools("converge")).toBe("Read, Edit, Bash(ambykit activity:*), Bash(ambykit trace:*), Bash(ambykit edit:*)");
     expect(tools("plan")).toBe("Read, Write, Edit, Bash(ambykit activity:*)");
     expect(tools("implement")).toBe("Read, Write, Edit, Bash");
     expect(tools("analyze")).toBe("Read");

@@ -25,8 +25,8 @@ export interface GraphJson {
   version: number;
   nodes: { id: string; feature: string; story: string; title: string; status: string; priority: string }[];
   edges: { from: string; to: string; kind: EdgeKind }[];
-  featureEdges: { from: string; to: string; via: { from: string; to: string; kind: EdgeKind }[] }[];
-  broken: { from: string; to: string; kind: EdgeKind; reason: string }[];
+  featureEdges: { from: string; to: string; via: { from: string; to: string; kind: EdgeKind }[]; declared?: true }[];
+  broken: { from: string; to: string; kind: EdgeKind; reason: string; scope?: "feature" }[];
   cycles: string[][];
 }
 
@@ -45,8 +45,8 @@ export function toJson(graph: DependencyGraph): GraphJson {
       priority: n.priority,
     })),
     edges: graph.edges.map(edge),
-    featureEdges: graph.featureEdges.map((f) => ({ from: f.from, to: f.to, via: f.via.map(edge) })),
-    broken: graph.broken.map((b) => ({ from: id(b.from), to: prettyRef(b.to), kind: b.kind, reason: b.reason })),
+    featureEdges: graph.featureEdges.map((f) => ({ from: f.from, to: f.to, via: f.via.map(edge), ...(f.declared ? { declared: true as const } : {}) })),
+    broken: graph.broken.map((b) => ({ from: id(b.from), to: prettyRef(b.to), kind: b.kind, reason: b.reason, ...(b.scope ? { scope: b.scope } : {}) })),
     cycles: graph.cycles.map((c) => c.stories.map(id)),
   };
 }
@@ -72,7 +72,8 @@ export function toText(graph: DependencyGraph): string {
   if (graph.featureEdges.length > 0) {
     out.push("", "Feature dependencies:");
     for (const f of graph.featureEdges) {
-      out.push(`  ${f.from} -> ${f.to}  (${f.via.map((e) => `${id(e.from)} ${e.kind} ${id(e.to)}`).join("; ")})`);
+      const why = [...(f.declared ? ["declared"] : []), ...f.via.map((e) => `${id(e.from)} ${e.kind} ${id(e.to)}`)];
+      out.push(`  ${f.from} -> ${f.to}  (${why.join("; ")})`);
     }
   }
 

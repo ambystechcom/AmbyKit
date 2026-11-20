@@ -37,6 +37,8 @@ export interface FeatureEdge {
   from: string;
   to: string;
   via: StoryEdge[];
+  /** Feature 030: the feature declares this dependency itself (frontmatter `depends-on`); `via` may then be empty. Absent = derived only. */
+  declared?: true;
 }
 
 /** A dependency that names something that does not exist (FR-004): `from` is a node key, `to` is the reference as written. */
@@ -45,6 +47,8 @@ export interface BrokenEdge {
   to: string;
   kind: EdgeKind;
   reason: BrokenReason;
+  /** Feature 030: `"feature"` when a feature-level `depends-on` names an unknown feature; `from` is then a feature directory. Absent = story-level. */
+  scope?: "feature";
 }
 
 /** A dependency cycle (FR-005): node keys in dependency order; a self-dependency is a cycle of one. */

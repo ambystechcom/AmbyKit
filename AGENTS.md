@@ -34,7 +34,7 @@ prompts) is translated by per-tool **emitters** into each assistant's native com
 ## Project structure
 
 ```
-src/cli/         BaseCommand + activity/add/analyze/check/dashboard/directive/fleet/graph/init/lane/mcp/restore/run/sync/trace/update/worktree + registry
+src/cli/         BaseCommand + activity/add/analyze/check/dashboard/directive/edit/fleet/graph/init/lane/mcp/migrate/restore/run/sync/trace/update/worktree + registry
 src/core/        CommandSpec model, template loader, feature-dir/numbering, dependency graph
 src/emitters/    BaseEmitter + per-tool subclasses + registry (target→emitter map)
 src/plugins/     emitter plugin API, loader, registry (experimental); src/testkit/ = published contract kit
@@ -52,7 +52,7 @@ specs/           AmbyKit's OWN feature specs (dogfooding)
 - `npm run build` — compile TypeScript to `dist/` (ESM, NodeNext).
 - `npm run typecheck` — type-check without emitting.
 - `npm test` — run Vitest (emitter snapshot tests + CLI e2e).
-- Node ≥ 20, ESM only (`"type": "module"`). Use `.js` extensions in relative imports.
+- Node ≥ 22, ESM only (`"type": "module"`). Use `.js` extensions in relative imports.
 
 ## Emitter contract (read before touching `src/emitters/`)
 
