@@ -18,6 +18,14 @@ Plugins: affected, see the `[plugin-api]` line below.
 
 ### Added
 
+- Official Antigravity plugin (feature 036): `@ambystech/ambykit-emitter-antigravity`, in `plugins/antigravity/`, provides both
+  Antigravity targets (`antigravity` and `antigravity-cli`) on the stable plugin API, with output byte-identical to the
+  built-in emitters (a test compares them with and without roles, MCP and rules, and with the shared `.agents/skills`
+  files of Codex and Pi). **In AmbyKit 2.0 Antigravity is no longer bundled and comes from this package** (see
+  `docs/migration.md`); in this version both targets are still bundled and nothing changes for you. A moved target is listed by
+  `init` and `add` as an official plugin to install first, and refused with the install lines (nothing is installed or
+  written), and a bundled target that will move gets a one-line notice with the package that will replace it; both stay silent
+  until 2.0.
 - Release tooling for the official plugins (feature 036, maintainers): plugins live in `plugins/<name>/` and are published by one extra
   workflow, `publish-plugins.yml`, from a GitHub Release tagged `plugin/<name>/v<x.y.z>`; `publish.yml` ignores those tags, `ci.yml` runs
   `npm run build:plugins`, and `scripts/plugin-release.mjs` checks the tag, the package and the plugin-API range before anything is

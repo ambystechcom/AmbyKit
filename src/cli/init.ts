@@ -5,6 +5,7 @@ import { applyFiles, writeIfAbsent } from "./io/fsops.js";
 import { buildEmittedFiles } from "../core/emit.js";
 import { classifyProject, describeSignals } from "../core/classify.js";
 import { saveConfig } from "../core/config.js";
+import { movedTargetRefusals } from "../core/moved-targets.js";
 import { packageVersion, templatesDir } from "../core/paths.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
 import { getTarget, TARGETS } from "../emitters/index.js";
@@ -65,6 +66,13 @@ export class InitCommand extends BaseCommand {
       tools = detectTools(target);
     }
 
+    // A target that moved to an official plugin is not added: say how to install it first (feature 036, FR-006, FR-010).
+    // Nothing is installed or written. There is no moved target before the 2.0 switch, so this is silent today.
+    const movedRefused = movedTargetRefusals(tools, (t) => getTarget(t) !== undefined);
+    if (movedRefused.length > 0) {
+      for (const line of movedRefused) this.error(line);
+      return 1;
+    }
     const unknown = tools.filter((t) => !getTarget(t));
     if (unknown.length > 0) {
       this.error(

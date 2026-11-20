@@ -110,6 +110,39 @@ The phase prompts (`/amby.implement`, `/amby.run` and the others) use it. If a v
 - **2.1** stops reading 1.x files and tells you to migrate with 2.0. It ships only once no migration issue has been
   open for a release.
 
+## Antigravity is a plugin in 2.0
+
+> **Takes effect when you upgrade to AmbyKit 2.0.** In 1.x Antigravity is still bundled and nothing here applies yet.
+
+AmbyKit 2.0 keeps Claude Code, Codex, Copilot, Cursor and OpenCode (with their variants `claude-vscode`, `copilot-cli`,
+`cursor-cli` and the `pi` alias) built in. **Both Antigravity targets, `antigravity` and `antigravity-cli`, move to an official
+plugin.** The files it writes are identical, so a project synced with 1.x has no diff afterwards.
+
+If your `.amby/config.json` lists either Antigravity target:
+
+1. Install the plugin in your project: `npm install --save-exact @ambystech/ambykit-emitter-antigravity`.
+2. List it, pinned to the exact installed version, next to your tools (the target ids do not change):
+
+   ```json
+   {
+     "tools": ["claude", "antigravity", "antigravity-cli"],
+     "plugins": { "@ambystech/ambykit-emitter-antigravity": "1.0.0" }
+   }
+   ```
+
+3. Run `ambykit sync`. It writes nothing new; `ambykit check` should pass.
+
+Until you do, `sync`, `check` and `update` name the target and print these two lines, keep syncing your other targets, exit
+non-zero, and **never delete or rewrite** the files Antigravity already has. AmbyKit does not install the package or edit your
+config for you. Read [plugin trust](./plugin-trust.md) first: a plugin is code that runs on your machine.
+
+`init` and `add` list Antigravity as "official plugin, install first" and refuse it with the same lines until the plugin is
+installed and listed. The files stay shared with Codex and Pi under `.agents/skills/`: removing one owner from your config
+leaves them for the others.
+
+Seven other targets (`gemini`, `llxprt`, `qwen`, `kilo`, `augment`, `windsurf`, `kiro`) stay bundled in 2.0 and print a one-line
+notice naming the plugin that will replace each one once it is published. Nothing to do yet.
+
 ## Also in 2.0
 
 - **Node 22 or newer.** An older Node exits with a message naming the required version.

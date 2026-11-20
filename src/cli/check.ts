@@ -12,7 +12,7 @@ import { featureWorktrees } from "../core/worktree.js";
 import { ROLES_DIR, loadRoles, validateRoles } from "../core/roles.js";
 import { SHIPPED_ROLES } from "../core/scaffold.js";
 import { legacyWorkflowFiles } from "../core/legacy.js";
-import { movedTarget, movedTargetNotices } from "../core/moved-targets.js";
+import { deprecatedTargetNotices, movedTarget, movedTargetNotices } from "../core/moved-targets.js";
 import { loadPluginSession } from "../plugins/session.js";
 import { reportPlugins } from "../plugins/report.js";
 
@@ -54,6 +54,8 @@ export class CheckCommand extends BaseCommand {
       this.warn(notice);
       ok = false;
     }
+    // Bundled targets that will move once their plugin is published: a notice only, nothing is removed (feature 036, FR-002, C-4).
+    for (const notice of deprecatedTargetNotices(config.tools)) this.warn(notice);
     for (const t of config.tools) {
       if (!getTarget(t, registry) && !movedTarget(t)) {
         this.warn(`Configured tool '${t}' is not a known target.`);

@@ -8,7 +8,7 @@ import { loadConfig } from "../core/config.js";
 import { installArtifactTemplates } from "../core/scaffold.js";
 import { loadRoles, validateRoles } from "../core/roles.js";
 import type { TargetRegistry } from "../plugins/registry.js";
-import { movedTargetNotices } from "../core/moved-targets.js";
+import { deprecatedTargetNotices, movedTargetNotices } from "../core/moved-targets.js";
 import { getTarget } from "../emitters/index.js";
 import { loadPluginSession } from "../plugins/session.js";
 import { reportPlugins } from "../plugins/report.js";
@@ -53,6 +53,8 @@ export class SyncCommand extends BaseCommand {
     // FR-004): say which package to install and how to list it, keep syncing the others, exit 1, and remove nothing (FR-005).
     const movedMissing = movedTargetNotices(config.tools, (id) => getTarget(id, session?.registry) !== undefined);
     for (const notice of movedMissing) this.error(notice);
+    // Bundled targets that will move once their plugin is published: a notice only, nothing is removed (feature 036, FR-002, C-4).
+    for (const notice of deprecatedTargetNotices(config.tools)) this.warn(notice);
     const pluginStatus = plugins.errors.length > 0 || movedMissing.length > 0 ? 1 : 0;
 
     const spin = this.spinner();
