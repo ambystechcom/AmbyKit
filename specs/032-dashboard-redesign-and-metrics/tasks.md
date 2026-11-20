@@ -115,9 +115,9 @@ created: 2026-11-19
 
 ## Phase 12 — Polish and integration
 
-- [ ] [T110] [P] Docs: dashboard tabs, keys, filters, metrics and `--metrics` (docs/cli-reference.md, site/src/content/docs/cli/index.mdx)
-- [x] [T111] [P] Changelog entry under [Unreleased] (CHANGELOG.md) ↪ DEVIATION: the entry says "in progress"; it is updated when the tab frame lands
+- [x] [T110] [P] Docs: dashboard tabs, keys, filters, metrics and `--metrics` (docs/cli-reference.md, site/src/content/docs/cli/index.mdx)
+- [x] [T111] [P] Changelog entry under [Unreleased] (CHANGELOG.md) (updated when the tab frame landed: "in progress" removed, the tabs, shared filter, FLOW panel and grouped fleet tab described)
 - [ ] [T112] Integration batch after merging: re-record goldens (`UPDATE_GOLDEN=1 npx vitest run test/emitters-golden.test.ts`), `ambykit sync` twice, `npm run typecheck`, `npm test` (test/fixtures/emitters-golden/)
 - [ ] [T113] Dogfood: a keys-only tour of all four tabs with a search and a filter on this repo's own specs and history, record the result under 032 SC-001 and SC-007 (specs/032-dashboard-redesign-and-metrics/research.md)
-- **Verify:** `npm run typecheck` and `npm test` pass; sync is a no-op the second time; the tour in T113 is recorded. ? unverified until a person runs T113.
+- **Verify:** `npm run typecheck` and `npm test` pass; sync is a no-op the second time; the tour in T113 is recorded. ✓ passed: typecheck, the full suite (apart from the known dashboard-worktrees 1 s timing flake, which passes alone) and `node scripts/check-docs-sync.mjs`. ? unverified: T112 (goldens and `sync` run once after merging, not in this branch) and T113 (the keys-only tour, a person task)
 - **Checkpoint:** 032 releasable.
