@@ -1,0 +1,8 @@
+{
+  "lane": "lane-1-2",
+  "full": "028-ambykit-run.lane-1-2",
+  "assistant": "codex",
+  "status": "conflict",
+  "restarts": 0,
+  "reason": "conflicts in shared.txt, specs/028-ambykit-run/tasks.md — merge it by hand"
+}

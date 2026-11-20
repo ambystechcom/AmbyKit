@@ -1,0 +1,9 @@
+{
+  "lane": "lane-1-2",
+  "full": "028-ambykit-run.lane-1-2",
+  "assistant": "codex",
+  "status": "queued",
+  "restarts": 0,
+  "startedAt": "2026-11-20T07:48:19.514Z",
+  "reason": "interrupted"
+}
