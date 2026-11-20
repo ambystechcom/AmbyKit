@@ -74,7 +74,7 @@ export class FleetCommand extends BaseCommand {
     // Feature 031: `fleet fleets [<fleet>]` (or a fleet id) shows the multi-feature fleets; the single-run commands are unchanged.
     if (sub === "fleets") return this.fleets(root, featureArg, opts);
     if (sub && isFleetId(sub)) return this.fleets(root, sub, opts);
-    if (!(SUBCOMMANDS as readonly string[]).includes(sub)) {
+    if (!sub || !(SUBCOMMANDS as readonly string[]).includes(sub)) {
       this.error(sub ? `Unknown fleet command '${sub}'.` : "Missing fleet command.", `Usage: ${this.usage}`);
       return 1;
     }
