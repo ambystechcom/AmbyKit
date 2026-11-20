@@ -32,10 +32,10 @@ created: 2026-11-20
 
 ## Phase 3 — User story US-1  (priority: P1)
 
-- [ ] [T020] [US1] Fill the `run` contract blocks: flags, exit codes 0 and 1, structure of the plan and finish lines, `.amby/fleet/` layout, directive protocol (docs/stability.md)
-- [ ] [T021] [US1] Fill the plugin contract blocks: exported names, descriptor shape, loading rules, kit exports; state that unlisted things are not covered and additions are allowed in a minor release (docs/stability.md)
-- [ ] [T022] [US1] Tests: every promise has a check; an unlisted name is not asserted; additions do not fail the contract test — 033:FR-001, FR-002, FR-003, FR-013 (test/stability-contract.test.ts)
-- **Verify:** `npx vitest run test/stability-contract.test.ts` passes and `node scripts/check-docs-sync.mjs` is clean.
+- [x] [T020] [US1] Fill the `run` contract blocks: flags, exit codes 0 and 1, structure of the plan and finish lines, `.amby/fleet/` layout, directive protocol (docs/stability.md)
+- [x] [T021] [US1] Fill the plugin contract blocks: exported names, descriptor shape, loading rules, kit exports; state that unlisted things are not covered and additions are allowed in a minor release (docs/stability.md)
+- [x] [T022] [US1] Tests: every promise has a check; an unlisted name is not asserted; additions do not fail the contract test — 033:FR-001, FR-002, FR-003, FR-013 (test/stability-contract.test.ts)
+- **Verify:** `npx vitest run test/stability-contract.test.ts` passes and `node scripts/check-docs-sync.mjs` is clean. ✓ passed
 - **Checkpoint:** US-1 done; the contract is readable and enforced.
 
 ## Phase 4 — User story US-5  (priority: P2, needed by US-4 and US-6)

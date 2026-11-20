@@ -183,4 +183,30 @@ describe.skipIf(!HAS_GIT)("the stability contract matches the code (feature 033)
     expect(text).toMatch(/not listed[^.]*(not covered|is not a breaking change)/i);
   });
 
+  it("033:FR-001: the document lists something for `run`, for the plugin API and for the kit, and every `run` promise named in US-1 is there", () => {
+    for (const surface of ["run", "plugin", "kit"]) {
+      const c = contractFor(blocks, surface);
+      const items = Object.entries(c).filter(([k, v]) => k !== "surface" && Array.isArray(v) && v.length > 0);
+      expect(items.length, `the ${surface} surface lists nothing`).toBeGreaterThan(0);
+    }
+    // US-1: flags, exit codes, the printed plan and finish lines, the fleet state files and the directive protocol.
+    const run = contractFor(blocks, "run");
+    for (const key of ["flags", "exitCodes", "printed", "stateFiles", "directiveActions", "directiveFields"]) {
+      expect((run[key] as unknown[] | undefined)?.length ?? 0, `run lists no ${key}`).toBeGreaterThan(0);
+    }
+    // US-1: the exported names, the descriptor shape, the loading rules and the kit.
+    const plugin = contractFor(blocks, "plugin");
+    for (const key of ["exports", "descriptor", "loadingRules"]) {
+      expect((plugin[key] as unknown[] | undefined)?.length ?? 0, `plugin lists no ${key}`).toBeGreaterThan(0);
+    }
+    expect((contractFor(blocks, "kit")["exports"] as unknown[] | undefined)?.length ?? 0).toBeGreaterThan(0);
+  });
+
+  it("033:FR-013, 033:SC-004: removing a listed fact from the code side fails the check (a state file, a printed line, an export)", () => {
+    const withoutState: Facts = { ...facts, stateFiles: new Set([...facts.stateFiles].filter((f) => !f.endsWith("budget.json"))) };
+    expect(checkContract(blocks, withoutState).join("\n")).toContain("budget.json");
+    expect(checkContract(blocks, { ...facts, runOutput: "" }).join("\n")).toContain("Run plan for");
+    const noBase: Facts = { ...facts, exports: { ...facts.exports, plugin: { ...facts.exports.plugin, values: new Set([...facts.exports.plugin.values].filter((v) => v !== "BaseEmitter")) } } };
+    expect(checkContract(blocks, noBase).join("\n")).toContain("BaseEmitter");
+  });
 });
