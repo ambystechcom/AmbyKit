@@ -42,7 +42,7 @@ async function bestMs(root: string, flags: Record<string, string | boolean>): Pr
 }
 
 describe.skipIf(!HAS_GIT)("dashboard JSON fields and one-second budget (feature 032, US-5)", () => {
-  it("032:FR-010: every recorded --json and --json --overview field is still present", async () => {
+  it("032:FR-010, FR-020: every recorded --json and --json --overview field is still present with the 030 reader in place", async () => {
     const root = worktreePerfFixture(8, 2);
     const now = {
       json: [...new Set(fieldPaths(JSON.parse((await run(root, { json: true })).out)))].sort(),
@@ -55,7 +55,7 @@ describe.skipIf(!HAS_GIT)("dashboard JSON fields and one-second budget (feature 
     expect(recorded.overview.length).toBeGreaterThan(5);
   });
 
-  it("032:FR-009: one-shot and --json stay under one second on the largest fixture", async () => {
+  it("032:FR-009, FR-020: one-shot and --json stay under one second on the largest fixture with the 030 reader in place", async () => {
     const root = worktreePerfFixture(50, 10);
     expect(await bestMs(root, {})).toBeLessThan(BUDGET_MS);
     expect(await bestMs(root, { json: true, overview: true })).toBeLessThan(BUDGET_MS);

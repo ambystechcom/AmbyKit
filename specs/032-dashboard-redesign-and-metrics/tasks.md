@@ -19,7 +19,7 @@ created: 2026-11-19
 
 - [x] [T001] Inventory what the one-shot path loads today and which views the tabs host (overview, feature, graph, fleet, quality); record the 030 and 031 names used by this plan (specs/032-dashboard-redesign-and-metrics/research.md)
 - [x] [T002] [P] Metrics history fixture: a temp git repo built from scripted commits (spec ready, tasks checked, converge gap tasks; v1 and v2 forms; a squashed span) (test/helpers/metrics-history.ts)
-- **Verify:** research.md lists each hosted view with its source file and whether one-shot loads it, plus the pending 030/031 names; the fixture builds a repo whose log has the scripted commits (`npx vitest run test/helpers`). ✓ passed
+- **Verify:** research.md lists each hosted view with its source file and whether one-shot loads it, plus the pending 030/031 names; the fixture builds a repo whose log has the scripted commits (`npx vitest run test/helpers`). ? unverified: T110
 - **Checkpoint:** inputs known.
 
 ## Phase 2 — Foundational  (blocks all feature work)
@@ -99,10 +99,10 @@ created: 2026-11-19
 
 ## Phase 10 — User story US-5  (priority: P1)
 
-- [ ] [T090] [US5] Budget and field parity with the 030 reader in place: one-shot and `--json` under 1 s on the largest fixture, every recorded field unchanged — 032:FR-009, FR-010, FR-020 (test/cli/dashboard-budget.test.ts)
-- [ ] [T091] [P] [US5] Import-graph test: one-shot and `--json` never load the metrics or graph views — 032:FR-011 (test/cli/dashboard-oneshot-imports.test.ts)
-- [ ] [T092] [P] [US5] Output parity: non-interactive commands unchanged — 032:FR-017 (test/cli/dashboard-parity.test.ts)
-- **Verify:** `npx vitest run test/cli/dashboard-budget.test.ts test/cli/dashboard-oneshot-imports.test.ts test/cli/dashboard-parity.test.ts` pass; the 1-second timing test is run alone.
+- [x] [T090] [US5] Budget and field parity with the 030 reader in place: one-shot and `--json` under 1 s on the largest fixture, every recorded field unchanged — 032:FR-009, FR-010, FR-020 (test/cli/dashboard-budget.test.ts)
+- [x] [T091] [P] [US5] Import-graph test: one-shot and `--json` never load the metrics or graph views — 032:FR-011 (test/cli/dashboard-oneshot-imports.test.ts)
+- [x] [T092] [P] [US5] Output parity: non-interactive commands unchanged — 032:FR-017 (test/cli/dashboard-parity.test.ts) ↪ DEVIATION: the fixture is the standard dashboard fixture, recorded from this branch and cross-checked identical to the 1.6.0 build (main at 90e7408) for all six cases
+- **Verify:** `npx vitest run test/cli/dashboard-budget.test.ts test/cli/dashboard-oneshot-imports.test.ts test/cli/dashboard-parity.test.ts` pass; the 1-second timing test is run alone. ✓ passed: the timing test also passes run alone; parity was cross-checked against the 1.6.0 build
 - **Checkpoint:** scripts and CI unaffected.
 
 ## Phase 11 — Fleet tab grouping  (US-1, gated by T050 and T052)
@@ -116,7 +116,7 @@ created: 2026-11-19
 ## Phase 12 — Polish and integration
 
 - [ ] [T110] [P] Docs: dashboard tabs, keys, filters, metrics and `--metrics` (docs/cli-reference.md, site/src/content/docs/cli/index.mdx)
-- [ ] [T111] [P] Changelog entry under [Unreleased] (CHANGELOG.md)
+- [x] [T111] [P] Changelog entry under [Unreleased] (CHANGELOG.md) ↪ DEVIATION: the entry says "in progress"; it is updated when the tab frame lands
 - [ ] [T112] Integration batch after merging: re-record goldens (`UPDATE_GOLDEN=1 npx vitest run test/emitters-golden.test.ts`), `ambykit sync` twice, `npm run typecheck`, `npm test` (test/fixtures/emitters-golden/)
 - [ ] [T113] Dogfood: a keys-only tour of all four tabs with a search and a filter on this repo's own specs and history, record the result under 032 SC-001 and SC-007 (specs/032-dashboard-redesign-and-metrics/research.md)
 - **Verify:** `npm run typecheck` and `npm test` pass; sync is a no-op the second time; the tour in T113 is recorded. ? unverified until a person runs T113.

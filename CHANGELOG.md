@@ -18,6 +18,12 @@ Plugins: not affected.
 
 ### Added
 
+- Dashboard metrics and keys (feature 032, in progress): `ambykit dashboard --json --metrics` adds cycle time per phase
+  (spec, plan, tasks, converge) and the converge gap rate over time, from git history alone with no model call, read
+  through the per-file reader so 1.x and 2.x history agree; the interactive dashboard loads them after the first paint
+  without blocking. In `--interactive`, `1`-`4` and `]`/`[` switch between the overview, Fleet, graph and quality
+  views, `/` searches feature names, and `?` lists the keys. One-shot and `--json` output is unchanged and never loads
+  the metrics, graph or Fleet code. The tab bar and the metrics panel arrive with the signed-off design.
 - Multi-feature fleets (feature 031, experimental like `run`): `ambykit run 030 031 032` or `--all-ready` plans the lanes of
   several features as one fleet and shows the plan first (nothing starts without `--yes`). A feature waits for the one it
   depends on (feature-level `depends-on` or a story edge) until that feature's lanes are merged into its branch, features that

@@ -262,8 +262,24 @@ Detection reads the process list only, never sends anything, and stops when you 
   status, and `others[]`); without a run the key is absent, so the output is byte-identical to before
   (`specs/029-fleet-control-room/contracts/dashboard-json-fleet.md`). Bare `--json` is unchanged.
 
+**Switching views and searching.** In `--interactive`, `1`-`4` (or `]` and `[`) switch between the overview,
+the Fleet view, the dependency graph and the quality view from any screen (`tab` still moves between panels in
+the overview); `?` lists the keys. `f` filters features by number or exact name, `/` searches feature names and
+numbers by text, `s` cycles the status filter and `esc` clears them.
+
+**Workflow metrics.** `ambykit dashboard --json --metrics` adds a `metrics` object to the `--json --overview`
+output (without the flag nothing is added or loaded). It is computed from git history alone, locally, with no model
+call: `phases` has the cycle time per phase (spec: first commit to the commit that sets it `ready`; plan: first
+plan commit to the first tasks commit; tasks: first tasks commit to every task checked; converge: first converge run
+to every gap task checked) per feature and the median, and `gap` has one point per converge run: gap tasks appended
+divided by the feature's requirement count. A converge run is a `tasks.md` commit that adds tasks closing a
+requirement (`(closes FR-###)`). `enough` is `false` (with a `reason`) when fewer than 3 features have a
+completed phase or no converge run is recorded; `skipped` counts revisions that could not be read. Revisions are read
+through the same per-file reader as everything else, so 1.x, 2.x and mixed history give the same numbers.
+
 ```bash
 ambykit dashboard
+ambykit dashboard --json --metrics      # + cycle time per phase and converge gap rate
 ambykit dashboard --interactive          # full-screen overview (TTY only)
 ambykit dashboard --feature=014          # feature view
 ambykit dashboard --next=10              # longer Up next list
