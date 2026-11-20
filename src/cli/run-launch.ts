@@ -1,3 +1,4 @@
+import { runDirRel } from "../core/fleet/index.js";
 import { runnable } from "../core/runners.js";
 import { nextToStart } from "../core/run-schedule.js";
 import { lanePromptText, laneOpenTasks } from "./run-plan.js";
@@ -30,7 +31,7 @@ export function startJob(s: Session, rt: LaneRuntime, job: JobKind, opts: { find
   }
   const prompt =
     job === "worker"
-      ? lanePromptText(rt.ref, s.run, laneOpenTasks(rt.ref), opts.findings)
+      ? lanePromptText(rt.ref, s.run, laneOpenTasks(rt.ref), opts.findings, runDirRel(s.root, s.run))
       : rolePromptText(s, rt, job);
   const file = writePromptFile(s.root, s.run, job === "worker" ? rt.file.lane : `${rt.file.lane}.${job}.${rt.round}`, prompt);
   const command = can.runner.invoke({ prompt, promptFile: file, ...(s.settings.workerModel ? { model: s.settings.workerModel } : {}) });
@@ -77,7 +78,7 @@ export function launchQueued(s: Session, phase: number): number {
   if (queue.length === 0) return 0;
   const toStart = nextToStart(
     queue.map((l) => ({ lane: l.file.lane, assistant: l.assistant })),
-    running(s).map((l) => ({ lane: l.file.lane, assistant: l.assistant })),
+    [...running(s).map((l) => ({ lane: l.file.lane, assistant: l.assistant })), ...(s.slots?.() ?? [])],
     s.settings.concurrency,
   );
   let n = 0;

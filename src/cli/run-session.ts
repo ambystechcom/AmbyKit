@@ -55,6 +55,11 @@ export interface Session {
   reportsUsage: boolean;
   /** Prompts for a decision in the foreground (TTY), when one is available. */
   ask?: (question: string) => Promise<boolean | undefined>;
+  /**
+   * Feature 031: the lanes running in the OTHER sessions of the same fleet. They count toward the total and
+   * per-type caps, so the caps hold across the fleet. Absent (a single run) means today's behavior exactly.
+   */
+  slots?: () => { lane: string; assistant: string }[];
 }
 
 /** Persist a lane's file after changing it. */

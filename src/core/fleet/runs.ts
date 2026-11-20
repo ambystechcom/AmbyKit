@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 import { primaryRoot } from "../checkouts.js";
 import { fleetSettings, loadConfig } from "../config.js";
 import { withLock, writeFileAtomic } from "./lock.js";
@@ -18,8 +18,52 @@ export function fleetRoot(root: string): string {
   return join(primaryRoot(root), FLEET_DIR);
 }
 
+/** A fleet directory name (feature 031): `fleet-<n>`. Never a run id (a run id ends in `.<n>`). */
+const FLEET_ID = /^fleet-\d+$/;
+
+export function isFleetId(s: string): boolean {
+  return FLEET_ID.test(s);
+}
+
+/** `.amby/fleet/<fleet>/`: where a fleet's record and its per-feature runs live (031 D1). */
+export function fleetDir(root: string, fleet: string): string {
+  return join(fleetRoot(root), fleet);
+}
+
+/** The fleet directories that exist, oldest first. */
+export function fleetIds(root: string): string[] {
+  const dir = fleetRoot(root);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && isFleetId(e.name))
+    .map((e) => e.name)
+    .sort((a, b) => Number(a.slice(6)) - Number(b.slice(6)));
+}
+
+/**
+ * A run's directory. A flat single run is `.amby/fleet/<run>/`; a run made by a fleet is nested one level down,
+ * `.amby/fleet/fleet-<n>/<run>/`. Every reader and writer goes through here, so a nested run is found by the same
+ * calls as a flat one (031 FR-021, D1).
+ */
 export function runDir(root: string, run: string): string {
-  return join(fleetRoot(root), run);
+  const flat = join(fleetRoot(root), run);
+  if (existsSync(flat)) return flat;
+  for (const id of fleetIds(root)) {
+    const nested = join(fleetDir(root, id), run);
+    if (existsSync(nested)) return nested;
+  }
+  return flat;
+}
+
+/** The run directory relative to the primary checkout, `/`-separated: what a prompt tells an assistant to write into. */
+export function runDirRel(root: string, run: string): string {
+  return relative(primaryRoot(root), runDir(root, run)).split(sep).join("/");
+}
+
+/** The fleet a run belongs to, or undefined for a flat single run. */
+export function fleetOfRun(root: string, run: string): string | undefined {
+  if (existsSync(join(fleetRoot(root), run))) return undefined;
+  return fleetIds(root).find((id) => existsSync(join(fleetDir(root, id), run)));
 }
 
 const RUN_ID = /^[a-z0-9][a-z0-9-]*\.\d+$/i;
@@ -67,14 +111,24 @@ function runNumber(run: string): number {
   return Number(run.slice(run.lastIndexOf(".") + 1));
 }
 
-/** Every readable run, optionally one feature's, oldest first (by run number). */
-export function listRuns(root: string, feature?: string): RunRecord[] {
+/** Run directory names under `.amby/fleet/` and under each `fleet-<n>/` (031: nested runs). */
+function runNames(root: string): string[] {
   const dir = fleetRoot(root);
   if (!existsSync(dir)) return [];
+  const names: string[] = [];
+  const scan = (d: string): void => {
+    for (const e of readdirSync(d, { withFileTypes: true })) if (e.isDirectory() && isRunId(e.name)) names.push(e.name);
+  };
+  scan(dir);
+  for (const id of fleetIds(root)) scan(fleetDir(root, id));
+  return names;
+}
+
+/** Every readable run, optionally one feature's, oldest first (by run number). A fleet's nested runs are included. */
+export function listRuns(root: string, feature?: string): RunRecord[] {
   const runs: RunRecord[] = [];
-  for (const e of readdirSync(dir, { withFileTypes: true })) {
-    if (!e.isDirectory() || !isRunId(e.name)) continue;
-    const rec = readRun(root, e.name);
+  for (const name of runNames(root)) {
+    const rec = readRun(root, name);
     if (rec && (!feature || rec.feature === feature)) runs.push(rec);
   }
   return runs.sort((a, b) => runNumber(a.run) - runNumber(b.run) || a.run.localeCompare(b.run));
@@ -89,7 +143,7 @@ export type RunResult = { ok: true; run: RunRecord } | { ok: false; warning: str
 export function createRun(
   root: string,
   feature: string,
-  init: Partial<Pick<RunRecord, "phase" | "stage" | "limit" | "lanes" | "gates">> = {},
+  init: Partial<Pick<RunRecord, "phase" | "stage" | "limit" | "lanes" | "gates">> & { fleet?: string } = {},
 ): RunResult {
   const primary = primaryRoot(root);
   ensureFleetRoot(root);
@@ -110,7 +164,8 @@ export function createRun(
       escalations: [],
       createdAt: new Date().toISOString(),
     };
-    writeFileAtomic(join(runDir(root, record.run), "run.json"), JSON.stringify(record, null, 2) + "\n");
+    const where = init.fleet ? join(fleetDir(root, init.fleet), record.run) : runDir(root, record.run);
+    writeFileAtomic(join(where, "run.json"), JSON.stringify(record, null, 2) + "\n");
     return record;
   });
   return locked.ok ? { ok: true, run: locked.value } : { ok: false, warning: locked.warning };
@@ -154,12 +209,10 @@ export function resolveRun(root: string, feature: string, requested?: string): R
  * skip them, so this is how a damaged run is found. Ids come from the directory name.
  */
 export function damagedRuns(root: string, feature: string): string[] {
-  const dir = fleetRoot(root);
-  if (!existsSync(dir)) return [];
   const out: string[] = [];
-  for (const e of readdirSync(dir, { withFileTypes: true })) {
-    if (!e.isDirectory() || !isRunId(e.name) || e.name.slice(0, e.name.lastIndexOf(".")) !== feature) continue;
-    if (!readRun(root, e.name)) out.push(e.name);
+  for (const name of runNames(root)) {
+    if (name.slice(0, name.lastIndexOf(".")) !== feature) continue;
+    if (!readRun(root, name)) out.push(name);
   }
   return out.sort();
 }

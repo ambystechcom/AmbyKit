@@ -23,6 +23,8 @@ export interface LanePromptOptions {
   findings?: string[];
   /** The protocol wording shared with spec 019's worker persona (reporting cadence and directive text). */
   protocol?: string;
+  /** The run directory relative to the project root; `.amby/fleet/<run>` for a single run, nested in a fleet's directory for a fleet's (feature 031). */
+  runDir?: string;
 }
 
 export const shortName = (lane: string): string => lane.slice(lane.lastIndexOf(".lane-") + 1);
@@ -35,7 +37,7 @@ export function buildLanePrompt(lane: PromptLane, opts: LanePromptOptions): stri
   const lines: string[] = [];
   if (opts.findings && opts.findings.length > 0) {
     lines.push(`You are the worker of lane ${name} of ${lane.feature} (run ${opts.run}). Fix exactly these review findings and nothing else: ${opts.findings.join(", ")}.`);
-    lines.push(`Read: ${refs}. The findings are in the verdict files under .amby/fleet/${opts.run}/verdicts/. Report one line per ID: <id>: fixed (<files>).`);
+    lines.push(`Read: ${refs}. The findings are in the verdict files under ${opts.runDir ?? `.amby/fleet/${opts.run}`}/verdicts/. Report one line per ID: <id>: fixed (<files>).`);
   } else {
     lines.push(
       `You are the worker of lane ${name} of ${lane.feature} (run ${opts.run}), phase ${lane.phase}. Build only these tasks, in order, and check each off in tasks.md: ${open.join(", ") || "(none left)"}.`,
@@ -66,6 +68,8 @@ export interface RolePromptInput {
   artifacts: string[];
   /** The verdict file the role writes, relative to the run directory. */
   verdictFile: string;
+  /** The run directory relative to the project root (default `.amby/fleet/<run>`); a fleet's runs are nested (feature 031). */
+  runDir?: string;
 }
 
 /** QA and architect jobs: the role by `@` reference, the phase's Verify line, and where to write the verdict. */
@@ -74,6 +78,6 @@ export function buildRolePrompt(input: RolePromptInput): string {
   return [
     `Act as the ${input.role} reviewer: follow @${input.roleFile}. Review lane ${shortName(input.lane)} of ${input.feature}, phase ${input.phase}, round ${input.round}. Read: ${refs}.`,
     input.verify ? `Run this check and judge its result: ${input.verify}` : "The phase has no Verify line: review the lane's diff against the plan.",
-    `Write your verdict to .amby/fleet/${input.run}/${input.verdictFile} as JSON: {"verdict":"pass"|"fail","findings":[{"id","severity","finding","fix"}]}. A fail needs at least one finding with an id. Edit no other file.`,
+    `Write your verdict to ${input.runDir ?? `.amby/fleet/${input.run}`}/${input.verdictFile} as JSON: {"verdict":"pass"|"fail","findings":[{"id","severity","finding","fix"}]}. A fail needs at least one finding with an id. Edit no other file.`,
   ].join("\n");
 }

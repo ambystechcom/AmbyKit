@@ -17,7 +17,10 @@ import {
   damagedRuns,
   determinePhase,
   directiveAction,
+  fleetsLines,
+  fleetsView,
   freeSlots,
+  isFleetId,
   laneStatus,
   listRuns,
   nextRoundAction,
@@ -55,8 +58,10 @@ import {
  *   fleet release <feature> T###
  *   fleet note <feature> T### <text> [--files=a,b]
  *   fleet directive <feature> <lane>         print the lane's directive: continue, pause or stop
+ *   fleet fleets [<fleet>] [--json]          (031) every fleet of several features: its features, runs and lanes
  */
 const SUBCOMMANDS = ["start", "status", "update", "claim", "release", "note", "directive"] as const;
+/** Feature 031: `fleets` is the overview of multi-feature fleets; it takes no feature, so it is not in SUBCOMMANDS. */
 
 export class FleetCommand extends BaseCommand {
   readonly name = "fleet";
@@ -66,6 +71,9 @@ export class FleetCommand extends BaseCommand {
   protected async execute(opts: CliOptions): Promise<number> {
     const root = findProjectRoot(opts.cwd) ?? opts.cwd;
     const [sub, featureArg, ...rest] = opts.positionals;
+    // Feature 031: `fleet fleets [<fleet>]` (or a fleet id) shows the multi-feature fleets; the single-run commands are unchanged.
+    if (sub === "fleets") return this.fleets(root, featureArg, opts);
+    if (sub && isFleetId(sub)) return this.fleets(root, sub, opts);
     if (!sub || !(SUBCOMMANDS as readonly string[]).includes(sub)) {
       this.error(sub ? `Unknown fleet command '${sub}'.` : "Missing fleet command.", `Usage: ${this.usage}`);
       return 1;
@@ -95,6 +103,20 @@ export class FleetCommand extends BaseCommand {
       default:
         return this.directive(root, feature, rest, opts);
     }
+  }
+
+  // --- fleets of several features (031) -------------------------------------------------
+
+  private fleets(root: string, only: string | undefined, opts: CliOptions): number {
+    const view = fleetsView(root);
+    const shown = only ? { fleets: view.fleets.filter((f) => f.fleet === only) } : view;
+    if (only && shown.fleets.length === 0) {
+      this.error(`Fleet '${only}' not found.`);
+      return 1;
+    }
+    if (flag(opts, "json")) console.log(JSON.stringify(shown));
+    else for (const line of fleetsLines(shown, only)) console.log(line);
+    return 0;
   }
 
   // --- start (US-1, FR-014) -----------------------------------------------------
