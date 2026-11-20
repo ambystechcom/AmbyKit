@@ -144,11 +144,18 @@ export async function runFleet(root: string, args: string[], opts: CliOptions, d
     return 1;
   }
   const plan: FleetPlan = planned.value;
+  const assistants = assistantsOf(root, opts);
+  const reportsUsage = assistants.length > 0 && assistants.every((a) => deps.registry.find((r) => r.id === a)?.reportsUsage === true);
+  // a token ceiling is only enforceable where every runner reports usage (028's rule); say so up front (FR-011)
+  const ceilingNote = plan.budgets.maxTokens !== undefined && !reportsUsage ? "Token ceiling: not enforceable for this fleet (a runner does not report usage); the wall-clock and task budgets still apply." : undefined;
 
   if (!cont) {
     if (!allReady && plan.features.length === 1) return { single: plan.features[0]!.feature };
-    if (json) console.log(JSON.stringify({ ...(planJson(plan) as object), launched: false, launching: flag(opts, "yes") }));
-    else for (const line of planLines(plan)) io.info(line);
+    if (json) console.log(JSON.stringify({ ...(planJson(plan) as object), launched: false, launching: flag(opts, "yes"), ...(plan.budgets.maxTokens !== undefined ? { tokenCeilingEnforced: ceilingNote === undefined } : {}) }));
+    else {
+      for (const line of planLines(plan)) io.info(line);
+      if (ceilingNote) io.info(ceilingNote);
+    }
     if (!(flag(opts, "yes") || flag(opts, "y"))) {
       if (!json) io.info("Nothing launched. Re-run with --yes to start this fleet.");
       return 0;
@@ -156,7 +163,6 @@ export async function runFleet(root: string, args: string[], opts: CliOptions, d
   }
 
   // --- refuse unverified runners before anything starts (028 FR-006) ---------------------
-  const assistants = assistantsOf(root, opts);
   if (assistants.length === 0) {
     io.error("No assistants to run lanes on.", "Set `tools` in .amby/config.json or pass --assistant=<id>.");
     return 1;
@@ -178,6 +184,7 @@ export async function runFleet(root: string, args: string[], opts: CliOptions, d
       if (changes.length > 0) io.info(`Re-planned ${record.fleet}; changed since it was planned: ${changes.join("; ")}.`);
       else io.info(`Continuing ${record.fleet}: nothing changed since it was planned.`);
     }
+    if (ceilingNote && !json) io.info(ceilingNote);
     record.status = "active";
   } else {
     const made = createFleet(root, { features: plan.features, caps: plan.caps, budgets: plan.budgets, unattended });
@@ -190,7 +197,6 @@ export async function runFleet(root: string, args: string[], opts: CliOptions, d
   const prepareFor = new Map(plan.prepare.map((p) => [p.feature, p.lanes]));
   const caps = existing?.caps ?? settings.concurrency;
   const fleetSettingsForSessions: FleetSettings = { ...settings, concurrency: caps };
-  const reportsUsage = assistants.every((a) => deps.registry.find((r) => r.id === a)?.reportsUsage === true);
 
   // --- the loop --------------------------------------------------------------------------
   let sup!: FleetSupervisor;

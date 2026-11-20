@@ -72,10 +72,10 @@ created: 2026-11-19
 
 ## Phase 7 — User story US-5  (priority: P1)
 
-- [ ] [T060] [US5] Wire the `slots` hook across all sessions with the fleet default of 3 total and 2 per type, overriding 028's per-feature cap inside a fleet (src/cli/run-fleet-loop.ts, test/cli/run-fleet-caps.test.ts)
-- [ ] [T061] [US5] Fleet-wide budgets: sum meters over sessions, stop starting new work at a ceiling (src/cli/run-fleet-loop.ts, src/cli/run-fleet-budget.ts, test/cli/run-fleet-budget.test.ts)
-- [ ] [T062] [US5] Say so when a token ceiling is set and a runner reports no usage (src/cli/run-fleet-budget.ts, test/cli/run-fleet-budget-usage.test.ts)
-- **Verify:** `npx vitest run test/cli/run-fleet-caps.test.ts test/cli/run-fleet-budget.test.ts test/cli/run-fleet-budget-usage.test.ts` pass; no more than the configured lanes, in total and per type, run at once.
+- [x] [T060] [US5] Wire the `slots` hook across all sessions with the fleet default of 3 total and 2 per type, overriding 028's per-feature cap inside a fleet (src/cli/run-fleet-loop.ts, test/cli/run-fleet-caps.test.ts) ↪ DEVIATION: wired in run-fleet.ts (each session gets the fleet caps as its concurrency and slots: () => sup.slotsFor(feature)), not in the loop file; measured over real sessions with workers that stay alive
+- [x] [T061] [US5] Fleet-wide budgets: sum meters over sessions, stop starting new work at a ceiling (src/cli/run-fleet-loop.ts, src/cli/run-fleet-budget.ts, test/cli/run-fleet-budget.test.ts) ↪ DEVIATION: the fleet budget decision is in the loop (core/fleet-plan/budget.ts over 028's budgetDecision) and each session stops through the extracted beginStop in run-budget.ts; no src/cli/run-fleet-budget.ts
+- [x] [T062] [US5] Say so when a token ceiling is set and a runner reports no usage (src/cli/run-fleet-budget.ts, test/cli/run-fleet-budget-usage.test.ts) ↪ DEVIATION: the note is printed by the plan preview and the JSON preview (tokenCeilingEnforced) in run-fleet.ts; 028's own message is used when the ceiling is the reason a stop happens
+- **Verify:** `npx vitest run test/cli/run-fleet-caps.test.ts test/cli/run-fleet-budget.test.ts test/cli/run-fleet-budget-usage.test.ts` pass; no more than the configured lanes, in total and per type, run at once. ✓ passed
 - **Checkpoint:** US-5 is demoable.
 
 ## Phase 8 — User stories US-6 and US-8  (priority: P2)
