@@ -5,6 +5,7 @@ import { effectiveColumns, tabLayout } from "./layout.js";
 import { glyph, panel } from "./panel.js";
 import { renderTabBar, type TabBadges } from "./tab-bar.js";
 import { TAB_TOKENS as T } from "./tab-tokens.js";
+import { TOKENS } from "./tokens.js";
 import type { Tab } from "../interactive/tabs.js";
 
 /**
@@ -58,6 +59,29 @@ export function tabEmptyBody(caps: Capabilities, tab: Tab): string[] {
 export function tabErrorLine(caps: Capabilities, source: string, reason: string): string {
   const e = T.component["tab-body"].error;
   return paintToken(caps, e.fg, `${glyph(caps, e.glyph)} could not read ${source}: ${reason}`);
+}
+
+const ANSI = /\x1b\[[0-9;?]*[A-Za-z]/g;
+
+/**
+ * Keep a tab body within the terminal's height (flicker fix). A frame taller than the screen scrolls the alternate screen
+ * on every repaint, which shows as flicker and pushes the tab bar off the top. The body is windowed around the cursor row
+ * (the line that starts with the cursor glyph, after any panel frame), with a `⋮ n more` row above and below like the
+ * worktrees panel; the tab bar, filter line and footer are never cut. `avail` is the number of body rows that fit.
+ */
+export function fitBodyToRows(caps: Capabilities, lines: string[], avail: number): string[] {
+  const n = lines.length;
+  if (avail < 4 || n <= avail) return lines;
+  const cursor = glyph(caps, TOKENS.semantic.symbol.cursor);
+  const at = lines.findIndex((l) => l.replace(ANSI, "").replace(/^[\s┃│#|]+/, "").startsWith(cursor));
+  // The cursor sits at least two rows from the bottom of the window so the "more below" row never replaces it.
+  const start = at < 0 || at <= avail - 3 ? 0 : Math.min(at - (avail - 3), n - avail);
+  const out = lines.slice(start, start + avail);
+  const e = TOKENS.component.elision;
+  const mark = (hidden: number, where: "above" | "below"): string => paintToken(caps, e.fg, `${glyph(caps, e.glyph)}  ${hidden} more ${where}`);
+  if (start > 0) out[0] = mark(start, "above");
+  if (start + avail < n) out[out.length - 1] = mark(n - start - avail, "below");
+  return out;
 }
 
 export interface TabFrameInput {

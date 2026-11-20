@@ -23,7 +23,8 @@ function expectParity(d: OverviewTuiData, s: OverviewTuiState): void {
 }
 
 describe("existing views keep every line in their tab (feature 032, FR-003)", () => {
-  const d = tabData();
+  // Parity is about content, so use a terminal tall enough to show it all (a short one windows the body: tabs-fit-rows.test.ts).
+  const d = tabData({ rows: 200 });
 
   it("032:FR-003: the overview tab", () => {
     expectParity(d, initOverviewTui());

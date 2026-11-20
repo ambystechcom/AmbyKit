@@ -12,7 +12,7 @@ import type { FleetViewApi } from "../dashboard/fleet-view.js";
 import type { FleetTabApi } from "../dashboard/fleet-tab.js";
 import { renderMetricsPanel } from "../dashboard/metrics-panel.js";
 import type { TabBadges } from "../dashboard/tab-bar.js";
-import { noMatchBody, renderFilterLine, renderTabFrame, tabEmptyBody } from "../dashboard/tab-frame.js";
+import { fitBodyToRows, noMatchBody, renderFilterLine, renderTabFrame, tabEmptyBody } from "../dashboard/tab-frame.js";
 import { tabLayout } from "../dashboard/layout.js";
 import { applyListFilter } from "./list-filter.js";
 import type { GraphViewApi, GraphViewModel } from "../dashboard/graph-view.js";
@@ -639,7 +639,11 @@ function tabFramed(caps: Capabilities, data: OverviewTuiData, state: OverviewTui
     : tabLayout(caps) === "narrow"
       ? keyHints(caps, [["1-4", "tab"], ["?", "help"], ["q", "quit"]])
       : `${keyHints(caps, [["1-4", "tab"], ["] [", "next/prev"]])}  ${hints}`;
-  return `${renderTabFrame(caps, { active: tab, badges: tabBadges(data), filterLine, body })}\n\n${footer}`;
+  // Never draw more rows than the terminal has (flicker fix): the tab bar, the filter line and the footer stay, the body is
+  // windowed around the cursor when it is too tall. Without a terminal height (tests, one-shot) nothing is cut.
+  const fixed = 1 + (filterLine ? 1 : 0) + 1 + footer.split("\n").length;
+  const fitted = data.rows === undefined ? body : fitBodyToRows(caps, body.split("\n"), data.rows - fixed).join("\n");
+  return `${renderTabFrame(caps, { active: tab, badges: tabBadges(data), filterLine, body: fitted })}\n\n${footer}`;
 }
 
 function renderScreen(caps: Capabilities, data: OverviewTuiData, state: OverviewTuiState): { frame: string; screen: HelpScreen } {
