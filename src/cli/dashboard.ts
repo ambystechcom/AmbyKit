@@ -358,9 +358,13 @@ export class DashboardCommand extends BaseCommand {
       update?.((s) => ({ ...s, now, changed: new Set(), changedTasks: new Set() }));
       void scan().then((found) => {
         if (stopped || found === null) return;
-        matches = matchAgents(found, allCheckouts(checkouts), process.pid);
+        const next = matchAgents(found, allCheckouts(checkouts), process.pid);
+        // The scan returns a moment after the beat's own repaint: repaint again only when who is working changed,
+        // so a quiet heartbeat paints once, not twice.
+        const changed = JSON.stringify(next) !== JSON.stringify(matches);
+        matches = next;
         data = withBurndown({ ...data, presence: presenceOf(data.features, Date.now()) });
-        update?.((s) => ({ ...s }));
+        if (changed) update?.((s) => ({ ...s }));
       });
     };
 
