@@ -271,7 +271,7 @@ export class DashboardCommand extends BaseCommand {
     const withBurndown = (d: Omit<OverviewTuiData, "burndownFor">): OverviewTuiData => ({
       ...d,
       burndownFor: (f) => {
-        const key = JSON.stringify([f.feature ?? null, f.status ?? null]);
+        const key = JSON.stringify([f.feature ?? null, f.search ?? null, f.status ?? null]);
         if (!cache.has(key)) cache.set(key, this.burndown(root, d.features, f, maxPeriods));
         return cache.get(key)!;
       },

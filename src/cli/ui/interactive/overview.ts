@@ -20,6 +20,7 @@ import { paintToken } from "../theme.js";
 import type { Capabilities } from "../types.js";
 import type { FleetTuiState } from "./fleet.js";
 import type { KeyEvent } from "./fullscreen.js";
+import { tabForKey, type Tab } from "./tabs.js";
 
 /**
  * Interactive dashboard (features 014 and 017). Pure reducer + renderer over injected data; the
@@ -75,8 +76,10 @@ export interface OverviewTuiState {
   focus: Panel;
   cursors: [number, number, number, number];
   filters: Filters;
-  /** Feature-filter text being typed after `f`; null when not typing. */
+  /** Feature-filter text being typed after `f` (or search text after `/`); null when not typing. */
   input: string | null;
+  /** The field being typed is the free-text search (`/`), not the exact feature filter (`f`). */
+  searching?: boolean;
   feature: string | null; // dir, in feature view
   story: StoryNav | null;
   /** Feature 023: the graph view's cursor over the open stories; null outside the graph view. */
@@ -258,13 +261,18 @@ export function applyData(state: OverviewTuiState, prev: OverviewTuiData, next: 
 export function reduceOverviewTui(data: OverviewTuiData, state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
   if (state.help) return { ...state, help: false }; // any key closes help and is not passed on
   if (state.input !== null) return reduceInput(state, key);
-  if (state.quality) return key.name === "q" ? { ...state, done: true } : { ...state, quality: false };
   // An open Fleet confirmation owns the next key (even `?`), so a stray key can only cancel it (029 FR-008).
   if (state.view === "fleet" && state.fleet?.confirm) return reduceFleetView(data, state, key);
+  // Feature 032 (FR-004): `1`-`4`, `]` and `[` switch tabs from any screen; anything else is not a tab key.
+  const target = key.ctrl ? null : tabForKey(tabOf(state), key);
+  if (target) return selectTab(data, state, target);
+  if (state.quality) return key.name === "q" ? { ...state, done: true } : { ...state, quality: false };
   if (key.sequence === "?") return { ...state, help: true };
   if (state.view === "fleet") return reduceFleetView(data, state, key);
   if (state.view === "feature") return reduceFeature(data, state, key);
   if (state.view === "graph") return reduceGraph(data, state, key);
+  // `/` opens a free-text search over feature names and numbers (feature 032, US-3); `f` keeps the exact feature filter.
+  if (key.sequence === "/") return { ...state, input: state.filters.search ?? "", searching: true };
 
   switch (key.name) {
     case "q":
@@ -289,11 +297,11 @@ export function reduceOverviewTui(data: OverviewTuiData, state: OverviewTuiState
     case "enter":
       return openSelected(data, state);
     case "escape":
-      return state.filters.feature || state.filters.status ? { ...state, filters: {}, cursors: NO_CURSORS } : state;
+      return state.filters.feature || state.filters.status || state.filters.search ? { ...state, filters: {}, cursors: NO_CURSORS } : state;
     case "c":
       return { ...state, quality: true };
     case "f":
-      return { ...state, input: state.filters.feature ?? "" };
+      return { ...state, input: state.filters.feature ?? "", searching: false };
     case "s": {
       const i = STATUS_CYCLE.indexOf(state.filters.status);
       const status = STATUS_CYCLE[(i + 1) % STATUS_CYCLE.length];
@@ -304,11 +312,38 @@ export function reduceOverviewTui(data: OverviewTuiData, state: OverviewTuiState
   }
 }
 
+/** The tab a state is on: the feature view and story detail belong to the overview tab. */
+export function tabOf(state: OverviewTuiState): Tab {
+  if (state.quality) return "quality";
+  if (state.view === "fleet") return "fleet";
+  if (state.view === "graph") return "graph";
+  return "overview";
+}
+
+/** Switch to `tab`. A tab whose view is not available (no graph or fleet view injected) leaves the state unchanged. */
+function selectTab(data: OverviewTuiData, state: OverviewTuiState, tab: Tab): OverviewTuiState {
+  const here = tabOf(state);
+  // Pressing the overview key from the feature view goes back up to the overview; any other same-tab key is a no-op.
+  if (tab === here && !(tab === "overview" && state.view !== "overview")) return state;
+  const cleared: OverviewTuiState = { ...state, view: "overview", feature: null, story: null, graph: null, fleet: null, quality: false };
+  switch (tab) {
+    case "overview":
+      return cleared;
+    case "fleet":
+      return data.fleetView ? { ...cleared, view: "fleet", fleet: data.fleetView.init() } : state;
+    case "graph":
+      return data.graphView ? { ...cleared, view: "graph", graph: { cursor: 0 } } : state;
+    case "quality":
+      return { ...cleared, quality: true };
+  }
+}
+
 function reduceInput(state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
   const text = state.input ?? "";
-  if (key.name === "escape") return { ...state, input: null };
+  if (key.name === "escape") return { ...state, input: null, searching: false };
   if (key.name === "return" || key.name === "enter") {
-    return { ...state, input: null, filters: { ...state.filters, feature: text || undefined }, cursors: NO_CURSORS };
+    const filters = state.searching ? { ...state.filters, search: text || undefined } : { ...state.filters, feature: text || undefined };
+    return { ...state, input: null, searching: false, filters, cursors: NO_CURSORS };
   }
   if (key.name === "backspace") return { ...state, input: text.slice(0, -1) };
   const ch = key.sequence ?? "";
@@ -393,20 +428,20 @@ function keyHints(caps: Capabilities, pairs: [string, string][]): string {
 }
 
 function filterNote(filters: Filters): string {
-  const parts = [filters.feature ? `feature=${filters.feature}` : "", filters.status ? `status=${filters.status}` : ""].filter(Boolean);
+  const parts = [filters.feature ? `feature=${filters.feature}` : "", filters.search ? `search=${filters.search}` : "", filters.status ? `status=${filters.status}` : ""].filter(Boolean);
   return parts.length ? `  [${parts.join(" ")}]` : "";
 }
 
 const FILTER_FIELD = 36;
 
 /** FilterInput (ui.md US-4): ` filter  ( 017▏          )   ⏎ apply  esc cancel` in the hint row. */
-function filterInput(caps: Capabilities, value: string): string {
+function filterInput(caps: Capabilities, value: string, label = "filter"): string {
   const t = LIVE_TOKENS.component.input;
   const caret = caps.unicode ? t.caret.u : t.caret.a;
   const shown = value.length > FILTER_FIELD - 2 ? value.slice(-(FILTER_FIELD - 2)) : value;
   const field = paintToken(caps, t.fg, shown) + paintToken(caps, t["frame-fg"], caret) + " ".repeat(Math.max(0, FILTER_FIELD - 1 - shown.length));
   const frame = (s: string) => paintToken(caps, t["frame-fg"], s);
-  return ` ${paintToken(caps, t["label-fg"], "filter")}  ${frame("(")} ${field}${frame(")")}   ${keyHints(caps, [[caps.unicode ? "⏎" : "enter", "apply"], ["esc", "cancel"]])}`;
+  return ` ${paintToken(caps, t["label-fg"], label)}  ${frame("(")} ${field}${frame(")")}   ${keyHints(caps, [[caps.unicode ? "⏎" : "enter", "apply"], ["esc", "cancel"]])}`;
 }
 
 function metaOf(caps: Capabilities, data: OverviewTuiData, state: OverviewTuiState): HeaderMeta {
@@ -418,7 +453,7 @@ function emptyLines(caps: Capabilities, data: OverviewTuiData, filters: Filters)
   if (data.features.length === 0) {
     return emptyState(caps, "No feature specs yet.", { before: "Run ", command: "/amby.specify", after: " to create one." }, caps.columns);
   }
-  return ["", noMatchLine(caps, [filters.feature, filters.status].filter(Boolean).join(" "))];
+  return ["", noMatchLine(caps, [filters.feature, filters.search, filters.status].filter(Boolean).join(" "))];
 }
 
 function renderScreen(caps: Capabilities, data: OverviewTuiData, state: OverviewTuiState): { frame: string; screen: HelpScreen } {
@@ -505,7 +540,7 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
   });
   const footer =
     state.input !== null
-      ? filterInput(caps, state.input)
+      ? filterInput(caps, state.input, state.searching ? "search" : "filter")
       : keyHints(caps, [
           ["tab", "panel"],
           [move, "move"],

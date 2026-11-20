@@ -38,31 +38,29 @@ created: 2026-11-19
 - [x] [T020] Revisions edge: list the commits touching a feature's spec and tasks and read their text in batch, reusing burndown's cat-file reader, capped at 500 commits (src/core/metrics/revisions.ts)
 - [x] [T021] [P] `phaseCycle`: first commit touching an artifact to the first commit that sets it complete (spec ready or done, all tasks checked); in progress yields no end (src/core/metrics/cycle.ts)
 - [x] [T022] [P] `gapRate`: gap tasks appended per converge commit divided by the requirement count; a commit is a converge run when it appends tasks marked as gap tasks (src/core/metrics/gap.ts)
-- [x] [T023] `readMetrics`: parse every revision through the per-file reader, skip and count unreadable ones, median per phase, `enough: false` under 3 completed features or 0 converge runs, starting on the shipped parsers behind one `readRevisionModel` function (T051 swaps in spec 030's reader) (src/core/metrics/index.ts, src/core/index.ts)
-  ↪ DEVIATION: spec 030 was already merged, so the reader is `readSpec`/`readTasks` from the first commit; `readRevisionModel` calls the dispatcher with a version below the 1.x refusal, so history stays readable after 2.1 (T051 is satisfied here)
+- [x] [T023] `readMetrics`: parse every revision through the per-file reader, skip and count unreadable ones, median per phase, `enough: false` under 3 completed features or 0 converge runs, starting on the shipped parsers behind one `readRevisionModel` function (T051 swaps in spec 030's reader) (src/core/metrics/index.ts, src/core/index.ts) ↪ DEVIATION: spec 030 was already merged, so the reader is `readSpec`/`readTasks` from the first commit; `readRevisionModel` calls the dispatcher with a version below the 1.x refusal, so history stays readable after 2.1 (T051 is satisfied here)
 - [x] [T024] [P] Tests for cycle time: complete, in progress, rewritten history — 032:FR-007 (test/core/metrics-cycle.test.ts)
 - [x] [T025] [P] Tests for gap rate: several converge runs, none, requirement count zero — 032:FR-007 (test/core/metrics-gap.test.ts)
 - [x] [T026] Tests for `readMetrics`: v1 history, too little history, unreadable revision skipped and counted, large-history cap, no network and no model call, mixed v1/v2 history once 030 is merged — 032:FR-007, FR-008, FR-016, FR-019 (test/core/metrics-read.test.ts)
 - [x] [T027] `ambykit dashboard --json --metrics`: opt-in additive `metrics` field; nothing added without the flag (src/cli/dashboard.ts, test/cli/dashboard-metrics-json.test.ts)
-- [x] [T028] Interactive loading: read metrics after the first paint without blocking, deliver the result to state; failure leaves the other tabs working (src/cli/dashboard.ts, src/cli/ui/interactive/overview.ts)
-  ↪ DEVIATION: delivered as `metricsState` on the overview data with its own async git reads (`readMetricsAsync`); the panel that shows it waits for the design (T062)
+- [x] [T028] Interactive loading: read metrics after the first paint without blocking, deliver the result to state; failure leaves the other tabs working (src/cli/dashboard.ts, src/cli/ui/interactive/overview.ts) ↪ DEVIATION: delivered as `metricsState` on the overview data with its own async git reads (`readMetricsAsync`); the panel that shows it waits for the design (T062)
 - **Verify:** `npx vitest run test/core/metrics-cycle.test.ts test/core/metrics-gap.test.ts test/core/metrics-read.test.ts test/cli/dashboard-metrics-json.test.ts` pass; `node dist/cli/index.js dashboard --json --metrics` on this repo prints a `metrics` object (or `enough: false`). ✓ passed: on this repo the command reports 33 spec cycles and 2 converge runs
 - **Checkpoint:** US-4 data works headless; no panel yet (design-gated).
 
 ## Phase 4 — User story US-2  (priority: P1)
 
-- [ ] [T030] [US2] Wire tab keys into the reducer: `1`-`4`, `tab`, `shift-tab`; a key with no meaning leaves the state unchanged (src/cli/ui/interactive/overview.ts)
-- [ ] [T031] [P] [US2] Help overlay lists the keys from one key map, including tabs, filter and quit (src/cli/ui/dashboard/help-overlay.ts)
-- [ ] [T032] [US2] Tests: a keys-only tour (tab, move, open detail, back, quit), help lists the keys, a dead key changes nothing, the terminal is restored on quit, interrupt and error — 032:FR-004, FR-005 (test/ui/overview-tabs-keys.test.ts)
-- **Verify:** `npx vitest run test/ui/overview-tabs-keys.test.ts test/ui/fullscreen.test.ts` pass and the existing overview reducer tests are unchanged.
+- [x] [T030] [US2] Wire tab keys into the reducer: `1`-`4`, `tab`, `shift-tab`; a key with no meaning leaves the state unchanged (src/cli/ui/interactive/overview.ts) ↪ DEVIATION: `tab`/`shift-tab` keep moving panel focus in the overview (existing behaviour and tests), so tabs use `1`-`4` and `]`/`[`; the tab is derived from the view (`tabOf`), no new state field
+- [x] [T031] [P] [US2] Help overlay lists the keys from one key map, including tabs, filter and quit (src/cli/ui/dashboard/help-overlay.ts) ↪ DEVIATION: the one key map is `KEY_MAP` in help-overlay.ts, with the tab keys on every screen
+- [x] [T032] [US2] Tests: a keys-only tour (tab, move, open detail, back, quit), help lists the keys, a dead key changes nothing, the terminal is restored on quit, interrupt and error — 032:FR-004, FR-005 (test/ui/overview-tabs-keys.test.ts)
+- **Verify:** `npx vitest run test/ui/overview-tabs-keys.test.ts test/ui/fullscreen.test.ts` pass and the existing overview reducer tests are unchanged. ✓ passed
 - **Checkpoint:** US-2 reducer-complete; the tab bar itself waits for the design.
 
 ## Phase 5 — User story US-3  (priority: P2)
 
-- [ ] [T040] [US3] Wire the list filter into the reducer: `/` searches, `s` cycles the state filter, `esc` clears (src/cli/ui/interactive/overview.ts)
-- [ ] [T041] [P] [US3] Plain-text filter line and the no-match message with how to clear (src/cli/ui/dashboard/filter-line.ts)
-- [ ] [T042] [US3] Tests: search by text and ID, filter by state, nothing matches, clear restores the list — 032:FR-006 (test/ui/overview-filter.test.ts)
-- **Verify:** `npx vitest run test/ui/overview-filter.test.ts test/ui/list-filter.test.ts` pass.
+- [x] [T040] [US3] Wire the list filter into the reducer: `/` searches, `s` cycles the state filter, `esc` clears (src/cli/ui/interactive/overview.ts) ↪ DEVIATION: the overview keeps its `Filters` model (exact `f` feature filter, `s` status, `esc`); `/` adds a free-text search (`Filters.search`, matched in `applyFilters`). The `ListFilter` slice (T011) is built and tested but is not yet wired to the story and lane lists: where their filter line goes is a design decision (T050)
+- [x] [T041] [P] [US3] Plain-text filter line and the no-match message with how to clear (src/cli/ui/dashboard/filter-line.ts) ↪ DEVIATION: the module holds the plain text for the story and lane lists; the overview keeps its pinned `[feature=… status=…]` note and no-match line (014/017 tests)
+- [x] [T042] [US3] Tests: search by text and ID, filter by state, nothing matches, clear restores the list — 032:FR-006 (test/ui/overview-filter.test.ts)
+- **Verify:** `npx vitest run test/ui/overview-filter.test.ts test/ui/list-filter.test.ts` pass. ✓ passed: the overview feature list; story and lane lists are not wired yet (see T040)
 - **Checkpoint:** US-3 demoable on the existing overview.
 
 ## Phase 6 — Person gates  (block Phases 7–9 and 11)
@@ -70,7 +68,7 @@ created: 2026-11-19
 - [ ] [T050] Person task: run `/amby.design` for the tab frame, tab bar, metrics panel and state tokens, review and sign off; record `signed_off` (specs/032-dashboard-redesign-and-metrics/ui.md, specs/032-dashboard-redesign-and-metrics/design-tokens.json)
 - [x] [T051] Gate: spec 030 merged into main (reader and writer available); then switch T023's `readRevisionModel` to the dispatcher (src/core/metrics/index.ts)
 - [x] [T052] Gate: spec 031 merged into main (lane grouping across features available); record its function name (specs/032-dashboard-redesign-and-metrics/research.md)
-- **Verify:** `ui.md` exists with `signed_off` set; `src/core/spec-format/dispatch.ts` is on main; 031's grouping function is exported. ✓ passed
+- **Verify:** `ui.md` exists with `signed_off` set; `src/core/spec-format/dispatch.ts` is on main; 031's grouping function is exported. ? unverified: T050 (the /amby.design sign-off) is open; T051 and T052 are satisfied
 - **Checkpoint:** design signed off; 030 and 031 available.
 
 ## Phase 7 — User story US-1  (priority: P1)

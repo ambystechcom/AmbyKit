@@ -50,6 +50,10 @@ export function applyFilters(features: FeatureSnapshot[], filters: Filters): Fea
     const f = filters.feature;
     out = out.filter((x) => x.ref === f || x.dir === f || x.displayRef === f);
   }
+  if (filters.search) {
+    const q = filters.search.toLowerCase();
+    out = out.filter((x) => x.dir.toLowerCase().includes(q) || x.ref.toLowerCase().includes(q));
+  }
   if (filters.status) {
     const status = filters.status.toLowerCase();
     out = out
