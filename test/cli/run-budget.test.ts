@@ -39,13 +39,6 @@ describe.skipIf(!HAS_GIT)("budgets (feature 028)", () => {
     expect(readBudget(p.root, h.run).tasksUsed).toBe(4);
   });
 
-  it("028:FR-013: with no budget flags the defaults are 120 minutes and twice the open tasks", async () => {
-    const p = await preparedProject(F, 4, 2);
-    const h = harness(p);
-    expect(h.s.budgets.wallClockMinutes).toBe(120);
-    expect(h.s.budgets.maxTasks).toBe(16);
-  });
-
   it("028:FR-013: a token ceiling is reported as not enforceable when the runner does not report usage, and the run is not stopped by it", async () => {
     const p = await preparedProject(F, 4, 2);
     const h = harness(p, { budgets: { maxTokens: 10 }, usage: false });
@@ -111,9 +104,14 @@ describe.skipIf(!HAS_GIT)("budgets (feature 028)", () => {
     expect(readBudget(p.root, h.run).tasksUsed).toBe(4);
   });
 
-  it("028:FR-013: elapsed wall-clock time accumulates across ticks", async () => {
+  // The defaults check (no budget flags: 120 minutes and twice the open tasks) read the same fresh harness and shared this setup.
+  // Note: the harness passes a fixed openTasks of 8 to resolveBudgets, so 16 is twice 8, not twice this project's 4 open tasks;
+  // the real `ambykit run` default for a (4, 2) project is 8 (see run-budget-flow).
+  it("028:FR-013: with no budget flags the defaults are 120 minutes and twice the open tasks; elapsed wall-clock time accumulates across ticks", async () => {
     const p = await preparedProject(F, 4, 2);
     const h = harness(p);
+    expect(h.s.budgets.wallClockMinutes).toBe(120);
+    expect(h.s.budgets.maxTasks).toBe(16);
     script(h, p, { hang: true, work: false });
     await h.step();
     h.advance(3);
