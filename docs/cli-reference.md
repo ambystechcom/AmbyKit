@@ -326,6 +326,7 @@ ambykit fleet claim 019 T012 src/a.ts [--worker=<id>]   # refused, naming the ow
 ambykit fleet release 019 T012
 ambykit fleet note 019 T012 --files=src/a.ts "one-line note"
 ambykit fleet directive 019 lane-1-1     # prints continue, pause or stop
+ambykit fleet fleets [<fleet>] [--json]  # fleets of several features: features, runs and lanes, with causes
 ```
 
 `start` creates nothing for a feature that is already done or whose spec, plan or tasks are missing or draft.
@@ -384,6 +385,48 @@ ambykit run approve <run> --reassign=lane-1-1:codex  # a person's approval to mo
   exits; `--continue-run` carries on and repeats no completed task.
 - **State** is `.amby/fleet/<run>/`, the same layout `/amby.run` uses, so either host can inspect, pause or
   continue the other's run. Nothing is written outside the project.
+
+### Fleets: several features at once (experimental)
+
+Name several features, or `--all-ready`, and `run` plans their lanes as **one fleet**: one command schedules the
+lanes of every feature, each feature keeps its own worktree, run, gates and merge, and one supervisor owns what is
+shared. One feature, however it is named or repeated, is the single run described above and behaves exactly as
+before.
+
+```bash
+ambykit run 030 031 032                 # print the fleet plan (order, waits, shared files, caps, budgets); launch nothing
+ambykit run 030 031 032 --yes           # start it
+ambykit run --all-ready --yes           # every ready feature; the plan lists the skipped ones with reasons
+ambykit run --continue-fleet=fleet-1 --yes          # resume a stopped fleet: re-plans, repeats no completed lane
+ambykit run pause|stop|resume fleet-1   # one directive per lane of every feature, through spec 025's writer
+ambykit fleet fleets [fleet-1] [--json] # every feature's run and lanes, why a feature is paused, what it holds
+```
+
+- **Order.** A feature waits for what it depends on: its feature-level `depends-on` (2.x frontmatter) and any story
+  edge (`NNN:US-#`), read through the same per-file reader as everything else, so 1.x, 2.x and mixed projects behave
+  alike. A dependency that is not in the fleet and not done, or a cycle, stops the plan before anything starts.
+- **Shared files.** Features that own the same file are serialized, in dependency order and then by feature
+  number, and the plan names the shared files. A task with no usable ownership (no trailing path, no `files` entry,
+  or a glob) is flagged by id as `unknown ownership: T###`, and its feature is treated as owning everything.
+- **"Merged".** A feature is ready for what waits for it when its lanes are merged into **its own branch**. Merging a
+  feature into `main` stays a person's decision. Before a dependent (or a serialized feature) starts, the finished
+  feature's branch is merged into its branch and its prepared lanes are brought up to date; a conflict pauses that
+  feature only and is never resolved automatically.
+- **Lanes.** A feature with no prepared lanes gets them from `ambykit lane` when it starts (2 lanes, after its
+  dependencies are merged, so they branch from the merged result); when that fails the feature pauses with the exact
+  `ambykit lane` command to run by hand. Only the next set is prepared: prepare later phases yourself.
+- **Caps and budgets are fleet-wide.** `fleet.concurrency` (default 3 in total, 2 of one assistant) counts the lanes
+  of every feature, and overrides the per-feature use of the same setting, which applies only when a feature runs
+  alone. Wall-clock, task events and the token ceiling are the fleet's: task events and tokens are summed,
+  wall-clock is the fleet's own elapsed time. A token ceiling is enforced only where every runner reports usage, and
+  the plan says so when it cannot be.
+- **Containment.** A feature whose lane pauses, conflicts or is escalated pauses, and so does everything that depends
+  on it (it is *held*); independent features keep running. Resuming the lane releases the dependents. A story
+  checkpoint or a merge conflict waits only its own feature.
+- **State** is `.amby/fleet/fleet-<n>/`: `fleet.json` (features in planned order, what each waits for, ownership,
+  a fingerprint of what the plan was made from) and the per-feature runs `<feature>.<n>/`, nested one level down.
+  `report_activity` without a run finds a feature's unfinished run there. `--continue-fleet` re-plans, says which
+  features changed since (edited tasks or dependencies), and continues the same runs.
 
 `run` uses the single `fleet` object in `.amby/config.json` (`stallMinutes`, `restartLimit`, `concurrency`,
 `roundLimit`, `tickSeconds`, `budgets`, `workerModel`) and adds two keys: `stopGraceMinutes` and `runners` (the

@@ -18,6 +18,14 @@ Plugins: not affected.
 
 ### Added
 
+- Multi-feature fleets (feature 031, experimental like `run`): `ambykit run 030 031 032` or `--all-ready` plans the lanes of
+  several features as one fleet and shows the plan first (nothing starts without `--yes`). A feature waits for the one it
+  depends on (feature-level `depends-on` or a story edge) until that feature's lanes are merged into its branch, features that
+  share a file run one after the other (the plan names the shared files and flags a task with no ownership as `unknown
+  ownership: T###`), caps and budgets cover the whole fleet, and a failing lane pauses only its feature and what depends on
+  it. State is `.amby/fleet/fleet-<n>/`; `--continue-fleet=<fleet>` re-plans and resumes without repeating a completed lane,
+  `ambykit run pause|stop|resume <fleet>` writes a directive for every lane, and `ambykit fleet fleets [--json]` shows every
+  feature's runs and lanes with the cause of a pause. A single feature runs exactly as before.
 - Spec format v2 (feature 030, **breaking in 2.0**): a spec's story data (priority, status, `depends-on`, `blocked-by`) lives
   in the frontmatter `stories:` list, headings carry the title only, and each `tasks.md` phase ends with one `yaml` block
   holding `files:` (what each task owns) and `verify:` (the phase's check and last result). Both files carry `format: 2`.

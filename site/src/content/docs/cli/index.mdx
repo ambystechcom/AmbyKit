@@ -286,6 +286,13 @@ ambykit run --runners                   # which headless runners are verified
 ambykit run approve|reject <run>        # a story checkpoint
 ```
 
+Name several features (`ambykit run 030 031 032`) or pass `--all-ready` to run them as **one fleet** (experimental): lanes
+are planned across features by file ownership and feature dependencies, a feature waits for the one it depends on
+(once that feature's lanes are merged into its branch), features that share a file run one after the other, caps and
+budgets apply to the whole fleet, and a failing lane pauses only its feature and what depends on it.
+`ambykit run --continue-fleet=<fleet>` resumes a stopped fleet, `ambykit run pause|stop|resume <fleet>` steers it, and
+`ambykit fleet fleets` shows every feature's lanes. A single feature is the run below, unchanged.
+
 Prepare lanes first with `ambykit lane`. The run restarts stalled lanes, reviews each finished lane (QA, then the
 architect) before merging it, merges one at a time, stops at story checkpoints, and enforces wall-clock and task
 budgets. State is `.amby/fleet/<run>/`, shared with `/amby.run`. See the CLI reference for every flag.

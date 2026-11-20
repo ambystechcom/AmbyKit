@@ -2,7 +2,7 @@
 feature: 031-multi-feature-fleets          # NNN-slug
 title: Multi-feature fleets
 branch: 031-multi-feature-fleets
-status: ready                     # draft | ready | in-progress | blocked | done
+status: in-progress                   # draft | ready | in-progress | blocked | done
 created: 2026-11-12
 ---
 
@@ -35,7 +35,7 @@ that I do not start, order and watch each feature by hand.
   lists every feature's lanes and the order they start in.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a list of feature numbers, When the fleet is started, Then it plans the lanes of all of them as
@@ -57,7 +57,7 @@ work never produces avoidable merge conflicts.
   after the first has merged.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given two features that own the same file, When the fleet is planned, Then they are serialized, in
@@ -84,7 +84,7 @@ built on what it needs.
   has merged.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given feature B depends on feature A, declared either by B's feature-level `depends-on` (v2 frontmatter,
@@ -106,7 +106,7 @@ problem does not stop unrelated work.
   independent feature continues.
 - **depends-on:** [US-3]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a lane fails or stalls (15 minutes with no report and no `tasks.md` change), When it has been
@@ -128,7 +128,7 @@ respects rate limits and cost.
   more of either at once.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a cap on concurrent assistants, When the fleet runs, Then no more than that many run at once and
@@ -153,7 +153,7 @@ feature, so that I can steer a fleet from one place.
   merges on its own, and the fleet status shows both.
 - **depends-on:** [US-1, US-4]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given several features running, When a person checks status, Then one view shows every feature's lanes
@@ -176,7 +176,7 @@ available work in one go.
   confirm only the right ones are selected.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given the all-ready option, When the fleet is planned, Then it selects features that are ready to run
@@ -195,7 +195,7 @@ As a developer, I want a fleet's state in files, so that I can stop it, inspect 
   repeated.
 - **depends-on:** [US-1]
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a running fleet, When a person inspects its state files, Then the features, lanes, order,
@@ -220,7 +220,7 @@ disturb them.
   same behavior.
 - **depends-on:** []
 - **blocked-by:** []
-- **status:** draft
+- **status:** done
 
 **Acceptance criteria**
 - Given a single feature, When it is run, Then its behavior, gates and merge are as in a single run.

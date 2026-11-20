@@ -102,11 +102,11 @@ created: 2026-11-19
 
 ## Phase 11 — Polish and integration
 
-- [ ] [T090] Docs: fleets in the run guide and `docs/cli-reference.md`, the fleet directory layout, the C-1 and C-2 rules, and the experimental status carried from 028 (docs/cli-reference.md, docs/architecture.md)
-- [ ] [T091] Changelog `[Unreleased]` entry with the `Plugins:` line, and the structure line in AGENTS.md if a verb is added (CHANGELOG.md, AGENTS.md)
-- [ ] [T092] `ambykit trace 031` shows every FR covered; fix any gap; `ambykit analyze` shows no cycles, dangling references or lane conflicts (specs/031-multi-feature-fleets/tasks.md)
+- [x] [T090] Docs: fleets in the run guide and `docs/cli-reference.md`, the fleet directory layout, the C-1 and C-2 rules, and the experimental status carried from 028 (docs/cli-reference.md, docs/architecture.md) ↪ DEVIATION: docs are in docs/cli-reference.md, the site CLI page and docs/architecture.md; check-docs-sync passes
+- [x] [T091] Changelog `[Unreleased]` entry with the `Plugins:` line, and the structure line in AGENTS.md if a verb is added (CHANGELOG.md, AGENTS.md) ↪ DEVIATION: the [Unreleased] entry (its Plugins line already says not affected); AGENTS.md needs no change because no verb was added (fleets is a subcommand of fleet, and run already lists)
+- [x] [T092] `ambykit trace 031` shows every FR covered; fix any gap; `ambykit analyze` shows no cycles, dangling references or lane conflicts (specs/031-multi-feature-fleets/tasks.md) ↪ DEVIATION: trace 031 shows 22/22 covered and 39/39 designed cases matched; analyze shows no cycles, dangling references or lane conflicts
 - [ ] [T093] Integration, once after merging: golden re-record, `ambykit sync` twice, full tests (test/fixtures/emitters-golden/)
 - [ ] [T094] **Person task, the 2.0 gate (SC-001):** with a verified live runner, build two dependent features with one fleet and no manual start, order or merge; record the run id and result (specs/031-multi-feature-fleets/research.md)
 - [ ] [T095] **Person task:** confirm which runners were verified for T094 and update 028's verified flags only on evidence (src/core/runners.ts)
-- **Verify:** `npm run typecheck`, `npm test` and `node dist/cli/index.js trace 031` pass; T094 is checked only after a real fleet run.
+- **Verify:** `npm run typecheck`, `npm test` and `node dist/cli/index.js trace 031` pass; T094 is checked only after a real fleet run. ? unverified: typecheck, the suite (all but the known dashboard-worktrees timing flake) and trace pass, but T093 (integration, after merging) has not run and T094 and T095 are person tasks
 - **Checkpoint:** 031 is releasable; the 2.0 fleet gate is recorded.
