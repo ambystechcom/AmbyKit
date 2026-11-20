@@ -32,11 +32,11 @@ created: 2026-11-20
 
 ## Phase 3 — User story US-1  (priority: P1)
 
-- [ ] [T020] [US1] Tests: a moved target with its plugin listed and installed emits the files the fixture plugin defines, and a built-in target is unchanged — 036:FR-003 (test/plugins/moved-installed.test.ts)
-- [ ] [T021] [US1] Tests: a moved target with no plugin names the target, prints the exact install and config lines, other targets still sync, exit is non-zero, no file is changed or deleted — 036:FR-004, FR-005 (test/plugins/moved-missing.test.ts)
-- [ ] [T022] [US1] Tests: `codex` plus a plugin target sharing `.agents/skills` keep the shared files; removing one owner leaves them (test/plugins/moved-shared-outputs.test.ts)
-- [ ] [T023] [US1] Tests: plugin installed but not listed, version mismatch, plugin outdated for the stable API, offline `update` — 036:FR-004 (test/plugins/moved-edge.test.ts)
-- **Verify:** `npx vitest run test/plugins` passes.
+- [x] [T020] [US1] Tests: a moved target with its plugin listed and installed emits the files the fixture plugin defines, and a built-in target is unchanged — 036:FR-003 (test/plugins/moved-installed.test.ts) ↪ DEVIATION: the per-command cases of T020/T021 already existed in test/plugins/moved-failure.test.ts (phase 2); these files add the byte-identity of moved vs not-moved output, the built-in unchanged check, the exact wording, a whole-tree snapshot (nothing changed or deleted), --dry-run and --check
+- [x] [T021] [US1] Tests: a moved target with no plugin names the target, prints the exact install and config lines, other targets still sync, exit is non-zero, no file is changed or deleted — 036:FR-004, FR-005 (test/plugins/moved-missing.test.ts)
+- [x] [T022] [US1] Tests: `codex` plus a plugin target sharing `.agents/skills` keep the shared files; removing one owner leaves them (test/plugins/moved-shared-outputs.test.ts)
+- [x] [T023] [US1] Tests: plugin installed but not listed, version mismatch, plugin outdated for the stable API, offline `update` — 036:FR-004 (test/plugins/moved-edge.test.ts) ↪ DEVIATION: TC-020 (offline update) cannot say "offline" because update treats an unknown latest version as "current" and refreshes the project; the test pins what matters instead (no install attempt, other targets refreshed, moved target named, --dry-run writes nothing). Whether update should print an offline line is T041
+- **Verify:** `npx vitest run test/plugins` passes (moved-installed 5, moved-missing 7, moved-shared-outputs 5, moved-edge 7 tests, plus the phase 2 files).
 - **Checkpoint:** US-1 done in core with the fixture plugin.
 
 ## Phase 4 — User story US-2  (priority: P1; ends in person gates)
