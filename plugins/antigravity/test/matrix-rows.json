@@ -1,0 +1,18 @@
+[
+  {
+    "target": "antigravity",
+    "commandSurface": "skills",
+    "commandDir": ".agents/skills",
+    "fileTemplate": "amby-<phase>/SKILL.md",
+    "frontmatterKeys": ["name", "description"],
+    "sourceUrl": "https://antigravity.google/docs/skills"
+  },
+  {
+    "target": "antigravity-cli",
+    "commandSurface": "skills",
+    "commandDir": ".agents/skills",
+    "fileTemplate": "amby-<phase>/SKILL.md",
+    "frontmatterKeys": ["name", "description"],
+    "sourceUrl": "https://antigravity.google/docs/skills"
+  }
+]
