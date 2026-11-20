@@ -85,6 +85,8 @@ export interface FeatureSnapshot {
 
 export interface Filters {
   feature?: string; // matches ref or dir
+  /** Feature 032 (US-3): free-text search; matches a feature whose directory name or number contains it. */
+  search?: string;
   status?: string;
 }
 

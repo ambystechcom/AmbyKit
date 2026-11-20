@@ -1,0 +1,163 @@
+{
+  "$schema": "https://ambystech.dev/schemas/design-tokens.json",
+  "$note": "Terminal UI tokens for 032-dashboard-redesign-and-metrics (signed off 2026-11-19). EXTENDS specs/014-enhanced-dashboard, specs/017-live-dashboard and specs/029-fleet-control-room design tokens: every inherited token keeps its name and is cited as-is; only additions are listed here. semantic.state.* is a naming layer over 029's fleet-* state tokens (same words, glyphs and colors) so every tab shares one state vocabulary. Colors reuse 014's semantic colors, so the measured 014 contrast applies unchanged. Every state carries a word; nothing depends on a glyph or a color alone.",
+  "signed_off": true,
+  "signed_off_by": "Gustavo Barrientos",
+  "signed_off_date": "2026-11-19",
+  "$extends": [
+    "specs/014-enhanced-dashboard/design-tokens.json",
+    "specs/017-live-dashboard/design-tokens.json",
+    "specs/029-fleet-control-room/design-tokens.json"
+  ],
+  "primitive": {
+    "glyph": {
+      "tab-open": { "u": "[", "a": "[" },
+      "tab-close": { "u": "]", "a": "]" },
+      "tab-badge-attention": { "u": "●", "a": "*" },
+      "tab-badge-warn": { "u": "⚠", "a": "[!]" },
+      "bar-fill": { "u": "█", "a": "#" },
+      "bar-empty": { "u": "░", "a": "." },
+      "feature-open": { "u": "▾", "a": "v" },
+      "feature-closed": { "u": "▸", "a": ">" },
+      "trend-improving": { "u": "↓", "a": "down" },
+      "trend-worsening": { "u": "↑", "a": "up" },
+      "trend-flat": { "u": "→", "a": "flat" },
+      "spark": { "u": "▁▂▃▄▅▆▇█", "a": "_.-=" }
+    },
+    "word": {
+      "tab-overview": "overview",
+      "tab-fleet": "fleet",
+      "tab-graph": "graph",
+      "tab-quality": "quality",
+      "tab-overview-short": "ovw",
+      "tab-fleet-short": "flt",
+      "tab-graph-short": "gph",
+      "tab-quality-short": "qlt",
+      "trend-improving": "improving",
+      "trend-worsening": "worsening",
+      "trend-flat": "flat",
+      "metrics-loading": "reading history…",
+      "metrics-none-yet": "no completed cycle yet",
+      "metrics-skipped": "revisions could not be read and were skipped",
+      "metrics-too-little": "Not enough history for metrics yet",
+      "metrics-not-a-repo": "Not a git repository, so there is no history to read.",
+      "metrics-git-missing": "git is not available, so metrics cannot be computed.",
+      "no-match": "Nothing matches",
+      "filter-clear": "Press esc to clear."
+    },
+    "space": {
+      "tab-bar-gap": 3,
+      "metrics-label-col": 20,
+      "metrics-typical-col": 10,
+      "metrics-bar-width": 10,
+      "metrics-bar-narrow": 0,
+      "metrics-top-features": 3,
+      "default-columns": 80,
+      "trend-threshold-pct": 10
+    },
+    "limit": {
+      "metrics-gap-runs-shown": 5
+    }
+  },
+  "semantic": {
+    "symbol": {
+      "state-working": "{semantic.symbol.fleet-working}",
+      "state-waiting": "{semantic.symbol.fleet-waiting}",
+      "state-blocked": "{semantic.symbol.fleet-blocked}",
+      "state-paused": "{semantic.symbol.fleet-paused}",
+      "state-done": "{semantic.symbol.fleet-done}",
+      "state-stalled": "{semantic.symbol.fleet-stalled}"
+    },
+    "state": {
+      "working": { "glyph": "{semantic.symbol.fleet-working}", "word": "{primitive.word.working}", "fg": "{semantic.color.fleet-working}" },
+      "waiting": { "glyph": "{semantic.symbol.fleet-waiting}", "word": "{primitive.word.waiting}", "fg": "{semantic.color.fleet-waiting}" },
+      "blocked": { "glyph": "{semantic.symbol.fleet-blocked}", "word": "{primitive.word.blocked}", "fg": "{semantic.color.fleet-blocked}" },
+      "paused": { "glyph": "{semantic.symbol.fleet-paused}", "word": "{primitive.word.paused}", "fg": "{semantic.color.fleet-paused}" },
+      "done": { "glyph": "{semantic.symbol.fleet-done}", "word": "{primitive.word.done}", "fg": "{semantic.color.fleet-done}" },
+      "stalled": { "glyph": "{semantic.symbol.fleet-stalled}", "word": "{primitive.word.stalled}", "fg": "{semantic.color.fleet-stalled}", "weight": "{semantic.weight.heading}" }
+    }
+  },
+  "component": {
+    "tab-bar": {
+      "active": {
+        "open": "{primitive.glyph.tab-open}",
+        "close": "{primitive.glyph.tab-close}",
+        "fg": "{semantic.color.accent-strong}",
+        "weight": "{semantic.weight.selected}"
+      },
+      "inactive": { "fg": "{semantic.color.muted}" },
+      "number-fg": "{semantic.color.text}",
+      "gap": "{primitive.space.tab-bar-gap}",
+      "badge": {
+        "attention": { "glyph": "{primitive.glyph.tab-badge-attention}", "fg": "{semantic.color.warn}" },
+        "warn": { "glyph": "{primitive.glyph.tab-badge-warn}", "fg": "{semantic.color.warn}" }
+      },
+      "narrow": {
+        "names": {
+          "overview": "{primitive.word.tab-overview-short}",
+          "fleet": "{primitive.word.tab-fleet-short}",
+          "graph": "{primitive.word.tab-graph-short}",
+          "quality": "{primitive.word.tab-quality-short}"
+        }
+      }
+    },
+    "tab-body": {
+      "loading": { "glyph": "{component.live.polling.glyph}", "fg": "{semantic.color.muted}" },
+      "error": { "glyph": "{semantic.symbol.graph-problem}", "fg": "{semantic.color.warn}" }
+    },
+    "filter-line": {
+      "state-fg": "{semantic.color.accent}",
+      "count-fg": "{semantic.color.muted}",
+      "match-fg": "{semantic.color.accent}",
+      "no-match-fg": "{semantic.color.warn}"
+    },
+    "metrics": {
+      "title-fg": "{component.panel.title-fg}",
+      "label-fg": "{semantic.color.muted}",
+      "value-fg": "{semantic.color.text}",
+      "note-fg": "{semantic.color.muted}",
+      "bar": {
+        "fill": "{primitive.glyph.bar-fill}",
+        "empty": "{primitive.glyph.bar-empty}",
+        "fg": "{semantic.color.state-in-progress}",
+        "width": "{primitive.space.metrics-bar-width}",
+        "width-narrow": "{primitive.space.metrics-bar-narrow}"
+      },
+      "spark": {
+        "glyphs": "{primitive.glyph.spark}",
+        "fg": "{semantic.color.accent}",
+        "runs-shown": "{primitive.limit.metrics-gap-runs-shown}"
+      },
+      "trend": {
+        "improving": { "glyph": "{primitive.glyph.trend-improving}", "word": "{primitive.word.trend-improving}", "fg": "{semantic.color.state-done}" },
+        "worsening": { "glyph": "{primitive.glyph.trend-worsening}", "word": "{primitive.word.trend-worsening}", "fg": "{semantic.color.warn}" },
+        "flat": { "glyph": "{primitive.glyph.trend-flat}", "word": "{primitive.word.trend-flat}", "fg": "{semantic.color.muted}" },
+        "threshold-pct": "{primitive.space.trend-threshold-pct}"
+      },
+      "col": {
+        "label": "{primitive.space.metrics-label-col}",
+        "typical": "{primitive.space.metrics-typical-col}",
+        "top-features": "{primitive.space.metrics-top-features}"
+      }
+    },
+    "state-badge": {
+      "working": "{semantic.state.working}",
+      "waiting": "{semantic.state.waiting}",
+      "blocked": "{semantic.state.blocked}",
+      "paused": "{semantic.state.paused}",
+      "done": "{semantic.state.done}",
+      "stalled": "{semantic.state.stalled}"
+    },
+    "fleet-feature": {
+      "glyph-open": "{primitive.glyph.feature-open}",
+      "glyph-closed": "{primitive.glyph.feature-closed}",
+      "name-fg": "{semantic.color.text}",
+      "cause-fg": "{semantic.color.muted}"
+    },
+    "dashboard-layout": {
+      "wide-min": "{component.layout.wide-min}",
+      "narrow-max": "{component.layout.min-columns}",
+      "default-columns": "{primitive.space.default-columns}"
+    }
+  }
+}

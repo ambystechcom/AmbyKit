@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 import { join } from "node:path";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { FullscreenApp } from "../../src/cli/ui/interactive/fullscreen.js";
 import { HAS_GIT } from "../helpers/git-repo.js";
 import { tick, worktreeProject } from "../helpers/worktree-fixture.js";
@@ -84,6 +84,12 @@ afterEach(() => {
 });
 
 describe.skipIf(!HAS_GIT)("live interactive dashboard (feature 017, US-2)", () => {
+  // The dashboard keeps its frame within the terminal height (032 flicker fix), so give the fake terminal enough rows for
+  // every panel; these tests are about live updates, not about windowing.
+  const realRows = Object.getOwnPropertyDescriptor(process.stdout, "rows");
+  beforeAll(() => void Object.defineProperty(process.stdout, "rows", { value: 200, configurable: true, writable: true }));
+  afterAll(() => (realRows ? void Object.defineProperty(process.stdout, "rows", realRows) : void delete (process.stdout as { rows?: number }).rows));
+
   it("a task ticked in a worktree repaints within 1 s, and quitting stops all monitoring (SC-002, FR-016)", async () => {
     const root = worktreeProject(["001-a", "002-b"], ["002-b"]);
     const term = fakeTerminal();

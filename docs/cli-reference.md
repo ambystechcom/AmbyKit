@@ -240,7 +240,10 @@ Detection reads the process list only, never sends anything, and stops when you 
   back, `?` lists the keys. Pause, continue and stop are written as directives for the lane's worker,
   which obeys at its next report; approving a gate is the same action as `ambykit run approve` and
   writes no directive. Without a run the view says so. It reads local files only (no network, no model
-  tokens) and is loaded only under `--interactive`.
+  tokens) and is loaded only under `--interactive`. When a fleet of two or more features exists (`ambykit run 030 031`),
+  the fleet tab groups lanes by feature: a header per feature with its state and what it waits for (or why it is
+  paused and how many features that holds), lanes under it, `←`/`→` collapse and expand a feature, and the lane and
+  whole-run keys act on the feature under the cursor with the same confirmations. One feature is the view above.
 - **`--icons=nerd|unicode|ascii`** — icon set. `nerd` (also `AMBYKIT_ICONS=nerd`) shows the
   worktree tag as the Nerd Font git-branch icon; agent icons stay Unicode. `ascii` uses tags like
   `[CC] Claude` and `wt`. The default is unicode when the terminal supports it. The setting can also
@@ -262,8 +265,35 @@ Detection reads the process list only, never sends anything, and stops when you 
   status, and `others[]`); without a run the key is absent, so the output is byte-identical to before
   (`specs/029-fleet-control-room/contracts/dashboard-json-fleet.md`). Bare `--json` is unchanged.
 
+**Tabs, keys and the shared filter.** `--interactive` is organized as four tabs shown in a bar above every screen:
+`overview`, `fleet`, `graph` and `quality`. `1`-`4` (or `]` and `[`) switch between them from any screen
+(`tab` still moves between panels in the overview); the active tab is bracketed and bold, and `fleet ●`, `graph ⚠` or
+`quality ⚠` mark a tab with something to read first (a stalled or blocked lane, a paused feature, graph problems,
+findings). `?` lists the keys for the tab you are on. `/` searches by text, `s` cycles the state filter and `esc`
+clears them: one filter line under the tab bar (`/ codex   s state: all   2 of 6 match   esc clear`) applies to the
+list of the tab you are on (features, lanes, stories) and is kept when you change tab; a filter that matches nothing
+says so and how to clear it. `f` still filters features by number or exact name. A tab with nothing to show says what
+is missing and how to get it. Under 60 columns the tab names shorten (`ovw flt gph qlt`) and the key row becomes
+`1-4 tab  ? help  q quit`; with `--icons=ascii` or no unicode every new glyph has an ASCII form, and a state is
+always a word first.
+
+**Workflow metrics.** `ambykit dashboard --json --metrics` adds a `metrics` object to the `--json --overview`
+output (without the flag nothing is added or loaded). It is computed from git history alone, locally, with no model
+call: `phases` has the cycle time per phase (spec: first commit to the commit that sets it `ready`; plan: first
+plan commit to the first tasks commit; tasks: first tasks commit to every task checked; converge: first converge run
+to every gap task checked) per feature and the median, and `gap` has one point per converge run: gap tasks appended
+divided by the feature's requirement count. A converge run is a `tasks.md` commit that adds tasks closing a
+requirement (`(closes FR-###)`). `enough` is `false` (with a `reason`) when fewer than 3 features have a
+completed phase or no converge run is recorded; `skipped` counts revisions that could not be read. Revisions are read
+through the same per-file reader as everything else, so 1.x, 2.x and mixed history give the same numbers. In `--interactive` the same numbers are the **FLOW** panel in the quality tab: the typical
+cycle time per phase with a bar and the three longest features, and the converge gap rate as a sparkline, the latest
+value with its counts and a trend word (`improving` or `worsening` when the latest run is at least 10% below or above
+the median of the earlier ones, else `flat`). It loads after the first paint, and says so when there is too little
+history, no repository or no `git`.
+
 ```bash
 ambykit dashboard
+ambykit dashboard --json --metrics      # + cycle time per phase and converge gap rate
 ambykit dashboard --interactive          # full-screen overview (TTY only)
 ambykit dashboard --feature=014          # feature view
 ambykit dashboard --next=10              # longer Up next list

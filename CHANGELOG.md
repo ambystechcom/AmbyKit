@@ -18,6 +18,16 @@ Plugins: not affected.
 
 ### Added
 
+- Dashboard redesign and workflow metrics (feature 032): `ambykit dashboard --interactive` is now four tabs (`overview`,
+  `fleet`, `graph`, `quality`) under a tab bar, switched with `1`-`4` or `]`/`[`, with `?` listing the keys, one
+  shared `/` search and `s` state filter line (with an `n of N match` count) that applies to the tab you are on, a tab
+  badge when a tab has something to read first, and an empty state per tab that says how to get data. The quality tab gains the
+  **FLOW** panel: cycle time per phase and the converge gap rate with a trend, computed from git history alone with no
+  model call and read through the per-file reader so 1.x, 2.x and mixed history agree; `ambykit dashboard --json
+  --metrics` carries the same numbers. When a fleet of two or more features exists (spec 031) the fleet tab groups lanes
+  by feature, with collapse and the same lane and whole-run actions. One state vocabulary (word, glyph, color) is shared by
+  every tab; narrow terminals, no color, `--icons=ascii`, resize and piped output all degrade (a state is always a word).
+  One-shot and `--json` output is unchanged and never loads the tab frame, the metrics, graph or Fleet code.
 - Multi-feature fleets (feature 031, experimental like `run`): `ambykit run 030 031 032` or `--all-ready` plans the lanes of
   several features as one fleet and shows the plan first (nothing starts without `--yes`). A feature waits for the one it
   depends on (feature-level `depends-on` or a story edge) until that feature's lanes are merged into its branch, features that
