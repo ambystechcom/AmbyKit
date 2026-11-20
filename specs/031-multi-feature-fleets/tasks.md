@@ -56,10 +56,10 @@ created: 2026-11-19
 
 ## Phase 5 — User story US-2  (priority: P1)
 
-- [ ] [T040] [US2] Serialize features that share files in the loop, in dependency order then number; independent features run together (src/cli/run-fleet-loop.ts, test/cli/run-fleet-serialize.test.ts)
-- [ ] [T041] [US2] Show each serialization with the shared files, and `unknown ownership: T###` flags, in the plan preview (src/core/fleet-plan/format.ts, test/core/fleet-plan-format.test.ts)
-- [ ] [T042] [US2] Mixed 1.x and 2.x features give the same ownership and dependencies (test/core/fleet-plan-mixed.test.ts)
-- **Verify:** `npx vitest run test/cli/run-fleet-serialize.test.ts test/core/fleet-plan-format.test.ts test/core/fleet-plan-mixed.test.ts` pass; two overlapping features never have running lanes at the same time.
+- [x] [T040] [US2] Serialize features that share files in the loop, in dependency order then number; independent features run together (src/cli/run-fleet-loop.ts, test/cli/run-fleet-serialize.test.ts) ↪ DEVIATION: serialization is decided in core (order.ts adds the shared-files waits, schedule.ts starts a feature only when they are done), so the loop needed no new code here; the tests prove the invariant tick by tick and over real git
+- [x] [T041] [US2] Show each serialization with the shared files, and `unknown ownership: T###` flags, in the plan preview (src/core/fleet-plan/format.ts, test/core/fleet-plan-format.test.ts) ↪ DEVIATION: the preview text was written with T023 (format.ts); this task adds the dedicated format tests
+- [x] [T042] [US2] Mixed 1.x and 2.x features give the same ownership and dependencies (test/core/fleet-plan-mixed.test.ts)
+- **Verify:** `npx vitest run test/cli/run-fleet-serialize.test.ts test/core/fleet-plan-format.test.ts test/core/fleet-plan-mixed.test.ts` pass; two overlapping features never have running lanes at the same time. ✓ passed
 - **Checkpoint:** US-2 is demoable.
 
 ## Phase 6 — User story US-4  (priority: P1)
