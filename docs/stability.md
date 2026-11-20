@@ -31,7 +31,20 @@ covered only when it is added to this page (with its check). A tool that reads t
 
 ## Changing what is stable
 
-<!-- Filled by T030: the deprecation policy. -->
+Nothing listed on this page is removed or changed incompatibly without notice. The policy, in order:
+
+1. **Deprecate in a minor release.** A stable flag, subcommand, exported name, state-file field or printed line is first
+   *deprecated* in a minor release. The old name keeps working exactly as before. The replacement exists from that release on.
+2. **One notice, once per run, on stderr.** Using a deprecated name prints one line that names the replacement
+   (`ambykit: '<name>' is deprecated and will be removed in the next major release; use '<replacement>' instead.`), once per
+   process, to the error stream. It never goes to the output stream, so `--json` output and pipes are not disturbed.
+3. **Remove only in the next major release.** A deprecated name is removed no earlier than the next major version, and the
+   changelog says so when it is deprecated and again when it is removed.
+4. **Security exception.** A fix for a security problem may break a stable behaviour in a minor or patch release when keeping it
+   would leave people exposed. The changelog must say that a stable behaviour changed, what changed and why.
+
+Nothing is deprecated at 2.0. A name deprecated in a later 2.x release keeps working for plugins and scripts written for 2.0 until
+3.0. The notice is produced by one helper (`src/core/deprecation.ts`), so every deprecation reads the same.
 
 ## The `run` surface
 

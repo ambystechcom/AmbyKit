@@ -40,9 +40,9 @@ created: 2026-11-20
 
 ## Phase 4 — User story US-5  (priority: P2, needed by US-4 and US-6)
 
-- [ ] [T030] [US5] Policy text: deprecate in a minor, remove in the next major, notice once per run to stderr, security exception recorded in the changelog (docs/stability.md)
-- [ ] [T031] [US5] Tests: a hypothetical rename follows the policy; the notice prints once to stderr and the command still works — 033:FR-010, FR-011 (test/core/deprecation.test.ts)
-- **Verify:** `npx vitest run test/core/deprecation.test.ts` passes.
+- [x] [T030] [US5] Policy text: deprecate in a minor, remove in the next major, notice once per run to stderr, security exception recorded in the changelog (docs/stability.md)
+- [x] [T031] [US5] Tests: a hypothetical rename follows the policy; the notice prints once to stderr and the command still works — 033:FR-010, FR-011 (test/core/deprecation.test.ts) ↪ DEVIATION: the notice tests (033:FR-010, FR-011) were written with the helper in T011, in the same file; this task adds the hypothetical-rename case and the stderr-not-stdout case
+- **Verify:** `npx vitest run test/core/deprecation.test.ts` passes. ✓ passed
 - **Checkpoint:** US-5 done.
 
 ## Phase 5 — User story US-4  (priority: P1)
