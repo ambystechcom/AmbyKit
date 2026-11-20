@@ -16,18 +16,18 @@ created: 2026-11-20
 
 ## Phase 1 — Setup
 
-- [ ] [T001] Contract block helper: parse the fenced `contract` json blocks of a markdown file into typed lists (flags, exitCodes, stateFiles, exports) (test/helpers/contract-doc.ts)
-- [ ] [T002] Fixture: a fake runner registry with and without verification records, for platform and version cases (test/helpers/runner-registry-fixture.ts)
-- **Verify:** `npm run typecheck` passes and the helper parses a sample block in a unit test.
+- [x] [T001] Contract block helper: parse the fenced `contract` json blocks of a markdown file into typed lists (flags, exitCodes, stateFiles, exports) (test/helpers/contract-doc.ts)
+- [x] [T002] Fixture: a fake runner registry with and without verification records, for platform and version cases (test/helpers/runner-registry-fixture.ts)
+- **Verify:** `npm run typecheck` passes and the helper parses a sample block in a unit test. ✓ passed
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T010] [P] `RunnerSpec` gains `verifiedOn` and `verifiedRange`; `runnable(id, { platform, version })` refuses an unlisted platform or an out-of-range version and says which (src/core/runners.ts, test/core/runners-verification.test.ts)
-- [ ] [T011] [P] `deprecated(name, replacement)`: one stderr line, once per process, behaviour unchanged (src/core/deprecation.ts, test/core/deprecation.test.ts)
-- [ ] [T012] [P] `RUN_STABILITY` constant and one `stabilityLabel()` replacing the scattered "(experimental)" strings (src/core/run-stability.ts, src/cli/run.ts, src/cli/run-fleet.ts, src/cli/run-script.ts, src/core/fleet-plan/format.ts)
-- [ ] [T013] [P] `docs/stability.md` skeleton: what stable promises, additions rule, policy headings, empty `contract` blocks (docs/stability.md)
-- [ ] [T014] The contract test: each listed flag, exit code, state-file path and export is checked against the code; a missing item fails (test/stability-contract.test.ts)
-- **Verify:** `npm run typecheck` and `npx vitest run test/core/runners-verification.test.ts test/core/deprecation.test.ts test/stability-contract.test.ts` pass.
+- [x] [T010] [P] `RunnerSpec` gains `verifiedOn` and `verifiedRange`; `runnable(id, { platform, version })` refuses an unlisted platform or an out-of-range version and says which (src/core/runners.ts, test/core/runners-verification.test.ts) ↪ DEVIATION: runnable() takes the registry or the environment as its second argument so the existing callers are unchanged; a version is checked only when one is supplied (the run path does not detect the assistant's version yet, so only platform is enforced at run time until T063/T064 record versions)
+- [x] [T011] [P] `deprecated(name, replacement)`: one stderr line, once per process, behaviour unchanged (src/core/deprecation.ts, test/core/deprecation.test.ts)
+- [x] [T012] [P] `RUN_STABILITY` constant and one `stabilityLabel()` replacing the scattered "(experimental)" strings (src/core/run-stability.ts, src/cli/run.ts, src/cli/run-fleet.ts, src/cli/run-script.ts, src/core/fleet-plan/format.ts)
+- [x] [T013] [P] `docs/stability.md` skeleton: what stable promises, additions rule, policy headings, empty `contract` blocks (docs/stability.md)
+- [x] [T014] The contract test: each listed flag, exit code, state-file path and export is checked against the code; a missing item fails (test/stability-contract.test.ts) ↪ DEVIATION: the contract test builds its facts from one real fake-assistant run (printed lines, exit code 0, state files), a no-feature probe (exit 1) and a --runners probe (exit 0), so every listed exit code, printed line and state file is checked against real behaviour
+- **Verify:** `npm run typecheck` and `npx vitest run test/core/runners-verification.test.ts test/core/deprecation.test.ts test/stability-contract.test.ts` pass. ✓ passed: the contract test reads the (still empty) blocks and checks the doc's prose rules
 - **Checkpoint:** the verification model, the deprecation helper, the label constant and the contract test exist. User stories may start.
 
 ## Phase 3 — User story US-1  (priority: P1)

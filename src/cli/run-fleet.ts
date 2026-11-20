@@ -26,7 +26,7 @@ import type { RunDeps } from "./run.js";
  * `ambykit run <f1> <f2> ...`, `--all-ready`, `--continue-fleet=<id>` (feature 031). A fleet is one `Session` per
  * feature (028's, unchanged: its own run, lanes, gates and merge) driven by one `FleetSupervisor`. This file is the
  * edge: it reads the project through spec 030's reader (`readFleetInput`), shows the plan, and wires the real
- * sessions, lane preparation and dependency merges behind the loop's interfaces. Experimental, like `run` itself.
+ * sessions, lane preparation and dependency merges behind the loop's interfaces. Its stability is `run`'s (`src/core/run-stability.ts`).
  */
 
 export interface FleetIo {

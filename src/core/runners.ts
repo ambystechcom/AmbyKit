@@ -6,6 +6,8 @@
  * keeps them equal). `runnable()` is the single chokepoint before any process is spawned (SC-006, Principle 4).
  */
 
+import { satisfies } from "../plugins/semver.js";
+
 export interface RunnerJob {
   /** The full prompt text (IDs, `@` references, ownership). */
   prompt: string;
@@ -34,6 +36,13 @@ export interface RunnerSpec {
   verified: boolean;
   /** The CLI version the command was verified against; present only when `verified`. */
   verifiedVersion?: string;
+  /**
+   * Feature 033 (FR-004, C-3): the operating systems the live check was recorded on. A verified runner is runnable only
+   * there. Absent on a runner written for 1.6, which carried no platform list (no platform restriction is applied).
+   */
+  verifiedOn?: NodeJS.Platform[];
+  /** Feature 033: the assistant versions the record covers, as a semver range; a detected version outside it is unverified. */
+  verifiedRange?: string;
   /** What is still to confirm on a live install. */
   toVerify: string;
 }
@@ -67,8 +76,21 @@ export function runnerFor(id: string): RunnerSpec | undefined {
 
 export type Runnable = { ok: true; runner: RunnerSpec } | { ok: false; reason: string };
 
-/** FR-006: only a verified runner is runnable; the reason says exactly why a refused one is not. */
-export function runnable(id: string, registry: RunnerSpec[] = RUNNERS): Runnable {
+/** Where a runner would run: the operating system (default: this one) and, when known, the assistant's version. */
+export interface RunnerEnv {
+  platform?: NodeJS.Platform;
+  version?: string;
+}
+
+/**
+ * FR-006: only a verified runner is runnable; the reason says exactly why a refused one is not. Feature 033 (FR-004, FR-005):
+ * a verified runner is also refused on a platform its record does not list, and for a known version outside its recorded range,
+ * and the reason names which. The second argument is the registry (tests) or the environment; a version is checked only when given.
+ */
+export function runnable(id: string, registryOrEnv?: RunnerSpec[] | RunnerEnv, env?: RunnerEnv): Runnable {
+  const registry = Array.isArray(registryOrEnv) ? registryOrEnv : RUNNERS;
+  const where: RunnerEnv = (Array.isArray(registryOrEnv) ? env : registryOrEnv) ?? {};
+  const platform = where.platform ?? process.platform;
   const runner = registry.find((r) => r.id === id);
   if (!runner) {
     const ok = registry.filter((r) => r.verified).map((r) => r.id);
@@ -76,6 +98,15 @@ export function runnable(id: string, registry: RunnerSpec[] = RUNNERS): Runnable
   }
   if (!runner.verified) {
     return { ok: false, reason: `the ${runner.label} runner is not verified yet (to confirm on a live install: ${runner.toVerify}); see docs/tool-compatibility.md` };
+  }
+  if (runner.verifiedOn && !runner.verifiedOn.includes(platform)) {
+    return { ok: false, reason: `the ${runner.label} runner is unverified on this platform (${platform}); it was verified on ${runner.verifiedOn.join(", ")}` };
+  }
+  if (runner.verifiedRange && where.version !== undefined) {
+    const inRange = satisfies(where.version, runner.verifiedRange);
+    if (!inRange.supported || !inRange.satisfied) {
+      return { ok: false, reason: `the ${runner.label} runner is unverified for version ${where.version}; it was verified for ${runner.verifiedRange}` };
+    }
   }
   return { ok: true, runner };
 }
@@ -85,6 +116,9 @@ export interface RunnerListing {
   label: string;
   verified: boolean;
   verifiedVersion?: string;
+  /** Feature 033: where and for which versions the live check was recorded. */
+  verifiedOn?: NodeJS.Platform[];
+  verifiedRange?: string;
   reportsUsage: boolean;
   runnable: boolean;
   /** Present when not runnable. */
@@ -92,14 +126,16 @@ export interface RunnerListing {
 }
 
 /** FR-007: the runners with their capabilities, for `ambykit run --runners`. */
-export function listRunners(registry: RunnerSpec[] = RUNNERS): RunnerListing[] {
+export function listRunners(registry: RunnerSpec[] = RUNNERS, env: RunnerEnv = {}): RunnerListing[] {
   return registry.map((r) => {
-    const can = runnable(r.id, registry);
+    const can = runnable(r.id, registry, env);
     return {
       id: r.id,
       label: r.label,
       verified: r.verified,
       ...(r.verifiedVersion ? { verifiedVersion: r.verifiedVersion } : {}),
+      ...(r.verifiedOn ? { verifiedOn: r.verifiedOn } : {}),
+      ...(r.verifiedRange ? { verifiedRange: r.verifiedRange } : {}),
       reportsUsage: r.reportsUsage,
       runnable: can.ok,
       ...(can.ok ? {} : { reason: can.reason }),
