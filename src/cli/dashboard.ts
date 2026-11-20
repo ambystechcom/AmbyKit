@@ -20,6 +20,7 @@ import type { Burndown, Checkout, FeatureSnapshot, Filters, ParseIssue } from ".
 import { applyFilters, computeOverview } from "../core/overview.js";
 import { fleetJson } from "../core/fleet-view/json.js";
 import { readFleet } from "../core/fleet-view/read.js";
+import type { FleetsView } from "../core/fleet/fleet-view.js";
 import { packageVersion } from "../core/paths.js";
 import { maxPeriodsFor } from "./ui/dashboard/burndown-chart.js";
 import type { HeaderMeta } from "./ui/dashboard/cards.js";
@@ -42,6 +43,7 @@ import {
   isOverviewDone,
   reduceOverviewTui,
   renderOverviewTui,
+  selectedFleetView,
   type OverviewTuiData,
   type OverviewTuiState,
 } from "./ui/interactive/overview.js";
@@ -280,11 +282,24 @@ export class DashboardCommand extends BaseCommand {
     const { graphViewApi } = await import("./ui/dashboard/graph-view.js");
     // Feature 029 (FR-012): the Fleet view is likewise loaded only here, never one-shot or --json.
     const { fleetViewApi } = await import("./ui/dashboard/fleet-view.js");
+    // Feature 032: the tabbed frame's grouped Fleet tab and spec 031's fleets, also interactive-only.
+    const { fleetTabApi } = await import("./ui/dashboard/fleet-tab.js");
+    const { fleetsView } = await import("../core/fleet/fleet-view.js");
+    const readFleets = (at: string, now?: number): FleetsView | null => {
+      try {
+        return fleetsView(at, now);
+      } catch {
+        return null;
+      }
+    };
     const terminalRows = (): number => process.stdout.rows ?? 24;
     let data = withBurndown({
       ...base,
       graphView: graphViewApi,
       fleetView: fleetViewApi,
+      fleetTab: fleetTabApi,
+      tabs: true,
+      fleets: readFleets(initialCheckouts.primary.root),
       fleet: readFleet(initialCheckouts.primary.root),
       rows: terminalRows(),
       presence: presenceOf(base.features, Date.now()),
@@ -322,7 +337,7 @@ export class DashboardCommand extends BaseCommand {
         const prev = data;
         cache.clear();
         const now = Date.now();
-        data = withBurndown({ ...prev, features: read.features, issues: read.issues, presence: presenceOf(read.features, now), fleet: readFleet(checkouts.primary.root, now), rows: terminalRows() });
+        data = withBurndown({ ...prev, features: read.features, issues: read.issues, presence: presenceOf(read.features, now), fleet: readFleet(checkouts.primary.root, now), fleets: readFleets(checkouts.primary.root, now), rows: terminalRows() });
         if (rearmNeeded()) arm();
         update?.((s) => ({ ...applyData(s, prev, data), now, live: { mode: watcher?.mode ?? "paused", lastChange: now } }));
       } catch {
@@ -339,7 +354,7 @@ export class DashboardCommand extends BaseCommand {
       }
       const now = Date.now();
       // The heartbeat also re-reads the run, so a quiet lane crosses the stall limit on screen without a file change (029 SC-002).
-      data = withBurndown({ ...data, presence: presenceOf(data.features, now), fleet: readFleet(checkouts.primary.root, now), rows: terminalRows() });
+      data = withBurndown({ ...data, presence: presenceOf(data.features, now), fleet: readFleet(checkouts.primary.root, now), fleets: readFleets(checkouts.primary.root, now), rows: terminalRows() });
       update?.((s) => ({ ...s, now, changed: new Set(), changedTasks: new Set() }));
       void scan().then((found) => {
         if (stopped || found === null) return;
@@ -362,9 +377,11 @@ export class DashboardCommand extends BaseCommand {
         const next = reduceOverviewTui({ ...data, rows: terminalRows() }, s, key);
         // Feature 029 (FR-006, FR-009): the pure reducer only records the confirmed intent; it is performed here, through
         // 025's directive writer or 028's approveGate, and the run is re-read so the row shows the result at once.
-        if (next.view === "fleet" && next.fleet?.intent && data.fleet) {
-          const out = fleetViewApi.perform(checkouts.primary.root, data.fleet, next.fleet.intent);
-          data = withBurndown({ ...data, fleet: readFleet(checkouts.primary.root) });
+        // In the grouped Fleet tab (feature 032) the intent belongs to the feature under the cursor, so its run is the target.
+        const target = next.view === "fleet" && next.fleet?.intent ? selectedFleetView(data, next) : null;
+        if (next.view === "fleet" && next.fleet?.intent && target) {
+          const out = fleetViewApi.perform(checkouts.primary.root, target, next.fleet.intent);
+          data = withBurndown({ ...data, fleet: readFleet(checkouts.primary.root), fleets: readFleets(checkouts.primary.root) });
           return { ...next, fleet: { ...next.fleet, intent: null, notice: out.message } };
         }
         return next;

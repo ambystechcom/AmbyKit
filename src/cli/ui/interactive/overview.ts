@@ -5,9 +5,17 @@ import type { BurndownState } from "../dashboard/burndown-chart.js";
 import type { HeaderMeta } from "../dashboard/cards.js";
 import { emptyState, noMatchLine } from "../dashboard/empty-state.js";
 import type { FleetView } from "../../../core/fleet-view/types.js";
+import { currentFleet, featureRunView, filterLanes, groupCounts, groupRows, isGrouped, type GroupFilter } from "../../../core/fleet-view/group.js";
+import type { FleetsView } from "../../../core/fleet/fleet-view.js";
 import type { Metrics } from "../../../core/metrics/types.js";
 import type { FleetViewApi } from "../dashboard/fleet-view.js";
-import type { GraphViewApi } from "../dashboard/graph-view.js";
+import type { FleetTabApi } from "../dashboard/fleet-tab.js";
+import { renderMetricsPanel } from "../dashboard/metrics-panel.js";
+import type { TabBadges } from "../dashboard/tab-bar.js";
+import { noMatchBody, renderFilterLine, renderTabFrame, tabEmptyBody } from "../dashboard/tab-frame.js";
+import { tabLayout } from "../dashboard/layout.js";
+import { applyListFilter } from "./list-filter.js";
+import type { GraphViewApi, GraphViewModel } from "../dashboard/graph-view.js";
 import { renderQualityView } from "../dashboard/quality-view.js";
 import { renderHelp, type HelpScreen } from "../dashboard/help-overlay.js";
 import { liveIndicator, type LiveStatus } from "../dashboard/live-indicator.js";
@@ -57,6 +65,15 @@ export interface OverviewTuiData {
   metricsState?: MetricsState;
   /** Terminal rows, for the Fleet view's scroll window (default 24). */
   rows?: number;
+  /**
+   * Feature 032: draw the tabbed frame (tab bar, shared filter line, the metrics panel, grouped fleet) around every screen.
+   * Set only by the interactive command; absent ⇒ the screens render exactly as before 032.
+   */
+  tabs?: boolean;
+  /** Spec 031's fleets (features, their lanes and states), for the Fleet tab's grouping by feature. */
+  fleets?: FleetsView | null;
+  /** The grouped Fleet tab's renderer, injected after a dynamic import like the other views. */
+  fleetTab?: FleetTabApi;
 }
 
 export type Panel = 0 | 1 | 2 | 3;
@@ -86,6 +103,8 @@ export interface OverviewTuiState {
   graph: { cursor: number } | null;
   /** Feature 029: the Fleet view's cursor, scroll, confirm dialog and intended action; null outside it. */
   fleet: FleetTuiState | null;
+  /** Feature 032: the grouped Fleet tab's cursor over feature and lane rows, and the collapsed features; null otherwise. */
+  fleetGroup: { cursor: number; collapsed: string[] } | null;
   /** Help overlay open (FR-030). */
   help: boolean;
   /** Quality view open (feature 024, FR-013): uncovered requirements and analyze findings. */
@@ -116,6 +135,7 @@ export function initOverviewTui(filters: Filters = {}): OverviewTuiState {
     story: null,
     graph: null,
     fleet: null,
+    fleetGroup: null,
     help: false,
     quality: false,
     burndownReady: false,
@@ -241,10 +261,16 @@ export function applyData(state: OverviewTuiState, prev: OverviewTuiData, next: 
     changedTasks: checkedTasks(prev.features, next.features),
   };
   if (state.view === "fleet" && state.fleet && next.fleetView) {
-    return { ...out, fleet: next.fleetView.clamp(next.fleet ?? null, state.fleet, next.fleetView.windowRows(next.rows ?? 24, next.fleet ?? null)) };
+    const entry = next.tabs ? currentFleet(next.fleets) : null;
+    if (state.fleetGroup && isGrouped(entry)) {
+      const n = groupRows(entry, state.fleetGroup.collapsed, groupFilterOf(state)).length;
+      return { ...out, fleetGroup: { ...state.fleetGroup, cursor: Math.max(0, Math.min(state.fleetGroup.cursor, n - 1)) } };
+    }
+    const view = visibleFleet(next, state);
+    return { ...out, fleet: next.fleetView.clamp(view, state.fleet, next.fleetView.windowRows(next.rows ?? 24, view)) };
   }
   if (state.view === "graph" && state.graph) {
-    const n = next.graphView?.build(next.features).rows.length ?? 0;
+    const n = next.graphView ? graphModelFor(next, state).rows.length : 0;
     return { ...out, graph: { cursor: Math.max(0, Math.min(state.graph.cursor, n - 1)) } };
   }
   if (state.view !== "feature" || !state.feature) return out;
@@ -266,8 +292,21 @@ export function reduceOverviewTui(data: OverviewTuiData, state: OverviewTuiState
   // Feature 032 (FR-004): `1`-`4`, `]` and `[` switch tabs from any screen; anything else is not a tab key.
   const target = key.ctrl ? null : tabForKey(tabOf(state), key);
   if (target) return selectTab(data, state, target);
+  // Tab mode (feature 032): the quality tab is a tab like the others (help, the shared filter, esc to go back); a key that
+  // means nothing here changes nothing (FR-004). Without tab mode the quality view keeps its 024 behaviour: any key leaves it.
+  if (data.tabs && state.quality) {
+    if (key.name === "q") return { ...state, done: true };
+    if (key.sequence === "?") return { ...state, help: true };
+    const shared = reduceSharedFilter(state, key);
+    if (shared) return shared;
+    return key.name === "escape" ? { ...state, quality: false } : state;
+  }
   if (state.quality) return key.name === "q" ? { ...state, done: true } : { ...state, quality: false };
   if (key.sequence === "?") return { ...state, help: true };
+  if (data.tabs && (state.view === "fleet" || state.view === "graph")) {
+    const shared = reduceSharedFilter(state, key);
+    if (shared) return shared;
+  }
   if (state.view === "fleet") return reduceFleetView(data, state, key);
   if (state.view === "feature") return reduceFeature(data, state, key);
   if (state.view === "graph") return reduceGraph(data, state, key);
@@ -280,7 +319,7 @@ export function reduceOverviewTui(data: OverviewTuiData, state: OverviewTuiState
     case "g":
       return data.graphView ? { ...state, view: "graph", graph: { cursor: 0 } } : state;
     case "l":
-      return data.fleetView ? { ...state, view: "fleet", fleet: data.fleetView.init() } : state;
+      return data.fleetView ? { ...state, view: "fleet", ...enterFleet(data) } : state;
     case "tab": {
       const step = key.shift ? PANELS - 1 : 1;
       return { ...state, focus: ((state.focus + step) % PANELS) as Panel };
@@ -325,17 +364,56 @@ function selectTab(data: OverviewTuiData, state: OverviewTuiState, tab: Tab): Ov
   const here = tabOf(state);
   // Pressing the overview key from the feature view goes back up to the overview; any other same-tab key is a no-op.
   if (tab === here && !(tab === "overview" && state.view !== "overview")) return state;
-  const cleared: OverviewTuiState = { ...state, view: "overview", feature: null, story: null, graph: null, fleet: null, quality: false };
+  const cleared: OverviewTuiState = { ...state, view: "overview", feature: null, story: null, graph: null, fleet: null, fleetGroup: null, quality: false };
   switch (tab) {
     case "overview":
       return cleared;
     case "fleet":
-      return data.fleetView ? { ...cleared, view: "fleet", fleet: data.fleetView.init() } : state;
+      return data.fleetView ? { ...cleared, view: "fleet", ...enterFleet(data) } : state;
     case "graph":
       return data.graphView ? { ...cleared, view: "graph", graph: { cursor: 0 } } : state;
     case "quality":
       return { ...cleared, quality: true };
   }
+}
+
+/** Entering the Fleet tab: 029's slice, plus the group cursor when a fleet of two or more features is shown (tab mode). */
+function enterFleet(data: OverviewTuiData): Pick<OverviewTuiState, "fleet" | "fleetGroup"> {
+  return { fleet: data.fleetView!.init(), fleetGroup: data.tabs && isGrouped(currentFleet(data.fleets)) ? { cursor: 0, collapsed: [] } : null };
+}
+
+/** The shared filter as a text-and-state filter over lanes (feature 032, US-3). */
+function groupFilterOf(state: OverviewTuiState): GroupFilter {
+  return { query: state.filters.search ?? state.filters.feature ?? "", ...(state.filters.status !== undefined ? { state: state.filters.status } : {}) };
+}
+
+/** The current run as the Fleet view shows it in tab mode: its lanes narrowed by the shared filter. */
+function visibleFleet(data: OverviewTuiData, state: OverviewTuiState): FleetView | null {
+  const view = data.fleet ?? null;
+  if (!view || !data.tabs) return view;
+  return { ...view, lanes: filterLanes(view.lanes, groupFilterOf(state)) };
+}
+
+/** The dependency graph narrowed by the shared filter: text over the story id and title, and the status as buildable/blocked. */
+function graphModelFor(data: OverviewTuiData, state: OverviewTuiState): GraphViewModel {
+  const model = data.graphView!.build(data.features);
+  if (!data.tabs) return model;
+  const f = groupFilterOf(state);
+  const status = f.state === undefined ? undefined : ({ blocked: "blocked", ready: "buildable" } as Record<string, string>)[f.state] ?? " ";
+  const rows = applyListFilter(model.rows.map((r) => ({ ...r, state: r.state })), { query: f.query, ...(status !== undefined ? { state: status } : {}) });
+  return { ...model, rows };
+}
+
+/** `/`, `s` and `esc` on a tab other than the overview: the same shared filter (feature 032, US-3). Null when not a filter key. */
+function reduceSharedFilter(state: OverviewTuiState, key: KeyEvent): OverviewTuiState | null {
+  const reset = { cursors: NO_CURSORS, graph: state.graph ? { cursor: 0 } : state.graph, fleetGroup: state.fleetGroup ? { ...state.fleetGroup, cursor: 0 } : null, fleet: state.fleet ? { ...state.fleet, cursor: 0, scroll: 0 } : state.fleet };
+  if (key.sequence === "/") return { ...state, input: state.filters.search ?? "", searching: true };
+  if (key.name === "s") {
+    const i = STATUS_CYCLE.indexOf(state.filters.status);
+    return { ...state, filters: { ...state.filters, status: STATUS_CYCLE[(i + 1) % STATUS_CYCLE.length] }, ...reset };
+  }
+  if (key.name === "escape" && (state.filters.feature || state.filters.status || state.filters.search)) return { ...state, filters: {}, ...reset };
+  return null;
 }
 
 function reduceInput(state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
@@ -355,18 +433,65 @@ function reduceInput(state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
 /** Feature 029: the Fleet view's keys. The slice records an intended action; the command performs it (like `r`). */
 function reduceFleetView(data: OverviewTuiData, state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
   const api = data.fleetView;
-  if (!api || !state.fleet) return { ...state, view: "overview", fleet: null };
-  const rows = api.windowRows(data.rows ?? 24, data.fleet ?? null);
-  const next = api.reduce(data.fleet ?? null, state.fleet, key, rows);
+  if (!api || !state.fleet) return { ...state, view: "overview", fleet: null, fleetGroup: null };
+  const entry = data.tabs ? currentFleet(data.fleets) : null;
+  if (state.fleetGroup && isGrouped(entry)) return reduceFleetGroup(data, state, key, api, entry);
+  const view = visibleFleet(data, state);
+  const rows = api.windowRows(data.rows ?? 24, view);
+  const next = api.reduce(view, state.fleet, key, rows);
   if (next.quit) return { ...state, done: true };
-  if (next.back) return { ...state, view: "overview", fleet: null };
+  if (next.back) return { ...state, view: "overview", fleet: null, fleetGroup: null };
+  return { ...state, fleet: next };
+}
+
+/** The 029 view of the feature under the grouped cursor (null on a feature that has not started, or outside the group). */
+export function selectedFleetView(data: OverviewTuiData, state: OverviewTuiState): FleetView | null {
+  const entry = data.tabs ? currentFleet(data.fleets) : null;
+  if (!state.fleetGroup || !isGrouped(entry)) return data.fleet ?? null;
+  const rows = groupRows(entry, state.fleetGroup.collapsed, groupFilterOf(state));
+  const row = rows[Math.min(state.fleetGroup.cursor, Math.max(0, rows.length - 1))];
+  return row ? featureRunView(row.feature, data.fleet?.now ?? state.now) : null;
+}
+
+/**
+ * The grouped Fleet tab's keys (feature 032, FR-018): `↑↓` move over feature and lane rows, `←`/`→` collapse and expand a
+ * feature, and every directive or approve key goes to 029's reducer for the feature under the cursor, so its confirm
+ * dialog and rules are the same ones (a lane action needs a lane row; `P U X a` work on the feature's run).
+ */
+function reduceFleetGroup(data: OverviewTuiData, state: OverviewTuiState, key: KeyEvent, api: FleetViewApi, entry: NonNullable<ReturnType<typeof currentFleet>>): OverviewTuiState {
+  const group = state.fleetGroup!;
+  const filter = groupFilterOf(state);
+  const rows = groupRows(entry, group.collapsed, filter);
+  const cursor = Math.min(group.cursor, Math.max(0, rows.length - 1));
+  const row = rows[cursor];
+  if (!state.fleet!.confirm) {
+    if ((key.name === "up" || key.name === "down") && rows.length > 0) {
+      const step = key.name === "up" ? rows.length - 1 : 1;
+      return { ...state, fleetGroup: { ...group, cursor: (cursor + step) % rows.length }, fleet: { ...state.fleet!, notice: null } };
+    }
+    if ((key.name === "left" || key.name === "right") && row) {
+      const name = row.feature.feature;
+      const collapsed = key.name === "left" ? (group.collapsed.includes(name) ? group.collapsed : [...group.collapsed, name]) : group.collapsed.filter((c) => c !== name);
+      const at = groupRows(entry, collapsed, filter).findIndex((r) => r.kind === "feature" && r.feature.feature === name);
+      return { ...state, fleetGroup: { collapsed, cursor: at >= 0 ? at : cursor } };
+    }
+    // A lane action needs a lane row: on a feature header say so instead of acting on its first lane.
+    if (row?.kind === "feature" && (key.sequence === "p" || key.sequence === "u" || key.sequence === "x")) {
+      return { ...state, fleet: { ...state.fleet!, notice: "Select a lane to pause, continue or stop it; P, U and X act on the whole run." } };
+    }
+  }
+  const view = row ? featureRunView(row.feature, data.fleet?.now ?? state.now) : null;
+  const inner = { ...state.fleet!, cursor: row?.kind === "lane" ? row.index : 0 };
+  const next = api.reduce(view, inner, key, data.rows ?? 24);
+  if (next.quit) return { ...state, done: true };
+  if (next.back) return { ...state, view: "overview", fleet: null, fleetGroup: null };
   return { ...state, fleet: next };
 }
 
 function reduceGraph(data: OverviewTuiData, state: OverviewTuiState, key: KeyEvent): OverviewTuiState {
   if (key.name === "q") return { ...state, done: true };
   const toOverview = { ...state, view: "overview" as const, graph: null };
-  const model = data.graphView?.build(data.features);
+  const model = data.graphView ? graphModelFor(data, state) : undefined;
   if (!model) return toOverview;
   if (key.name === "escape" || key.name === "backspace" || key.name === "left") return toOverview;
   const n = model.rows.length;
@@ -450,10 +575,71 @@ function metaOf(caps: Capabilities, data: OverviewTuiData, state: OverviewTuiSta
 
 /** EmptyState for the interactive overview: no specs at all, or a filter that matches nothing. */
 function emptyLines(caps: Capabilities, data: OverviewTuiData, filters: Filters): string[] {
+  if (data.tabs) {
+    return data.features.length === 0 ? tabEmptyBody(caps, "overview") : noMatchBody(caps, [filters.feature, filters.search, filters.status].filter(Boolean).join(" "));
+  }
   if (data.features.length === 0) {
     return emptyState(caps, "No feature specs yet.", { before: "Run ", command: "/amby.specify", after: " to create one." }, caps.columns);
   }
   return ["", noMatchLine(caps, [filters.feature, filters.search, filters.status].filter(Boolean).join(" "))];
+}
+
+/** Which tabs have something to read first (ui.md "Tab bar"): a stalled or blocked lane, graph problems, findings. */
+function tabBadges(data: OverviewTuiData): TabBadges {
+  const badges: TabBadges = {};
+  const attention = (v: FleetView | null | undefined): boolean => !!v && (v.run.needsDecision || v.lanes.some((l) => l.stalled || l.state === "blocked"));
+  const entry = currentFleet(data.fleets);
+  const fleetFlag = attention(data.fleet) || !!entry?.features.some((f) => f.state === "paused" || f.run?.needsDecision || f.lanes.some((l) => l.stalled || l.state === "blocked"));
+  if (fleetFlag) badges.fleet = "attention";
+  if (data.graphView && data.graphView.build(data.features).problems > 0) badges.graph = "warn";
+  const o = overviewOf(data, {});
+  if (o.attention.length > 0 || data.features.some((f) => (f.coverage?.uncovered.length ?? 0) > 0)) badges.quality = "warn";
+  return badges;
+}
+
+/** Items shown and the unfiltered total on a tab, for the filter line's "n of N match". */
+function tabCounts(data: OverviewTuiData, state: OverviewTuiState, tab: ReturnType<typeof tabOf>): { shown: number; total: number } {
+  switch (tab) {
+    case "fleet": {
+      const entry = currentFleet(data.fleets);
+      if (state.fleetGroup && isGrouped(entry)) return groupCounts(entry, groupFilterOf(state));
+      return { shown: visibleFleet(data, state)?.lanes.length ?? 0, total: data.fleet?.lanes.length ?? 0 };
+    }
+    case "graph":
+      return data.graphView ? { shown: graphModelFor(data, state).rows.length, total: data.graphView.build(data.features).rows.length } : { shown: 0, total: 0 };
+    case "quality":
+      return { shown: applyFilters(data.features, state.filters).length, total: data.features.length };
+    default:
+      return { shown: overviewOf(data, state.filters).features.length, total: data.features.length };
+  }
+}
+
+/**
+ * The tabbed frame (feature 032, US-1/US-3): the tab bar, the shared filter line and the screen body, with the key row
+ * leading with the tab keys (or shortened to "1-4 tab, ? help, q quit" on a narrow terminal). While typing, the filter
+ * line shows the text and the key row says how to apply or cancel.
+ */
+function tabFramed(caps: Capabilities, data: OverviewTuiData, state: OverviewTuiState, rendered: string): string {
+  const at = rendered.lastIndexOf("\n\n");
+  const body = at >= 0 ? rendered.slice(0, at) : rendered;
+  const hints = at >= 0 ? rendered.slice(at + 2) : "";
+  const tab = tabOf(state);
+  const f = state.filters;
+  const typing = state.input !== null;
+  const counts = tabCounts(data, state, tab);
+  const filterLine = renderFilterLine(caps, {
+    text: typing ? state.input! : (f.search ?? f.feature ?? ""),
+    label: typing ? (state.searching ? "/" : "feature") : f.search || !f.feature ? "/" : "feature",
+    typing,
+    ...(f.status !== undefined ? { state: f.status } : {}),
+    ...counts,
+  });
+  const footer = typing
+    ? keyHints(caps, [[caps.unicode ? "⏎" : "enter", "apply"], ["esc", "cancel"]])
+    : tabLayout(caps) === "narrow"
+      ? keyHints(caps, [["1-4", "tab"], ["?", "help"], ["q", "quit"]])
+      : `${keyHints(caps, [["1-4", "tab"], ["] [", "next/prev"]])}  ${hints}`;
+  return `${renderTabFrame(caps, { active: tab, badges: tabBadges(data), filterLine, body })}\n\n${footer}`;
 }
 
 function renderScreen(caps: Capabilities, data: OverviewTuiData, state: OverviewTuiState): { frame: string; screen: HelpScreen } {
@@ -463,6 +649,15 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
   const noticeMax = LIVE_TOKENS.limit["notice-max"];
   const presence = data.presence ? { presence: data.presence } : {};
   const nav = state.story;
+  if (data.tabs && state.quality) {
+    // Feature 032: the quality tab is the 024 view plus the FLOW panel (cycle time per phase, converge gap trend).
+    const o = overviewOf(data, state.filters);
+    const features = applyFilters(data.features, state.filters);
+    const empty = !data.features.some((f) => f.coverage) && o.attention.length === 0;
+    const base = empty ? tabEmptyBody(caps, "quality").join("\n") : renderQualityView(caps, features, o.attention);
+    const body = [base, "", ...renderMetricsPanel(caps, data.metricsState)].join("\n");
+    return { frame: `${body}\n\n${keyHints(caps, [["esc", "back"], ["/", "search"], ["s", "state"], ["?", "help"], ["q", "quit"]])}`, screen: "quality" };
+  }
   if (state.view === "feature" && state.feature && nav) {
     const filters = { ...state.filters, feature: state.feature };
     const feature = applyFilters(data.features, filters)[0];
@@ -499,15 +694,51 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
   }
   if (state.view === "fleet" && data.fleetView && state.fleet) {
     const api = data.fleetView;
-    const body = api.render(caps, {
-      view: data.fleet ?? null,
-      state: state.fleet,
-      ...(state.live ? { live: state.live } : {}),
-      now: state.now,
-      rows: data.rows ?? 24,
-    });
     const lane = u ? "↑↓" : "up/down";
-    const run = data.fleet ?? null;
+    const entry = data.tabs ? currentFleet(data.fleets) : null;
+    if (data.tabs && state.fleetGroup && isGrouped(entry) && data.fleetTab) {
+      // Feature 032 (FR-018): lanes grouped by feature across features, with 029 rows, confirm and directive rules inside.
+      const rows = groupRows(entry, state.fleetGroup.collapsed, groupFilterOf(state));
+      const body =
+        rows.length === 0
+          ? noMatchBody(caps, groupFilterOf(state).query).join("\n")
+          : data.fleetTab.render(caps, {
+              entry,
+              rows,
+              cursor: Math.min(state.fleetGroup.cursor, rows.length - 1),
+              inner: state.fleet,
+              selected: selectedFleetView(data, state),
+              ...(state.live ? { live: state.live } : {}),
+              now: state.now,
+              window: api.windowRows(data.rows ?? 24, null),
+            });
+      const hints = keyHints(caps, [
+        ["esc", "back"],
+        [lane, "item"],
+        [u ? "← →" : "left/right", "collapse"],
+        ["p", "pause"],
+        ["u", "continue"],
+        ["x", "stop"],
+        [u ? "⇧" : "shift", "whole run"],
+        ["a", "approve"],
+        ["?", "help"],
+        ["q", "quit"],
+      ]);
+      return { frame: `${body}\n\n${hints}`, screen: "fleet" };
+    }
+    const run = visibleFleet(data, state);
+    const body =
+      data.tabs && !data.fleet
+        ? tabEmptyBody(caps, "fleet").join("\n")
+        : data.tabs && run && run.lanes.length === 0 && (data.fleet?.lanes.length ?? 0) > 0
+          ? noMatchBody(caps, groupFilterOf(state).query).join("\n")
+          : api.render(caps, {
+              view: run,
+              state: state.fleet,
+              ...(state.live ? { live: state.live } : {}),
+              now: state.now,
+              rows: data.rows ?? 24,
+            });
     const hints = keyHints(caps, [
       ["esc", "back"],
       [lane, "lane"],
@@ -522,8 +753,14 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
     return { frame: `${body}\n\n${hints}`, screen: "fleet" };
   }
   if (state.view === "graph" && data.graphView) {
-    const model = data.graphView.build(data.features);
-    const body = data.graphView.render(caps, model, state.graph?.cursor ?? 0);
+    const model = graphModelFor(data, state);
+    const everything = data.tabs ? data.graphView.build(data.features) : model;
+    const body =
+      data.tabs && everything.rows.length === 0 && everything.doneCount === 0
+        ? tabEmptyBody(caps, "graph").join("\n")
+        : data.tabs && model.rows.length === 0 && everything.rows.length > 0
+          ? noMatchBody(caps, groupFilterOf(state).query).join("\n")
+          : data.graphView.render(caps, model, state.graph?.cursor ?? 0);
     const hints = keyHints(caps, [["esc", "back"], [move, "move"], [enter, "open feature"], ["?", "help"], ["q", "quit"]]);
     return { frame: `${body}\n\n${hints}`, screen: "graph" };
   }
@@ -539,7 +776,7 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
     ...presence,
   });
   const footer =
-    state.input !== null
+    state.input !== null && !data.tabs
       ? filterInput(caps, state.input, state.searching ? "search" : "filter")
       : keyHints(caps, [
           ["tab", "panel"],
@@ -552,12 +789,17 @@ function renderScreen(caps: Capabilities, data: OverviewTuiData, state: Overview
           ["c", "quality"],
           ["?", "help"],
           ["q", "quit"],
-        ]) + filterNote(state.filters);
+        ]) + (data.tabs ? "" : filterNote(state.filters));
   return { frame: `${body}\n\n${footer}`, screen: "overview" };
 }
 
 /** Render the current frame, with the help overlay on top when it is open. */
 export function renderOverviewTui(caps: Capabilities, data: OverviewTuiData, state: OverviewTuiState): string {
+  if (data.tabs) {
+    const { frame, screen } = renderScreen(caps, data, state);
+    const framed = tabFramed(caps, data, state, frame);
+    return state.help ? renderHelp(caps, framed, screen, data.issues.map((i) => `${i.file}: ${i.reason}`)) : framed;
+  }
   if (state.quality && state.view === "overview") {
     const o = overviewOf(data, state.filters);
     const hints = keyHints(caps, [["any key", "back"], ["q", "quit"]]);

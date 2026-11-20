@@ -23,3 +23,11 @@ export function noMatchLine(caps: Capabilities, filter: string): string {
   const dash = caps.unicode ? " — " : " - ";
   return paintToken(caps, TOKENS.semantic.color.muted, `Nothing matches filter "${filter}"${dash}esc to clear.`);
 }
+
+/** Feature 032 (FR-002): what each tab says when it has nothing to show, and how to get data. */
+export const TAB_EMPTY: Record<"overview" | "fleet" | "graph" | "quality", { title: string; how: string }> = {
+  overview: { title: "No features yet.", how: "Run ambykit init, then /amby.specify." },
+  fleet: { title: "No fleet run is active.", how: "Start one with ambykit run <feature>." },
+  graph: { title: "No story dependencies yet.", how: "Add depends-on to stories, or run ambykit graph." },
+  quality: { title: "No coverage data yet.", how: "Run ambykit trace <feature> after tests exist." },
+};

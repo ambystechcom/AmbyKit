@@ -10,7 +10,7 @@ import { TOKENS } from "./tokens.js";
  * glyph legend, in a focused frame centered over the dimmed frame beneath. Pure.
  */
 
-export type HelpScreen = "overview" | "feature" | "story" | "graph" | "fleet";
+export type HelpScreen = "overview" | "feature" | "story" | "graph" | "fleet" | "quality";
 
 /** The tab keys, listed on every screen (feature 032, FR-004); the reducer binds them with `tabForKey`. */
 const TAB_KEYS: [string, string, string] = ["1-4 / ] [", "1-4 / ] [", "switch tab: overview, fleet, graph, quality"];
@@ -45,18 +45,31 @@ export const KEY_MAP: Record<HelpScreen, [string, string, string][]> = {
     TAB_KEYS,
     ["↑ ↓", "up / down", "move"],
     ["⏎", "enter", "open the story's feature"],
-    ["esc", "esc", "back"],
+    ["/", "/", "search stories (shared filter)"],
+    ["s", "s", "cycle the state filter"],
+    ["esc", "esc", "clear the filter, then back"],
     ["r", "r", "retry live updates (when paused)"],
     ["q", "q", "quit"],
   ],
   fleet: [
     TAB_KEYS,
-    ["↑ ↓", "up / down", "select a lane"],
+    ["↑ ↓", "up / down", "select a lane (or feature, when grouped)"],
+    ["← →", "left / right", "collapse / expand a feature (fleets of 2+ features)"],
+    ["/", "/", "search lanes (shared filter)"],
+    ["s", "s", "cycle the state filter"],
     ["p / P", "p / P", "pause the lane / the whole run"],
     ["u / U", "u / U", "continue the lane / the whole run"],
     ["x / X", "x / X", "stop the lane / the whole run (asks to confirm)"],
     ["a", "a", "approve the selected gate"],
     ["esc", "esc", "back"],
+    ["r", "r", "retry live updates (when paused)"],
+    ["q", "q", "quit"],
+  ],
+  quality: [
+    TAB_KEYS,
+    ["/", "/", "search features (shared filter)"],
+    ["s", "s", "cycle the state filter"],
+    ["esc", "esc", "clear the filter, then back"],
     ["r", "r", "retry live updates (when paused)"],
     ["q", "q", "quit"],
   ],

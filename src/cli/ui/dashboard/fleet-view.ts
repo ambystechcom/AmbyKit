@@ -169,7 +169,7 @@ function confirmLines(caps: Capabilities, view: FleetView, intent: FleetIntent):
   return { title: `${words[intent.kind].toUpperCase()} ALL LANES`, body: [`${words[intent.kind]} all ${n} lane${n === 1 ? "" : "s"} of ${view.run.run}?`, note, hint].filter((x) => x !== "") };
 }
 
-function renderConfirm(caps: Capabilities, frame: string, view: FleetView, intent: FleetIntent): string {
+export function renderConfirm(caps: Capabilities, frame: string, view: FleetView, intent: FleetIntent): string {
   const { title, body } = confirmLines(caps, view, intent);
   const widest = Math.max(...body.map(visibleWidth), visibleWidth(title)) + 4;
   const width = Math.min(caps.columns, Math.max(T.space["fleet-confirm-width"], widest));

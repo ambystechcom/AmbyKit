@@ -73,19 +73,19 @@ created: 2026-11-19
 
 ## Phase 7 — User story US-1  (priority: P1)
 
-- [ ] [T060] [P] [US1] Tab bar renderer from the signed-off tokens, active tab marked (src/cli/ui/dashboard/tab-bar.ts)
-- [ ] [T061] [P] [US1] Empty state per tab: what is missing and how to get data (src/cli/ui/dashboard/empty-state.ts)
-- [ ] [T062] [P] [US4] Metrics panel (cycle time per phase, converge gap trend, "not enough data") in the quality tab (src/cli/ui/dashboard/metrics-panel.ts)
-- [ ] [T063] [US1] Host the existing views as tab bodies, replace the scattered view and quality switches, no loss of information (src/cli/ui/interactive/overview.ts, src/cli/ui/dashboard/render-overview.ts)
-- [ ] [T064] [US1] Tests: parity of every existing panel's content in its tab against the 1.6.0 rendering, tab bar, empty states, metrics panel — 032:FR-001, FR-002, FR-003, FR-007, FR-008 (test/ui/tabs-render.test.ts, test/ui/tabs-parity.test.ts)
-- **Verify:** `npx vitest run test/ui/tabs-render.test.ts test/ui/tabs-parity.test.ts` pass; the overview, feature, graph, fleet and quality renderers' existing tests are unchanged.
+- [x] [T060] [P] [US1] Tab bar renderer from the signed-off tokens, active tab marked (src/cli/ui/dashboard/tab-bar.ts) ↪ DEVIATION: the tab bar is one row directly above each screen's own header, not inside a new outer heavy frame: the existing screens draw their own headers and frames, and FR-003 keeps them unchanged; tokens are mirrored in tab-tokens.ts (test/ui/tab-tokens.test.ts keeps them in sync)
+- [x] [T061] [P] [US1] Empty state per tab: what is missing and how to get data (src/cli/ui/dashboard/empty-state.ts) ↪ DEVIATION: the per-tab copy is `TAB_EMPTY` in empty-state.ts and is rendered (framed on a terminal, plain lines otherwise) by `tabEmptyBody` in tab-frame.ts
+- [x] [T062] [P] [US4] Metrics panel (cycle time per phase, converge gap trend, "not enough data") in the quality tab (src/cli/ui/dashboard/metrics-panel.ts)
+- [x] [T063] [US1] Host the existing views as tab bodies, replace the scattered view and quality switches, no loss of information (src/cli/ui/interactive/overview.ts, src/cli/ui/dashboard/render-overview.ts) ↪ DEVIATION: tab mode is `OverviewTuiData.tabs`, set only by the interactive command, so one-shot, --json and every earlier test render as before; `tabOf` maps the existing `view`/`quality` state onto the tabs and `renderOverviewTui` wraps the screen body (the old fields are the tab bodies' state, not removed)
+- [x] [T064] [US1] Tests: parity of every existing panel's content in its tab against the 1.6.0 rendering, tab bar, empty states, metrics panel — 032:FR-001, FR-002, FR-003, FR-007, FR-008 (test/ui/tabs-render.test.ts, test/ui/tabs-parity.test.ts) ↪ DEVIATION: tests are test/ui/tabs-render.test.ts and test/ui/tabs-parity.test.ts (plus test/ui/tab-tokens.test.ts for the token mirror)
+- **Verify:** `npx vitest run test/ui/tabs-render.test.ts test/ui/tabs-parity.test.ts` pass; the overview, feature, graph, fleet and quality renderers' existing tests are unchanged. ✓ passed: tabs-render and tabs-parity pass with the token-mirror test; the overview, feature, graph, fleet and quality renderers' existing tests are unchanged
 - **Checkpoint:** US-1 demoable: four tabs with metrics in quality.
 
 ## Phase 8 — User story US-7  (priority: P2)
 
-- [ ] [T070] [US7] One state token set (working, blocked, done, stalled) used by every tab; spacing and headings from the design (src/cli/ui/dashboard/tokens.ts)
-- [ ] [T071] [US7] Tests: a state renders identically in every tab — 032:FR-015 (test/ui/state-consistency.test.ts)
-- **Verify:** `npx vitest run test/ui/state-consistency.test.ts` pass.
+- [x] [T070] [US7] One state token set (working, blocked, done, stalled) used by every tab; spacing and headings from the design (src/cli/ui/dashboard/tokens.ts) ↪ DEVIATION: the shared state set is `semantic.state.*` in design-tokens.json, mirrored in tab-tokens.ts (not tokens.ts); the renderers reuse 029's `stateGlyph`/`stateCell`, so lane rows and feature headers share one glyph, word and color
+- [x] [T071] [US7] Tests: a state renders identically in every tab — 032:FR-015 (test/ui/state-consistency.test.ts)
+- **Verify:** `npx vitest run test/ui/state-consistency.test.ts` pass. ✓ passed: state-consistency passes
 - **Checkpoint:** one look across tabs.
 
 ## Phase 9 — User story US-6  (priority: P1)
