@@ -17,20 +17,20 @@ created: 2026-11-19
 
 ## Phase 1 — Setup: inventory and contracts
 
-- [ ] [T001] Inventory what the one-shot path loads today and which views the tabs host (overview, feature, graph, fleet, quality); record the 030 and 031 names used by this plan (specs/032-dashboard-redesign-and-metrics/research.md)
-- [ ] [T002] [P] Metrics history fixture: a temp git repo built from scripted commits (spec ready, tasks checked, converge gap tasks; v1 and v2 forms; a squashed span) (test/helpers/metrics-history.ts)
-- **Verify:** research.md lists each hosted view with its source file and whether one-shot loads it, plus the pending 030/031 names; the fixture builds a repo whose log has the scripted commits (`npx vitest run test/helpers`).
+- [x] [T001] Inventory what the one-shot path loads today and which views the tabs host (overview, feature, graph, fleet, quality); record the 030 and 031 names used by this plan (specs/032-dashboard-redesign-and-metrics/research.md)
+- [x] [T002] [P] Metrics history fixture: a temp git repo built from scripted commits (spec ready, tasks checked, converge gap tasks; v1 and v2 forms; a squashed span) (test/helpers/metrics-history.ts)
+- **Verify:** research.md lists each hosted view with its source file and whether one-shot loads it, plus the pending 030/031 names; the fixture builds a repo whose log has the scripted commits (`npx vitest run test/helpers`). ✓ passed
 - **Checkpoint:** inputs known.
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T010] Metrics types: Revision, PhaseCycle, GapPoint, Metrics (src/core/metrics/types.ts)
-- [ ] [T011] [P] List filter slice: `{query, state}` over features, stories and lanes, pure, with the active-filter text (src/cli/ui/interactive/list-filter.ts)
-- [ ] [T012] [P] Tests for the list filter: text and ID search, state filter, nothing matches, clear — 032:FR-006 (test/ui/list-filter.test.ts)
-- [ ] [T013] [P] Tab slice: `Tab` type, `nextTab`, `prevTab`, `tabByNumber`, unknown input is a no-op (src/cli/ui/interactive/tabs.ts)
-- [ ] [T014] [P] Tests for the tab slice — 032:FR-004 (test/ui/tabs.test.ts)
-- [ ] [T015] [P] JSON field-set baseline: record today's `dashboard --json` and overview-json field names; budget harness for one-shot on the largest fixture — 032:FR-009, FR-010 (test/cli/dashboard-budget.test.ts, test/fixtures/dashboard-json-fields.json)
-- **Verify:** `npm run typecheck` and `npx vitest run test/ui/list-filter.test.ts test/ui/tabs.test.ts test/cli/dashboard-budget.test.ts` pass; no existing dashboard test changes.
+- [x] [T010] Metrics types: Revision, PhaseCycle, GapPoint, Metrics (src/core/metrics/types.ts)
+- [x] [T011] [P] List filter slice: `{query, state}` over features, stories and lanes, pure, with the active-filter text (src/cli/ui/interactive/list-filter.ts)
+- [x] [T012] [P] Tests for the list filter: text and ID search, state filter, nothing matches, clear — 032:FR-006 (test/ui/list-filter.test.ts)
+- [x] [T013] [P] Tab slice: `Tab` type, `nextTab`, `prevTab`, `tabByNumber`, unknown input is a no-op (src/cli/ui/interactive/tabs.ts)
+- [x] [T014] [P] Tests for the tab slice — 032:FR-004 (test/ui/tabs.test.ts)
+- [x] [T015] [P] JSON field-set baseline: record today's `dashboard --json` and overview-json field names; budget harness for one-shot on the largest fixture — 032:FR-009, FR-010 (test/cli/dashboard-budget.test.ts, test/fixtures/dashboard-json-fields.json)
+- **Verify:** `npm run typecheck` and `npx vitest run test/ui/list-filter.test.ts test/ui/tabs.test.ts test/cli/dashboard-budget.test.ts` pass; no existing dashboard test changes. ✓ passed
 - **Checkpoint:** reducers and baselines exist. Story phases may start.
 
 ## Phase 3 — User story US-4  (priority: P1)
