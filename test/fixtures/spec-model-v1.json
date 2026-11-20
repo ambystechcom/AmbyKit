@@ -13910,5 +13910,839 @@
     "duplicates": 0
    }
   ]
+ },
+ "029-fleet-control-room": {
+  "stories": [
+   {
+    "id": "US1",
+    "displayId": "US-1",
+    "title": "See every lane at a glance",
+    "priority": "P1",
+    "status": "done",
+    "dependsOn": [],
+    "blockedBy": []
+   },
+   {
+    "id": "US2",
+    "displayId": "US-2",
+    "title": "See the review-loop state",
+    "priority": "P1",
+    "status": "done",
+    "dependsOn": [
+     "US1"
+    ],
+    "blockedBy": []
+   },
+   {
+    "id": "US3",
+    "displayId": "US-3",
+    "title": "Spot stalled lanes",
+    "priority": "P1",
+    "status": "done",
+    "dependsOn": [
+     "US1"
+    ],
+    "blockedBy": []
+   },
+   {
+    "id": "US4",
+    "displayId": "US-4",
+    "title": "Pause, resume and stop from the dashboard",
+    "priority": "P1",
+    "status": "done",
+    "dependsOn": [
+     "US1"
+    ],
+    "blockedBy": []
+   },
+   {
+    "id": "US5",
+    "displayId": "US-5",
+    "title": "Approve gates",
+    "priority": "P2",
+    "status": "done",
+    "dependsOn": [
+     "US4"
+    ],
+    "blockedBy": []
+   },
+   {
+    "id": "US6",
+    "displayId": "US-6",
+    "title": "Works in any terminal",
+    "priority": "P1",
+    "status": "done",
+    "dependsOn": [
+     "US1"
+    ],
+    "blockedBy": []
+   },
+   {
+    "id": "US7",
+    "displayId": "US-7",
+    "title": "Keep one-shot and JSON output fast and stable",
+    "priority": "P1",
+    "status": "done",
+    "dependsOn": [],
+    "blockedBy": []
+   },
+   {
+    "id": "US8",
+    "displayId": "US-8",
+    "title": "Settle the terminal foundation first",
+    "priority": "P2",
+    "status": "in-progress",
+    "dependsOn": [],
+    "blockedBy": []
+   }
+  ],
+  "tasks": [
+   {
+    "id": "T001",
+    "done": true,
+    "story": "US8",
+    "description": "Fleet fixture helper: temp project with a run, N lanes (worktrees), 025-shape markers, directives, and a `run.json` copied exactly from 025's `data-model.md` schema",
+    "phase": 1,
+    "parallel": false,
+    "paths": [
+     "test/helpers/fleet-fixture.ts"
+    ]
+   },
+   {
+    "id": "T002",
+    "done": true,
+    "story": "US8",
+    "description": "Spike A: Fleet view for 10 lanes on the existing layer plus a small internal screen-buffer/layout module",
+    "phase": 1,
+    "parallel": true,
+    "paths": [
+     "src/cli/ui/interactive/spike/fleet-spike.ts"
+    ],
+    "deviation": "spike code and its measure script were removed after measuring (T032 wrote the renderer fresh on 014/017's helpers); the numbers are kept in research.md"
+   },
+   {
+    "id": "T003",
+    "done": false,
+    "story": "US8",
+    "description": "Spike B: same view on Ink 7 in a scratch dir outside `src/`; measure install size, Node 22 need, restore, fallbacks, icon width",
+    "phase": 1,
+    "parallel": true,
+    "paths": [
+     "specs/029-fleet-control-room/spike"
+    ],
+    "blocked": "no network in this build, so Ink 7 could not be installed or measured (research.md records spike B as not measured)"
+   },
+   {
+    "id": "T004",
+    "done": true,
+    "story": "US8",
+    "description": "Write findings: measured effort and trade-offs for both options, recommendation",
+    "phase": 1,
+    "parallel": false,
+    "paths": [
+     "specs/029-fleet-control-room/research.md"
+    ]
+   },
+   {
+    "id": "T005",
+    "done": true,
+    "story": "US8",
+    "description": "Record the foundation decision with the evidence via `/amby.decide`",
+    "phase": 1,
+    "parallel": false,
+    "paths": [
+     ".amby/decisions"
+    ],
+    "deviation": "ADR-004 written by hand in the /amby.decide record format (the prompt cannot run inside a worker), index row added in .amby/decisions/README.md"
+   },
+   {
+    "id": "T010",
+    "done": true,
+    "story": null,
+    "description": "Contract check: confirm spec 025 provides lane/state (incl. `paused`) markers, `writeDirective`, run resolution, `laneStatus` and the `fleet.stallMinutes` config; confirm spec 019's prompt writes `stage`/`round` to `run.json` and spec 028 writes `gates[]` (`approveGate`); record deviations under Open decisions",
+    "phase": 2,
+    "parallel": false,
+    "paths": [
+     "specs/029-fleet-control-room/plan.md"
+    ],
+    "deviation": "pinned by a new test, test/core/fleet-view-contract.test.ts; notes are in research.md"
+   },
+   {
+    "id": "T011",
+    "done": true,
+    "story": null,
+    "description": "View-model types only: LaneView, RunView, ReviewStage, GateView, DirectiveStatus, FleetView, built from spec 025's types",
+    "phase": 2,
+    "parallel": false,
+    "paths": [
+     "src/core/fleet-view/types.ts"
+    ]
+   },
+   {
+    "id": "T012",
+    "done": true,
+    "story": null,
+    "description": "Pure mapping from 025's results to view rows: lane state, stalled flag from 025's `laneStatus`, directive-status word from 025's derivation, unknown on bad data; no stall logic and no state parsing here",
+    "phase": 2,
+    "parallel": true,
+    "paths": [
+     "src/core/fleet-view/derive.ts"
+    ]
+   },
+   {
+    "id": "T013",
+    "done": true,
+    "story": null,
+    "description": "Tests for the mapping: stalled rows follow `laneStatus` (waiting/done never stalled), directive vs report times, clock skew, unknown — 029:FR-003, FR-005, FR-007",
+    "phase": 2,
+    "parallel": true,
+    "paths": [
+     "test/core/fleet-derive.test.ts"
+    ]
+   },
+   {
+    "id": "T014",
+    "done": true,
+    "story": null,
+    "description": "`readFleet(checkouts, now)` over 025's readers: markers + directives + `run.json`; null when no run; unreadable lane ⇒ unknown",
+    "phase": 2,
+    "parallel": true,
+    "paths": [
+     "src/core/fleet-view/read.ts"
+    ]
+   },
+   {
+    "id": "T015",
+    "done": true,
+    "story": null,
+    "description": "Tests for readFleet incl. no-run null and corrupt files — 029:FR-003, FR-013",
+    "phase": 2,
+    "parallel": true,
+    "paths": [
+     "test/core/fleet-read.test.ts"
+    ]
+   },
+   {
+    "id": "T016",
+    "done": true,
+    "story": null,
+    "description": "`watchTargets` adds `.amby/fleet` (recursive) in the primary checkout",
+    "phase": 2,
+    "parallel": true,
+    "paths": [
+     "src/cli/ui/interactive/live.ts"
+    ],
+    "deviation": "added as separate `fleetWatchTargets`/`liveTargets` so `watchTargets` and its exact-list test stay unchanged; dashboard.ts arms `liveTargets`"
+   },
+   {
+    "id": "T017",
+    "done": true,
+    "story": null,
+    "description": "Test: fleet dir change triggers refresh; polling fallback covers it — 029:FR-002",
+    "phase": 2,
+    "parallel": true,
+    "paths": [
+     "test/ui/live-fleet.test.ts"
+    ]
+   },
+   {
+    "id": "T018",
+    "done": true,
+    "story": null,
+    "description": "Config: `dashboard.icons` nerd|unicode|ascii|auto (zod + `AmbyConfig`), never written by the dashboard",
+    "phase": 2,
+    "parallel": true,
+    "paths": [
+     "src/core/config.ts",
+     "src/core/types.ts"
+    ]
+   },
+   {
+    "id": "T019",
+    "done": true,
+    "story": null,
+    "description": "Pure `resolveIconMode({flag, env, config, caps})` with precedence flag > env > config > auto",
+    "phase": 2,
+    "parallel": true,
+    "paths": [
+     "src/cli/ui/icons.ts"
+    ]
+   },
+   {
+    "id": "T020",
+    "done": true,
+    "story": null,
+    "description": "Tests: precedence matrix, invalid config value, non-TTY — 029:FR-011",
+    "phase": 2,
+    "parallel": true,
+    "paths": [
+     "test/ui/icons.test.ts",
+     "test/core/config-icons.test.ts"
+    ]
+   },
+   {
+    "id": "T021",
+    "done": true,
+    "story": null,
+    "description": "Wire `resolveIconMode` into the dashboard command, keeping `--icons` validation as today",
+    "phase": 2,
+    "parallel": false,
+    "paths": [
+     "src/cli/dashboard.ts"
+    ],
+    "deviation": "`applyIcons` now takes the project root and leaves caps untouched when the resolved mode equals the detected one, so output without `dashboard.icons` is unchanged"
+   },
+   {
+    "id": "T022",
+    "done": true,
+    "story": null,
+    "description": "PERSON: `/amby.design` sign-off for the Fleet view (`ui.md` + `design-tokens.json`, starting from the roadmap sketch); must complete before T030 and T032",
+    "phase": 2,
+    "parallel": false,
+    "paths": [
+     "specs/029-fleet-control-room/ui.md"
+    ],
+    "deviation": "signed off 2026-11-18 with five decisions recorded in ui.md (continue is u/U; review state header-only; every whole-run action confirms; newest run plus '+N more runs'; Nerd glyphs keep the plan default, not asked)"
+   },
+   {
+    "id": "T030",
+    "done": true,
+    "story": "US1",
+    "description": "Fleet tokens: state glyphs in nerd/unicode/ascii plus a word for every state, from signed-off design tokens",
+    "phase": 3,
+    "parallel": true,
+    "paths": [
+     "src/cli/ui/dashboard/fleet-tokens.ts"
+    ],
+    "deviation": "the tokens mirror is generated by resolving the 029 tokens against 014 + 017 + 029; test/ui/fleet-tokens.test.ts keeps it in sync"
+   },
+   {
+    "id": "T031",
+    "done": true,
+    "story": "US1",
+    "description": "Reducer slice: `view: \"fleet\"`, lane cursor, scroll, enter/leave",
+    "phase": 3,
+    "parallel": true,
+    "paths": [
+     "src/cli/ui/interactive/fleet.ts"
+    ],
+    "deviation": "standalone slice with `back` and `quit` flags; hooking it into the overview reducer is T035 (gated by T022)"
+   },
+   {
+    "id": "T032",
+    "done": true,
+    "story": "US1",
+    "description": "Fleet renderer: rows (assistant badge, state, time since last activity), distinct rows for same assistant, no-run line, unknown lane, scroll in a short terminal",
+    "phase": 3,
+    "parallel": false,
+    "paths": [
+     "src/cli/ui/dashboard/fleet-view.ts"
+    ],
+    "deviation": "the renderer is written fresh on 014/017's panel, truncateVisible and agentBadge (the spike code was removed); gates sit in the same frame under a GATES line, not a second panel; it also exports the FleetViewApi that overview.ts receives"
+   },
+   {
+    "id": "T033",
+    "done": true,
+    "story": "US1",
+    "description": "Renderer tests: wide/narrow/plain, NO_COLOR, unknown, empty, many lanes — 029:FR-001, FR-003",
+    "phase": 3,
+    "parallel": true,
+    "paths": [
+     "test/ui/fleet-view.test.ts"
+    ],
+    "deviation": "extra renderer tests in test/ui/fleet-directive-view.test.ts (directive words and the confirm dialog) and test/ui/fleet-overview.test.ts (the overview wiring)"
+   },
+   {
+    "id": "T034",
+    "done": true,
+    "story": "US1",
+    "description": "Reducer tests: open/close, cursor bounds, scroll — 029:FR-001",
+    "phase": 3,
+    "parallel": true,
+    "paths": [
+     "test/ui/fleet-reducer.test.ts"
+    ]
+   },
+   {
+    "id": "T035",
+    "done": true,
+    "story": "US1",
+    "description": "Hook the Fleet view into the overview reducer/renderer; `l` opens, `esc` back; keys in the help overlay",
+    "phase": 3,
+    "parallel": false,
+    "paths": [
+     "src/cli/ui/interactive/overview.ts",
+     "src/cli/ui/dashboard/help-overlay.ts"
+    ],
+    "deviation": "the view is handed to overview.ts as an injected FleetViewApi after a dynamic import (type-only imports there), so the one-shot path never loads it, like 023's graph view; `l` opens it"
+   },
+   {
+    "id": "T036",
+    "done": true,
+    "story": "US1",
+    "description": "`interactive()`: read fleet on refresh and heartbeat, pass into view data",
+    "phase": 3,
+    "parallel": false,
+    "paths": [
+     "src/cli/dashboard.ts"
+    ],
+    "deviation": "the heartbeat re-reads the run as well as refresh, so a quiet lane shows STALLED without a file change; terminal rows come from process.stdout.rows"
+   },
+   {
+    "id": "T037",
+    "done": true,
+    "story": "US1",
+    "description": "e2e on fake stdin: 3 lanes shown, a lane state change updates the frame without reload, no run says so — SC-001, 029:FR-002",
+    "phase": 3,
+    "parallel": false,
+    "paths": [
+     "test/cli/dashboard-fleet.test.ts"
+    ]
+   },
+   {
+    "id": "T040",
+    "done": true,
+    "story": "US2",
+    "description": "Read `stage`, `round`, `limit` and `needsDecision` from `run.json` (025 schema, written by 019's prompt and 028); absent ⇒ stage working",
+    "phase": 4,
+    "parallel": true,
+    "paths": [
+     "src/core/fleet-view/read.ts"
+    ],
+    "deviation": "satisfied by `runView` over 025's `readRun` (which already defaults stage, round, limit and needsDecision); no separate read code"
+   },
+   {
+    "id": "T041",
+    "done": true,
+    "story": "US2",
+    "description": "Render the stage (working / QA / architect review), round vs limit, and a needs-decision mark",
+    "phase": 4,
+    "parallel": false,
+    "paths": [
+     "src/cli/ui/dashboard/fleet-view.ts"
+    ],
+    "deviation": "review state is shown once in the run header (signed-off decision), not per lane"
+   },
+   {
+    "id": "T042",
+    "done": true,
+    "story": "US2",
+    "description": "Core tests: stage mapping, missing data not an error — 029:FR-004",
+    "phase": 4,
+    "parallel": true,
+    "paths": [
+     "test/core/fleet-review.test.ts"
+    ]
+   },
+   {
+    "id": "T043",
+    "done": true,
+    "story": "US2",
+    "description": "Renderer tests for each stage and the needs-decision state",
+    "phase": 4,
+    "parallel": true,
+    "paths": [
+     "test/ui/fleet-review-view.test.ts"
+    ]
+   },
+   {
+    "id": "T050",
+    "done": true,
+    "story": "US3",
+    "description": "Stalled highlight with text `STALLED <quiet time>` driven by spec 025's `laneStatus`, cleared on next report",
+    "phase": 5,
+    "parallel": false,
+    "paths": [
+     "src/cli/ui/dashboard/fleet-view.ts"
+    ]
+   },
+   {
+    "id": "T051",
+    "done": true,
+    "story": "US3",
+    "description": "Tests: working lane over limit stalls; waiting/done do not; `tasks.md` change resets — 029:FR-005",
+    "phase": 5,
+    "parallel": true,
+    "paths": [
+     "test/core/fleet-stall.test.ts"
+    ]
+   },
+   {
+    "id": "T052",
+    "done": true,
+    "story": "US3",
+    "description": "View tests: highlight readable without color, clears on report",
+    "phase": 5,
+    "parallel": true,
+    "paths": [
+     "test/ui/fleet-stall-view.test.ts"
+    ]
+   },
+   {
+    "id": "T053",
+    "done": true,
+    "story": "US3",
+    "description": "e2e: quiet lane highlights within one refresh of the limit, then clears — SC-002",
+    "phase": 5,
+    "parallel": false,
+    "paths": [
+     "test/cli/dashboard-fleet-stall.test.ts"
+    ]
+   },
+   {
+    "id": "T060",
+    "done": true,
+    "story": "US4",
+    "description": "`fleet-actions`: pause/resume/stop → directive writes through spec 025's `writeDirective` (short lane form in file names), per lane or every lane of the run, last write wins; a worker finishes its current task before obeying",
+    "phase": 6,
+    "parallel": true,
+    "paths": [
+     "src/cli/ui/interactive/fleet-actions.ts"
+    ]
+   },
+   {
+    "id": "T061",
+    "done": true,
+    "story": "US4",
+    "description": "Reducer: `p` pause, `u` continue, `x` stop, shifted = whole run, confirm dialog for stop and run-level actions",
+    "phase": 6,
+    "parallel": true,
+    "paths": [
+     "src/cli/ui/interactive/fleet.ts"
+    ],
+    "deviation": "key letters are the plan's D3 defaults in one `FLEET_KEYS` constant, decided at the T022 sign-off: u/U continue, all whole-run actions confirm"
+   },
+   {
+    "id": "T062",
+    "done": true,
+    "story": "US4",
+    "description": "Render directive status (pending / pause requested / obeyed) and the confirm dialog",
+    "phase": 6,
+    "parallel": false,
+    "paths": [
+     "src/cli/ui/dashboard/fleet-view.ts"
+    ],
+    "deviation": "directive status words and the confirm dialog are rendered in fleet-view.ts; tests are in test/ui/fleet-directive-view.test.ts"
+   },
+   {
+    "id": "T063",
+    "done": true,
+    "story": "US4",
+    "description": "Wrapper executes the intent in `interactive()` reduce, then refreshes",
+    "phase": 6,
+    "parallel": false,
+    "paths": [
+     "src/cli/dashboard.ts"
+    ],
+    "deviation": "the effect runs in dashboard.ts's reduce wrapper after the pure reducer, then re-reads the run and shows the result as a notice line"
+   },
+   {
+    "id": "T064",
+    "done": true,
+    "story": "US4",
+    "description": "Tests with a fake writer: one lane, run-level, replace pause with continue — 029:FR-006",
+    "phase": 6,
+    "parallel": true,
+    "paths": [
+     "test/ui/fleet-actions.test.ts"
+    ]
+   },
+   {
+    "id": "T065",
+    "done": true,
+    "story": "US4",
+    "description": "Reducer tests: confirm on stop, cancel writes nothing — 029:FR-008",
+    "phase": 6,
+    "parallel": true,
+    "paths": [
+     "test/ui/fleet-controls.test.ts"
+    ]
+   },
+   {
+    "id": "T066",
+    "done": true,
+    "story": "US4",
+    "description": "e2e: pause shows pause requested until the lane's next report, resume continues, opposite directives show last write — SC-003, 029:FR-007",
+    "phase": 6,
+    "parallel": false,
+    "paths": [
+     "test/cli/dashboard-fleet-control.test.ts"
+    ]
+   },
+   {
+    "id": "T070",
+    "done": true,
+    "story": "US6",
+    "description": "Matrix test: every state × nerd/unicode/ascii × wide/narrow/plain/NO_COLOR is readable by word — SC-004, 029:FR-010",
+    "phase": 7,
+    "parallel": true,
+    "paths": [
+     "test/ui/fleet-icons.test.ts"
+    ]
+   },
+   {
+    "id": "T071",
+    "done": true,
+    "story": "US6",
+    "description": "Compact layout under 60 columns without truncating state names",
+    "phase": 7,
+    "parallel": false,
+    "paths": [
+     "src/cli/ui/dashboard/fleet-view.ts"
+    ],
+    "deviation": "in the compact layout the live indicator is dropped from the header so NEEDS A DECISION is never cut"
+   },
+   {
+    "id": "T072",
+    "done": true,
+    "story": "US6",
+    "description": "e2e: precedence flag > env > config > auto on the Fleet view — 029:FR-011",
+    "phase": 7,
+    "parallel": true,
+    "paths": [
+     "test/cli/dashboard-fleet-icons.test.ts"
+    ]
+   },
+   {
+    "id": "T080",
+    "done": true,
+    "story": "US7",
+    "description": "Add optional `fleet` object to `--json --overview` only when a run exists; bare `--json` and one-shot text unchanged",
+    "phase": 8,
+    "parallel": false,
+    "paths": [
+     "src/cli/dashboard.ts"
+    ]
+   },
+   {
+    "id": "T081",
+    "done": true,
+    "story": "US7",
+    "description": "Contract doc for the new JSON fields",
+    "phase": 8,
+    "parallel": true,
+    "paths": [
+     "specs/029-fleet-control-room/contracts/dashboard-json-fleet.md"
+    ]
+   },
+   {
+    "id": "T082",
+    "done": true,
+    "story": "US7",
+    "description": "Tests: existing fields unchanged, no-run output byte-identical, fleet fields shape — 029:FR-012, FR-013",
+    "phase": 8,
+    "parallel": true,
+    "paths": [
+     "test/cli/dashboard-fleet-json.test.ts"
+    ]
+   },
+   {
+    "id": "T083",
+    "done": true,
+    "story": "US7",
+    "description": "Perf: one-shot and `--json` with 10 lanes under 1 s; non-interactive loads no fleet view or watcher — SC-005",
+    "phase": 8,
+    "parallel": true,
+    "paths": [
+     "test/cli/dashboard-fleet-perf.test.ts"
+    ]
+   },
+   {
+    "id": "T090",
+    "done": true,
+    "story": "US5",
+    "description": "Read gates (story, awaiting approval) from `gates[]` in `run.json`",
+    "phase": 9,
+    "parallel": true,
+    "paths": [
+     "src/core/fleet-view/read.ts"
+    ]
+   },
+   {
+    "id": "T091",
+    "done": true,
+    "story": "US5",
+    "description": "Render awaiting-approval marks and a combined gate list",
+    "phase": 9,
+    "parallel": false,
+    "paths": [
+     "src/cli/ui/dashboard/fleet-view.ts"
+    ],
+    "deviation": "pending gates first, then the last two approved ones; tests are in test/ui/fleet-gates-view.test.ts"
+   },
+   {
+    "id": "T092",
+    "done": true,
+    "story": "US5",
+    "description": "Reducer: `a` approve calls spec 028's `approveGate` (the same function as `ambykit run approve`), never a `continue` directive; declining or leaving writes nothing, lane stays paused",
+    "phase": 9,
+    "parallel": true,
+    "paths": [
+     "src/cli/ui/interactive/fleet.ts",
+     "src/cli/ui/interactive/fleet-actions.ts"
+    ],
+    "deviation": "the reducer records an approve intent and `performFleetIntent` in fleet-actions.ts calls 028's approveGate; the gate list is rendered by T091 (gated)"
+   },
+   {
+    "id": "T093",
+    "done": true,
+    "story": "US5",
+    "description": "Tests: approve releases a 028 gate, decline, several gates listed — 029:FR-009",
+    "phase": 9,
+    "parallel": true,
+    "paths": [
+     "test/ui/fleet-gates.test.ts"
+    ]
+   },
+   {
+    "id": "T094",
+    "done": true,
+    "story": "US5",
+    "description": "e2e: lane reaches a gate, is approved from the dashboard, the 028 gate state releases and the lane continues",
+    "phase": 9,
+    "parallel": false,
+    "paths": [
+     "test/cli/dashboard-fleet-gates.test.ts"
+    ]
+   },
+   {
+    "id": "T100",
+    "done": true,
+    "story": null,
+    "description": "Terminal-restore regression for the Fleet view: quit, Ctrl-C, SIGTERM, resize, detach — 029:FR-016",
+    "phase": 10,
+    "parallel": false,
+    "paths": [
+     "test/ui/interactive-fleet-restore.test.ts"
+    ],
+    "deviation": "fullscreen.ts (the 017 host) was hardened: it now restores the terminal and rejects when the app throws, and stops on SIGHUP or the input ending; the regression drives the real overview app with the Fleet view open"
+   },
+   {
+    "id": "T101",
+    "done": true,
+    "story": null,
+    "description": "Docs: Fleet view keys, `dashboard.icons`, JSON `fleet` field",
+    "phase": 10,
+    "parallel": true,
+    "paths": [
+     "docs/cli-reference.md"
+    ],
+    "deviation": "the site CLI page (site/src/content/docs/cli/index.mdx) is updated too, and its 'no project setting for icons' sentence is replaced by dashboard.icons"
+   },
+   {
+    "id": "T102",
+    "done": true,
+    "story": null,
+    "description": "Changelog entry under Unreleased",
+    "phase": 10,
+    "parallel": true,
+    "paths": [
+     "changelog.md"
+    ],
+    "deviation": "the entry is under [Unreleased]; folding it into the 1.6.0 section is left to the release batch"
+   },
+   {
+    "id": "T103",
+    "done": true,
+    "story": null,
+    "description": "Local-only test: fleet paths use no network and no model call — 029:FR-014",
+    "phase": 10,
+    "parallel": true,
+    "paths": [
+     "test/cli/dashboard-fleet-local-only.test.ts"
+    ]
+   },
+   {
+    "id": "T104",
+    "done": false,
+    "story": null,
+    "description": "SC-007 dogfood: supervise a real run of one AmbyKit feature with the Fleet view and record the result",
+    "phase": 10,
+    "parallel": false,
+    "paths": [
+     "specs/029-fleet-control-room/dogfood.md"
+    ]
+   }
+  ],
+  "phases": [
+   {
+    "phase": 1,
+    "title": "Phase 1 — Setup: foundation spike  (US-8, gates Phase 3)",
+    "tasks": 5,
+    "check": "research.md has measurements for both options against build cost, restore, fallbacks and icon width, plus a recommendation; an ADR for the decision exists; spike code is either promoted by later tasks or removed. ? unverified: spike B (Ink 7) not measured because T003 is blocked (no network); spike A is measured, the recommendation and ADR-004 are done, and the spike code was removed",
+    "duplicates": 0
+   },
+   {
+    "phase": 2,
+    "title": "Phase 2 — Foundational  (blocks all feature work)",
+    "tasks": 13,
+    "check": "`npm run typecheck` and `npx vitest run test/core/fleet-derive.test.ts test/core/fleet-read.test.ts test/ui/live-fleet.test.ts test/ui/icons.test.ts test/core/config-icons.test.ts` pass; no existing dashboard test changes.",
+    "result": "passed",
+    "duplicates": 0
+   },
+   {
+    "phase": 3,
+    "title": "Phase 3 — User story US-1  (priority: P1)",
+    "tasks": 8,
+    "check": "`npx vitest run test/ui/fleet-view.test.ts test/ui/fleet-reducer.test.ts test/cli/dashboard-fleet.test.ts` pass.",
+    "result": "passed",
+    "duplicates": 0
+   },
+   {
+    "phase": 4,
+    "title": "Phase 4 — User story US-2  (priority: P1)",
+    "tasks": 4,
+    "check": "`npx vitest run test/core/fleet-review.test.ts test/ui/fleet-review-view.test.ts` pass.",
+    "result": "passed",
+    "duplicates": 0
+   },
+   {
+    "phase": 5,
+    "title": "Phase 5 — User story US-3  (priority: P1)",
+    "tasks": 4,
+    "check": "`npx vitest run test/core/fleet-stall.test.ts test/ui/fleet-stall-view.test.ts test/cli/dashboard-fleet-stall.test.ts` pass.",
+    "result": "passed",
+    "duplicates": 0
+   },
+   {
+    "phase": 6,
+    "title": "Phase 6 — User story US-4  (priority: P1)",
+    "tasks": 7,
+    "check": "`npx vitest run test/ui/fleet-actions.test.ts test/ui/fleet-controls.test.ts test/cli/dashboard-fleet-control.test.ts` pass; directive files written only through the 025 writer.",
+    "result": "passed",
+    "duplicates": 0
+   },
+   {
+    "phase": 7,
+    "title": "Phase 7 — User story US-6  (priority: P1)",
+    "tasks": 3,
+    "check": "`npx vitest run test/ui/fleet-icons.test.ts test/cli/dashboard-fleet-icons.test.ts` pass.",
+    "result": "passed",
+    "duplicates": 0
+   },
+   {
+    "phase": 8,
+    "title": "Phase 8 — User story US-7  (priority: P1)",
+    "tasks": 4,
+    "check": "`npx vitest run test/cli/dashboard-fleet-json.test.ts test/cli/dashboard-fleet-perf.test.ts` and the existing dashboard json and perf tests pass unchanged.",
+    "result": "passed",
+    "duplicates": 0
+   },
+   {
+    "phase": 9,
+    "title": "Phase 9 — User story US-5  (priority: P2)",
+    "tasks": 5,
+    "check": "`npx vitest run test/ui/fleet-gates.test.ts test/cli/dashboard-fleet-gates.test.ts` pass; approving writes no directive file.",
+    "result": "passed",
+    "duplicates": 0
+   },
+   {
+    "phase": 10,
+    "title": "Phase 10 — Polish",
+    "tasks": 5,
+    "check": "`npm run typecheck` and `npm test` pass; every FR in the spec maps to at least one named test; dogfood.md records a run supervised from the Fleet view. ? unverified: typecheck and the full suite pass (one run failed only the known dashboard-worktrees timing test, which passes alone) and every FR maps to a test (trace 029: 16/16), but dogfood.md (T104, a real supervised run) does not exist yet",
+    "duplicates": 0
+   }
+  ]
  }
 }

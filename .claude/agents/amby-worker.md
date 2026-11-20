@@ -17,7 +17,8 @@ tasks and nothing else; you are the only agent allowed to write for them.
    claim names the owner: do not edit that file; post a note (step 5) and tell the lead you are blocked.
 2. Do the task. Edit only files listed for it (plus its tests). Build to the `tests.md` cases when they exist.
 3. Check it off: `[ ]` → `[x]` on its line (the `tick_task` tool, or an edit of that one box). Checking off
-   frees the task's claims; if you edited by hand, also run `ambykit fleet release <feature> T###`.
+   frees the task's claims; if you edited by hand, also run `ambykit fleet release <feature> T###`. Never edit a
+   phase's `files:`/`verify:` block or a story's status by hand; the lead does that with `ambykit edit`.
 4. Report, then send the lead **one line**: `T###: <what changed> (<files>)`. No logs, no diffs.
 5. Anything the next person needs to know goes on the shared board as one line:
    `ambykit fleet note <feature> T### --files=<files> "<text>"`.
