@@ -199,8 +199,8 @@ and jump from a story to its feature.
   one-shot budget and uses zero model tokens.
 - SC-002  The graph's story edges for the existing specs equal what `analyze` reports before this
   change, with no new errors.
-- SC-003  `analyze`, the dashboard, and `ambykit graph` always agree on the blockers of any story,
-  verified by a test that compares them.
+- SC-003  `analyze`, the dashboard, and `ambykit graph` agree on the blockers of every story in the test fixtures and
+  in AmbyKit's own specs, verified by a test that compares them.
 - SC-004  Every FR maps to at least one test (Principle 5), and `npm run typecheck` and `npm test`
   pass.
 - SC-005  Feature 023 is itself built using its own graph to order its stories, and its stories'

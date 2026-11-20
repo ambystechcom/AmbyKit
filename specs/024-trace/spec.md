@@ -231,7 +231,9 @@ changes nothing until I use it.
   tokens.
 - SC-002  Every requirement in this repo is reported covered, uncovered, or deliberately uncovered, and
   none is unaccounted for.
-- SC-003  After `trace` is adopted here, every FR in 019–025 maps to at least one test (Principle 5).
+- SC-003  After `trace` is adopted here, it reports the coverage of every FR in 019–025, and an FR with no citing test
+  is listed as uncovered (Principle 5). Older tests are retrofitted to cite `NNN:FR-###` as they are touched, not all
+  at once, so full coverage of these specs is a goal tracked by `trace`, not a state this feature guarantees.
 - SC-004  `/amby.converge` on a sample feature reads fewer test files than before, because it starts from
   the matrix.
 - SC-005  Every FR in this spec maps to at least one test, and `npm run typecheck` and `npm test` pass.

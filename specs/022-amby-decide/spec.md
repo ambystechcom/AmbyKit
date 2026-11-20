@@ -207,8 +207,9 @@ that upgrading to 1.5 needs no migration.
   decision changed.
 - FR-014  THE SYSTEM SHALL provide a security reviewer role invokable as `/amby.review --as security`,
   read-only and advisory, reporting findings by stable ID.
-- FR-015  WHERE a project has no decision records, THE SYSTEM SHALL leave the behavior and output of
-  every existing command unchanged.
+- FR-015  WHERE a project has no decision records, THE SYSTEM SHALL leave the output of the existing commands that
+  read project state (`analyze`, `dashboard`, `check`) unchanged, as shown by unchanged-output tests on a project
+  without `.amby/decisions/`.
 - FR-016  THE SYSTEM SHALL emit `/amby.decide` and the security role per tool from the neutral source,
   and a repeated `ambykit sync` SHALL produce no diff (Principles 1 and 6).
 - FR-017  THE decision-record prompt and template SHALL be short and SHALL load only the artifacts a
@@ -222,7 +223,8 @@ that upgrading to 1.5 needs no migration.
   a model.
 - SC-003  A superseded decision is never presented as current, and following the supersede chain from
   any record reaches the current one.
-- SC-004  A project with no decision records produces unchanged output from every existing command.
+- SC-004  A project with no decision records produces unchanged output from `analyze`, `dashboard` and `check`,
+  shown by tests on a fixture project without `.amby/decisions/`.
 - SC-005  Every FR maps to at least one test (Principle 5), and `npm run typecheck` and `npm test`
   pass.
 - SC-006  Feature 022 is itself built with its own decisions recorded as ADRs for its design choices
