@@ -104,17 +104,20 @@ function specText(def: FeatureDef): string {
   ].join("\n");
 }
 
+/** Write one feature's spec, tasks and optional plan into `<root>/specs/<dir>/`. */
+export function writeFeatureFiles(root: string, d: FeatureDef): void {
+  const dir = join(root, "specs", d.dir);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "spec.md"), specText(d));
+  const tasks = d.tasks ?? [{ id: "T001", paths: [`src/${ref(d.dir)}.ts`] }];
+  writeFileSync(join(dir, "tasks.md"), ["---", `feature: ${d.dir}`, "---", "", "# Tasks", "", "## Phase 1", "", ...tasks.map(taskLine), ""].join("\n"));
+  if (d.plan !== false) writeFileSync(join(dir, "plan.md"), `# Plan ${d.dir}\n`);
+}
+
 /** The file form: a temp project (no git) with every feature's spec, tasks and optional plan. */
 export function fleetProject(defs: FeatureDef[]): string {
   const root = tempProject({});
-  for (const d of defs) {
-    const dir = join(root, "specs", d.dir);
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, "spec.md"), specText(d));
-    const tasks = d.tasks ?? [{ id: "T001", paths: [`src/${ref(d.dir)}.ts`] }];
-    writeFileSync(join(dir, "tasks.md"), ["---", `feature: ${d.dir}`, "---", "", "# Tasks", "", "## Phase 1", "", ...tasks.map(taskLine), ""].join("\n"));
-    if (d.plan !== false) writeFileSync(join(dir, "plan.md"), `# Plan ${d.dir}\n`);
-  }
+  for (const d of defs) writeFeatureFiles(root, d);
   return root;
 }
 

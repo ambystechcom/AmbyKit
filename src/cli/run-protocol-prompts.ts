@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { readPhases } from "../core/spec-format/dispatch.js";
-import { verdictPath } from "../core/fleet/index.js";
+import { runDirRel, verdictPath } from "../core/fleet/index.js";
 import { buildRolePrompt } from "../core/run-prompt.js";
 import { laneArtifacts } from "./run-plan.js";
 import type { JobKind, LaneRuntime, Session } from "./run-session.js";
@@ -34,5 +34,6 @@ export function rolePromptText(s: Session, rt: LaneRuntime, job: JobKind): strin
     ...(verify ? { verify } : {}),
     artifacts: laneArtifacts(rt.ref),
     verdictFile: verdictFile(rt, role, rt.round),
+    runDir: runDirRel(s.root, s.run),
   });
 }

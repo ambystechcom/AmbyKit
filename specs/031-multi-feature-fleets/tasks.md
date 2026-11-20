@@ -48,10 +48,10 @@ created: 2026-11-19
 
 ## Phase 4 — User story US-3  (priority: P1)
 
-- [ ] [T030] [US3] `FleetSupervisor` skeleton: one `Session` per feature in its own run dir inside the fleet dir; a feature starts only when everything it waits for is done (src/cli/run-fleet-loop.ts, test/cli/run-fleet-loop.test.ts)
-- [ ] [T031] [US3] Before a dependent starts, merge the finished feature's branch into its worktree; a conflict pauses that feature only (src/cli/run-fleet-merge.ts, test/cli/run-fleet-merge.test.ts)
-- [ ] [T032] [US3] End-to-end with fake port and clock: dependency waits, chain order, missing dependency and cycle stop before starting (test/cli/run-fleet-deps.test.ts)
-- **Verify:** `npx vitest run test/cli/run-fleet-loop.test.ts test/cli/run-fleet-merge.test.ts test/cli/run-fleet-deps.test.ts` pass; with B depending on A, no lane of B starts before A's run is done.
+- [x] [T030] [US3] `FleetSupervisor` skeleton: one `Session` per feature in its own run dir inside the fleet dir; a feature starts only when everything it waits for is done (src/cli/run-fleet-loop.ts, test/cli/run-fleet-loop.test.ts) ↪ DEVIATION: FeatureRun is the loop's interface (tests drive it with fakes); SessionRun in run-fleet.ts wraps 028's Session and Supervisor unchanged
+- [x] [T031] [US3] Before a dependent starts, merge the finished feature's branch into its worktree; a conflict pauses that feature only (src/cli/run-fleet-merge.ts, test/cli/run-fleet-merge.test.ts) ↪ DEVIATION: a dependent's lanes are also brought up to its branch after the dependency merge (syncLanesWithFeature), and run prompts now name the run's real directory (runDir in core/run-prompt) because a fleet's runs are nested; single runs keep the same text
+- [x] [T032] [US3] End-to-end with fake port and clock: dependency waits, chain order, missing dependency and cycle stop before starting (test/cli/run-fleet-deps.test.ts) ↪ DEVIATION: end to end over real git with the fake port and scripted workers (test/cli/run-fleet-deps.test.ts); cycle detection is covered in run-fleet-start.test.ts and the order tests
+- **Verify:** `npx vitest run test/cli/run-fleet-loop.test.ts test/cli/run-fleet-merge.test.ts test/cli/run-fleet-deps.test.ts` pass; with B depending on A, no lane of B starts before A's run is done. ✓ passed
 - **Checkpoint:** US-3 is demoable.
 
 ## Phase 5 — User story US-2  (priority: P1)

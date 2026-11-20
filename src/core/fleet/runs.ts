@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 import { primaryRoot } from "../checkouts.js";
 import { fleetSettings, loadConfig } from "../config.js";
 import { withLock, writeFileAtomic } from "./lock.js";
@@ -53,6 +53,11 @@ export function runDir(root: string, run: string): string {
     if (existsSync(nested)) return nested;
   }
   return flat;
+}
+
+/** The run directory relative to the primary checkout, `/`-separated: what a prompt tells an assistant to write into. */
+export function runDirRel(root: string, run: string): string {
+  return relative(primaryRoot(root), runDir(root, run)).split(sep).join("/");
 }
 
 /** The fleet a run belongs to, or undefined for a flat single run. */

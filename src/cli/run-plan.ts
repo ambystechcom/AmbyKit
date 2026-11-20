@@ -46,10 +46,10 @@ export interface PlanContext {
   assignment?: Map<string, string>;
 }
 
-export function lanePromptText(lane: LaneRef, run: string, open?: string[], findings?: string[]): string {
+export function lanePromptText(lane: LaneRef, run: string, open?: string[], findings?: string[], runDir?: string): string {
   return buildLanePrompt(
     { feature: lane.manifest.feature, lane: lane.name, phase: lane.manifest.phase, tasks: lane.manifest.tasks },
-    { run, artifacts: laneArtifacts(lane), open: open ?? laneOpenTasks(lane), ...(findings ? { findings } : {}), protocol: PROTOCOL },
+    { run, artifacts: laneArtifacts(lane), open: open ?? laneOpenTasks(lane), ...(findings ? { findings } : {}), protocol: PROTOCOL, ...(runDir ? { runDir } : {}) },
   );
 }
 
