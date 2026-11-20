@@ -18,8 +18,8 @@ them not to break until the next major version. Stable is a promise, so this fea
 what must be true before the label changes, and how a stable thing is later changed or removed. It does not add
 capabilities to `run` or to plugins.
 
-**Out of scope:** new run or plugin features; the choice of which assistants ship as built-in targets versus
-plugins (an owner decision, not made here); the release itself (spec 034).
+**Out of scope:** new run or plugin features; which assistants ship as built-in targets versus plugins (decided by the
+owner and specified in spec 036); the release itself (spec 034).
 
 ## User scenarios & testing
 
@@ -174,4 +174,4 @@ As an existing user, I want my 1.6 fleet state and my plugins to survive the lab
   contract does not include markdown layout.
 - Live verification needs a real install of each assistant and a person to run it (028's T044 and T045 and 031's T094 are
   person tasks); a missing verification blocks the label change and does not delay 2.0 for the surfaces that have one.
-- The set of built-in targets versus plugins is decided separately by the owner and does not change this contract.
+- The set of built-in targets versus plugins is specified in spec 036, does not change this contract, and 036 depends on it.

@@ -34,7 +34,8 @@ As a user on 1.x, I want a plain list of what breaks and a migration guide, so t
 
 **Acceptance criteria**
 - Given the 2.0 changelog, When a person reads it, Then it lists every breaking change: the spec format v2 and the `migrate`
-  step, the config schema version, Node 22 as the minimum, and the stable `run` and plugin API (with their deprecation policy).
+  step, the config schema version, Node 22 as the minimum, the stable `run` and plugin API (with their deprecation policy),
+  and the targets that moved from the core to official plugins (spec 036).
 - Given the migration guide, When a person follows it on a 1.x project, Then they reach a migrated project with `check`
   and `analyze` clean, using only commands in the guide.
 - Given a breaking change, When it is listed, Then it says who is affected and what to do.
