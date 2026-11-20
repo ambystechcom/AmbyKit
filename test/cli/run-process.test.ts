@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -17,7 +17,8 @@ describe("process edge (feature 028)", () => {
     expect(h.alive()).toBe(false);
     const rec = JSON.parse(readFileSync(record, "utf8").trim());
     expect(rec.prompt).toBe("build T001");
-    expect(rec.cwd.toLowerCase()).toBe(dir.toLowerCase());
+    // macOS reports /private/var for a /var temp dir, so compare real paths.
+    expect(realpathSync(rec.cwd).toLowerCase()).toBe(realpathSync(dir).toLowerCase());
   });
 
   it("028:FR-008: a hung process is alive until it is killed", async () => {

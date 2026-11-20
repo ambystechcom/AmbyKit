@@ -14,6 +14,7 @@ const configSchema = z.object({
     .object({
       activeMinutes: z.number().positive().optional(),
       idleMinutes: z.number().positive().optional(),
+      icons: z.enum(["nerd", "unicode", "ascii", "auto"]).optional(),
     })
     .optional(),
   mcp: z.object({ enabled: z.boolean() }).optional(),

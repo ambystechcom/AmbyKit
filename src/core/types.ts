@@ -124,6 +124,9 @@ export interface RulesContext {
   workerModel?: string;
 }
 
+/** `dashboard.icons` (feature 029): the icon set, hand-edited; `auto` detects from the terminal. */
+export type DashboardIcons = "nerd" | "unicode" | "ascii" | "auto";
+
 /** Persisted project configuration at .amby/config.json. */
 export interface AmbyConfig {
   version: string;
@@ -138,7 +141,7 @@ export interface AmbyConfig {
   /** When true, `/amby.specify` creates a `.worktrees/<feature>` worktree for each new feature (feature 012). */
   worktrees?: boolean;
   /** Dashboard tuning (feature 017): agent-presence thresholds in minutes. */
-  dashboard?: { activeMinutes?: number; idleMinutes?: number };
+  dashboard?: { activeMinutes?: number; idleMinutes?: number; icons?: DashboardIcons };
   /** Requirement traceability (feature 024): where to look for tests, and extra directory names to skip. */
   trace?: { roots?: string[]; ignore?: string[] };
   /** MCP server setup (feature 025): opt-in; `sync` writes each verified target's MCP config only when enabled. */

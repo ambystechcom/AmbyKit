@@ -18,6 +18,8 @@ import { allCheckouts, readProjectFeatures, type ProjectCheckouts } from "../cor
 import { loadConfig } from "../core/config.js";
 import type { Burndown, Checkout, FeatureSnapshot, Filters, ParseIssue } from "../core/overview-types.js";
 import { applyFilters, computeOverview } from "../core/overview.js";
+import { fleetJson } from "../core/fleet-view/json.js";
+import { readFleet } from "../core/fleet-view/read.js";
 import { packageVersion } from "../core/paths.js";
 import { maxPeriodsFor } from "./ui/dashboard/burndown-chart.js";
 import type { HeaderMeta } from "./ui/dashboard/cards.js";
@@ -26,12 +28,14 @@ import { renderFeatureView, renderOverview } from "./ui/dashboard/render-overvie
 import { TOKENS } from "./ui/dashboard/tokens.js";
 import { progressCell, renderTable, statusCell } from "./ui/table.js";
 import type { Cell } from "./ui/types.js";
+import { iconMode } from "./ui/capabilities.js";
+import { resolveIconMode } from "./ui/icons.js";
 import type { AmbyConfig } from "../core/types.js";
 import { LIVE_TOKENS } from "./ui/dashboard/live-tokens.js";
 import type { PresenceView } from "./ui/dashboard/worktrees-panel.js";
 import { guardedScanner, listAgentProcesses } from "./ui/interactive/agent-scan.js";
 import { runFullscreen } from "./ui/interactive/fullscreen.js";
-import { targetsSignature, watchProject, watchTargets, type ProjectWatcher, type WatchMode } from "./ui/interactive/live.js";
+import { liveTargets, targetsSignature, watchProject, type ProjectWatcher, type WatchMode } from "./ui/interactive/live.js";
 import {
   applyData,
   initOverviewTui,
@@ -55,7 +59,7 @@ export class DashboardCommand extends BaseCommand {
   protected async execute(opts: CliOptions): Promise<number> {
     let root = this.projectRoot(opts.cwd);
     const filters: Filters = { feature: stringFlag(opts, "feature"), status: stringFlag(opts, "status") };
-    if (!this.applyIcons(opts)) return 1;
+    if (!this.applyIcons(opts, root)) return 1;
 
     const storyArg = opts.positionals[0];
     if (storyArg) {
@@ -125,16 +129,20 @@ export class DashboardCommand extends BaseCommand {
     });
   }
 
-  /** `--icons=nerd|unicode|ascii` overrides the detected agent-icon mode (FR-025). */
-  private applyIcons(opts: CliOptions): boolean {
+  /**
+   * Icon set (features 017, 029): `--icons` > `AMBYKIT_ICONS` > `dashboard.icons` > auto-detect (FR-011). The flag is
+   * validated here as before; the rest of the precedence is the pure `resolveIconMode`. Config is only read, never written.
+   */
+  private applyIcons(opts: CliOptions, root: string): boolean {
     const icons = stringFlag(opts, "icons");
-    if (icons === undefined) return true;
-    if (icons !== "nerd" && icons !== "unicode" && icons !== "ascii") {
+    if (icons !== undefined && icons !== "nerd" && icons !== "unicode" && icons !== "ascii") {
       this.error(`--icons expects nerd, unicode or ascii, got '${icons}'.`, "e.g. ambykit dashboard --icons=nerd");
       return false;
     }
+    const { mode } = resolveIconMode({ flag: icons, env: process.env["AMBYKIT_ICONS"], config: readConfig(root)?.dashboard?.icons, caps: this.caps });
+    if (mode === iconMode(this.caps)) return true;
     const { icons: _drop, ...rest } = this.caps;
-    this.caps = icons === "unicode" ? rest : { ...rest, icons };
+    this.caps = mode === "unicode" ? rest : { ...rest, icons: mode };
     return true;
   }
 
@@ -187,6 +195,7 @@ export class DashboardCommand extends BaseCommand {
   private async overviewJson(root: string, filters: Filters, upNextCap: number, stories: StoryProgress[]): Promise<unknown> {
     const { features, issues, checkouts } = await readProjectFeatures(root);
     const o = computeOverview(features, filters, { upNextCap }, issues);
+    const fleet = readFleet(checkouts.primary.root);
     return {
       stories,
       summary: o.summary,
@@ -198,6 +207,8 @@ export class DashboardCommand extends BaseCommand {
       burndown: this.burndown(checkouts.primary.root, features, filters, JSON_PERIODS),
       issues: o.issues,
       filters: { feature: filters.feature ?? null, status: filters.status ?? null, next: upNextCap },
+      // Feature 029: only when a fleet run exists, so output without one is byte-identical to before (FR-013).
+      ...(fleet ? { fleet: fleetJson(fleet) } : {}),
     };
   }
 
@@ -261,7 +272,17 @@ export class DashboardCommand extends BaseCommand {
     });
     // Feature 023 (FR-015): the graph view is loaded only here, on the interactive path, never one-shot or --json.
     const { graphViewApi } = await import("./ui/dashboard/graph-view.js");
-    let data = withBurndown({ ...base, graphView: graphViewApi, presence: presenceOf(base.features, Date.now()) });
+    // Feature 029 (FR-012): the Fleet view is likewise loaded only here, never one-shot or --json.
+    const { fleetViewApi } = await import("./ui/dashboard/fleet-view.js");
+    const terminalRows = (): number => process.stdout.rows ?? 24;
+    let data = withBurndown({
+      ...base,
+      graphView: graphViewApi,
+      fleetView: fleetViewApi,
+      fleet: readFleet(initialCheckouts.primary.root),
+      rows: terminalRows(),
+      presence: presenceOf(base.features, Date.now()),
+    });
 
     let update: ((fn: (s: OverviewTuiState) => OverviewTuiState) => void) | null = null;
     let watcher: ProjectWatcher | null = null;
@@ -275,12 +296,12 @@ export class DashboardCommand extends BaseCommand {
     let armed = "";
     const arm = (): void => {
       watcher?.stop();
-      const targets = watchTargets(checkouts);
+      const targets = liveTargets(checkouts);
       armed = targetsSignature(targets);
       watcher = watchProject(targets, refresh, undefined, { onMode: setLive });
     };
     // A worktree came or went, or a watched dir appeared after we armed (FR-011).
-    const rearmNeeded = (): boolean => watcher?.mode !== "paused" && targetsSignature(watchTargets(checkouts)) !== armed;
+    const rearmNeeded = (): boolean => watcher?.mode !== "paused" && targetsSignature(liveTargets(checkouts)) !== armed;
 
     // Re-read every checkout and swap the data in, keeping cursors and input (FR-010–FR-012).
     // Reads are async, so overlapping refreshes can finish out of order: only the latest one applies.
@@ -295,7 +316,7 @@ export class DashboardCommand extends BaseCommand {
         const prev = data;
         cache.clear();
         const now = Date.now();
-        data = withBurndown({ ...prev, features: read.features, issues: read.issues, presence: presenceOf(read.features, now) });
+        data = withBurndown({ ...prev, features: read.features, issues: read.issues, presence: presenceOf(read.features, now), fleet: readFleet(checkouts.primary.root, now), rows: terminalRows() });
         if (rearmNeeded()) arm();
         update?.((s) => ({ ...applyData(s, prev, data), now, live: { mode: watcher?.mode ?? "paused", lastChange: now } }));
       } catch {
@@ -311,7 +332,8 @@ export class DashboardCommand extends BaseCommand {
         void refresh();
       }
       const now = Date.now();
-      data = withBurndown({ ...data, presence: presenceOf(data.features, now) });
+      // The heartbeat also re-reads the run, so a quiet lane crosses the stall limit on screen without a file change (029 SC-002).
+      data = withBurndown({ ...data, presence: presenceOf(data.features, now), fleet: readFleet(checkouts.primary.root, now), rows: terminalRows() });
       update?.((s) => ({ ...s, now, changed: new Set(), changedTasks: new Set() }));
       void scan().then((found) => {
         if (stopped || found === null) return;
@@ -323,7 +345,7 @@ export class DashboardCommand extends BaseCommand {
 
     await runFullscreen({
       initial: { ...initOverviewTui(filters), live: { mode: "watching", lastChange: Date.now() } },
-      render: (s) => renderOverviewTui(this.caps, data, s),
+      render: (s) => renderOverviewTui(this.caps, { ...data, rows: terminalRows() }, s),
       reduce: (s, key) => {
         // `r` restarts monitoring when it is paused (ui.md LiveIndicator).
         if (key.name === "r" && s.input === null && s.live?.mode === "paused") {
@@ -331,7 +353,15 @@ export class DashboardCommand extends BaseCommand {
           void refresh();
           return { ...s, live: { mode: watcher?.mode ?? "paused", lastChange: Date.now() } };
         }
-        return reduceOverviewTui(data, s, key);
+        const next = reduceOverviewTui({ ...data, rows: terminalRows() }, s, key);
+        // Feature 029 (FR-006, FR-009): the pure reducer only records the confirmed intent; it is performed here, through
+        // 025's directive writer or 028's approveGate, and the run is re-read so the row shows the result at once.
+        if (next.view === "fleet" && next.fleet?.intent && data.fleet) {
+          const out = fleetViewApi.perform(checkouts.primary.root, data.fleet, next.fleet.intent);
+          data = withBurndown({ ...data, fleet: readFleet(checkouts.primary.root) });
+          return { ...next, fleet: { ...next.fleet, intent: null, notice: out.message } };
+        }
+        return next;
       },
       isDone: isOverviewDone,
       start: (u) => {
