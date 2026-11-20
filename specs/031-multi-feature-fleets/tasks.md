@@ -38,12 +38,12 @@ created: 2026-11-19
 
 ## Phase 3 — User story US-1  (priority: P1)
 
-- [ ] [T020] [US1] Bind `read.ts` to 030's reader and add a source-scan test: no markdown or YAML parsing inside `src/core/fleet-plan/` (src/core/fleet-plan/read.ts, test/core/fleet-plan-read.test.ts)
-- [ ] [T021] [P] [US1] `select.ts`: resolve numbers and names, de-duplicate, stop on a missing or not-ready feature with the reason; `--all-ready` selection with skipped reasons (src/core/fleet-plan/select.ts, test/core/fleet-select.test.ts)
-- [ ] [T022] [P] [US1] Lane preparation (C-2): prepare missing next-phase lanes with the lane core and report it; refuse with the `ambykit lane` hint when it cannot (src/cli/run-fleet-prepare.ts, test/cli/run-fleet-prepare.test.ts)
-- [ ] [T023] [US1] `buildFleetPlan`: select, ownership, order and caps into one `FleetPlan`; its text and `--json` preview (src/core/fleet-plan/plan.ts, src/core/fleet-plan/format.ts, test/core/fleet-plan.test.ts)
-- [ ] [T024] [US1] `ambykit run <f1> <f2>`: preview, `--yes`, decline starts nothing; one feature falls through to the unchanged single run (src/cli/run-fleet.ts, src/cli/run.ts, test/cli/run-fleet-start.test.ts)
-- **Verify:** `npx vitest run test/core/fleet-plan-read.test.ts test/core/fleet-select.test.ts test/core/fleet-plan.test.ts test/cli/run-fleet-prepare.test.ts test/cli/run-fleet-start.test.ts` pass; a three-feature fixture prints one plan listing every feature's lanes and start order.
+- [x] [T020] [US1] Bind `read.ts` to 030's reader and add a source-scan test: no markdown or YAML parsing inside `src/core/fleet-plan/` (src/core/fleet-plan/read.ts, test/core/fleet-plan-read.test.ts) ↪ DEVIATION: bound in T010 already (readFleetInput over readFeatures and the 023 graph); this task adds the reader tests and the source-scan test
+- [x] [T021] [P] [US1] `select.ts`: resolve numbers and names, de-duplicate, stop on a missing or not-ready feature with the reason; `--all-ready` selection with skipped reasons (src/core/fleet-plan/select.ts, test/core/fleet-select.test.ts)
+- [x] [T022] [P] [US1] Lane preparation (C-2): prepare missing next-phase lanes with the lane core and report it; refuse with the `ambykit lane` hint when it cannot (src/cli/run-fleet-prepare.ts, test/cli/run-fleet-prepare.test.ts) ↪ DEVIATION: lanes are prepared when a feature BEGINS (after its dependencies are merged into its branch), not at the plan step, so they branch from the merged result; the preview says 'N lanes to prepare'
+- [x] [T023] [US1] `buildFleetPlan`: select, ownership, order and caps into one `FleetPlan`; its text and `--json` preview (src/core/fleet-plan/plan.ts, src/core/fleet-plan/format.ts, test/core/fleet-plan.test.ts)
+- [x] [T024] [US1] `ambykit run <f1> <f2>`: preview, `--yes`, decline starts nothing; one feature falls through to the unchanged single run (src/cli/run-fleet.ts, src/cli/run.ts, test/cli/run-fleet-start.test.ts) ↪ DEVIATION: experimental note, --all-ready and --continue-fleet are in the same entry; a fleet of one feature, or the same feature twice, falls through to the unchanged single run; fleet pause|stop|resume <fleet> are added to run (T071)
+- **Verify:** `npx vitest run test/core/fleet-plan-read.test.ts test/core/fleet-select.test.ts test/core/fleet-plan.test.ts test/cli/run-fleet-prepare.test.ts test/cli/run-fleet-start.test.ts` pass; a three-feature fixture prints one plan listing every feature's lanes and start order. ✓ passed
 - **Checkpoint:** US-1 is demoable: a fleet plan is shown, confirmed or declined.
 
 ## Phase 4 — User story US-3  (priority: P1)

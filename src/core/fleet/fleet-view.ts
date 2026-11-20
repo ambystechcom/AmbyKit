@@ -63,7 +63,7 @@ export function fleetsView(root: string, now: number = Date.now()): FleetsView {
           )
         : [];
       const last = run?.escalations[run.escalations.length - 1] as { kind?: string; lane?: string; reason?: string } | undefined;
-      const cause = f.state === "paused" ? [last?.kind ?? "paused", last?.lane ? `on ${last.lane}` : "", last?.reason ? `(${last.reason})` : ""].filter(Boolean).join(" ") : undefined;
+      const cause = f.state === "paused" ? (f.cause ?? ([last?.kind ?? "paused", last?.lane ? `on ${last.lane}` : "", last?.reason ? `(${last.reason})` : ""].filter(Boolean).join(" "))) : undefined;
       return {
         feature: f.feature,
         state: f.state,

@@ -52,6 +52,8 @@ export interface FleetFeature {
   waitsFor: WaitsFor[];
   /** The feature whose pause holds this one. */
   heldBy?: string;
+  /** Why the feature is paused (a lane waiting for a person, a merge conflict before start), when it is. */
+  cause?: string;
   ownership: Ownership;
   /** Hash of what the plan was made from (spec and tasks through the 030 reader, plus the ownership set). */
   fingerprint: string;
@@ -95,6 +97,8 @@ export interface FleetPlan {
   skipped: Skipped[];
   /** Features whose lanes the fleet prepares before starting (clarification C-2), with the lane count. */
   prepare: { feature: string; lanes: number }[];
+  /** Lanes already prepared per feature (0 for a feature in `prepare`). */
+  laneCounts: Record<string, number>;
 }
 
 export type PlanError =

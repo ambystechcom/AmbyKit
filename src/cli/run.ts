@@ -1,6 +1,9 @@
 import { relative } from "node:path";
 import { BaseCommand, flag, stringFlag, type CliOptions } from "./base-command.js";
 import { nodeProcessPort, type ProcessPort } from "./run-process.js";
+import { runFleet } from "./run-fleet.js";
+import { controlFleet, type FleetAction } from "./run-fleet-control.js";
+import type { LaneRunner } from "./run-fleet-prepare.js";
 import { buildLaunchPlan, laneOpenTasks, nextRunId } from "./run-plan.js";
 import { emitScripts } from "./run-script.js";
 import { fleetSettings, loadConfig, type FleetSettings } from "../core/config.js";
@@ -29,6 +32,8 @@ import { featureDirOf } from "../core/tasks-edit.js";
 export const EXPERIMENTAL_NOTE = "ambykit run is experimental in 1.6: its flags and runner commands may change before it is stable in 2.0.";
 
 const SUBCOMMANDS = ["approve", "reject"] as const;
+/** Feature 031: whole-fleet control, `ambykit run pause|stop|resume <fleet>`. */
+const FLEET_CONTROL = ["pause", "stop", "resume"] as const;
 
 /** Everything a test needs to replace so no real assistant, clock or terminal is involved (Principle 5). */
 export interface RunDeps {
@@ -40,6 +45,8 @@ export interface RunDeps {
   interactive: boolean;
   /** Ask a yes/no question; `undefined` = no answer (not interactive). */
   ask?: (question: string) => Promise<boolean | undefined>;
+  /** Feature 031: how a fleet prepares missing lanes (default: the lane command in-process). */
+  laneRunner?: LaneRunner;
 }
 
 const realDeps = (): RunDeps => ({
@@ -70,7 +77,7 @@ export class RunCommand extends BaseCommand {
   readonly name = "run";
   readonly summary = "(experimental) Run a feature's prepared lanes headless: print, launch, supervise, merge.";
   readonly usage =
-    "ambykit run <feature> [--yes] [--emit-script] [--assistant=<id,id>] [--unattended] [--max-minutes=N] [--max-tasks=N] [--max-tokens=N] [--continue-run=<run>] [--json] | --runners | approve|reject <run> [--gate=<id>] [--reason=<text>] | approve <run> --reassign=<lane>:<assistant>";
+    "ambykit run <feature> [<feature>...|--all-ready] [--yes] [--emit-script] [--assistant=<id,id>] [--unattended] [--max-minutes=N] [--max-tasks=N] [--max-tokens=N] [--continue-run=<run>] [--continue-fleet=<fleet>] [--json] | pause|stop|resume <fleet> | --runners | approve|reject <run> [--gate=<id>] [--reason=<text>] | approve <run> --reassign=<lane>:<assistant>";
 
   protected readonly deps: RunDeps;
 
@@ -86,8 +93,23 @@ export class RunCommand extends BaseCommand {
 
     if (flag(opts, "runners")) return this.listRunnerRows(opts);
     if (first && (SUBCOMMANDS as readonly string[]).includes(first)) return this.gate(root, first as (typeof SUBCOMMANDS)[number], second, opts);
+    if (first && (FLEET_CONTROL as readonly string[]).includes(first)) return this.fleetControl(root, first as FleetAction, second, opts);
 
-    const featureArg = first ?? (cont ? cont.slice(0, cont.lastIndexOf(".")) : undefined);
+    // Feature 031: several features, --all-ready or --continue-fleet start (or resume) a fleet; one feature is a single run.
+    let single = first;
+    let warned = false;
+    if (!cont && (opts.positionals.length >= 2 || flag(opts, "all-ready") || stringFlag(opts, "continue-fleet"))) {
+      if (!flag(opts, "json")) {
+        this.warn(EXPERIMENTAL_NOTE);
+        warned = true;
+      }
+      const io = { info: (m: string) => this.info(m), warn: (m: string) => this.warn(m), error: (m: string, h?: string) => this.error(m, h), success: (m: string) => this.success(m) };
+      const entry = await runFleet(root, opts.positionals, opts, this.deps, io);
+      if (typeof entry === "number") return entry;
+      single = entry.single; // a fleet of one feature is a single run, unchanged
+    }
+
+    const featureArg = single ?? (cont ? cont.slice(0, cont.lastIndexOf(".")) : undefined);
     if (!featureArg) {
       this.error("Missing feature.", `Usage: ${this.usage}`);
       return 1;
@@ -97,7 +119,7 @@ export class RunCommand extends BaseCommand {
       this.error(`Feature '${featureArg}' not found.`, "Use a feature number or directory name from specs/.");
       return 1;
     }
-    if (!flag(opts, "json")) this.warn(EXPERIMENTAL_NOTE);
+    if (!flag(opts, "json") && !warned) this.warn(EXPERIMENTAL_NOTE);
 
     const lanes = preparedLanes(root, feature);
     if (lanes.length === 0) {
@@ -319,6 +341,22 @@ export class RunCommand extends BaseCommand {
       this.info(`  ${r.id}  ${r.label}  ${status}  usage ${r.reportsUsage ? "reported" : "not reported"}  ${r.runnable ? "runnable" : "not runnable"}`);
       if (r.reason) this.info(`    ${r.reason}`);
     }
+    return 0;
+  }
+
+  /** `ambykit run pause|stop|resume <fleet>`: one directive per lane of every feature of the fleet (031 FR-015). */
+  protected fleetControl(root: string, action: FleetAction, fleet: string | undefined, opts: CliOptions): number {
+    if (!fleet) {
+      this.error("Missing fleet.", `Usage: ambykit run ${action} <fleet>`);
+      return 1;
+    }
+    const out = controlFleet(root, fleet, action);
+    if (!out.ok) {
+      this.error(out.error ?? "could not write the directives");
+      return 1;
+    }
+    if (flag(opts, "json")) console.log(JSON.stringify({ fleet, action, lanes: out.written }));
+    else this.success(`Asked ${out.written.length} lane${out.written.length === 1 ? "" : "s"} of ${fleet} to ${action === "resume" ? "continue" : action}; each worker obeys at its next report.`);
     return 0;
   }
 

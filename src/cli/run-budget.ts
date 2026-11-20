@@ -48,10 +48,20 @@ export function enforceBudgets(s: Session): string | undefined {
     ...(b.tokensUsed !== undefined ? { tokensUsed: b.tokensUsed } : {}),
   });
   if (!d.exceeded || !d.reason) return undefined;
-  s.stopReason = d.reason;
   const note = d.unenforced.length > 0 ? ` (${d.unenforced.join("; ")})` : "";
   s.say(`Budget exceeded: ${d.reason}${note}. Stopping the run: no new lanes start and running lanes are asked to stop.`);
-  event(s, "budget-exceeded", undefined, d.reason);
+  beginStop(s, d.reason, d.unenforced);
+  return d.reason;
+}
+
+/**
+ * Begin a budget stop: nothing new launches, running lanes get a `stop` directive through 025's writer and the run
+ * is recorded as paused with the reason. Shared by the run's own budgets and by a fleet's (feature 031, FR-011).
+ */
+export function beginStop(s: Session, reason: string, unenforced: string[] = []): void {
+  if (s.stopReason) return;
+  s.stopReason = reason;
+  event(s, "budget-exceeded", undefined, reason);
   for (const rt of s.lanes) {
     if (!isRunning(s, rt)) continue;
     rt.stopAskedMs = s.now();
@@ -61,10 +71,9 @@ export function enforceBudgets(s: Session): string | undefined {
   if (rec) {
     updateRun(s.root, s.run, {
       status: "paused",
-      escalations: [...rec.escalations, { kind: "budget", reason: d.reason, unenforced: d.unenforced, at: new Date(s.now()).toISOString() }],
+      escalations: [...rec.escalations, { kind: "budget", reason, unenforced, at: new Date(s.now()).toISOString() }],
     });
   }
-  return d.reason;
 }
 
 /** Terminate every running lane (used when a budget stop has run out its grace, and on interrupt). */
