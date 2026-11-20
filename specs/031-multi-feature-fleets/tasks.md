@@ -64,10 +64,10 @@ created: 2026-11-19
 
 ## Phase 6 — User story US-4  (priority: P1)
 
-- [ ] [T050] [US4] Apply containment in the loop: a feature whose lane is paused or escalated holds its dependents, independent features keep running (src/cli/run-fleet-loop.ts, test/cli/run-fleet-contain.test.ts)
-- [ ] [T051] [US4] Resume of a paused feature releases its dependents (src/cli/run-fleet-loop.ts, src/cli/run-fleet-resume.ts, test/cli/run-fleet-resume.test.ts)
-- [ ] [T052] [US4] Show the cause and the affected features in `fleetView` and the fleet text output (src/core/fleet/fleet-view.ts, src/cli/fleet.ts, test/cli/fleet-fleets-status.test.ts)
-- **Verify:** `npx vitest run test/cli/run-fleet-contain.test.ts test/cli/run-fleet-resume.test.ts test/cli/fleet-fleets-status.test.ts` pass; a failed lane pauses its feature and dependents while an independent feature finishes.
+- [x] [T050] [US4] Apply containment in the loop: a feature whose lane is paused or escalated holds its dependents, independent features keep running (src/cli/run-fleet-loop.ts, test/cli/run-fleet-contain.test.ts) ↪ DEVIATION: containment was written into the loop in T030 (state follows each feature's supervisor and lanes; heldFeatures is recomputed every tick); a paused feature keeps its other running lanes working, the pause holds only what depends on it
+- [x] [T051] [US4] Resume of a paused feature releases its dependents (src/cli/run-fleet-loop.ts, src/cli/run-fleet-resume.ts, test/cli/run-fleet-resume.test.ts) ↪ DEVIATION: no run-fleet-resume.ts: resuming needs no code, the next tick sees no lane waiting for a person and releases the dependents; the tests resume through directives (controlFleet resume) over real sessions
+- [x] [T052] [US4] Show the cause and the affected features in `fleetView` and the fleet text output (src/core/fleet/fleet-view.ts, src/cli/fleet.ts, test/cli/fleet-fleets-status.test.ts) ↪ DEVIATION: the overview is `ambykit fleet fleets [<fleet>] [--json]` (a bare `ambykit fleet` stays an error, as 019's test pins); text is src/core/fleet/fleet-text.ts
+- **Verify:** `npx vitest run test/cli/run-fleet-contain.test.ts test/cli/run-fleet-resume.test.ts test/cli/fleet-fleets-status.test.ts` pass; a failed lane pauses its feature and dependents while an independent feature finishes. ✓ passed
 - **Checkpoint:** US-4 is demoable.
 
 ## Phase 7 — User story US-5  (priority: P1)
