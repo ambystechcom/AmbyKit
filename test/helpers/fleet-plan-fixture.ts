@@ -14,12 +14,16 @@ export interface TaskDefn {
   /** `string[]` = declared files, `null` = no usable path (missing), `"glob"` = a glob was declared. */
   paths?: string[] | null | "glob";
   parallel?: boolean;
+  /** Story number for the `[US#]` tag (default 1). */
+  story?: number;
 }
 
 export interface FeatureDef {
   dir: string;
   status?: string;
   tasks?: TaskDefn[];
+  /** Several phases (`## Phase N`); overrides `tasks`. Used for story checkpoints. */
+  phases?: TaskDefn[][];
   /** Feature-level `depends-on` (v2 frontmatter), as written. Writing it makes the spec a v2 spec. */
   dependsOn?: string[];
   /** A story edge in the spec: story `US-1` depends on these (`NNN:US-#` of another feature). */
@@ -60,7 +64,7 @@ export function model(def: FeatureDef): FeatureModel {
 
 function taskLine(t: TaskDefn): string {
   const group = Array.isArray(t.paths) ? ` (${t.paths.join(", ")})` : t.paths === "glob" ? " (src/**/*.ts)" : "";
-  return `- [${t.done ? "x" : " "}] [${t.id}]${t.parallel === false ? "" : " [P]"} [US1] task ${t.id}${group}`;
+  return `- [${t.done ? "x" : " "}] [${t.id}]${t.parallel === false ? "" : " [P]"} [US${t.story ?? 1}] task ${t.id}${group}`;
 }
 
 function specText(def: FeatureDef): string {
@@ -109,8 +113,9 @@ export function writeFeatureFiles(root: string, d: FeatureDef): void {
   const dir = join(root, "specs", d.dir);
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "spec.md"), specText(d));
-  const tasks = d.tasks ?? [{ id: "T001", paths: [`src/${ref(d.dir)}.ts`] }];
-  writeFileSync(join(dir, "tasks.md"), ["---", `feature: ${d.dir}`, "---", "", "# Tasks", "", "## Phase 1", "", ...tasks.map(taskLine), ""].join("\n"));
+  const phases = d.phases ?? [d.tasks ?? [{ id: "T001", paths: [`src/${ref(d.dir)}.ts`] }]];
+  const body = phases.flatMap((tasks, i) => [`## Phase ${i + 1}`, "", ...tasks.map(taskLine), ""]);
+  writeFileSync(join(dir, "tasks.md"), ["---", `feature: ${d.dir}`, "---", "", "# Tasks", "", ...body].join("\n"));
   if (d.plan !== false) writeFileSync(join(dir, "plan.md"), `# Plan ${d.dir}\n`);
 }
 

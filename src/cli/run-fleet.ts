@@ -134,7 +134,8 @@ export async function runFleet(root: string, args: string[], opts: CliOptions, d
     ...(allReady ? { allReady: true } : {}),
     models: input.models,
     deps: input.deps,
-    done: new Set([...input.done].filter((d) => !names.includes(d))),
+    // the fleet's own finished features are done dependencies: their work is on their branches, not on main's task lists
+    done: new Set([...[...input.done].filter((d) => !names.includes(d)), ...(existing?.features.filter((f) => f.state === "done" || f.state === "skipped").map((f) => f.feature) ?? [])]),
     caps: existing?.caps ?? settings.concurrency,
     budgets,
   });

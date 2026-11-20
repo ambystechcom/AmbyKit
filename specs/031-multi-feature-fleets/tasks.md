@@ -80,18 +80,18 @@ created: 2026-11-19
 
 ## Phase 8 — User stories US-6 and US-8  (priority: P2)
 
-- [ ] [T070] [US6] Per-feature approval gates and merges inside the fleet: only the gated or conflicting feature waits (src/cli/run-fleet-loop.ts, test/cli/run-fleet-gates.test.ts)
-- [ ] [T071] [US6] Pause or stop writes one directive per lane through the core writer across every session (src/cli/run-fleet-control.ts, test/cli/run-fleet-control.test.ts)
-- [ ] [T072] [US6] One status view of every feature's lanes: `ambykit fleet` text and `--json` group by feature (src/cli/fleet.ts, src/core/fleet/fleet-view.ts, test/cli/fleet-fleets-view.test.ts)
-- [ ] [T073] [US8] Fleet record, fingerprints, and `--continue-fleet=<id>`: re-plan on resume, report what changed, never repeat finished lanes (src/cli/run-fleet.ts, src/core/fleet/fleets.ts, test/cli/run-fleet-continue.test.ts)
-- [ ] [T074] [US8] `report_activity` without a run resolves the feature's unfinished run inside its fleet dir (test/mcp/fleet-nested-run.test.ts)
-- **Verify:** `npx vitest run test/cli/run-fleet-gates.test.ts test/cli/run-fleet-control.test.ts test/cli/fleet-fleets-view.test.ts test/cli/run-fleet-continue.test.ts test/mcp/fleet-nested-run.test.ts` pass; stopping a fleet and starting it again repeats no completed lane.
+- [x] [T070] [US6] Per-feature approval gates and merges inside the fleet: only the gated or conflicting feature waits (src/cli/run-fleet-loop.ts, test/cli/run-fleet-gates.test.ts) ↪ DEVIATION: no new loop code: each feature keeps 028's own Session, so a gate or a merge conflict already waits only that feature (the fleet loop reports it as paused only for a conflict or paused lane); proven over real sessions
+- [x] [T071] [US6] Pause or stop writes one directive per lane through the core writer across every session (src/cli/run-fleet-control.ts, test/cli/run-fleet-control.test.ts) ↪ DEVIATION: the command is `ambykit run pause|stop|resume <fleet>` (run.ts) over run-fleet-control.ts
+- [x] [T072] [US6] One status view of every feature's lanes: `ambykit fleet` text and `--json` group by feature (src/cli/fleet.ts, src/core/fleet/fleet-view.ts, test/cli/fleet-fleets-view.test.ts) ↪ DEVIATION: the overview command is `ambykit fleet fleets [<fleet>] [--json]` (T052); the tests are test/cli/fleet-fleets-view.test.ts
+- [x] [T073] [US8] Fleet record, fingerprints, and `--continue-fleet=<id>`: re-plan on resume, report what changed, never repeat finished lanes (src/cli/run-fleet.ts, src/core/fleet/fleets.ts, test/cli/run-fleet-continue.test.ts) ↪ DEVIATION: lives in run-fleet.ts (replan, adopt) and src/core/fleet/fleets.ts; a resumed fleet counts its own finished features as done dependencies, because their work is on their branches, not on main
+- [x] [T074] [US8] `report_activity` without a run resolves the feature's unfinished run inside its fleet dir (test/mcp/fleet-nested-run.test.ts) ↪ DEVIATION: nothing to change: runDir and listRuns follow nested runs, so resolveRun finds them; the test proves it through the MCP tool
+- **Verify:** `npx vitest run test/cli/run-fleet-gates.test.ts test/cli/run-fleet-control.test.ts test/cli/fleet-fleets-view.test.ts test/cli/run-fleet-continue.test.ts test/mcp/fleet-nested-run.test.ts` pass; stopping a fleet and starting it again repeats no completed lane. ✓ passed
 - **Checkpoint:** US-6 and US-8 are demoable.
 
 ## Phase 9 — User story US-7  (priority: P3)
 
-- [ ] [T080] [US7] Wire `--all-ready` into the command: choose ready features, show chosen and skipped with reasons, start nothing when none is ready (src/cli/run-fleet.ts, test/cli/run-fleet-all-ready.test.ts)
-- **Verify:** `npx vitest run test/cli/run-fleet-all-ready.test.ts` passes.
+- [x] [T080] [US7] Wire `--all-ready` into the command: choose ready features, show chosen and skipped with reasons, start nothing when none is ready (src/cli/run-fleet.ts, test/cli/run-fleet-all-ready.test.ts) ↪ DEVIATION: the flag was wired with T024 in run-fleet.ts; this task adds its tests
+- **Verify:** `npx vitest run test/cli/run-fleet-all-ready.test.ts` passes. ✓ passed
 - **Checkpoint:** US-7 is demoable.
 
 ## Phase 10 — User story US-9  (priority: P2)

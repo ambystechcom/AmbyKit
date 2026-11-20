@@ -87,7 +87,16 @@ const featureOfCwd = (cwd: string): string => /^(.+?)\.lane-/.exec(basename(cwd)
  * Script every process a fleet spawns: a worker ticks its tasks and commits a file in its lane, a reviewer writes a
  * passing verdict. `hold(feature)` makes that feature's workers hang (never finish by themselves).
  */
-export function scriptWorkers(port: FakePort, root: string, opts: { hold?: (feature: string) => boolean; failExit?: (feature: string) => number | undefined } = {}): WorkerLog {
+export function scriptWorkers(
+  port: FakePort,
+  root: string,
+  opts: {
+    hold?: (feature: string) => boolean;
+    failExit?: (feature: string) => number | undefined;
+    /** A file every lane of the feature writes with its own content: two lanes then conflict when merged. */
+    clash?: (feature: string) => string | undefined;
+  } = {},
+): WorkerLog {
   const log: WorkerLog = { spawns: [], jobs: [] };
   port.onSpawn = (proc) => {
     const prompt = proc.spec.stdin ?? "";
@@ -114,7 +123,8 @@ export function scriptWorkers(port: FakePort, root: string, opts: { hold?: (feat
       let text = readFileSync(file, "utf8");
       for (const id of m[1]!.split(",").map((x) => x.trim())) text = text.replace(`- [ ] [${id}]`, `- [x] [${id}]`);
       writeFileSync(file, text);
-      commitFile(proc.spec.cwd, `src/${basename(proc.spec.cwd)}.ts`, "work\n", "worker commit");
+      const clash = opts.clash?.(feature);
+      commitFile(proc.spec.cwd, clash ?? `src/${basename(proc.spec.cwd)}.ts`, clash ? `${basename(proc.spec.cwd)}\n` : "work\n", "worker commit");
       proc.finish(0);
     }
   };
