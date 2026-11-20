@@ -31,45 +31,37 @@ describe.skipIf(!HAS_GIT)("budgets inside ambykit run (feature 028)", () => {
     expect(readEvents(p.root, rec.run).some((e) => e.kind === "budget-exceeded")).toBe(true);
   });
 
-  it("028:FR-013: the defaults are shown at the start of a run", async () => {
-    const p = await preparedProject(F, 4, 2);
-    const port = new FakePort();
-    script({ port }, p, { work: true });
-    const c = clock(0);
-    const r = await runCommand(new RunCommand({ registry: fakeRegistry(), port, ...c }), p.root, [F], { yes: true });
-    expect(r.out).toContain("Budgets: 120 minutes wall-clock, 8 task events");
-  });
-
-  it("028:FR-013: a token ceiling the runner cannot report is stated at the start, not silently ignored", async () => {
-    const p = await preparedProject(F, 4, 2);
-    const port = new FakePort();
-    script({ port }, p, { work: true });
-    const c = clock(0);
-    const r = await runCommand(new RunCommand({ registry: fakeRegistry(), port, ...c }), p.root, [F], { yes: true, "max-tokens": "5000" });
-    expect(r.out).toContain("5000 tokens");
-    expect(r.out).toContain("not enforceable for this runner");
-    expect(r.code).toBe(0);
-  });
-
-  it("028:FR-013: a runner that reports usage gets no not-enforceable notice", async () => {
-    const p = await preparedProject(F, 4, 2);
-    const port = new FakePort();
-    script({ port }, p, { work: true });
-    const c = clock(0);
-    const r = await runCommand(new RunCommand({ registry: fakeRegistry(["claude", "codex"], true), port, ...c }), p.root, [F], { yes: true, "max-tokens": "5000" });
-    expect(r.out).not.toContain("not enforceable");
-  });
-
-  it("028:FR-013: budgets set in .amby/config.json are used, and flags override them", async () => {
-    const p = await preparedProject(F, 4, 2);
-    const { writeFileSync, readFileSync } = await import("node:fs");
-    const { join } = await import("node:path");
-    const file = join(p.root, ".amby", "config.json");
-    writeFileSync(file, JSON.stringify({ ...JSON.parse(readFileSync(file, "utf8")), fleet: { budgets: { wallClockMinutes: 45, maxTasks: 20 } } }) + "\n");
-    const port = new FakePort();
-    const a = await runCommand(new RunCommand({ registry: fakeRegistry(), port }), p.root, [F]);
-    expect(a.out).toContain("45 minutes wall-clock, 20 task events");
-    const b = await runCommand(new RunCommand({ registry: fakeRegistry(), port }), p.root, [F], { "max-tasks": "6" });
-    expect(b.out).toContain("45 minutes wall-clock, 6 task events");
-  });
+  // Tests 2-5 only read what a run prints about its budgets before it launches, and the budget line appears without --yes
+  // (the config test already ran that way), so they share one prepared project in preview mode instead of four full runs.
+  it(
+    "028:FR-013: the defaults are shown at the start of a run; a token ceiling the runner cannot report is stated, not silently ignored; " +
+      "a runner that reports usage gets no not-enforceable notice; budgets set in .amby/config.json are used and flags override them",
+    async () => {
+      const p = await preparedProject(F, 4, 2);
+      const port = new FakePort();
+      const run = (registry: ReturnType<typeof fakeRegistry>, flags: Record<string, unknown> = {}) =>
+        runCommand(new RunCommand({ registry, port }), p.root, [F], flags);
+      // the defaults are shown at the start of a run
+      const d = await run(fakeRegistry());
+      expect(d.out, "FR-013: default budgets").toContain("Budgets: 120 minutes wall-clock, 8 task events");
+      // a token ceiling the runner cannot report is stated at the start, not silently ignored
+      const nt = await run(fakeRegistry(), { "max-tokens": "5000" });
+      expect(nt.out).toContain("5000 tokens");
+      expect(nt.out).toContain("not enforceable for this runner");
+      expect(nt.code).toBe(0);
+      // a runner that reports usage gets no not-enforceable notice
+      const ut = await run(fakeRegistry(["claude", "codex"], true), { "max-tokens": "5000" });
+      expect(ut.out, "FR-013: a usage-reporting runner").not.toContain("not enforceable");
+      // budgets set in .amby/config.json are used, and flags override them (last: it changes the config)
+      const { writeFileSync, readFileSync } = await import("node:fs");
+      const { join } = await import("node:path");
+      const file = join(p.root, ".amby", "config.json");
+      writeFileSync(file, JSON.stringify({ ...JSON.parse(readFileSync(file, "utf8")), fleet: { budgets: { wallClockMinutes: 45, maxTasks: 20 } } }) + "\n");
+      const a = await run(fakeRegistry());
+      expect(a.out).toContain("45 minutes wall-clock, 20 task events");
+      const b = await run(fakeRegistry(), { "max-tasks": "6" });
+      expect(b.out).toContain("45 minutes wall-clock, 6 task events");
+    },
+    60_000,
+  );
 });
