@@ -94,7 +94,7 @@ your edits are kept), warns when a role in `.amby/roles/` exceeds 150 words, and
 when two roles share an id. Projects with roles get one native sub-agent per role for Claude Code,
 OpenCode, and Copilot.
 
-**Plugins (experimental).** `plugins` in `.amby/config.json` maps an `ambykit-emitter-*` package to the exact
+**Plugins.** `plugins` in `.amby/config.json` maps an `ambykit-emitter-*` package to the exact
 version installed in the project's own `node_modules`; `sync` (and `check` and `add`) load only those, then
 emit their targets like built-in ones:
 
@@ -102,7 +102,7 @@ emit their targets like built-in ones:
 { "tools": ["claude", "mytool"], "plugins": { "ambykit-emitter-mytool": "1.0.0" } }
 ```
 
-`sync` prints each loaded plugin as `name@version` and an experimental note. A plugin that is missing,
+`sync` prints each loaded plugin as `name@version` (and a note when it declares the 1.x plugin API). A plugin that is missing,
 mis-pinned, outside the plugin-API range, malformed, or that clashes with another target is reported by name
 and skipped; the other targets still sync and `sync` exits **1**. A plugin file outside the project is refused;
 a file in the home directory needs `--include-user` and is never part of `--check`. Without a `plugins` key

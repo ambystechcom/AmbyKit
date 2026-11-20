@@ -1,7 +1,7 @@
-# Plugin API (experimental)
+# Plugin API
 
-> **Experimental in 1.6.** The API may change in minor releases until it is frozen at 2.0. Plugins say
-> which API range they support, and AmbyKit refuses a plugin outside it. Read
+> **Stable from 2.0.** What [`stability.md`](./stability.md) lists does not change incompatibly within 2.x; additions are
+> allowed in a minor release. Plugins say which API range they support, and AmbyKit refuses a plugin outside it. Read
 > [`plugin-trust.md`](./plugin-trust.md) before you install one: a plugin is code that runs on your
 > machine.
 
@@ -38,12 +38,15 @@ working example with all three extension points is in
 
 ```json
 { "name": "ambykit-emitter-mytool", "version": "1.0.0", "type": "module",
-  "ambykit": { "pluginApi": "^1" },
-  "peerDependencies": { "@ambystech/ambykit": ">=1.6.0" } }
+  "ambykit": { "pluginApi": "^2" },
+  "peerDependencies": { "@ambystech/ambykit": ">=2.0.0" } }
 ```
 
-The current API version is `1.0.0` (`PLUGIN_API_VERSION`). A plugin whose range does not contain it is
-refused, and the message names the range it asked for and the version found. Ranges may use an exact
+The current API version is `2.0.0` (`PLUGIN_API_VERSION`). A plugin whose range contains neither it nor the 1.x API is
+refused, and the message names the range it asked for and the version found. **A plugin written for the 1.x API (`^1`)
+still loads**: 2.0 keeps everything 1.0 had and only adds, so `sync` prints a one-line note that the plugin declares
+the 1.x API; declare `^2` once you have tested it. A 1.x plugin that imported a name the API does not export is refused with
+the name it relied on (and, if the factory's `api` argument provides it, where to get it). Ranges may use an exact
 version, `^`, `~`, `>=`, `>`, `<=`, `<`, spaces (AND) and `||` (OR); anything else is refused.
 
 ## Extension points
@@ -62,7 +65,7 @@ Import from `@ambystech/ambykit/plugin`, or take them from the factory's `api` a
 - `MCP_SERVER_NAME`, `MCP_COMMAND` — the name AmbyKit's MCP server is registered under and how a host starts it, for an
   emitter that writes a project MCP file through the inherited `mcpFile()` helper (override `mcpFiles()`; return `null`
   from `mcpSkipReason()`).
-- `PLUGIN_API_VERSION`, `PLUGIN_API_EXPERIMENTAL` — the API version and the experimental flag.
+- `PLUGIN_API_VERSION` — the API version.
 
 Types: `TargetDef`, `CommandSpec`, `CommandSurface`, `EmittedFile`, `RulesContext`, `Role`,
 `PluginModule`, `PluginFactory`, `PluginApi`.
@@ -85,8 +88,8 @@ Types: `TargetDef`, `CommandSpec`, `CommandSurface`, `EmittedFile`, `RulesContex
   naming both owners (and their plugins).
 - **Failures are isolated.** A plugin that is missing, mis-pinned, out of range, malformed or throws on
   load is reported with a reason; the other targets still sync, and `sync` exits 1.
-- **What AmbyKit prints.** On every `sync`, each loaded plugin as `name@version` and a note that the
-  API is experimental.
+- **What AmbyKit prints.** On every `sync`, each loaded plugin as `name@version`, plus a note under a plugin that
+  loaded through 1.x compatibility.
 
 ## Using a plugin
 
@@ -123,5 +126,7 @@ without a documented row for its host cannot pass.
 
 ## Stability
 
-- 1.6: experimental; `[plugin-api]` entries in `CHANGELOG.md` say whether a release affects plugins.
-- 2.0: frozen under semver. A breaking change then needs a new major plugin API version.
+- 1.x: experimental.
+- 2.0: stable. [`stability.md`](./stability.md) lists what is promised and how a stable name is deprecated and removed.
+  `[plugin-api]` entries in `CHANGELOG.md` say whether a release affects plugins; a change that would break a listed name is
+  held for the next major plugin API version (3.0).

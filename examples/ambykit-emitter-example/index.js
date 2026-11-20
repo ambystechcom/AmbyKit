@@ -1,4 +1,4 @@
-// A worked AmbyKit emitter plugin (feature 027). The plugin API is EXPERIMENTAL in 1.6.
+// A worked AmbyKit emitter plugin (feature 027). The plugin API is stable from 2.0.
 //
 // A plugin's default export is a factory. AmbyKit calls it with the extension points, so the classes you
 // subclass always come from the running copy of AmbyKit (never a second install next to your package).

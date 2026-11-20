@@ -32,9 +32,11 @@ describe("ambykit sync with plugins (feature 027)", () => {
     }
   });
 
-  it("027:FR-011: sync prints the experimental note when a plugin loads", async () => {
+  it("033:FR-007: sync no longer prints an experimental note, and a plugin that declares the 1.x API loads with a one-line note (033:FR-009)", async () => {
     const root = pluginProject({ tools: ["fake"], plugins: FAKE });
-    expect(text(await sync(root))).toMatch(/plugin API \(1\.0\.0\) is experimental in 1\.6/);
+    const out = text(await sync(root));
+    expect(out).not.toMatch(/experimental/i);
+    expect(out).toMatch(/Plugin ambykit-emitter-fake@1\.2\.3\n.*note: it declares the 1\.x plugin API \(\^1\)/s);
   });
 
   it("027:FR-017: a second sync over the same plugins changes nothing, and --check is clean", async () => {

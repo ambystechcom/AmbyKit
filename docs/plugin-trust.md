@@ -1,7 +1,7 @@
 # Plugin trust
 
-> The plugin API is **experimental** in 1.6 (see [`plugin-api.md`](./plugin-api.md)). **There is no
-> sandbox.** A plugin is JavaScript that runs inside `ambykit sync` with your permissions. Install one
+> The plugin API is **stable from 2.0** (see [`plugin-api.md`](./plugin-api.md) and [`stability.md`](./stability.md)), but
+> stable is not safe. **There is no sandbox.** A plugin is JavaScript that runs inside `ambykit sync` with your permissions. Install one
 > only if you would run its author's code.
 
 ## What AmbyKit does to keep this safe

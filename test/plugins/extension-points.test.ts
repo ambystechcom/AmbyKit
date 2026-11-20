@@ -55,7 +55,7 @@ describe("plugin extension points (feature 027)", () => {
     const section = doc.slice(doc.indexOf("## Extension points"), doc.indexOf("## Options and guarantees"));
     const names = [...section.matchAll(/`([A-Za-z][A-Za-z0-9_]+)`/g)].map((m) => m[1]!);
     const barrelText = readFileSync(join(ROOT, "src", "plugins", "index.ts"), "utf8");
-    const extensionPoints = ["BaseEmitter", "SkillsEmitter", "TomlCommandEmitter", "skillName", "skillPath", "skillFrontmatter", "tomlBasic", "tomlPrompt", "PLUGIN_API_VERSION", "PLUGIN_API_EXPERIMENTAL"];
+    const extensionPoints = ["BaseEmitter", "SkillsEmitter", "TomlCommandEmitter", "skillName", "skillPath", "skillFrontmatter", "tomlBasic", "tomlPrompt", "PLUGIN_API_VERSION"];
     for (const n of extensionPoints) {
       expect(names, n).toContain(n);
       expect(Object.keys(barrel), n).toContain(n);
@@ -67,8 +67,8 @@ describe("plugin extension points (feature 027)", () => {
     }
   });
 
-  it("027:FR-011: the API is labelled experimental in the barrel and the docs", () => {
-    expect(barrel.PLUGIN_API_EXPERIMENTAL).toBe(true);
-    expect(readFileSync(join(ROOT, "docs", "plugin-api.md"), "utf8")).toMatch(/Experimental in 1\.6/);
+  it("033:FR-007: the API is labelled stable from 2.0 in the docs and has no experimental flag in the barrel", () => {
+    expect(Object.keys(barrel)).not.toContain("PLUGIN_API_EXPERIMENTAL");
+    expect(readFileSync(join(ROOT, "docs", "plugin-api.md"), "utf8")).toMatch(/Stable from 2\.0/);
   });
 });

@@ -40,9 +40,9 @@ describe("plugin loader (feature 027)", () => {
     }
   });
 
-  it("027:FR-010: a plugin API range that excludes this version is refused with both", async () => {
+  it("033:FR-009: a plugin API range that excludes both 1.x and this version is refused, naming the range and the version found", async () => {
     const r = await load({ "ambykit-emitter-wrongrange": "1.0.0" });
-    expect(r.failures[0]!.reason).toMatch(/requires plugin API \^2.*provides 1\.0\.0/);
+    expect(r.failures[0]!.reason).toMatch(/requires plugin API \^3.*provides 2\.0\.0/);
   });
 
   it("027:FR-010: no declared range, and an unsupported range, are refused", async () => {

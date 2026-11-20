@@ -51,7 +51,7 @@ Adding a tool = one subclass + a compatibility-matrix row + a snapshot test.
 
 ## Plugins
 
-`src/plugins/` lets a project add targets without changing the core (feature 027, experimental). Config lists
+`src/plugins/` lets a project add targets without changing the core (feature 027; stable from 2.0, see `docs/stability.md`). Config lists
 `plugins: { "<package>": "<exact version>" }`; `sync`, `check` and `add` call `loadPluginSession`, which returns
 `undefined` without importing anything when no plugin is listed. With plugins, `loader.ts` (the only side-effecting
 module) reads `<project>/node_modules/<package>/package.json`, requires the installed version to equal the pin

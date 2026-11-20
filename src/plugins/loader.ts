@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { TargetDef } from "../emitters/index.js";
-import { createPluginApi, PLUGIN_API_VERSION, type PluginApi, type PluginModule } from "./api.js";
+import { createPluginApi, PLUGIN_API_1X, PLUGIN_API_VERSION, type PluginApi, type PluginModule } from "./api.js";
 import { isPluginPackageName, readManifest } from "./manifest.js";
 import { isExactVersion, satisfies } from "./semver.js";
 
@@ -20,6 +20,8 @@ export interface LoadedPlugin {
   name: string;
   version: string;
   targets: TargetDef[];
+  /** One-line notes for the person, e.g. that a plugin written for the 1.x API loaded through compatibility (033:FR-009). */
+  notes?: string[];
 }
 
 export interface PluginFailure {
@@ -78,6 +80,30 @@ function message(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
+/**
+ * Feature 033 (FR-009): a plugin written for the 1.x API that reached into something the API does not export fails when it is
+ * imported, with an error about a missing export or a package path. Say which name it relied on, that it is not part of the plugin
+ * API, and where the name is available if it is (a name the factory's `api` argument provides).
+ */
+export function importHint(err: unknown): string {
+  const text = message(err);
+  const missing = /does not provide an export named '([^']+)'/.exec(text)?.[1];
+  const subpath = /Package subpath '([^']+)' is not defined by "exports"/.exec(text)?.[1];
+  // The names a plugin may use: the factory's argument and the barrel's constant. `MCP_SERVER_NAME` and `MCP_COMMAND` are in the API.
+  const api = new Set([...Object.keys(createPluginApi()), "PLUGIN_API_VERSION"]);
+  if (missing) {
+    if (api.has(missing)) {
+      return `failed to load: ${text}. It imported '${missing}' from a module that does not provide it; the name is part of the plugin API: import it from '@ambystech/ambykit/plugin' or use api.${missing} from the factory's argument.`;
+    }
+    return `failed to load: ${text}. It imported '${missing}', which is not part of the plugin API (docs/stability.md lists the names a plugin may import).`;
+  }
+  if (subpath) {
+    const needs = /base-emitter/.test(subpath) ? " If it needed MCP_SERVER_NAME or MCP_COMMAND, use api.MCP_SERVER_NAME and api.MCP_COMMAND from the factory's argument." : "";
+    return `failed to load: ${text}. It imported '${subpath}', which is internal and not part of the plugin API (import only from '@ambystech/ambykit/plugin'; docs/stability.md lists the names).${needs}`;
+  }
+  return `failed to load: ${text}`;
+}
+
 async function loadOne(root: string, name: string, pin: string, deps: LoaderDeps): Promise<LoadedPlugin | string> {
   if (!isPluginPackageName(name)) return `'${name}' is not a plugin package name (expected ambykit-emitter-*, optionally scoped)`;
   if (!isExactVersion(pin)) return `listed with '${pin}'; plugins must be pinned to an exact version (x.y.z)`;
@@ -98,10 +124,18 @@ async function loadOne(root: string, name: string, pin: string, deps: LoaderDeps
   if (manifest.name !== name) return `package.json names '${manifest.name}', not '${name}'`;
   if (manifest.version !== pin) return `installed version ${manifest.version} does not match the pin ${pin}`;
 
-  if (manifest.pluginApi === null) return `declares no plugin API range (add "ambykit": { "pluginApi": "^1" } to its package.json)`;
+  if (manifest.pluginApi === null) return `declares no plugin API range (add "ambykit": { "pluginApi": "^2" } to its package.json)`;
   const range = satisfies(PLUGIN_API_VERSION, manifest.pluginApi);
   if (!range.supported) return `its plugin API range '${manifest.pluginApi}' is unsupported: ${range.reason}`;
-  if (!range.satisfied) return `requires plugin API ${manifest.pluginApi}, but this AmbyKit provides ${PLUGIN_API_VERSION}`;
+  const notes: string[] = [];
+  if (!range.satisfied) {
+    // Feature 033 (C-4, FR-009): API 2.0.0 keeps everything 1.0.0 had, so a plugin that targets the 1.x API loads, with a note.
+    const legacy = satisfies(PLUGIN_API_1X, manifest.pluginApi);
+    if (!legacy.supported || !legacy.satisfied) {
+      return `requires plugin API ${manifest.pluginApi}, but this AmbyKit provides ${PLUGIN_API_VERSION} (it accepts plugins declaring ^1 or ^2)`;
+    }
+    notes.push(`it declares the 1.x plugin API (${manifest.pluginApi}) and loads because API ${PLUGIN_API_VERSION} keeps everything 1.0 had; declare ^2 once you have tested it`);
+  }
 
   const entry = join(dir, manifest.entry);
   if (!existsSync(entry)) return `entry file ${manifest.entry} does not exist`;
@@ -109,7 +143,7 @@ async function loadOne(root: string, name: string, pin: string, deps: LoaderDeps
   try {
     mod = await (deps.importModule ?? ((url: string) => import(url)))(pathToFileURL(entry).href);
   } catch (err) {
-    return `failed to load: ${message(err)}`;
+    return importHint(err);
   }
   let exported: unknown = (mod as { default?: unknown } | null)?.default;
   if (typeof exported === "function") {
@@ -121,7 +155,7 @@ async function loadOne(root: string, name: string, pin: string, deps: LoaderDeps
   }
   const problems = validateShape(exported);
   if (problems.length > 0) return `bad shape: ${problems.join("; ")}`;
-  return { name, version: manifest.version, targets: (exported as PluginModule).targets };
+  return { name, version: manifest.version, targets: (exported as PluginModule).targets, ...(notes.length > 0 ? { notes } : {}) };
 }
 
 /** Load every listed plugin, in listing order. A failure never stops the others (FR-004). */

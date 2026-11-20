@@ -18,6 +18,10 @@ Plugins: affected, see the `[plugin-api]` line below.
 
 ### Added
 
+- Stability contract (feature 033): `docs/stability.md` lists the stable surface of `ambykit run` (flags, exit codes, printed lines,
+  fleet state files, directive protocol) and of the plugin API and its test kit, with the policy for changing it (deprecate in a
+  minor release with one stderr notice, remove in the next major). A test reads the list and checks every item against the
+  code. A runner now records the operating systems and versions it was verified on, and is runnable only there.
 - Dashboard redesign and workflow metrics (feature 032): `ambykit dashboard --interactive` is now four tabs (`overview`,
   `fleet`, `graph`, `quality`) under a tab bar, switched with `1`-`4` or `]`/`[`, with `?` listing the keys, one
   shared `/` search and `s` state filter line (with an `n of N match` count) that applies to the tab you are on, a tab
@@ -69,7 +73,13 @@ Plugins: affected, see the `[plugin-api]` line below.
 - A migrated task's description no longer ends with its `(file/path)` group, so the dashboard's "Up next" lines and the
   `upNext` descriptions in `--json --overview` show the description alone.
 
-- `[plugin-api]` Two additions to the plugin API (feature 036, an addition only; `PLUGIN_API_VERSION` is unchanged): the factory
+- `[plugin-api]` The plugin API is **stable from 2.0** (feature 033): `PLUGIN_API_VERSION` is `2.0.0` and `PLUGIN_API_EXPERIMENTAL` is
+  removed from `@ambystech/ambykit` and `@ambystech/ambykit/plugin` (a plugin that read it must stop; nothing else changes), and
+  `sync` no longer prints the experimental note. `docs/stability.md` lists what is promised and how a stable name is deprecated
+  and removed. 2.0 keeps everything 1.0 had and only adds, so a plugin declaring `^1` still loads, with a one-line note; a plugin
+  that imported a name the API does not export is refused with the name it relied on. A plugin that uses the new
+  `MCP_COMMAND` must declare `^2`.
+- `[plugin-api]` Two additions to the plugin API (feature 036, an addition only): the factory
   argument and `@ambystech/ambykit/plugin` now provide `MCP_SERVER_NAME` and `MCP_COMMAND`, so an emitter whose host has a
   project MCP file can pass them to the inherited `mcpFile()` helper instead of copying the strings. The `EmittedFile` and
   `RulesContext` types were already exported. Existing plugins are unaffected.

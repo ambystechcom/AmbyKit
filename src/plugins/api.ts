@@ -9,16 +9,14 @@ import { skillFrontmatter, skillName, skillPath } from "../emitters/skills-emitt
 import { tomlBasic, tomlPrompt } from "../emitters/toml-command-emitter.js";
 
 /**
- * The plugin API version. Plugins declare the range they support in `package.json`
- * (`"ambykit": { "pluginApi": "^1" }`); the loader refuses a plugin whose range does not contain it.
+ * The plugin API version, stable from 2.0 (feature 033, FR-007): what `docs/stability.md` lists does not change incompatibly
+ * within 2.x. Plugins declare the range they support in `package.json` (`"ambykit": { "pluginApi": "^2" }`); the loader refuses a
+ * plugin whose range contains neither this version nor the 1.x API it is a superset of (a `^1` plugin loads with a note).
  */
-export const PLUGIN_API_VERSION = "1.0.0";
+export const PLUGIN_API_VERSION = "2.0.0";
 
-/**
- * True in 1.6: the plugin API may change in minor releases until it is frozen at 2.0 (feature 027,
- * FR-011). The loader prints a note while this is true.
- */
-export const PLUGIN_API_EXPERIMENTAL = true;
+/** The last 1.x API version. 2.0.0 keeps everything 1.0.0 had (additions only), so a plugin written for it still loads. */
+export const PLUGIN_API_1X = "1.0.0";
 
 /** What a plugin package's default export provides, in its object form. */
 export interface PluginModule {

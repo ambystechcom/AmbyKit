@@ -1,5 +1,5 @@
 /**
- * The plugin contract test kit (feature 027, EXPERIMENTAL in 1.6), published as
+ * The plugin contract test kit (feature 027; stable from 2.0, feature 033), published as
  * `@ambystech/ambykit/testkit`. It uses nothing outside the package.
  */
 import type { TargetDef } from "../emitters/index.js";

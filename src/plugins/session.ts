@@ -5,7 +5,7 @@ import type { TargetCollision, TargetRegistry } from "./registry.js";
 /** What `sync`, `check` and `add` need once the listed plugins have been loaded (feature 027). */
 export interface PluginSession {
   registry: TargetRegistry;
-  loaded: { name: string; version: string }[];
+  loaded: { name: string; version: string; notes?: string[] }[];
   failures: PluginFailure[];
   collisions: TargetCollision[];
 }
@@ -25,7 +25,7 @@ export async function loadPluginSession(root: string, config: Pick<AmbyConfig, "
   const registry = buildRegistry(TARGETS, loaded);
   return {
     registry,
-    loaded: loaded.map((p) => ({ name: p.name, version: p.version })),
+    loaded: loaded.map((p) => ({ name: p.name, version: p.version, ...(p.notes ? { notes: p.notes } : {}) })),
     failures,
     collisions: registry.collisions,
   };

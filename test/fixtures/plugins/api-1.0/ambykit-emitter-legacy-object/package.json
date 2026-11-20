@@ -1,0 +1,7 @@
+{
+  "name": "ambykit-emitter-legacy-object",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "ambykit": { "pluginApi": "^1" }
+}
