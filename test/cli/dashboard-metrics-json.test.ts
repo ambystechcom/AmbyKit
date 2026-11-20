@@ -15,7 +15,7 @@ const json = async (root: string, flags: Record<string, string | boolean>) => {
 };
 
 describe.skipIf(!HAS_GIT)("dashboard --json --metrics (feature 032, US-4)", () => {
-  it("032:FR-007, FR-010: --metrics adds a `metrics` field to the overview JSON and keeps every other field", async () => {
+  it("032:FR-007, 032:FR-010: --metrics adds a `metrics` field to the overview JSON and keeps every other field", async () => {
     const root = metricsRepo("x", history());
     const base = await json(root, { json: true, overview: true });
     const withMetrics = await json(root, { json: true, metrics: true });
@@ -32,7 +32,7 @@ describe.skipIf(!HAS_GIT)("dashboard --json --metrics (feature 032, US-4)", () =
     expect(doc["metrics"]).toMatchObject({ enough: false, reason: "too-little-history" });
   });
 
-  it("032:FR-010, FR-011: without the flag nothing about metrics is added", async () => {
+  it("032:FR-010, 032:FR-011: without the flag nothing about metrics is added", async () => {
     const root = metricsRepo("x", history());
     expect(await json(root, { json: true, overview: true })).toMatchObject({ code: 0 });
     const plain = await runCommand(new DashboardCommand(), root, [], { json: true });
