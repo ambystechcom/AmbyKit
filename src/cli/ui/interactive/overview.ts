@@ -5,6 +5,7 @@ import type { BurndownState } from "../dashboard/burndown-chart.js";
 import type { HeaderMeta } from "../dashboard/cards.js";
 import { emptyState, noMatchLine } from "../dashboard/empty-state.js";
 import type { FleetView } from "../../../core/fleet-view/types.js";
+import type { Metrics } from "../../../core/metrics/types.js";
 import type { FleetViewApi } from "../dashboard/fleet-view.js";
 import type { GraphViewApi } from "../dashboard/graph-view.js";
 import { renderQualityView } from "../dashboard/quality-view.js";
@@ -27,6 +28,9 @@ import type { KeyEvent } from "./fullscreen.js";
  * every screen. Refreshed data arrives through `applyData`.
  */
 
+/** Feature 032 (US-4): workflow metrics, read after the first paint; absent outside the interactive dashboard. */
+export type MetricsState = { status: "loading" } | { status: "ready"; metrics: Metrics } | { status: "failed" };
+
 export interface OverviewTuiData {
   features: FeatureSnapshot[];
   issues: ParseIssue[];
@@ -48,6 +52,8 @@ export interface OverviewTuiData {
   fleetView?: FleetViewApi;
   /** The current fleet run as read from spec 025's files; null/absent ⇒ no run. */
   fleet?: FleetView | null;
+  /** Feature 032: the metrics read, delivered without blocking; a failure leaves every other view working. */
+  metricsState?: MetricsState;
   /** Terminal rows, for the Fleet view's scroll window (default 24). */
   rows?: number;
 }

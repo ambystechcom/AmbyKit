@@ -54,7 +54,7 @@ export class DashboardCommand extends BaseCommand {
   readonly name = "dashboard";
   readonly summary = "Progress view over the story/task graph.";
   readonly usage =
-    "ambykit dashboard [story-id] [--interactive] [--stories] [--next=N] [--json [--overview]] [--status=X] [--feature=X] [--icons=nerd|unicode|ascii]";
+    "ambykit dashboard [story-id] [--interactive] [--stories] [--next=N] [--json [--overview] [--metrics]] [--status=X] [--feature=X] [--icons=nerd|unicode|ascii]";
 
   protected async execute(opts: CliOptions): Promise<number> {
     let root = this.projectRoot(opts.cwd);
@@ -74,11 +74,17 @@ export class DashboardCommand extends BaseCommand {
 
     if (flag(opts, "json")) {
       const stories = this.legacyStories(root, filters);
-      if (!flag(opts, "overview")) {
+      if (!flag(opts, "overview") && !flag(opts, "metrics")) {
         this.info(JSON.stringify(stories, null, 2));
         return 0;
       }
-      this.info(JSON.stringify(await this.overviewJson(root, filters, upNextCap, stories), null, 2));
+      const doc = (await this.overviewJson(root, filters, upNextCap, stories)) as Record<string, unknown>;
+      // Feature 032 (FR-010/FR-011): metrics are opt-in and additive; nothing is added, or loaded, without the flag.
+      if (flag(opts, "metrics")) {
+        const { readMetrics } = await import("../core/metrics/index.js");
+        doc["metrics"] = readMetrics(root);
+      }
+      this.info(JSON.stringify(doc, null, 2));
       return 0;
     }
 
@@ -375,6 +381,18 @@ export class DashboardCommand extends BaseCommand {
           data.burndownFor(filters);
           u((s) => ({ ...s, burndownReady: true }));
           beat();
+          // Feature 032 (US-4): metrics load after the first paint on their own async git reads, so nothing waits on
+          // them; a failure becomes a state, not an exception, and the other views keep working.
+          data = withBurndown({ ...data, metricsState: { status: "loading" } });
+          void import("../core/metrics/index.js")
+            .then(({ readMetricsAsync }) => readMetricsAsync(checkouts.primary.root))
+            .then((metrics) => ({ status: "ready", metrics }) as const)
+            .catch(() => ({ status: "failed" }) as const)
+            .then((metricsState) => {
+              if (stopped) return;
+              data = withBurndown({ ...data, metricsState });
+              update?.((s) => ({ ...s }));
+            });
         });
       },
       resize: (columns) => {

@@ -22,3 +22,4 @@ export * from "./trace-tests.js";
 export * from "./trace-design.js";
 export * from "./trace.js";
 export * from "./trace-io.js";
+export * from "./metrics/index.js";

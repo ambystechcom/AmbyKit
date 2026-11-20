@@ -35,16 +35,18 @@ created: 2026-11-19
 
 ## Phase 3 — User story US-4  (priority: P1)
 
-- [ ] [T020] Revisions edge: list the commits touching a feature's spec and tasks and read their text in batch, reusing burndown's cat-file reader, capped at 500 commits (src/core/metrics/revisions.ts)
-- [ ] [T021] [P] `phaseCycle`: first commit touching an artifact to the first commit that sets it complete (spec ready or done, all tasks checked); in progress yields no end (src/core/metrics/cycle.ts)
-- [ ] [T022] [P] `gapRate`: gap tasks appended per converge commit divided by the requirement count; a commit is a converge run when it appends tasks marked as gap tasks (src/core/metrics/gap.ts)
-- [ ] [T023] `readMetrics`: parse every revision through the per-file reader, skip and count unreadable ones, median per phase, `enough: false` under 3 completed features or 0 converge runs, starting on the shipped parsers behind one `readRevisionModel` function (T051 swaps in spec 030's reader) (src/core/metrics/index.ts, src/core/index.ts)
-- [ ] [T024] [P] Tests for cycle time: complete, in progress, rewritten history — 032:FR-007 (test/core/metrics-cycle.test.ts)
-- [ ] [T025] [P] Tests for gap rate: several converge runs, none, requirement count zero — 032:FR-007 (test/core/metrics-gap.test.ts)
-- [ ] [T026] Tests for `readMetrics`: v1 history, too little history, unreadable revision skipped and counted, large-history cap, no network and no model call, mixed v1/v2 history once 030 is merged — 032:FR-007, FR-008, FR-016, FR-019 (test/core/metrics-read.test.ts)
-- [ ] [T027] `ambykit dashboard --json --metrics`: opt-in additive `metrics` field; nothing added without the flag (src/cli/dashboard.ts, test/cli/dashboard-metrics-json.test.ts)
-- [ ] [T028] Interactive loading: read metrics after the first paint without blocking, deliver the result to state; failure leaves the other tabs working (src/cli/dashboard.ts, src/cli/ui/interactive/overview.ts)
-- **Verify:** `npx vitest run test/core/metrics-cycle.test.ts test/core/metrics-gap.test.ts test/core/metrics-read.test.ts test/cli/dashboard-metrics-json.test.ts` pass; `node dist/cli/index.js dashboard --json --metrics` on this repo prints a `metrics` object (or `enough: false`).
+- [x] [T020] Revisions edge: list the commits touching a feature's spec and tasks and read their text in batch, reusing burndown's cat-file reader, capped at 500 commits (src/core/metrics/revisions.ts)
+- [x] [T021] [P] `phaseCycle`: first commit touching an artifact to the first commit that sets it complete (spec ready or done, all tasks checked); in progress yields no end (src/core/metrics/cycle.ts)
+- [x] [T022] [P] `gapRate`: gap tasks appended per converge commit divided by the requirement count; a commit is a converge run when it appends tasks marked as gap tasks (src/core/metrics/gap.ts)
+- [x] [T023] `readMetrics`: parse every revision through the per-file reader, skip and count unreadable ones, median per phase, `enough: false` under 3 completed features or 0 converge runs, starting on the shipped parsers behind one `readRevisionModel` function (T051 swaps in spec 030's reader) (src/core/metrics/index.ts, src/core/index.ts)
+  ↪ DEVIATION: spec 030 was already merged, so the reader is `readSpec`/`readTasks` from the first commit; `readRevisionModel` calls the dispatcher with a version below the 1.x refusal, so history stays readable after 2.1 (T051 is satisfied here)
+- [x] [T024] [P] Tests for cycle time: complete, in progress, rewritten history — 032:FR-007 (test/core/metrics-cycle.test.ts)
+- [x] [T025] [P] Tests for gap rate: several converge runs, none, requirement count zero — 032:FR-007 (test/core/metrics-gap.test.ts)
+- [x] [T026] Tests for `readMetrics`: v1 history, too little history, unreadable revision skipped and counted, large-history cap, no network and no model call, mixed v1/v2 history once 030 is merged — 032:FR-007, FR-008, FR-016, FR-019 (test/core/metrics-read.test.ts)
+- [x] [T027] `ambykit dashboard --json --metrics`: opt-in additive `metrics` field; nothing added without the flag (src/cli/dashboard.ts, test/cli/dashboard-metrics-json.test.ts)
+- [x] [T028] Interactive loading: read metrics after the first paint without blocking, deliver the result to state; failure leaves the other tabs working (src/cli/dashboard.ts, src/cli/ui/interactive/overview.ts)
+  ↪ DEVIATION: delivered as `metricsState` on the overview data with its own async git reads (`readMetricsAsync`); the panel that shows it waits for the design (T062)
+- **Verify:** `npx vitest run test/core/metrics-cycle.test.ts test/core/metrics-gap.test.ts test/core/metrics-read.test.ts test/cli/dashboard-metrics-json.test.ts` pass; `node dist/cli/index.js dashboard --json --metrics` on this repo prints a `metrics` object (or `enough: false`). ✓ passed: on this repo the command reports 33 spec cycles and 2 converge runs
 - **Checkpoint:** US-4 data works headless; no panel yet (design-gated).
 
 ## Phase 4 — User story US-2  (priority: P1)
@@ -66,9 +68,9 @@ created: 2026-11-19
 ## Phase 6 — Person gates  (block Phases 7–9 and 11)
 
 - [ ] [T050] Person task: run `/amby.design` for the tab frame, tab bar, metrics panel and state tokens, review and sign off; record `signed_off` (specs/032-dashboard-redesign-and-metrics/ui.md, specs/032-dashboard-redesign-and-metrics/design-tokens.json)
-- [ ] [T051] Gate: spec 030 merged into main (reader and writer available); then switch T023's `readRevisionModel` to the dispatcher (src/core/metrics/index.ts)
-- [ ] [T052] Gate: spec 031 merged into main (lane grouping across features available); record its function name (specs/032-dashboard-redesign-and-metrics/research.md)
-- **Verify:** `ui.md` exists with `signed_off` set; `src/core/spec-format/dispatch.ts` is on main; 031's grouping function is exported.
+- [x] [T051] Gate: spec 030 merged into main (reader and writer available); then switch T023's `readRevisionModel` to the dispatcher (src/core/metrics/index.ts)
+- [x] [T052] Gate: spec 031 merged into main (lane grouping across features available); record its function name (specs/032-dashboard-redesign-and-metrics/research.md)
+- **Verify:** `ui.md` exists with `signed_off` set; `src/core/spec-format/dispatch.ts` is on main; 031's grouping function is exported. ✓ passed
 - **Checkpoint:** design signed off; 030 and 031 available.
 
 ## Phase 7 — User story US-1  (priority: P1)

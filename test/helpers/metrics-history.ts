@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type { FeatureHistory } from "../../src/core/metrics/types.js";
 
 /**
  * A throwaway git repo built from scripted commits (feature 032 fixture): spec status changes, task check-offs and
@@ -74,4 +75,17 @@ export function fullHistory(feature: string, start: number, opts: { v2?: boolean
     { at: start + 9 * HOUR, file: "tasks.md", feature: f, text: tasksText(4, 4, { count: g }) },
     { at: start + 12 * HOUR, file: "tasks.md", feature: f, text: tasksText(4, 4, { count: g, done: true }) },
   ];
+}
+
+/** Turn scripted steps into an in-memory history (no git), oldest first. */
+export function historyOf(feature: string, steps: ScriptStep[]): FeatureHistory {
+  const h: FeatureHistory = { feature, spec: [], plan: [], tasks: [] };
+  steps.forEach((s, i) => {
+    const commit = `c${i}`;
+    const time = T0 + s.at;
+    if (s.file === "spec.md") h.spec.push({ commit, time, text: s.text });
+    else if (s.file === "tasks.md") h.tasks.push({ commit, time, text: s.text });
+    else h.plan.push({ commit, time });
+  });
+  return h;
 }
