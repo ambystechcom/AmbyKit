@@ -2,7 +2,7 @@
 feature: 033-stable-run-and-plugin-api          # NNN-slug
 title: Stable run and plugin API
 branch: 033-stable-run-and-plugin-api
-status: draft                     # draft | ready | in-progress | blocked | done
+status: ready                     # draft | ready | in-progress | blocked | done
 created: 2026-11-20
 ---
 
@@ -175,3 +175,12 @@ As an existing user, I want my 1.6 fleet state and my plugins to survive the lab
 - Live verification needs a real install of each assistant and a person to run it (028's T044 and T045 and 031's T094 are
   person tasks); a missing verification blocks the label change and does not delay 2.0 for the surfaces that have one.
 - The set of built-in targets versus plugins is specified in spec 036, does not change this contract, and 036 depends on it.
+
+## Clarifications
+
+No `[NEEDS CLARIFICATION]` marker was open. Found while reading the code; each is an **assumed default, confirm with owner**.
+
+- **C-1 Where the contract lives.** One document, `docs/stability.md`, with machine-checked lists (run flags, exit codes, state-file layout, plugin exports); a test fails when a listed item disappears (SC-004). `docs/plugin-api.md` and `docs/cli-reference.md` link to it and do not repeat the lists.
+- **C-2 Which runners.** `RUNNERS` in `src/core/runners.ts` holds two entries, `claude` and `codex`, both `verified: false`. "Every runner" in US-2 and FR-004 means those two; Copilot, Cursor and OpenCode have no headless runner and stay "no runner recorded" (not a gap, and not a 2.0 blocker).
+- **C-3 Per-OS verification.** A record names the operating systems it was checked on; a runner is runnable only there (edge case 1). A runner may be stable on one OS and refused on another, so `verified` alone is not enough: the record also carries the OS list and the version range.
+- **C-4 Plugins written for 1.x.** API 2.0.0 is a superset of 1.0.0, so a plugin declaring `^1` is accepted with a one-line note that it targets 1.x; a range that excludes both 1.x and 2.x is refused with the version it needs (FR-009).
