@@ -296,6 +296,11 @@ disturb them.
 - All features independent: the fleet reduces to parallel single runs.
 - An assistant type unavailable on this machine.
 
+## Clarifications (plan-time, 2026-11-19)
+
+- **C-1 "Merged".** For ordering, a feature is merged when all its lanes are merged into its feature branch (its run is done). A dependent or serialized feature then merges that branch into its own worktree before starting. Merging a feature into `main` stays a person's decision.
+- **C-2 Lanes.** A fleet prepares missing lanes for the next phase with the existing lane preparation and shows that in the plan preview; it refuses with the `ambykit lane` hint if it cannot.
+
 ## Assumptions
 
 - Spec 028 (single-feature `run`, released in 1.6.0), spec 029 (Fleet view, 1.6.0) and spec 023 (graph)
