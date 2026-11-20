@@ -40,7 +40,8 @@ describe("plugins/antigravity package (036:FR-007, FR-008)", () => {
   it("036:FR-007: its source imports nothing at run time: only `import type` from the published plugin API", () => {
     for (const file of readdirSync(join(dir, "src")).filter((f) => f.endsWith(".ts"))) {
       const imports = readFileSync(join(dir, "src", file), "utf8")
-        .split("\n")
+        // CRLF-safe: a Windows checkout may end every line with \r.
+        .split(/\r?\n/)
         .filter((l) => /^\s*(import|export\s.*\sfrom)\b/.test(l));
       for (const line of imports) {
         expect(line, `${file}: ${line}`).toMatch(/^import type .* from "@ambystech\/ambykit\/plugin";$/);
