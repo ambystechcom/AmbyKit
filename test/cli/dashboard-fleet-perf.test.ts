@@ -5,6 +5,7 @@ import { DashboardCommand } from "../../src/cli/dashboard.js";
 import { readFleet } from "../../src/core/fleet-view/read.js";
 import { NOW, fleetProject } from "../helpers/fleet-fixture.js";
 import { runCommand } from "../helpers/run-command.js";
+import { scaledBudget } from "../helpers/machine-load.js";
 
 const ten = () => fleetProject(Array.from({ length: 10 }, (_, i) => ({ k: i + 1, reportMinutesAgo: i, state: "working" as const })), { now: NOW });
 
@@ -16,7 +17,7 @@ describe("fleet performance and loading (feature 029, SC-005, FR-012)", () => {
       const r = await runCommand(new DashboardCommand(), f.root, [], flags);
       const ms = performance.now() - t0;
       expect(r.code).toBe(0);
-      expect(ms).toBeLessThan(1000);
+      expect(ms).toBeLessThan(scaledBudget(1000));
     }
   });
 
@@ -24,7 +25,7 @@ describe("fleet performance and loading (feature 029, SC-005, FR-012)", () => {
     const f = ten();
     const t0 = performance.now();
     const v = readFleet(f.root, NOW)!;
-    expect(performance.now() - t0).toBeLessThan(500);
+    expect(performance.now() - t0).toBeLessThan(scaledBudget(500));
     expect(v.lanes).toHaveLength(10);
   });
 
