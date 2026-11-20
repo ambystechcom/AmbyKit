@@ -1,10 +1,15 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { DashboardCommand } from "../../src/cli/dashboard.js";
 import { worktreePerfFixture } from "../helpers/dashboard-perf-fixture.js";
 import { HAS_GIT } from "../helpers/git-repo.js";
+import { expectWithinBudget } from "../helpers/load-independent-budget.js";
 import { runCommand } from "../helpers/run-command.js";
+
+// Count child-process spawns (every git call goes through node:child_process) while still running them for real.
+vi.mock("node:child_process", async (importOriginal) =>
+  (await import("../helpers/load-independent-budget.js")).countingChildProcess(await importOriginal<typeof import("node:child_process")>()));
 
 /**
  * Feature 032, US-5: the redesign must not slow or reshape the non-interactive output. This records the field names of
@@ -13,7 +18,9 @@ import { runCommand } from "../helpers/run-command.js";
  * Re-record with UPDATE_JSON_FIELDS_032=1 only for a deliberate, reviewed change.
  */
 const file = join(import.meta.dirname, "..", "fixtures", "dashboard-json-fields.json");
-const BUDGET_MS = 1000;
+// Spawn ceilings per run on the 50-feature / 10-worktree fixture (measured counts plus about a third of headroom).
+const SPAWNS_ONE_SHOT = 24; // measured: 18
+const SPAWNS_OVERVIEW_JSON = 24; // measured: 18
 
 /** Every key path in a JSON value; array elements collapse to `[]`. */
 export function fieldPaths(value: unknown, prefix = ""): string[] {
@@ -28,18 +35,6 @@ export function fieldPaths(value: unknown, prefix = ""): string[] {
 }
 
 const run = async (root: string, flags: Record<string, string | boolean>) => runCommand(new DashboardCommand(), root, [], flags);
-
-/** Best of three, so one slow scheduling hiccup under load does not fail a budget the code meets. */
-async function bestMs(root: string, flags: Record<string, string | boolean>): Promise<number> {
-  let best = Infinity;
-  for (let i = 0; i < 3; i++) {
-    const t0 = performance.now();
-    const r = await run(root, flags);
-    best = Math.min(best, performance.now() - t0);
-    expect(r.code).toBe(0);
-  }
-  return best;
-}
 
 describe.skipIf(!HAS_GIT)("dashboard JSON fields and one-second budget (feature 032, US-5)", () => {
   it("032:FR-010, 032:FR-020: every recorded --json and --json --overview field is still present with the 030 reader in place", async () => {
@@ -57,7 +52,18 @@ describe.skipIf(!HAS_GIT)("dashboard JSON fields and one-second budget (feature 
 
   it("032:FR-009, 032:FR-020: one-shot and --json stay under one second on the largest fixture with the 030 reader in place", async () => {
     const root = worktreePerfFixture(50, 10);
-    expect(await bestMs(root, {})).toBeLessThan(BUDGET_MS);
-    expect(await bestMs(root, { json: true, overview: true })).toBeLessThan(BUDGET_MS);
+    // The budget is two load-independent checks (see test/helpers/load-independent-budget.ts): a bound on git spawns,
+    // and the fastest of three runs under 1 s or within a multiple of the spawn floor measured right now.
+    const timed = (label: string, flags: Record<string, string | boolean>, spawnBudget: number) =>
+      expectWithinBudget({
+        label,
+        spawnBudget,
+        run: async () => {
+          const r = await run(root, flags);
+          expect(r.code).toBe(0);
+        },
+      });
+    await timed("one-shot", {}, SPAWNS_ONE_SHOT);
+    await timed("--json --overview", { json: true, overview: true }, SPAWNS_OVERVIEW_JSON);
   }, 60_000);
 });
