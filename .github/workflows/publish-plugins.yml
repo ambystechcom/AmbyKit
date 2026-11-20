@@ -1,0 +1,93 @@
+name: Publish plugin to npm
+
+# Publishes ONE official plugin from plugins/<name>/ when a GitHub Release is published with the tag
+# plugin/<name>/v<x.y.z> (or when run by hand with the plugin name). The core package has its own workflow
+# (publish.yml), which ignores plugin/* tags. See docs/plugins-release.md.
+#
+# Auth is npm Trusted Publishing (OIDC), no stored token. Each plugin package needs its trusted publisher set on
+# npmjs.com: this repository, workflow filename "publish-plugins.yml" (case-sensitive), environment "Prod". npm can
+# only trust a package that already exists, so the FIRST version of a new plugin is published by hand once.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      plugin:
+        description: "Plugin directory name under plugins/ (for example: antigravity)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write # npm provenance attestation
+
+jobs:
+  publish:
+    # Release events for the core (v1.2.3 tags) are not ours.
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'plugin/')
+    runs-on: ubuntu-latest
+    # Must match the "Environment" set on the npm trusted publisher (case-sensitive).
+    environment: Prod
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+
+      # Trusted Publishing (OIDC) needs npm >= 11.5.1, newer than what ships with Node 22.
+      - name: Upgrade npm for OIDC
+        run: npm install -g npm@latest
+
+      - name: Install
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      # The plugin is checked against the core of this same commit, so the core is built first.
+      - name: Build core
+        run: npm run build
+
+      # Tag -> directory, tag version == package version, package name, pluginApi range includes the current plugin API.
+      - name: Verify the plugin package
+        id: plugin
+        env:
+          REF: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.plugin }}
+        run: node scripts/plugin-release.mjs verify "$REF"
+
+      - name: Build plugins
+        run: npm run build:plugins
+
+      # The plugin's own tests, with the published contract kit (alias in vitest.config.ts).
+      - name: Test the plugin
+        env:
+          PLUGIN_DIR: ${{ steps.plugin.outputs.dir }}
+        run: npx vitest run "$PLUGIN_DIR/"
+
+      - name: Show what would be published
+        working-directory: ${{ steps.plugin.outputs.dir }}
+        run: npm pack --dry-run
+
+      # The same version can reach this workflow twice (a manual run, then the Release). npm rejects the second
+      # publish, so detect it and skip rather than fail.
+      - name: Check whether this version is already on npm
+        id: published
+        env:
+          PKG: ${{ steps.plugin.outputs.package }}
+          VER: ${{ steps.plugin.outputs.version }}
+        run: |
+          if [ -n "$(npm view "$PKG@$VER" version 2>/dev/null)" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::$PKG@$VER is already published, skipping the publish step."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Trusted Publishing: npm uses the id-token (OIDC), no NODE_AUTH_TOKEN. Provenance is automatic.
+      - name: Publish
+        if: steps.published.outputs.exists != 'true'
+        working-directory: ${{ steps.plugin.outputs.dir }}
+        run: npm publish --access public

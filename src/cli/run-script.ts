@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { LaunchEntry } from "../core/run-launch-plan.js";
 import { primaryRoot } from "../core/checkouts.js";
 import { FLEET_DIR, ensureFleetRoot } from "../core/fleet/runs.js";
+import { withStability } from "../core/run-stability.js";
 
 /**
  * `--emit-script` (feature 028, FR-003): write the plan as `launch.sh` and `launch.ps1`, launching nothing.
@@ -16,7 +17,7 @@ const sh = (s: string): string => `'${s.replace(/'/g, `'\\''`)}'`;
 const ps = (s: string): string => `'${s.replace(/'/g, "''")}'`;
 
 export function shellScript(feature: string, plan: LaunchEntry[], batch: number): string {
-  const lines = ["#!/bin/sh", `# ambykit run --emit-script for ${feature} (experimental). Review before running; nothing has been launched.`, "set -e"];
+  const lines = ["#!/bin/sh", `# ${withStability(`ambykit run --emit-script for ${feature}`)}. Review before running; nothing has been launched.`, "set -e"];
   let n = 0;
   for (const e of plan) {
     if (!e.command) continue;
@@ -31,7 +32,7 @@ export function shellScript(feature: string, plan: LaunchEntry[], batch: number)
 }
 
 export function powershellScript(feature: string, plan: LaunchEntry[], batch: number): string {
-  const lines = [`# ambykit run --emit-script for ${feature} (experimental). Review before running; nothing has been launched.`, "$ErrorActionPreference = 'Stop'", "$jobs = @()"];
+  const lines = [`# ${withStability(`ambykit run --emit-script for ${feature}`)}. Review before running; nothing has been launched.`, "$ErrorActionPreference = 'Stop'", "$jobs = @()"];
   let n = 0;
   for (const e of plan) {
     if (!e.command) continue;

@@ -1,0 +1,81 @@
+---
+feature: 036-core-and-plugin-targets
+created: 2026-11-20
+---
+
+# Tasks — Core targets and official plugin targets
+
+> Line format: `- [ ] [T###] [P?] [US#] description (file/path)`
+> `[x]` = done (source of truth for `ambykit dashboard`). `[P]` = parallelizable. `[US#]` = story tag.
+> Gate: no user-story task starts until Foundational completes. **Extra gates:** (1) **033's plugin-API freeze** (033 T040): any addition the
+> Antigravity plugin needs (`MCP_COMMAND`, the `EmittedFile` and `RulesContext` types) must be in `PluginApi` before that task; T003 records
+> the list; (2) Phase 5 (removing the built-in Antigravity emitters) starts only after the plugin is **published and install-tested** (person
+> tasks T034, T035, T037); (3) the official plugins live in this repository under `plugins/<name>/` (decided C-3) with one extra workflow,
+> `publish-plugins.yml`. Tests name what they cover as `036:FR-###`.
+> Story order: US-1 → US-2 → US-3 → US-4.
+> Written in the 1.x task format on purpose: the repo's own specs migrate last (030 T095).
+
+## Phase 1 — Setup
+
+- [x] [T001] Research: confirm each coupling point (`emit.ts`, `agents.ts`, `subagents.ts`, `legacy.ts`, `live-tokens.ts`), the 12 test files, and every `getTarget(id)` call without a registry (specs/036-core-and-plugin-targets/research.md) ↪ DEVIATION: the code has 16 test files that mention Antigravity, not 12 (converge-emit, decide-emit, review-emit and roles-emit were missed); `init.ts` stays registry-blind by design (it runs before a project can list a plugin)
+- [x] [T002] Fixture plugin shaped like Antigravity: a `SkillsEmitter` target writing `.agents/skills/`, in factory form, with its `package.json` (test/fixtures/plugins/ambykit-emitter-skills-target/) ↪ DEVIATION: the loader requires the package name `ambykit-emitter-*` and the helper installs a fixture by that name, so the folder carries the prefix; it also adds `.agents/mcp_config.json` through `api.MCP_COMMAND` on the CLI target
+- [x] [T003] Gate: list the API additions the Antigravity plugin needs and hand them to 033 before its T040 (`MCP_COMMAND`, types) (specs/036-core-and-plugin-targets/research.md, src/plugins/api.ts, src/plugins/index.ts, docs/plugin-api.md) ↪ DEVIATION: the additions are made here, not only listed: `MCP_SERVER_NAME` and `MCP_COMMAND` on `PluginApi` and the barrel (additive, `PLUGIN_API_VERSION` unchanged); the types were already exported, so there is nothing to add for them
+- **Verify:** `npm run typecheck` passes and `research.md` names every coupling point and API gap. ✓ passed: `npm run typecheck` clean; `npx vitest run test/plugins` 97 passed (api-mcp.test.ts proves the fixture plugin matches the built-in emitters); 033 T040 still has to freeze the additions (listed in research.md)
+
+## Phase 2 — Foundational  (blocks all feature work)
+
+- [x] [T010] [P] `targetStatus(id)`: `built-in`, `moved` (package, since) or `deprecated` (package that will replace it); pure (src/core/moved-targets.ts, test/plugins/moved-targets.test.ts) ↪ DEVIATION: a fourth state, `unknown`, for an id that is neither bundled nor moved, and an empty `DEPRECATED_TARGETS` map that Phase 4 fills
+- [x] [T011] [P] `sync`, `check` and `update`: a configured moved target with no plugin fails only that target, prints the install and config lines, continues, exits non-zero, deletes nothing (src/cli/sync.ts, src/cli/check.ts, src/cli/update.ts, test/plugins/moved-failure.test.ts) ↪ DEVIATION: the install and config lines are the existing `movedTargetNotices` text; the 027 test that expected exit 0 now expects 1 (036:FR-004). `update`'s consent offer for the install is Phase 4 (T041)
+- [x] [T012] [P] Pass the plugin registry to every caller that looked a target up without one, so a plugin-provided target is visible (src/core/legacy.ts, src/cli/sync.ts, src/cli/check.ts) ↪ DEVIATION: only `legacyWorkflowFiles` was registry-blind among the callers that have a registry; `core/emit.ts` already takes it, and `init.ts` stays blind on purpose (see T001)
+- **Verify:** `npm run typecheck` and `npx vitest run test/plugins/moved-targets.test.ts` pass. ✓ passed: typecheck clean; moved-targets.test.ts 10 passed; moved-failure.test.ts 8 passed (sync, check and update fail only the moved target, exit 1, delete nothing; an installed fixture plugin gives no failure; a registry finds Antigravity's stale workflows)
+- **Checkpoint:** `targetStatus` exists, a missing plugin is a per-target failure, and no caller is registry-blind. User stories may start.
+
+## Phase 3 — User story US-1  (priority: P1)
+
+- [x] [T020] [US1] Tests: a moved target with its plugin listed and installed emits the files the fixture plugin defines, and a built-in target is unchanged — 036:FR-003 (test/plugins/moved-installed.test.ts) ↪ DEVIATION: the per-command cases of T020/T021 already existed in test/plugins/moved-failure.test.ts (phase 2); these files add the byte-identity of moved vs not-moved output, the built-in unchanged check, the exact wording, a whole-tree snapshot (nothing changed or deleted), --dry-run and --check
+- [x] [T021] [US1] Tests: a moved target with no plugin names the target, prints the exact install and config lines, other targets still sync, exit is non-zero, no file is changed or deleted — 036:FR-004, FR-005 (test/plugins/moved-missing.test.ts)
+- [x] [T022] [US1] Tests: `codex` plus a plugin target sharing `.agents/skills` keep the shared files; removing one owner leaves them (test/plugins/moved-shared-outputs.test.ts)
+- [x] [T023] [US1] Tests: plugin installed but not listed, version mismatch, plugin outdated for the stable API, offline `update` — 036:FR-004 (test/plugins/moved-edge.test.ts) ↪ DEVIATION: TC-020 (offline update) cannot say "offline" because update treats an unknown latest version as "current" and refreshes the project; the test pins what matters instead (no install attempt, other targets refreshed, moved target named, --dry-run writes nothing). Whether update should print an offline line is T041
+- **Verify:** `npx vitest run test/plugins` passes (moved-installed 5, moved-missing 7, moved-shared-outputs 5, moved-edge 7 tests, plus the phase 2 files).
+- **Checkpoint:** US-1 done in core with the fixture plugin.
+
+## Phase 4 — User story US-2  (priority: P1; ends in person gates)
+
+- [x] [T030] [US2] Release tooling for `plugins/<name>/`: `publish-plugins.yml` (tag `plugin/<name>/v<x.y.z>` or manual `plugin` input), the guard in `publish.yml`, `build:plugins` in `ci.yml`, `scripts/build-plugins.mjs`, `scripts/plugin-release.mjs` (tag parse, package and API-range checks), `docs/plugins-release.md` — 036:FR-007, FR-008 (.github/workflows/publish-plugins.yml, .github/workflows/publish.yml, .github/workflows/ci.yml, scripts/build-plugins.mjs, scripts/plugin-release.mjs, test/scripts/plugin-release.test.ts, docs/plugins-release.md)
+- [x] [T031] [US2] `@ambystech/ambykit-emitter-antigravity` with both harnesses on `api.SkillsEmitter`, declaring `ambykit.pluginApi` (plugins/antigravity/package.json, plugins/antigravity/tsconfig.json, plugins/antigravity/src/index.ts, plugins/antigravity/CHANGELOG.md) ↪ DEVIATION: the package also has README.md, LICENSE and test/ (not published: `files` is dist, README, LICENSE); it declares no peerDependencies because it has no runtime import of core and the loader already checks `ambykit.pluginApi`
+- [x] [T032] [US2] The contract kit against the Antigravity row from `docs/tool-compatibility.md`, and the two goldens moved here from core — 036:FR-007, FR-012 (plugins/antigravity/test/) ↪ DEVIATION: the goldens are compared in place (test/fixtures/emitters-golden/antigravity*.json) while the built-in emitters still exist; moving them is T052. The kit rows are in plugins/antigravity/test/matrix-rows.json (recorded from antigravity.google/docs/skills, already summarised in docs/tool-compatibility.md). The strongest evidence is plugins/antigravity/test/equivalence.test.ts: whole EmittedFile objects, plugin vs built-in, 6 target sets x roles x mcp x manageRules (48 cases), plus the shared .agents/skills owners
+- [x] [T033] [US2] CI builds and tests every plugin against the core of the same commit; releasing one plugin tag publishes only that package — 036:FR-008 (test/scripts/plugin-release.test.ts, .github/workflows/ci.yml) ↪ DEVIATION: satisfied by the root vitest picking up plugins/*/test (the alias in vitest.config.ts resolves @ambystech/ambykit/plugin and /testkit to this checkout) and by the existing wiring tests; CI runs the tests before `build:plugins`, so no plugin test may need a build (loader.test.ts imports the source through the loader importModule hook)
+- [ ] [T034] [US2] **Person task:** first publish of `@ambystech/ambykit-emitter-antigravity` by hand from your machine (npm cannot trust a package that does not exist yet): `npm publish --access public` in `plugins/antigravity/` (plugins/antigravity/package.json)
+- [ ] [T037] [US2] **Person task:** on npmjs.com add the trusted publisher for the package (this repository, workflow filename `publish-plugins.yml`, case-sensitive, environment `Prod`; the entry is not validated when saved); then release the next version with tag `plugin/antigravity/v<x.y.z>` within 2 days to prove it (docs/plugins-release.md)
+- [ ] [T035] [US2] **Person task:** install-test on a project synced by 1.6 with `antigravity` and `antigravity-cli`: install the package, list it, run `ambykit sync`, expect no diff — 036:SC-001 (specs/036-core-and-plugin-targets/research.md)
+- [ ] [T036] [US2] Long-tail plugins (`gemini`, `llxprt`, `qwen`, `kilo`, `augment`, `windsurf`, `kiro`), one package each; **not a 2.0 gate** (plugins/)
+- **Verify:** `npx vitest run plugins/antigravity test/scripts` passes (68 plugin tests); `npm run build:plugins` builds plugins/antigravity; `npm pack --dry-run` lists exactly LICENSE, README.md, dist/index.d.ts, dist/index.js and package.json; `node scripts/plugin-release.mjs verify antigravity` and `verify plugin/antigravity/v1.0.0` pass and `v1.0.1` fails. ? unverified: T034, T035 and T037 need a person; the publish workflow cannot run until a real release; T036 is after 2.0.
+- **Checkpoint:** US-2 done for Antigravity when T034, T035 and T037 pass; this unlocks Phase 6.
+
+## Phase 5 — User story US-3  (priority: P1)
+
+- [x] [T040] [US3] `MOVED_TARGETS` entries for `antigravity` and `antigravity-cli` (since 2.0.0); `deprecated` entries for the long tail naming the replacing package (src/core/moved-targets.ts) ↪ DEVIATION: the entries exist as data (PLANNED_MOVED_TARGETS and PLANNED_DEPRECATED_TARGETS in src/core/moved-targets.ts) but MOVED_TARGETS and DEPRECATED_TARGETS stay EMPTY behind one constant, SPLIT_ACTIVE = false. Reason: a moved id is treated as no longer bundled, so filling MOVED_TARGETS while the built-in Antigravity emitters still exist would make init and add refuse a target that still works, and targetStatus would answer moved for a bundled target. T050 removes the built-in emitters, flips SPLIT_ACTIVE to true in the same commit and updates test/plugins/moved-switch.test.ts, which pins the false state. Also: after T050 TARGETS holds nine ids, not eight: the eight products plus the pi alias (moved-switch.test.ts lists them)
+- [x] [T041] [US3] `update` offers the install and config change and writes nothing user-level without consent — 036:FR-006 (src/cli/update.ts, test/plugins/moved-update.test.ts) ↪ DEVIATION: update already printed the install and config lines and never installed or wrote anything user-level, so no src/cli/update.ts change was needed for FR-006: test/plugins/moved-update.test.ts pins it (no install attempt, config byte-identical, no node_modules or package.json, nothing written to a temp HOME)
+- [x] [T042] [US3] `init` and `add` list built-in targets and show moved ones as "official plugin, install first" with the install line — 036:FR-010 (src/cli/init.ts, src/cli/add.ts, test/cli/init-targets.test.ts) ↪ DEVIATION: added `movedTargetRefusals` and `movedTargetChoices` (pure) and wired them into init, add and the pickers (src/cli/ui/tool-options.ts); they return nothing while MOVED_TARGETS is empty, so today the pickers and messages are byte-identical. A refusal exits 1 before anything is saved or emitted. The deprecation notice (TC-016) is wired into sync, check and update the same way (`deprecatedTargetNotices`), gated by SPLIT_ACTIVE
+- [x] [T043] [US3] Changelog and migration guide list the moved ids, package names and install lines — 036:FR-009 (CHANGELOG.md, docs/migration.md) ↪ DEVIATION: the changelog states the 2.0 move as taking effect in 2.0 and says both targets are still bundled in this version; docs/migration.md has a section marked "Takes effect when you upgrade to AmbyKit 2.0". T050 must rewrite the changelog line from "will move" to "moved" in the same commit that flips SPLIT_ACTIVE Covered by test/plugins/moved-docs.test.ts, which reads both documents against the planned table
+- **Verify:** `npx vitest run test/plugins/moved-update.test.ts test/plugins/moved-switch.test.ts test/cli/init-targets.test.ts` pass (3, 7 and 12 tests), plus test/plugins/moved-docs.test.ts (4 tests) and `node scripts/check-docs-sync.mjs` is clean.
+- **Checkpoint:** US-3 done.
+
+## Phase 6 — User story US-4  (priority: P2; gated by T034 and T035)
+
+- [ ] [T050] [US4] Remove the built-in Antigravity emitters from `TARGETS`; `TARGETS` is exactly the eight built-in ids — 036:FR-001, FR-002 (src/emitters/index.ts, src/emitters/antigravity.ts, src/emitters/antigravity-cli.ts, test/plugins/registry-core.test.ts)
+- [ ] [T051] [US4] Mark each target built in or official plugin, with its package, and update the earlier split page — 036:FR-011 (docs/tool-compatibility.md, README.md, docs/plugin-split.md)
+- [ ] [T052] [US4] Core goldens keep the built-in ids only; the Antigravity fixtures are removed (they live in `plugins/antigravity/test/`) — 036:FR-012 (test/emitters-golden.test.ts, test/fixtures/emitters-golden/)
+- [ ] [T053] [US4] Rewrite or move the Antigravity-specific tests: generic behaviour uses the fixture plugin, format tests move to `plugins/antigravity/test/` (test/antigravity-migration-018.test.ts, test/antigravity-shared-018.test.ts, test/antigravity-skills-018.test.ts, test/core/antigravity-identity-018.test.ts, test/mcp-emit-antigravity.test.ts, test/legacy.test.ts, test/emit-collision.test.ts, test/emit-mcp.test.ts, test/m3-emitters.test.ts, test/worker-emit.test.ts, test/ui/dashboard-agents.test.ts)
+- [ ] [T054] [US4] The doc-sync check and the registry test agree on the built-in list — 036:FR-011 (scripts/check-docs-sync.mjs, test/check-docs-sync.test.ts)
+- **Verify:** `npx vitest run test/plugins test/check-docs-sync.test.ts test/emitters-golden.test.ts` pass and `ambykit trace 036` lists 12 of 12 requirements covered.
+- **Checkpoint:** US-4 done; core and docs match the split.
+
+## Phase 7 — Polish and integration
+
+- [ ] [T080] INTEGRATION STEP (once per batch, after merges, not in a lane branch): re-record the emitter goldens with `UPDATE_GOLDEN=1 npx vitest run test/emitters-golden.test.ts` (test/fixtures/emitters-golden/)
+- [ ] [T081] INTEGRATION STEP (once per batch, after merges): run `ambykit sync` twice; the second run is a no-op (.claude/, .agents/, .github/)
+- [ ] [T082] Full gate: `npm run typecheck`, `npm test`, `node scripts/check-docs-sync.mjs`, `ambykit trace 036` (test/check-docs-sync.test.ts)
+- [ ] [T094] **Person task:** confirm the assumed defaults C-2 (`pi` stays with `codex`), and C-4 (only Antigravity gates 2.0); C-3 (plugins in this repository, one package per target, no workspaces, one deploy workflow) is decided; record the answers in `spec.md` (specs/036-core-and-plugin-targets/spec.md)
+- **Verify:** `npm run typecheck` and `npm test` pass and `node dist/cli/index.js trace 036` shows every FR covered. ? unverified: T094 is a person task.
+- **Checkpoint:** feature complete except the person gates above.

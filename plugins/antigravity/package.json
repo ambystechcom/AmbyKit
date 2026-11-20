@@ -1,0 +1,30 @@
+{
+  "name": "@ambystech/ambykit-emitter-antigravity",
+  "version": "1.0.0",
+  "description": "AmbyKit emitter plugin for Google Antigravity (IDE and CLI): writes the phase skills to .agents/skills/.",
+  "keywords": ["ambykit", "ambykit-plugin", "antigravity", "agy", "skills", "spec-driven-development"],
+  "license": "MIT",
+  "author": "ambystech",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ambystechcom/AmbyKit.git",
+    "directory": "plugins/antigravity"
+  },
+  "homepage": "https://ambykit.ambystech.io",
+  "bugs": {
+    "url": "https://github.com/ambystechcom/AmbyKit/issues"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "README.md", "LICENSE"],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "ambykit": {
+    "pluginApi": "^2"
+  }
+}

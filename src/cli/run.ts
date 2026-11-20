@@ -18,6 +18,7 @@ import { refusals, type LaunchEntry } from "../core/run-launch-plan.js";
 import { laneRefs, type LaneRef } from "../core/query.js";
 import { RUNNERS, listRunners, type RunnerSpec } from "../core/runners.js";
 import { resolveBudgets, type Budgets } from "../core/run-supervise.js";
+import { isExperimental, stabilityLabel, withStability } from "../core/run-stability.js";
 import { featureDirOf } from "../core/tasks-edit.js";
 
 /**
@@ -75,7 +76,7 @@ export interface RunContext {
 
 export class RunCommand extends BaseCommand {
   readonly name = "run";
-  readonly summary = "(experimental) Run a feature's prepared lanes headless: print, launch, supervise, merge.";
+  readonly summary = `${stabilityLabel()} Run a feature's prepared lanes headless: print, launch, supervise, merge.`.trim();
   readonly usage =
     "ambykit run <feature> [<feature>...|--all-ready] [--yes] [--emit-script] [--assistant=<id,id>] [--unattended] [--max-minutes=N] [--max-tasks=N] [--max-tokens=N] [--continue-run=<run>] [--continue-fleet=<fleet>] [--json] | pause|stop|resume <fleet> | --runners | approve|reject <run> [--gate=<id>] [--reason=<text>] | approve <run> --reassign=<lane>:<assistant>";
 
@@ -100,7 +101,7 @@ export class RunCommand extends BaseCommand {
     let warned = false;
     if (!cont && (opts.positionals.length >= 2 || flag(opts, "all-ready") || stringFlag(opts, "continue-fleet"))) {
       if (!flag(opts, "json")) {
-        this.warn(EXPERIMENTAL_NOTE);
+        if (isExperimental()) this.warn(EXPERIMENTAL_NOTE);
         warned = true;
       }
       const io = { info: (m: string) => this.info(m), warn: (m: string) => this.warn(m), error: (m: string, h?: string) => this.error(m, h), success: (m: string) => this.success(m) };
@@ -119,7 +120,7 @@ export class RunCommand extends BaseCommand {
       this.error(`Feature '${featureArg}' not found.`, "Use a feature number or directory name from specs/.");
       return 1;
     }
-    if (!flag(opts, "json") && !warned) this.warn(EXPERIMENTAL_NOTE);
+    if (!flag(opts, "json") && !warned && isExperimental()) this.warn(EXPERIMENTAL_NOTE);
 
     const lanes = preparedLanes(root, feature);
     if (lanes.length === 0) {
@@ -292,7 +293,7 @@ export class RunCommand extends BaseCommand {
 
   private printPlan(ctx: RunContext): void {
     const { settings, budgets } = ctx;
-    this.info(ctx.continueRun ? `Continuing run ${ctx.run} of ${ctx.feature} (experimental)` : `Run plan for ${ctx.feature} — run ${ctx.run} (experimental)`);
+    this.info(ctx.continueRun ? withStability(`Continuing run ${ctx.run} of ${ctx.feature}`) : withStability(`Run plan for ${ctx.feature} — run ${ctx.run}`));
     this.info(
       `Lanes: ${ctx.lanes.length} · assistants: ${[...new Set(ctx.plan.map((e) => e.assistant))].join(", ")} · caps: ${settings.concurrency.total} at once, ${settings.concurrency.perType} per assistant`,
     );
@@ -316,7 +317,7 @@ export class RunCommand extends BaseCommand {
 
   private planJson(ctx: RunContext, launching: boolean): unknown {
     return {
-      experimental: true,
+      experimental: isExperimental(),
       feature: ctx.feature,
       run: ctx.run,
       launched: false,
@@ -335,9 +336,12 @@ export class RunCommand extends BaseCommand {
       console.log(JSON.stringify(rows));
       return 0;
     }
-    this.info("Headless runners (experimental). Only a verified runner can be launched.");
+    this.info(`${withStability("Headless runners")}. Only a verified runner can be launched.`);
     for (const r of rows) {
-      const status = r.verified ? `verified${r.verifiedVersion ? ` (${r.verifiedVersion})` : ""}` : "unverified";
+      // Feature 033 (FR-004): where and for which versions the live check was recorded, when it was.
+      const where = r.verifiedOn ? ` on ${r.verifiedOn.join(", ")}` : "";
+      const range = r.verifiedRange ? ` for ${r.verifiedRange}` : "";
+      const status = r.verified ? `verified${r.verifiedVersion ? ` (${r.verifiedVersion})` : ""}${where}${range}` : "unverified";
       this.info(`  ${r.id}  ${r.label}  ${status}  usage ${r.reportsUsage ? "reported" : "not reported"}  ${r.runnable ? "runnable" : "not runnable"}`);
       if (r.reason) this.info(`    ${r.reason}`);
     }

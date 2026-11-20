@@ -14,10 +14,26 @@ Every release states whether plugins are affected, with such a line or with "Plu
 
 ## [Unreleased]
 
-Plugins: not affected.
+Plugins: affected, see the `[plugin-api]` line below.
 
 ### Added
 
+- Official Antigravity plugin (feature 036): `@ambystech/ambykit-emitter-antigravity`, in `plugins/antigravity/`, provides both
+  Antigravity targets (`antigravity` and `antigravity-cli`) on the stable plugin API, with output byte-identical to the
+  built-in emitters (a test compares them with and without roles, MCP and rules, and with the shared `.agents/skills`
+  files of Codex and Pi). **In AmbyKit 2.0 Antigravity is no longer bundled and comes from this package** (see
+  `docs/migration.md`); in this version both targets are still bundled and nothing changes for you. A moved target is listed by
+  `init` and `add` as an official plugin to install first, and refused with the install lines (nothing is installed or
+  written), and a bundled target that will move gets a one-line notice with the package that will replace it; both stay silent
+  until 2.0.
+- Release tooling for the official plugins (feature 036, maintainers): plugins live in `plugins/<name>/` and are published by one extra
+  workflow, `publish-plugins.yml`, from a GitHub Release tagged `plugin/<name>/v<x.y.z>`; `publish.yml` ignores those tags, `ci.yml` runs
+  `npm run build:plugins`, and `scripts/plugin-release.mjs` checks the tag, the package and the plugin-API range before anything is
+  published. See `docs/plugins-release.md`. Nothing is published by this change.
+- Stability contract (feature 033): `docs/stability.md` lists the stable surface of `ambykit run` (flags, exit codes, printed lines,
+  fleet state files, directive protocol) and of the plugin API and its test kit, with the policy for changing it (deprecate in a
+  minor release with one stderr notice, remove in the next major). A test reads the list and checks every item against the
+  code. A runner now records the operating systems and versions it was verified on, and is runnable only there.
 - Dashboard redesign and workflow metrics (feature 032): `ambykit dashboard --interactive` is now four tabs (`overview`,
   `fleet`, `graph`, `quality`) under a tab bar, switched with `1`-`4` or `]`/`[`, with `?` listing the keys, one
   shared `/` search and `s` state filter line (with an `n of N match` count) that applies to the tab you are on, a tab
@@ -68,6 +84,24 @@ Plugins: not affected.
   `ambykit edit`; `/amby.converge` is also granted `ambykit edit` in Claude Code.
 - A migrated task's description no longer ends with its `(file/path)` group, so the dashboard's "Up next" lines and the
   `upNext` descriptions in `--json --overview` show the description alone.
+
+- `[plugin-api]` The plugin API is **stable from 2.0** (feature 033): `PLUGIN_API_VERSION` is `2.0.0` and `PLUGIN_API_EXPERIMENTAL` is
+  removed from `@ambystech/ambykit` and `@ambystech/ambykit/plugin` (a plugin that read it must stop; nothing else changes), and
+  `sync` no longer prints the experimental note. `docs/stability.md` lists what is promised and how a stable name is deprecated
+  and removed. 2.0 keeps everything 1.0 had and only adds, so a plugin declaring `^1` still loads, with a one-line note; a plugin
+  that imported a name the API does not export is refused with the name it relied on. A plugin that uses the new
+  `MCP_COMMAND` must declare `^2`.
+- `[plugin-api]` Two additions to the plugin API (feature 036, an addition only): the factory
+  argument and `@ambystech/ambykit/plugin` now provide `MCP_SERVER_NAME` and `MCP_COMMAND`, so an emitter whose host has a
+  project MCP file can pass them to the inherited `mcpFile()` helper instead of copying the strings. The `EmittedFile` and
+  `RulesContext` types were already exported. Existing plugins are unaffected.
+
+### Changed
+
+- A configured target that moved to a plugin whose package is not installed now fails only that target (feature 036): `sync`,
+  `check` and `update` name the target, print the install and `plugins` config lines, keep processing the other targets,
+  exit 1, and delete or rewrite nothing it emitted before. Before, `sync` and `update` only warned and exited 0. No built-in
+  target has moved yet, so this changes nothing for a project that lists only built-in targets.
 
 ## [1.6.0] — 2026-11-18
 

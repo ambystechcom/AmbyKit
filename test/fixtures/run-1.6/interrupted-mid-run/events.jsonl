@@ -1,0 +1,3 @@
+{"at":"2026-11-20T07:48:19.514Z","kind":"started","lane":"lane-1-1","detail":"claude worker pid 1000"}
+{"at":"2026-11-20T07:48:19.514Z","kind":"started","lane":"lane-1-2","detail":"codex worker pid 1001"}
+{"at":"2026-11-20T07:48:19.514Z","kind":"interrupted"}

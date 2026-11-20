@@ -2,6 +2,7 @@ import { BaseCommand, type CliOptions } from "./base-command.js";
 import { applyFiles } from "./io/fsops.js";
 import { buildEmittedFiles } from "../core/emit.js";
 import { loadConfig, saveConfig } from "../core/config.js";
+import { movedTargetRefusals } from "../core/moved-targets.js";
 import { getTarget, TARGETS } from "../emitters/index.js";
 import { multiSelect } from "./ui/interactive/prompt.js";
 import { toolOptions } from "./ui/tool-options.js";
@@ -37,6 +38,13 @@ export class AddCommand extends BaseCommand {
         return 1;
       }
       targets = picked;
+    }
+    // A target that moved to an official plugin that is not available here is not added; the message says how to install it
+    // first (feature 036, FR-006, FR-010). Nothing is installed, written or saved.
+    const movedRefused = movedTargetRefusals(targets, (t) => getTarget(t, registry) !== undefined);
+    if (movedRefused.length > 0) {
+      for (const line of movedRefused) this.error(line);
+      return 1;
     }
     const unknown = targets.filter((t) => !getTarget(t, registry));
     if (unknown.length > 0) {

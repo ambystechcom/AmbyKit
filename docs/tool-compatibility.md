@@ -234,7 +234,7 @@ AGENTS.md guide). Gemini CLI, LLxprt, Qwen Code, Kilo, Augment, Windsurf, Kiro a
 
 ## Matrix rows for plugins
 
-The matrix above is prose for people. A plugin (feature 027, experimental) records the same facts as
+The matrix above is prose for people. A plugin (feature 027, stable from 2.0) records the same facts as
 **data**, so the test kit in `@ambystech/ambykit/testkit` can check an emitter against them. One row
 describes one target:
 

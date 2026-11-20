@@ -12,7 +12,7 @@ import { featureWorktrees } from "../core/worktree.js";
 import { ROLES_DIR, loadRoles, validateRoles } from "../core/roles.js";
 import { SHIPPED_ROLES } from "../core/scaffold.js";
 import { legacyWorkflowFiles } from "../core/legacy.js";
-import { movedTargetNotices } from "../core/moved-targets.js";
+import { deprecatedTargetNotices, movedTarget, movedTargetNotices } from "../core/moved-targets.js";
 import { loadPluginSession } from "../plugins/session.js";
 import { reportPlugins } from "../plugins/report.js";
 
@@ -49,9 +49,15 @@ export class CheckCommand extends BaseCommand {
       ok = false;
     }
     const registry = session?.registry;
-    for (const notice of movedTargetNotices(config.tools, (id) => getTarget(id, registry) !== undefined)) this.warn(notice);
+    // A moved target with no plugin is drift for that target (feature 036, FR-004): the notice names the package to install.
+    for (const notice of movedTargetNotices(config.tools, (id) => getTarget(id, registry) !== undefined)) {
+      this.warn(notice);
+      ok = false;
+    }
+    // Bundled targets that will move once their plugin is published: a notice only, nothing is removed (feature 036, FR-002, C-4).
+    for (const notice of deprecatedTargetNotices(config.tools)) this.warn(notice);
     for (const t of config.tools) {
-      if (!getTarget(t, registry)) {
+      if (!getTarget(t, registry) && !movedTarget(t)) {
         this.warn(`Configured tool '${t}' is not a known target.`);
         ok = false;
       }
@@ -91,7 +97,7 @@ export class CheckCommand extends BaseCommand {
     }
 
     // Stale generated Antigravity workflows (feature 018, FR-007): informational, never drift.
-    const stale = legacyWorkflowFiles(root, config);
+    const stale = legacyWorkflowFiles(root, config, registry);
     if (stale.length > 0) {
       this.warn(`${stale.length} stale Antigravity workflow file(s) no longer run — \`ambykit sync --prune-legacy\` removes them (backed up).`);
       for (const p of stale) this.info(`  ~ ${p}`);

@@ -2,5 +2,5 @@
   "name": "ambykit-emitter-wrongrange",
   "version": "1.0.0",
   "type": "module",
-  "main": "index.js", "ambykit": { "pluginApi": "^2" }
+  "main": "index.js", "ambykit": { "pluginApi": "^3" }
 }

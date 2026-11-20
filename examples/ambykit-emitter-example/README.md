@@ -1,7 +1,7 @@
 # ambykit-emitter-example
 
 A worked AmbyKit emitter plugin. It is documentation, not a published package. The plugin API is
-**experimental** in 1.6 (see `docs/plugin-api.md`).
+**stable** from 2.0 (see `docs/plugin-api.md` and `docs/stability.md`).
 
 - `index.js` — the plugin: one target per extension point (`BaseEmitter`, `SkillsEmitter`,
   `TomlCommandEmitter`).

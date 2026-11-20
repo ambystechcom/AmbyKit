@@ -12,8 +12,8 @@ created: 2026-11-12
 > Flag unknowns inline as `[NEEDS CLARIFICATION: …]` — never guess.
 
 Once `ambykit run` (spec 028) launches several assistants at once, a person needs one place to see who
-is doing what, whether work is healthy, and to steer it. This feature adds a **Fleet tab** to the
-terminal dashboard: the lanes of a run with the assistant, state and last activity of each, the
+is doing what, whether work is healthy, and to steer it. This feature adds a **Fleet view** to the
+terminal dashboard (a full-screen view opened with `l`; spec 032 later hosts it as a tab): the lanes of a run with the assistant, state and last activity of each, the
 review-loop state, stalled lanes highlighted, and **pause, resume, stop and approval gates** sent
 through directives. It stays in the terminal, local and at zero model tokens (Principle 3); a web
 dashboard is out of scope.
@@ -22,7 +22,7 @@ dashboard is out of scope.
 and directive mechanism (025); dependency-graph, traceability and metrics views (other specs); the
 final tabbed redesign and metrics (spec 032); grouping lanes across several features, which is a 2.0
 addition owned by specs 031 and 032. Depends on 025 (activity reports, directive writer, states) and
-028 (run). The first UI sketch of the Fleet tab in the roadmap is a starting point for `/amby.design`, not a
+028 (run). The first UI sketch of the Fleet view in the roadmap is a starting point for `/amby.design`, not a
 final layout.
 
 ## User scenarios & testing
@@ -33,19 +33,19 @@ As a developer running several assistants, I want one view of every lane in a ru
 who is doing what without opening worktrees or logs.
 
 - **Why this priority:** visibility is the base of the control room; the other stories add to it.
-- **Independent test:** with one run of three lanes, open the Fleet tab and confirm each lane shows its
+- **Independent test:** with one run of three lanes, open the Fleet view and confirm each lane shows its
   assistant, state and last activity.
 - **depends-on:** []
 - **blocked-by:** []
 - **status:** done
 
 **Acceptance criteria**
-- Given a run, When the Fleet tab is opened, Then its lanes are listed under the run and each shows the
+- Given a run, When the Fleet view is opened, Then its lanes are listed under the run and each shows the
   assistant, state (working, waiting, blocked, paused, done) and time since last activity.
 - Given a lane's state changes, When the interactive dashboard refreshes, Then the lane updates without
   a manual reload.
 - Given two lanes of the same assistant in one feature, When shown, Then they are distinct rows.
-- Given no active run, When the Fleet tab is opened, Then it says so and shows nothing stale.
+- Given no active run, When the Fleet view is opened, Then it says so and shows nothing stale.
 - Given lane data is missing or unreadable, When shown, Then the lane appears as unknown rather than
   failing the whole view.
 
@@ -139,7 +139,7 @@ continues as soon as I decide.
 
 ### US-6 — Works in any terminal  (priority: P1)
 
-As a developer on any terminal, I want the Fleet tab to look right with or without special fonts, so
+As a developer on any terminal, I want the Fleet view to look right with or without special fonts, so
 that I am never blocked by my terminal.
 
 - **Why this priority:** AmbyKit is portable; a view that needs a Nerd Font would exclude users
@@ -164,7 +164,7 @@ that I am never blocked by my terminal.
 ### US-7 — Keep one-shot and JSON output fast and stable  (priority: P1)
 
 As a maintainer of scripts that read the dashboard, I want existing output to stay fast and unchanged in
-shape, so that adding the Fleet tab breaks nothing.
+shape, so that adding the Fleet view breaks nothing.
 
 - **Why this priority:** the 1-second budget and stable `--json` are existing promises (Principle 3).
 - **Independent test:** run one-shot and `--json` on a project with and without a run and confirm timing
@@ -186,7 +186,7 @@ As a maintainer, I want the terminal foundation chosen by a short spike before t
 that we do not commit to a dependency or a rewrite on a guess.
 
 - **Why this priority:** it is a precondition decision, not user-visible, but it controls cost and risk.
-- **Independent test:** the spike produces a recorded decision with measured effort for the Fleet tab
+- **Independent test:** the spike produces a recorded decision with measured effort for the Fleet view
   on the chosen option.
 - **depends-on:** []
 - **blocked-by:** []
@@ -203,7 +203,7 @@ that we do not commit to a dependency or a rewrite on a guess.
 
 ## Requirements (EARS)
 
-- FR-001  WHEN the Fleet tab is opened, THE SYSTEM SHALL list the lanes of a run, each with its
+- FR-001  WHEN the Fleet view is opened, THE SYSTEM SHALL list the lanes of a run, each with its
   assistant, state (working, waiting, blocked, paused or done) and time since last activity.
 - FR-002  WHILE the interactive dashboard is open, THE SYSTEM SHALL refresh lane data without a manual
   reload.
@@ -234,7 +234,7 @@ that we do not commit to a dependency or a rewrite on a guess.
   `--interactive`.
 - FR-013  WHERE no run exists, THE SYSTEM SHALL leave dashboard output unchanged from today.
 - FR-014  THE SYSTEM SHALL run entirely locally at zero model tokens, with no network service.
-- FR-015  THE SYSTEM SHALL record the terminal-foundation decision, with evidence, before the Fleet tab
+- FR-015  THE SYSTEM SHALL record the terminal-foundation decision, with evidence, before the Fleet view
   is built (spike).
 - FR-016  THE SYSTEM SHALL restore the terminal to its prior state on exit, signal or error.
 
@@ -248,7 +248,7 @@ that we do not commit to a dependency or a rewrite on a guess.
 - SC-004  All states are readable in each icon mode and on a narrow plain-text terminal.
 - SC-005  One-shot and `--json` output stay within 1 second and keep every existing field.
 - SC-006  Every FR maps to at least one test (Principle 5), and `npm run typecheck` and `npm test` pass.
-- SC-007  The Fleet tab is used to supervise a real run of AmbyKit's own feature (the 1.6 gate,
+- SC-007  The Fleet view is used to supervise a real run of AmbyKit's own feature (the 1.6 gate,
   Principle 6).
 
 ## Edge cases

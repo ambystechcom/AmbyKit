@@ -102,3 +102,29 @@ describe("contract test kit (feature 027)", () => {
     expect(pkg.exports["."]).toBe("./dist/index.js");
   });
 });
+
+describe("the contract kit checks only the frozen surface (feature 033, FR-008)", () => {
+  it("033:FR-008: the kit exports exactly the runtime names the stability contract lists for it", async () => {
+    const { contractFor, parseContractBlocks } = await import("../helpers/contract-doc.js");
+    const listed = contractFor(parseContractBlocks(readFileSync(join(ROOT, "docs", "stability.md"), "utf8")), "kit")["exports"] as string[];
+    const kit = await import("../../src/testkit/index.js");
+    expect(Object.keys(kit).sort()).toEqual([...listed].sort());
+  });
+
+  it("033:FR-008: an emitter built only from the frozen plugin API passes the kit with a row of its own", () => {
+    const api = createPluginApi();
+    class Frozen extends api.BaseEmitter {
+      toolId = "frozen";
+      displayName = "Frozen";
+      commandSurface = "commands" as const;
+      commandDir = ".frozen/commands";
+      commandFrontmatter(spec: { description: string }): [string, string][] {
+        return [["description", this.yamlQuote(spec.description)]];
+      }
+    }
+    const frozen = { id: "frozen", displayName: "Frozen", emitter: new Frozen() } as unknown as NonNullable<ReturnType<typeof getTarget>>;
+    const row: MatrixRow = { target: "frozen", commandSurface: "commands", commandDir: ".frozen/commands", fileTemplate: "amby.<phase>.md", frontmatterKeys: ["description"], sourceUrl: "https://example.invalid/frozen" };
+    expect(checkEmitterContract(frozen, row)).toEqual([]);
+    expect(api.apiVersion).toMatch(/^2\./);
+  });
+});

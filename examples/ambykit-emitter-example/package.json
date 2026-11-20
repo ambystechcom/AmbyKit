@@ -5,6 +5,6 @@
   "type": "module",
   "main": "index.js",
   "private": true,
-  "ambykit": { "pluginApi": "^1" },
-  "peerDependencies": { "@ambystech/ambykit": ">=1.6.0" }
+  "ambykit": { "pluginApi": "^2" },
+  "peerDependencies": { "@ambystech/ambykit": ">=2.0.0" }
 }

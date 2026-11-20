@@ -1,0 +1,32 @@
+{
+  "run": "028-ambykit-run.1",
+  "feature": "028-ambykit-run",
+  "status": "paused",
+  "phase": 1,
+  "stage": "working",
+  "round": 0,
+  "limit": 3,
+  "needsDecision": false,
+  "gates": [],
+  "lanes": [
+    {
+      "lane": "028-ambykit-run.lane-1-1",
+      "assistant": "claude",
+      "tasks": [
+        "T001",
+        "T003"
+      ]
+    },
+    {
+      "lane": "028-ambykit-run.lane-1-2",
+      "assistant": "codex",
+      "tasks": [
+        "T002",
+        "T004"
+      ]
+    }
+  ],
+  "approvals": [],
+  "escalations": [],
+  "createdAt": "2026-11-20T07:48:19.513Z"
+}

@@ -1,3 +1,4 @@
+import { isExperimental, withStability } from "../run-stability.js";
 import type { FleetPlan, PlanError, WaitsFor } from "./types.js";
 
 /**
@@ -13,7 +14,7 @@ function why(w: WaitsFor): string {
 
 export function planLines(plan: FleetPlan): string[] {
   const lines: string[] = [];
-  lines.push(`Fleet plan — ${plan.features.length} feature${plan.features.length === 1 ? "" : "s"} (experimental)`);
+  lines.push(withStability(`Fleet plan — ${plan.features.length} feature${plan.features.length === 1 ? "" : "s"}`));
   const tokens = plan.budgets.maxTokens !== undefined ? `, ${plan.budgets.maxTokens} tokens` : "";
   lines.push(`Caps for the whole fleet: ${plan.caps.total} assistants at once, ${plan.caps.perType} of one type. Budgets: ${plan.budgets.wallClockMinutes} minutes, ${plan.budgets.maxTasks} task events${tokens}.`);
   lines.push("Order:");
@@ -34,7 +35,7 @@ export function planLines(plan: FleetPlan): string[] {
 
 export function planJson(plan: FleetPlan): unknown {
   return {
-    experimental: true,
+    experimental: isExperimental(),
     caps: plan.caps,
     budgets: plan.budgets,
     features: plan.features.map((f) => ({
