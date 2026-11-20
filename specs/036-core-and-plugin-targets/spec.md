@@ -18,9 +18,8 @@ the core for 2.0 are **Claude Code, Codex, Copilot, Cursor and OpenCode**, with 
 registered target becomes an **official plugin**, published separately and maintained by the project, so each can
 release when its upstream format changes. Nobody who uses a moved target loses it or has files removed without consent.
 
-**Reading of the decision (flagged):** Antigravity is not on the owner's list, so it moves out. That reverses the split
-recorded in 027:US-5, which kept Antigravity built in. [NEEDS CLARIFICATION: confirm Antigravity (`antigravity`,
-`antigravity-cli`) moves to a plugin]
+**Decision (confirmed by the owner, 2026-11-20):** both Antigravity harnesses (`antigravity` and `antigravity-cli`) move out
+of core to a plugin. That reverses the split recorded in 027:US-5, which kept Antigravity built in.
 
 **Out of scope:** the plugin API itself (027, 033); new targets; per-assistant behaviour changes; third-party plugins.
 
