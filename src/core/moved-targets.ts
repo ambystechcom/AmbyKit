@@ -6,6 +6,8 @@
  * follows once the API has been used (`docs/plugin-split.md`, plan open decision 3). When a target moves,
  * add `"<id>": { package: "ambykit-emitter-<id>", since: "<release>" }` here and drop it from `TARGETS`.
  */
+import { TARGETS } from "../emitters/index.js";
+
 export interface MovedTarget {
   /** The npm package that now provides the target. */
   package: string;
@@ -14,6 +16,50 @@ export interface MovedTarget {
 }
 
 export const MOVED_TARGETS: Record<string, MovedTarget> = {};
+
+/**
+ * Targets still bundled that will move once their official plugin is published (feature 036, C-4): the id, and the
+ * package that will replace it. They keep working and get a deprecation notice; nothing is removed until the plugin ships.
+ */
+export interface DeprecatedTarget {
+  /** The npm package that will replace the built-in target. */
+  package: string;
+}
+
+export const DEPRECATED_TARGETS: Record<string, DeprecatedTarget> = {};
+
+/**
+ * What a target id is, for `init`, `add`, `check`, `update` and the docs check (feature 036, FR-001/FR-002):
+ * one answer to "is this core?".
+ * - `built-in`: bundled and not going away.
+ * - `deprecated`: bundled today, replaced by `package` once that plugin is published.
+ * - `moved`: no longer bundled; `package` provides it since `since`.
+ * - `unknown`: neither bundled nor known to have moved (a typo, or a plugin's own id).
+ */
+export type TargetStatus =
+  | { state: "built-in" }
+  | { state: "deprecated"; package: string }
+  | { state: "moved"; package: string; since: string }
+  | { state: "unknown" };
+
+export interface TargetStatusSources {
+  /** The ids bundled with this AmbyKit (default: the built-in registry). */
+  bundled: readonly string[];
+  moved: Readonly<Record<string, MovedTarget>>;
+  deprecated: Readonly<Record<string, DeprecatedTarget>>;
+}
+
+/** Pure: the sources are parameters so tests can describe a future registry without touching the real one. */
+export function targetStatus(
+  id: string,
+  sources: TargetStatusSources = { bundled: TARGETS.map((t) => t.id), moved: MOVED_TARGETS, deprecated: DEPRECATED_TARGETS },
+): TargetStatus {
+  const moved = movedTarget(id, sources.moved);
+  if (moved) return { state: "moved", package: moved.package, since: moved.since };
+  if (!sources.bundled.includes(id)) return { state: "unknown" };
+  if (Object.hasOwn(sources.deprecated, id)) return { state: "deprecated", package: sources.deprecated[id]!.package };
+  return { state: "built-in" };
+}
 
 /** Where a moved target lives now, or undefined for a target that did not move. Pure. */
 export function movedTarget(id: string, map: Readonly<Record<string, MovedTarget>> = MOVED_TARGETS): MovedTarget | undefined {

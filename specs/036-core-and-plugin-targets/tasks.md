@@ -17,17 +17,17 @@ created: 2026-11-20
 
 ## Phase 1 — Setup
 
-- [ ] [T001] Research: confirm each coupling point (`emit.ts`, `agents.ts`, `subagents.ts`, `legacy.ts`, `live-tokens.ts`), the 12 test files, and every `getTarget(id)` call without a registry (specs/036-core-and-plugin-targets/research.md)
-- [ ] [T002] Fixture plugin shaped like Antigravity: a `SkillsEmitter` target writing `.agents/skills/`, in factory form, with its `package.json` (test/fixtures/plugins/skills-target/)
-- [ ] [T003] Gate: list the API additions the Antigravity plugin needs and hand them to 033 before its T040 (`MCP_COMMAND`, types) (specs/036-core-and-plugin-targets/research.md)
-- **Verify:** `npm run typecheck` passes and `research.md` names every coupling point and API gap. ? unverified: T003 depends on 033's schedule.
+- [x] [T001] Research: confirm each coupling point (`emit.ts`, `agents.ts`, `subagents.ts`, `legacy.ts`, `live-tokens.ts`), the 12 test files, and every `getTarget(id)` call without a registry (specs/036-core-and-plugin-targets/research.md) ↪ DEVIATION: the code has 16 test files that mention Antigravity, not 12 (converge-emit, decide-emit, review-emit and roles-emit were missed); `init.ts` stays registry-blind by design (it runs before a project can list a plugin)
+- [x] [T002] Fixture plugin shaped like Antigravity: a `SkillsEmitter` target writing `.agents/skills/`, in factory form, with its `package.json` (test/fixtures/plugins/ambykit-emitter-skills-target/) ↪ DEVIATION: the loader requires the package name `ambykit-emitter-*` and the helper installs a fixture by that name, so the folder carries the prefix; it also adds `.agents/mcp_config.json` through `api.MCP_COMMAND` on the CLI target
+- [x] [T003] Gate: list the API additions the Antigravity plugin needs and hand them to 033 before its T040 (`MCP_COMMAND`, types) (specs/036-core-and-plugin-targets/research.md, src/plugins/api.ts, src/plugins/index.ts, docs/plugin-api.md) ↪ DEVIATION: the additions are made here, not only listed: `MCP_SERVER_NAME` and `MCP_COMMAND` on `PluginApi` and the barrel (additive, `PLUGIN_API_VERSION` unchanged); the types were already exported, so there is nothing to add for them
+- **Verify:** `npm run typecheck` passes and `research.md` names every coupling point and API gap. ✓ passed: `npm run typecheck` clean; `npx vitest run test/plugins` 97 passed (api-mcp.test.ts proves the fixture plugin matches the built-in emitters); 033 T040 still has to freeze the additions (listed in research.md)
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T010] [P] `targetStatus(id)`: `built-in`, `moved` (package, since) or `deprecated` (package that will replace it); pure (src/core/moved-targets.ts, test/plugins/moved-targets.test.ts)
-- [ ] [T011] [P] `sync`, `check` and `update`: a configured moved target with no plugin fails only that target, prints the install and config lines, continues, exits non-zero, deletes nothing (src/cli/sync.ts, src/cli/check.ts, src/cli/update.ts)
-- [ ] [T012] [P] Pass the plugin registry to every caller that looked a target up without one, so a plugin-provided target is visible (src/core/legacy.ts, src/core/emit.ts)
-- **Verify:** `npm run typecheck` and `npx vitest run test/plugins/moved-targets.test.ts` pass.
+- [x] [T010] [P] `targetStatus(id)`: `built-in`, `moved` (package, since) or `deprecated` (package that will replace it); pure (src/core/moved-targets.ts, test/plugins/moved-targets.test.ts) ↪ DEVIATION: a fourth state, `unknown`, for an id that is neither bundled nor moved, and an empty `DEPRECATED_TARGETS` map that Phase 4 fills
+- [x] [T011] [P] `sync`, `check` and `update`: a configured moved target with no plugin fails only that target, prints the install and config lines, continues, exits non-zero, deletes nothing (src/cli/sync.ts, src/cli/check.ts, src/cli/update.ts, test/plugins/moved-failure.test.ts) ↪ DEVIATION: the install and config lines are the existing `movedTargetNotices` text; the 027 test that expected exit 0 now expects 1 (036:FR-004). `update`'s consent offer for the install is Phase 4 (T041)
+- [x] [T012] [P] Pass the plugin registry to every caller that looked a target up without one, so a plugin-provided target is visible (src/core/legacy.ts, src/cli/sync.ts, src/cli/check.ts) ↪ DEVIATION: only `legacyWorkflowFiles` was registry-blind among the callers that have a registry; `core/emit.ts` already takes it, and `init.ts` stays blind on purpose (see T001)
+- **Verify:** `npm run typecheck` and `npx vitest run test/plugins/moved-targets.test.ts` pass. ✓ passed: typecheck clean; moved-targets.test.ts 10 passed; moved-failure.test.ts 8 passed (sync, check and update fail only the moved target, exit 1, delete nothing; an installed fixture plugin gives no failure; a registry finds Antigravity's stale workflows)
 - **Checkpoint:** `targetStatus` exists, a missing plugin is a per-target failure, and no caller is registry-blind. User stories may start.
 
 ## Phase 3 — User story US-1  (priority: P1)

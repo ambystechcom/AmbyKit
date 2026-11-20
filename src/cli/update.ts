@@ -8,6 +8,8 @@ import { packageVersion, projectAtCwd } from "../core/paths.js";
 import { refreshLatest } from "./io/version-check.js";
 import { loadPluginSession } from "../plugins/session.js";
 import { reportPlugins } from "../plugins/report.js";
+import { movedTargetNotices } from "../core/moved-targets.js";
+import { getTarget } from "../emitters/index.js";
 
 const PACKAGE = "@ambystech/ambykit";
 
@@ -64,16 +66,21 @@ export class UpdateCommand extends BaseCommand {
     const config = loadConfig(root);
     const session = await loadPluginSession(root, config); // plugin targets refresh with the rest (feature 027)
     for (const line of reportPlugins(session).errors) this.warn(line);
+    // A moved target whose plugin is not installed fails that target only (feature 036, FR-004/FR-005): the others
+    // refresh, nothing is deleted, and the run exits 1 after saying which package to install.
+    const movedMissing = movedTargetNotices(config.tools, (id) => getTarget(id, session?.registry) !== undefined);
+    for (const notice of movedMissing) this.error(notice);
+    const failed = movedMissing.length > 0 ? 1 : 0;
     const files = buildEmittedFiles(root, config, session?.registry);
     const result = applyFiles(root, files, { dryRun: this.dryRun, includeUser: false });
     const changed = this.dryRun ? result.wouldChange.length : result.written.length;
     if (changed === 0) {
       this.success("Everything is up to date.");
-      return 0;
+      return failed;
     }
     this.success(`${this.dryRun ? "Would refresh" : "Refreshed"} ${changed} prompt file(s).`);
     this.printSummary(result);
-    return 0;
+    return failed;
   }
 
   /** The latest published version (awaited, since the user explicitly asked). Overridable in tests. */

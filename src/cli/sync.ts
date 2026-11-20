@@ -49,9 +49,11 @@ export class SyncCommand extends BaseCommand {
     const plugins = reportPlugins(session);
     for (const line of plugins.info) this.info(line);
     for (const line of plugins.errors) this.error(line);
-    const pluginStatus = plugins.errors.length > 0 ? 1 : 0;
-    // A configured target that moved to a plugin: say which package to install; remove nothing (FR-014).
-    for (const notice of movedTargetNotices(config.tools, (id) => getTarget(id, session?.registry) !== undefined)) this.warn(notice);
+    // A configured target that moved to a plugin whose package is not installed fails that target only (feature 036,
+    // FR-004): say which package to install and how to list it, keep syncing the others, exit 1, and remove nothing (FR-005).
+    const movedMissing = movedTargetNotices(config.tools, (id) => getTarget(id, session?.registry) !== undefined);
+    for (const notice of movedMissing) this.error(notice);
+    const pluginStatus = plugins.errors.length > 0 || movedMissing.length > 0 ? 1 : 0;
 
     const spin = this.spinner();
     spin.start(this.dryRun || checkOnly ? "Checking what would change…" : "Emitting tool files…");
@@ -79,7 +81,7 @@ export class SyncCommand extends BaseCommand {
     this.success(`${this.dryRun ? "Would sync" : "Synced"} ${changed.length} file(s).`);
     this.printSummary(result);
     this.printMcpGaps(config, session?.registry);
-    this.handleLegacyWorkflows(root, legacyWorkflowFiles(root, config), flag(opts, "prune-legacy"));
+    this.handleLegacyWorkflows(root, legacyWorkflowFiles(root, config, session?.registry), flag(opts, "prune-legacy"));
     return pluginStatus;
   }
 

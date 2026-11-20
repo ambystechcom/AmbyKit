@@ -14,7 +14,7 @@ Every release states whether plugins are affected, with such a line or with "Plu
 
 ## [Unreleased]
 
-Plugins: not affected.
+Plugins: affected, see the `[plugin-api]` line below.
 
 ### Added
 
@@ -68,6 +68,18 @@ Plugins: not affected.
   `ambykit edit`; `/amby.converge` is also granted `ambykit edit` in Claude Code.
 - A migrated task's description no longer ends with its `(file/path)` group, so the dashboard's "Up next" lines and the
   `upNext` descriptions in `--json --overview` show the description alone.
+
+- `[plugin-api]` Two additions to the plugin API (feature 036, an addition only; `PLUGIN_API_VERSION` is unchanged): the factory
+  argument and `@ambystech/ambykit/plugin` now provide `MCP_SERVER_NAME` and `MCP_COMMAND`, so an emitter whose host has a
+  project MCP file can pass them to the inherited `mcpFile()` helper instead of copying the strings. The `EmittedFile` and
+  `RulesContext` types were already exported. Existing plugins are unaffected.
+
+### Changed
+
+- A configured target that moved to a plugin whose package is not installed now fails only that target (feature 036): `sync`,
+  `check` and `update` name the target, print the install and `plugins` config lines, keep processing the other targets,
+  exit 1, and delete or rewrite nothing it emitted before. Before, `sync` and `update` only warned and exited 0. No built-in
+  target has moved yet, so this changes nothing for a project that lists only built-in targets.
 
 ## [1.6.0] — 2026-11-18
 
