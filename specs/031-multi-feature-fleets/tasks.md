@@ -17,23 +17,23 @@ created: 2026-11-19
 
 ## Phase 1 — Setup
 
-- [ ] [T001] Fixture helper: temp project with N features (spec, tasks with paths, optional feature-level `depends-on`), as injected models and as files (test/helpers/fleet-plan-fixture.ts)
-- [ ] [T002] Types: `FeatureModel`, `FleetPlan`, `FleetRecord`, `FleetFeature` exactly as in data-model.md (src/core/fleet-plan/types.ts, src/core/fleet-plan/index.ts)
-- **Verify:** `npm run typecheck` passes and the fixture builds a three-feature project with a dependency and an overlap.
+- [x] [T001] Fixture helper: temp project with N features (spec, tasks with paths, optional feature-level `depends-on`), as injected models and as files (test/helpers/fleet-plan-fixture.ts)
+- [x] [T002] Types: `FeatureModel`, `FleetPlan`, `FleetRecord`, `FleetFeature` exactly as in data-model.md (src/core/fleet-plan/types.ts, src/core/fleet-plan/index.ts)
+- **Verify:** `npm run typecheck` passes and the fixture builds a three-feature project with a dependency and an overlap. ✓ passed
 
 ## Phase 2 — Foundational  (blocks all feature work)
 
-- [ ] [T010] [P] `read.ts`: the one adapter that turns a feature into a `FeatureModel` (stories, feature `dependsOn`, tasks with `paths` and `pathIssue`); models are injected, the 030 binding comes in T020 (src/core/fleet-plan/read.ts)
-- [ ] [T011] [P] `ownership.ts`: feature path set as the union of task paths; a task with missing ownership puts the feature in `unknown` (src/core/fleet-plan/ownership.ts, test/core/fleet-ownership.test.ts)
-- [ ] [T012] [P] `order.ts`: feature DAG from feature `depends-on`, story edges and shared-file serialization (naming the files); topological order, ties by dependency order then number; cycle and missing-dependency errors (src/core/fleet-plan/order.ts, test/core/fleet-order.test.ts)
-- [ ] [T013] [P] `schedule.ts`: which features may start, and which lanes start under fleet caps via `nextToStart` (src/core/fleet-plan/schedule.ts, test/core/fleet-schedule.test.ts)
-- [ ] [T014] [P] `contain.ts`: pause closure of a paused feature and its transitive dependents; release on resume (src/core/fleet-plan/contain.ts, test/core/fleet-contain.test.ts)
-- [ ] [T015] [P] `budget.ts`: fleet-wide task, wall-clock and token sums over `budgetDecision`; token ceiling not enforced when a runner reports no usage (src/core/fleet-plan/budget.ts, test/core/fleet-budget.test.ts)
-- [ ] [T016] [P] `fleets.ts`: `.amby/fleet/fleet-<n>/`, `fleet.json` read and write, next fleet id, and nested run lookup in `runDir`, `readRun`, `listRuns`, `resolveRun` (src/core/fleet/fleets.ts, src/core/fleet/runs.ts, src/core/fleet/index.ts, test/core/fleet-fleets.test.ts)
-- [ ] [T017] [P] `Session.slots` hook: lanes running in the other sessions count toward the total and per-type caps; absent means today's behavior (src/cli/run-session.ts, src/cli/run-launch.ts, test/cli/run-fleet-slots.test.ts)
-- [ ] [T018] `fleetView(root)`: features, then runs, then lanes with states, for `ambykit fleet --json` and the 029/032 views (src/core/fleet/fleet-view.ts, test/core/fleet-view.test.ts)
-- [ ] [T019] **Person gate:** confirm spec 030 is merged into `main` and that its reader (`readSpec`, `readTasks`: `dependsOn`, `paths`, `pathIssue`) and writer match what `read.ts` assumes; if not, adjust only `read.ts` (specs/031-multi-feature-fleets/plan.md)
-- **Verify:** `npm run typecheck` and `npx vitest run test/core/fleet-ownership.test.ts test/core/fleet-order.test.ts test/core/fleet-schedule.test.ts test/core/fleet-contain.test.ts test/core/fleet-budget.test.ts test/core/fleet-fleets.test.ts test/core/fleet-view.test.ts test/cli/run-fleet-slots.test.ts` pass; the existing run and fleet tests are unchanged.
+- [x] [T010] [P] `read.ts`: the one adapter that turns a feature into a `FeatureModel` (stories, feature `dependsOn`, tasks with `paths` and `pathIssue`); models are injected, the 030 binding comes in T020 (src/core/fleet-plan/read.ts) ↪ DEVIATION: bound to the real 030 reader at once (readFleetInput over readFeatures and the 023 graph), so T020's binding is done here; spec status is read through readSpec
+- [x] [T011] [P] `ownership.ts`: feature path set as the union of task paths; a task with missing ownership puts the feature in `unknown` (src/core/fleet-plan/ownership.ts, test/core/fleet-ownership.test.ts) ↪ DEVIATION: ownership counts open tasks only (a done task's file is already merged) and treats a glob as unknown ownership; sharedFiles/conflicts live here too
+- [x] [T012] [P] `order.ts`: feature DAG from feature `depends-on`, story edges and shared-file serialization (naming the files); topological order, ties by dependency order then number; cycle and missing-dependency errors (src/core/fleet-plan/order.ts, test/core/fleet-order.test.ts)
+- [x] [T013] [P] `schedule.ts`: which features may start, and which lanes start under fleet caps via `nextToStart` (src/core/fleet-plan/schedule.ts, test/core/fleet-schedule.test.ts)
+- [x] [T014] [P] `contain.ts`: pause closure of a paused feature and its transitive dependents; release on resume (src/core/fleet-plan/contain.ts, test/core/fleet-contain.test.ts)
+- [x] [T015] [P] `budget.ts`: fleet-wide task, wall-clock and token sums over `budgetDecision`; token ceiling not enforced when a runner reports no usage (src/core/fleet-plan/budget.ts, test/core/fleet-budget.test.ts)
+- [x] [T016] [P] `fleets.ts`: `.amby/fleet/fleet-<n>/`, `fleet.json` read and write, next fleet id, and nested run lookup in `runDir`, `readRun`, `listRuns`, `resolveRun` (src/core/fleet/fleets.ts, src/core/fleet/runs.ts, src/core/fleet/index.ts, test/core/fleet-fleets.test.ts) ↪ DEVIATION: nested lookup is in runDir/listRuns/damagedRuns (resolveRun and readRun follow); the record functions are readFleetRecord/writeFleetRecord to avoid 029's readFleet; createRun takes an optional fleet
+- [x] [T017] [P] `Session.slots` hook: lanes running in the other sessions count toward the total and per-type caps; absent means today's behavior (src/cli/run-session.ts, src/cli/run-launch.ts, test/cli/run-fleet-slots.test.ts) ↪ DEVIATION: the hook returns the other sessions' running lanes ({lane, assistant}[]) instead of totals, so nextToStart counts them unchanged
+- [x] [T018] `fleetView(root)`: features, then runs, then lanes with states, for `ambykit fleet --json` and the 029/032 views (src/core/fleet/fleet-view.ts, test/core/fleet-view.test.ts) ↪ DEVIATION: exported as fleetsView; features carry cause and affected for paused ones (T052 data)
+- [x] [T019] **Person gate:** confirm spec 030 is merged into `main` and that its reader (`readSpec`, `readTasks`: `dependsOn`, `paths`, `pathIssue`) and writer match what `read.ts` assumes; if not, adjust only `read.ts` (specs/031-multi-feature-fleets/plan.md) ↪ DEVIATION: 030 merged into main in PR #39 (d7bbc5f); readFeatures/readSpec/readTasks match what read.ts assumes, no change needed
+- **Verify:** `npm run typecheck` and `npx vitest run test/core/fleet-ownership.test.ts test/core/fleet-order.test.ts test/core/fleet-schedule.test.ts test/core/fleet-contain.test.ts test/core/fleet-budget.test.ts test/core/fleet-fleets.test.ts test/core/fleet-view.test.ts test/cli/run-fleet-slots.test.ts` pass; the existing run and fleet tests are unchanged. ✓ passed
 - **Checkpoint:** the pure core is done and 030 is merged. User stories may start.
 
 ## Phase 3 — User story US-1  (priority: P1)

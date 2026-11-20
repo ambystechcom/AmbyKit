@@ -77,7 +77,7 @@ export function launchQueued(s: Session, phase: number): number {
   if (queue.length === 0) return 0;
   const toStart = nextToStart(
     queue.map((l) => ({ lane: l.file.lane, assistant: l.assistant })),
-    running(s).map((l) => ({ lane: l.file.lane, assistant: l.assistant })),
+    [...running(s).map((l) => ({ lane: l.file.lane, assistant: l.assistant })), ...(s.slots?.() ?? [])],
     s.settings.concurrency,
   );
   let n = 0;
