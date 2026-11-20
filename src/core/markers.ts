@@ -125,10 +125,11 @@ export interface PhaseVerify {
   duplicates: number;
 }
 
-const VERIFY_LINE = /^\s*(?:-\s*)?\*\*Verify:\*\*\s*(.*?)\s*$/;
+export const VERIFY_LINE = /^\s*(?:-\s*)?\*\*Verify:\*\*\s*(.*?)\s*$/;
 const RESULT_SUFFIX = /(?:^|\s)(✓\s*passed|passed|✗\s*failed(?::\s*.*)?|failed:\s*.*|\?\s*unverified|unverified)\s*$/i;
 
-function splitResult(value: string): { check: string; result?: VerifyResult; why?: string } {
+/** Split a Verify line's value into the check and its result suffix (`✓ passed`, `✗ failed: <why>`, `? unverified`). */
+export function splitResult(value: string): { check: string; result?: VerifyResult; why?: string } {
   const m = RESULT_SUFFIX.exec(value);
   if (!m || m.index === undefined) return { check: value };
   const token = m[1] ?? "";

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseTasks } from "../core/dashboard.js";
+import { readTasks } from "../core/spec-format/dispatch.js";
 import type { FleetSettings } from "../core/config.js";
 import { listRuns, runDir } from "../core/fleet/index.js";
 import { assignAssistants, launchPlan, type LaunchEntry } from "../core/run-launch-plan.js";
@@ -22,7 +22,7 @@ export function nextRunId(root: string, feature: string): string {
 export function laneOpenTasks(lane: LaneRef): string[] {
   const file = join(lane.root, "specs", lane.manifest.feature, "tasks.md");
   if (!existsSync(file)) return lane.manifest.tasks.map((t) => t.id);
-  const done = new Set(parseTasks(readFileSync(file, "utf8")).filter((t) => t.done).map((t) => t.id));
+  const done = new Set(readTasks(readFileSync(file, "utf8")).tasks.filter((t) => t.done).map((t) => t.id));
   return lane.manifest.tasks.map((t) => t.id).filter((id) => !done.has(id));
 }
 

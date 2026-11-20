@@ -60,7 +60,9 @@ needed. See [the plan artifact](./artifacts/plan.md).
 ## 7. Tasks
 
 Turns the plan into an ordered, dependency-aware checklist: stable `T###` IDs, `[P]` parallel
-markers, `[US#]` story tags, and file paths, grouped so foundational work precedes feature work. See
+markers, `[US#]` story tags, and each phase's file ownership and Verify check in one `yaml` block, grouped
+so foundational work precedes feature work. New features are written in the v2 format
+([migrating existing ones](./migration.md)). See
 [the tasks artifact](./artifacts/tasks.md). The same phase also writes `tests.md`, the test design: one case per
 acceptance criterion with an automate-or-manual decision, decided before any code. See
 [the tests artifact](./artifacts/tests.md).
@@ -73,13 +75,14 @@ Cross-checks spec ↔ plan ↔ tasks for coverage gaps and inconsistencies, and 
 ## 9. Implement
 
 Executes tasks one slice at a time, checking off `tasks.md` checkboxes and updating each story's
-`status:` as it goes — which is what `ambykit dashboard` reports on.
+status as it goes (with `ambykit edit status`, so nobody hand-edits the YAML) — which is what
+`ambykit dashboard` reports on.
 
 A task that cannot proceed gets a trailing `⚠ BLOCKED: <reason>` marker (and `↪ DEVIATION: <note>` when it
 was done differently than planned); the implementer moves on to another unblocked task. Each phase ends
-with one `**Verify:**` line that is run before the checkpoint, and its result (`✓ passed`,
-`✗ failed: <why>`, `? unverified`) is written back on that line; a failed Verify keeps the checkpoint
-closed. `ambykit dashboard` and `ambykit analyze` surface both at zero model tokens. Syntax:
+with one Verify check (a `verify:` entry in the phase block, or a `**Verify:**` line in a 1.x file) that is run
+before the checkpoint, and its result (`passed`, `failed` with a reason, `unverified`) is recorded with
+`ambykit edit verify`; a failed Verify keeps the checkpoint closed. `ambykit dashboard` and `ambykit analyze` surface both at zero model tokens. Syntax:
 [tasks artifact](./artifacts/tasks.md).
 
 ## 10. Converge
@@ -165,6 +168,7 @@ prompt once and running `ambykit sync` updates all of them.
 ## Dependencies & prioritization
 
 Stories and features carry `priority` (P1/P2/P3) and `depends-on`/`blocked-by` references by stable
-ID. `tasks` orders work topologically within the foundational-first gate; `analyze` validates the
+ID, in the spec's frontmatter `stories:` list (and a feature may declare `depends-on` on other features).
+`tasks` orders work topologically within the foundational-first gate; `analyze` validates the
 graph; `dashboard` shows blocked vs. buildable. See [the spec artifact](./artifacts/spec.md) for the
 metadata shape.

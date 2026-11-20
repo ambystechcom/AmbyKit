@@ -2,7 +2,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
 import { attachCoverage } from "./trace-coverage.js";
 import { compareFeatureDirs, assignDisplayRefs, readFeatures } from "./features.js";
-import { applyTasks, parseTasks } from "./dashboard.js";
+import { applyTasks, type TaskLine } from "./dashboard.js";
+import { readTasks } from "./spec-format/dispatch.js";
 import { gitAsync, parseWorktreeList } from "./git.js";
 import { laneState, manifestDrift, readManifest, unionLaneDone, type LaneManifest } from "./lanes.js";
 import type { Checkout, FeatureSnapshot, LaneView, ParseIssue } from "./overview-types.js";
@@ -208,9 +209,9 @@ function attachLanes(features: FeatureSnapshot[], lanes: LaneCheckout[]): void {
     const featureTasks = f.tasks ?? [];
     const read = mine.map((l) => {
       const file = join(l.checkout.root, "specs", f.dir, "tasks.md");
-      let tasks: ReturnType<typeof parseTasks> = [];
+      let tasks: TaskLine[] = [];
       try {
-        if (existsSync(file)) tasks = parseTasks(readFileSync(file, "utf8"));
+        if (existsSync(file)) tasks = readTasks(readFileSync(file, "utf8")).tasks;
       } catch {
         /* unreadable lane tasks.md: counts stay zero */
       }

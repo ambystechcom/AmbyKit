@@ -2,7 +2,8 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { analyzeProject, type AnalysisReport } from "./analyze.js";
 import { primaryRoot } from "./checkouts.js";
-import { canonicalStoryId, parseTasks, type TaskLine } from "./dashboard.js";
+import { canonicalStoryId, type TaskLine } from "./dashboard.js";
+import { readTasks } from "./spec-format/dispatch.js";
 import { readFeatures } from "./features.js";
 import { buildGraph } from "./graph.js";
 import { blockersOf } from "./graph-paths.js";
@@ -203,7 +204,7 @@ export function laneTasks(root: string, featureRef: string, laneArg?: string): L
   let source: TaskLine[] = feature.tasks ?? [];
   if (lane) {
     const own = join(lane.root, "specs", feature.dir, "tasks.md");
-    if (existsSync(own)) source = parseTasks(readFileSync(own, "utf8"));
+    if (existsSync(own)) source = readTasks(readFileSync(own, "utf8")).tasks;
     const ids = new Set(lane.manifest.tasks.map((m) => m.id));
     source = source.filter((t) => ids.has(t.id));
   }
