@@ -57,10 +57,10 @@ created: 2026-11-19
 
 ## Phase 5 — User story US-3  (priority: P2)
 
-- [x] [T040] [US3] Wire the list filter into the reducer: `/` searches, `s` cycles the state filter, `esc` clears (src/cli/ui/interactive/overview.ts) ↪ DEVIATION: the overview keeps its `Filters` model (exact `f` feature filter, `s` status, `esc`); `/` adds a free-text search (`Filters.search`, matched in `applyFilters`). The `ListFilter` slice (T011) is built and tested but is not yet wired to the story and lane lists: where their filter line goes is a design decision (T050)
+- [x] [T040] [US3] Wire the list filter into the reducer: `/` searches, `s` cycles the state filter, `esc` clears (src/cli/ui/interactive/overview.ts) ↪ DEVIATION: the overview keeps its `Filters` model (exact `f` feature filter, `s` status, `esc`); `/` adds a free-text search (`Filters.search`, matched in `applyFilters`). The `ListFilter` slice (T011) is built and tested; with the signed-off design (T050) the filter is one shared line under the tab bar, wired to the fleet lanes, the graph stories and the quality features in tab mode (T063, test/ui/tabs-filter.test.ts)
 - [x] [T041] [P] [US3] Plain-text filter line and the no-match message with how to clear (src/cli/ui/dashboard/filter-line.ts) ↪ DEVIATION: the module holds the plain text for the story and lane lists; the overview keeps its pinned `[feature=… status=…]` note and no-match line (014/017 tests)
 - [x] [T042] [US3] Tests: search by text and ID, filter by state, nothing matches, clear restores the list — 032:FR-006 (test/ui/overview-filter.test.ts)
-- **Verify:** `npx vitest run test/ui/overview-filter.test.ts test/ui/list-filter.test.ts` pass. ✓ passed: the overview feature list; story and lane lists are not wired yet (see T040)
+- **Verify:** `npx vitest run test/ui/overview-filter.test.ts test/ui/list-filter.test.ts` pass. ✓ passed: the overview feature list; the lane, story and feature lists follow in tab mode (test/ui/tabs-filter.test.ts)
 - **Checkpoint:** US-3 demoable on the existing overview.
 
 ## Phase 6 — Person gates  (block Phases 7–9 and 11)
@@ -90,11 +90,11 @@ created: 2026-11-19
 
 ## Phase 9 — User story US-6  (priority: P1)
 
-- [ ] [T080] [US6] Narrow layout for the tab bar and each tab body, reusing 029's compact breakpoint (src/cli/ui/dashboard/layout.ts)
-- [ ] [T081] [US6] New tabs, states and lanes use 029's icon tokens and the `dashboard.icons` precedence (src/cli/ui/dashboard/fleet-tokens.ts)
-- [ ] [T082] [US6] Redraw on resize; piped output falls back to plain (src/cli/dashboard.ts)
-- [ ] [T083] [US6] Tests: narrow, no color, no icons, each icon mode, resize, piped — 032:FR-012, FR-013, FR-014 (test/ui/tabs-terminals.test.ts)
-- **Verify:** `npx vitest run test/ui/tabs-terminals.test.ts` pass; every state still distinguishable with color and icons off.
+- [x] [T080] [US6] Narrow layout for the tab bar and each tab body, reusing 029's compact breakpoint (src/cli/ui/dashboard/layout.ts)
+- [x] [T081] [US6] New tabs, states and lanes use 029's icon tokens and the `dashboard.icons` precedence (src/cli/ui/dashboard/fleet-tokens.ts) ↪ DEVIATION: the new glyphs follow `iconGlyph` in layout.ts (ASCII with --icons=ascii or without unicode, unicode otherwise, Nerd reuses unicode as in 029); the state glyphs reuse 029's `stateGlyph`, so no new icon token file was needed
+- [x] [T082] [US6] Redraw on resize; piped output falls back to plain (src/cli/dashboard.ts) ↪ DEVIATION: resize and piped fallback already existed (017 FR-013: the fullscreen host calls `resize` before each redraw; the command goes one-shot when output is not a terminal); this change only sets tab mode and injects the grouped Fleet tab in src/cli/dashboard.ts, and test/ui/tabs-terminals.test.ts drives a real resize through the host
+- [x] [T083] [US6] Tests: narrow, no color, no icons, each icon mode, resize, piped — 032:FR-012, FR-013, FR-014 (test/ui/tabs-terminals.test.ts)
+- **Verify:** `npx vitest run test/ui/tabs-terminals.test.ts` pass; every state still distinguishable with color and icons off. ✓ passed: tabs-terminals passes; every state is still distinguishable with color and icons off (checked in ASCII, no-color output)
 - **Checkpoint:** works on any terminal.
 
 ## Phase 10 — User story US-5  (priority: P1)
@@ -107,10 +107,10 @@ created: 2026-11-19
 
 ## Phase 11 — Fleet tab grouping  (US-1, gated by T050 and T052)
 
-- [ ] [T100] [US1] Group lanes by feature across features using 031's grouping, inside 029's run and lane view model (src/core/fleet-view/group.ts)
-- [ ] [T101] [US1] Fleet tab hosts 029's view and renders the feature grouping (src/cli/ui/dashboard/fleet-view.ts)
-- [ ] [T102] [US1] Tests: two features' lanes grouped by feature, single feature unchanged — 032:FR-018 (test/ui/fleet-tab-grouping.test.ts)
-- **Verify:** `npx vitest run test/ui/fleet-tab-grouping.test.ts test/ui/fleet-view.test.ts` pass.
+- [x] [T100] [US1] Group lanes by feature across features using 031's grouping, inside 029's run and lane view model (src/core/fleet-view/group.ts)
+- [x] [T101] [US1] Fleet tab hosts 029's view and renders the feature grouping (src/cli/ui/dashboard/fleet-view.ts) ↪ DEVIATION: the grouped renderer is src/cli/ui/dashboard/fleet-tab.ts (029's lane rows and confirm dialog are reused, `renderConfirm` is now exported); its keys (collapse, expand, delegating lane and run actions to 029's reducer for the feature under the cursor) are in overview.ts, and the command performs the intent against `selectedFleetView`
+- [x] [T102] [US1] Tests: two features' lanes grouped by feature, single feature unchanged — 032:FR-018 (test/ui/fleet-tab-grouping.test.ts)
+- **Verify:** `npx vitest run test/ui/fleet-tab-grouping.test.ts test/ui/fleet-view.test.ts` pass. ✓ passed: fleet-tab-grouping and the existing fleet-view tests pass
 - **Checkpoint:** fleet tab complete.
 
 ## Phase 12 — Polish and integration

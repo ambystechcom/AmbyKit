@@ -118,7 +118,7 @@ export function renderMetricsPanel(caps: Capabilities, state: MetricsState | und
   let title = "FLOW";
   let body: string[];
   if (state.status === "loading") {
-    body = [muted(caps, T.word["metrics-loading"])];
+    body = [muted(caps, caps.unicode ? T.word["metrics-loading"] : T.word["metrics-loading"].replace("…", "..."))];
   } else if (state.status === "failed") {
     body = [tabErrorLine(caps, "metrics", "git history is unavailable")];
   } else {
