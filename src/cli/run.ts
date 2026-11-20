@@ -338,7 +338,10 @@ export class RunCommand extends BaseCommand {
     }
     this.info(`${withStability("Headless runners")}. Only a verified runner can be launched.`);
     for (const r of rows) {
-      const status = r.verified ? `verified${r.verifiedVersion ? ` (${r.verifiedVersion})` : ""}` : "unverified";
+      // Feature 033 (FR-004): where and for which versions the live check was recorded, when it was.
+      const where = r.verifiedOn ? ` on ${r.verifiedOn.join(", ")}` : "";
+      const range = r.verifiedRange ? ` for ${r.verifiedRange}` : "";
+      const status = r.verified ? `verified${r.verifiedVersion ? ` (${r.verifiedVersion})` : ""}${where}${range}` : "unverified";
       this.info(`  ${r.id}  ${r.label}  ${status}  usage ${r.reportsUsage ? "reported" : "not reported"}  ${r.runnable ? "runnable" : "not runnable"}`);
       if (r.reason) this.info(`    ${r.reason}`);
     }

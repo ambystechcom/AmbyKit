@@ -65,9 +65,9 @@ created: 2026-11-20
 
 ## Phase 7 — User story US-2  (priority: P1; ends in person gates)
 
-- [ ] [T060] [US2] `run --runners` and the plan print each runner's platforms and version range, and say "unverified on this platform" when it does not match (src/cli/run.ts, src/core/runners.ts)
-- [ ] [T061] [US2] Record test: `verified: true` requires a record file under `verification/` for every platform in `verifiedOn`, with version, invocation, prompt delivery, exit and usage (test/core/runner-records.test.ts, specs/033-stable-run-and-plugin-api/verification/README.md)
-- [ ] [T062] [US2] Tests: an unlisted platform or version is not runnable by default and is reported — 033:FR-004, FR-005 (test/core/runners-verification.test.ts)
+- [x] [T060] [US2] `run --runners` and the plan print each runner's platforms and version range, and say "unverified on this platform" when it does not match (src/cli/run.ts, src/core/runners.ts) ↪ DEVIATION: the listing prints 'verified (<version>) on <platforms> for <range>' only for a runner that has a record; a runner without one prints exactly what 1.6 did; a lane refused for its platform already carries the 'unverified on this platform' reason from runnable()
+- [x] [T061] [US2] Record test: `verified: true` requires a record file under `verification/` for every platform in `verifiedOn`, with version, invocation, prompt delivery, exit and usage (test/core/runner-records.test.ts, specs/033-stable-run-and-plugin-api/verification/README.md) ↪ DEVIATION: the check function lives in the test (a record per operating system with eight labelled fields, the verified version mentioned); the shipped registry has no verified runner yet, so the test passes vacuously for it until T063/T064 add records, and is proven against fixtures
+- [x] [T062] [US2] Tests: an unlisted platform or version is not runnable by default and is reported — 033:FR-004, FR-005 (test/core/runners-verification.test.ts) ↪ DEVIATION: the tests are in test/core/runners-verification.test.ts (written with T010) and test/cli/run-runners-platform.test.ts
 - [ ] [T063] [US2] **Person task:** verify the `claude` runner on a live install per operating system (including a Windows `.cmd` shim); write `verification/claude-<os>.md`; set `verified`, `verifiedOn`, `verifiedRange` from it (specs/033-stable-run-and-plugin-api/verification/, src/core/runners.ts, docs/tool-compatibility.md)
 - [ ] [T064] [US2] **Person task:** the same for `codex` (specs/033-stable-run-and-plugin-api/verification/, src/core/runners.ts, docs/tool-compatibility.md)
 - **Verify:** `npx vitest run test/core/runner-records.test.ts test/core/runners-verification.test.ts` pass. ? unverified: T063 and T064 need a live install and a person.
@@ -75,7 +75,7 @@ created: 2026-11-20
 
 ## Phase 8 — User story US-3  (priority: P1; ends in person gates)
 
-- [ ] [T070] [US3] Guard: `RUN_STABILITY` may be `"stable"` only if `specs/033-stable-run-and-plugin-api/dogfood.md` records a fleet run id, runner, versions and result — 033:FR-006 (src/core/run-stability.ts, test/core/run-stability.test.ts)
+- [x] [T070] [US3] Guard: `RUN_STABILITY` may be `"stable"` only if `specs/033-stable-run-and-plugin-api/dogfood.md` records a fleet run id, runner, versions and result — 033:FR-006 (src/core/run-stability.ts, test/core/run-stability.test.ts) ↪ DEVIATION: dogfoodProblems() and stabilityProblems() are pure functions in src/core/run-stability.ts; test/core/run-stability.test.ts fails if RUN_STABILITY is 'stable' without a passing record in dogfood.md (which does not exist yet)
 - [ ] [T071] [US3] **Person task:** run the dogfood (also 031 T094): one fleet builds two dependent features of this repository with a verified runner; record it in `dogfood.md` and the features' notes (specs/033-stable-run-and-plugin-api/dogfood.md, specs/031-multi-feature-fleets/notes.md)
 - [ ] [T072] [US3] **Person task:** if T071 passed, set `RUN_STABILITY = "stable"` and drop the "(experimental)" text from help and docs; if not, leave `run` experimental and say so in the 2.0 changelog (src/core/run-stability.ts, docs/cli-reference.md, docs/stability.md)
 - **Verify:** `npx vitest run test/core/run-stability.test.ts` passes. ? unverified: T071 and T072 need a live run and a person.
