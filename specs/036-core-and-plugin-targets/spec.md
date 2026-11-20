@@ -69,9 +69,9 @@ release.
 - **status:** draft
 
 **Acceptance criteria**
-- Given a moved target, When its plugin is built, Then it is an `ambykit-emitter-*` package published under the
-  project's npm scope, with its API range declared; one package per target (both Antigravity harnesses in one), for example
-  `@ambystech/ambykit-emitter-antigravity` (assumed default, confirm with owner: C-3).
+- Given a moved target, When its plugin is built, Then it is an `ambykit-emitter-*` package in `plugins/<name>/` of this repository,
+  published under the project's npm scope from one release workflow, with its API range declared; one package per target (both
+  Antigravity harnesses in one), for example `@ambystech/ambykit-emitter-antigravity` (C-3).
 - Given the plugin, When the published contract kit runs, Then it passes the emitted-path, frontmatter and idempotence
   checks against the target's row in the compatibility doc.
 - Given an upstream format change for a moved target, When it is fixed, Then only that plugin is released.
@@ -166,11 +166,18 @@ both Antigravity harnesses move to a plugin. The rest are **assumed defaults, co
 
 - **C-1 Count.** The registry has 18 target ids (16 plus the aliases `claude-vscode` and `pi`), not 15.
 - **C-2 `pi`.** Stays an alias of the built-in `codex`, because it writes the same files from the same emitter.
-- **C-3 Packages and home.** One plugin package per moved target under `@ambystech`, named `ambykit-emitter-<target>` (one package covers
-  both Antigravity harnesses). The packages live in a sibling repository (an npm-workspaces monorepo with its own CI and npm Trusted
-  Publishing), not in this one. Trade-off: each plugin releases on its own cadence (FR-008) and the core stays small, at the price of a
-  second repository to maintain and golden fixtures that move there (FR-012); the alternative, a `plugins/` workspace in this repository,
-  keeps core and plugin changes in one pull request but ties plugin releases to this repository's release tooling.
+- **C-3 Packages and home (decided by the owner, 2026-11-20).** One plugin package per moved target under `@ambystech`, named
+  `ambykit-emitter-<target>` (one package covers both Antigravity harnesses). The official plugins live **in this repository**, each in
+  `plugins/<name>/` (`package.json`, `tsconfig.json`, `src/index.ts`, `test/`, `CHANGELOG.md`), with **no npm workspaces**: a plugin gets
+  everything through the `api` its factory receives, so it has no runtime dependency, and the root `files` allowlist already keeps
+  `plugins/` out of the core package. Versions are independent (FR-008). **One** extra deploy workflow, `publish-plugins.yml`, publishes
+  any plugin from a GitHub Release whose tag is `plugin/<name>/v<x.y.z>`; `publish.yml` ignores those tags. Trade-off against a sibling
+  repository: core and plugin changes ship in one pull request and share CI, at the price of plugin releases using this repository's
+  tooling.
+- **C-3a First publish.** npm only lets a trusted publisher be configured for a package that already exists (there is no pending
+  publisher), so the **first** version of each new package is published by hand from the owner's machine; the owner then adds the trusted
+  publisher on npmjs.com (this repository, workflow filename `publish-plugins.yml`, case-sensitive, environment `Prod`). npm does not
+  validate that entry when it is saved, and the first publish through it must happen within 2 days. Person tasks T034 and T037.
 - **C-4 The 2.0 gate.** The Antigravity plugin must be **published and install-tested** before the built-in Antigravity emitters are
   removed in 2.0. The long-tail targets (`gemini`, `llxprt`, `qwen`, `kilo`, `augment`, `windsurf`, `kiro`) follow the same rule but do
   not gate 2.0: if a plugin is not ready they stay built in with a deprecation notice that names the package that will replace them.

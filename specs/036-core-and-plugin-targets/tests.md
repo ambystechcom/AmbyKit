@@ -7,18 +7,18 @@ created: 2026-11-20
 
 > Test design, written by `/amby.tasks` before code. One case per acceptance criterion; machine-read by `ambykit analyze`.
 > Case: `- [TC-###] [US-n#k] [FR-###, FR-###] auto — short name → expected outcome`
-> Name tests in code `036:FR-###: …` (qualified). Core tests use a fixture plugin shaped like Antigravity; the published package is tested in the plugin repository.
+> Name tests in code `036:FR-###: …` (qualified). Core tests use a fixture plugin shaped like Antigravity; the package in `plugins/<name>/` is tested by the root vitest with the published contract kit, and the release scripts by `test/scripts/plugin-release.test.ts`.
 
 ## Cases
 
-- [TC-001] [US-1#1] [FR-003] auto — moved target with its plugin installed and listed → files are what the plugin defines; the plugin repo's golden and install test show byte-identity with 1.x
+- [TC-001] [US-1#1] [FR-003] auto — moved target with its plugin installed and listed → files are what the plugin defines; the golden in `plugins/antigravity/test/` and the install test show byte-identity with 1.x
 - [TC-002] [US-1#2] [FR-004] auto — moved target with no plugin → `sync`, `check` and `update` name the target and print the exact install and config lines
 - [TC-003] [US-1#2] [FR-004] auto — moved target with no plugin and two other targets → the others still sync and the exit code is non-zero
 - [TC-004] [US-1#3] [FR-005] auto — moved target with no plugin → no file it previously emitted is deleted or changed
 - [TC-005] [US-1#4] [FR-001] auto — built-in target → behaviour unchanged by the move
-- [TC-006] [US-2#1] [FR-007] auto — the plugin package → named `ambykit-emitter-*`, under the project scope, declaring its API range (plugin repo)
-- [TC-007] [US-2#2] [FR-007] auto — the published kit run → emitted paths, frontmatter keys and idempotence pass against the target's row (plugin repo)
-- [TC-008] [US-2#3] [FR-008] auto — an upstream format fix for one moved target → only that package changes version (plugin repo)
+- [TC-006] [US-2#1] [FR-007] auto — the plugin package → named `ambykit-emitter-*`, under the project scope, declaring its API range (`plugins/<name>/package.json`, checked by `verifyPackage` in `test/scripts/plugin-release.test.ts`)
+- [TC-007] [US-2#2] [FR-007] auto — the published kit run → emitted paths, frontmatter keys and idempotence pass against the target's row (`plugins/antigravity/test/`)
+- [TC-008] [US-2#3] [FR-008] auto — an upstream format fix for one moved target → only that package changes version (`parseTag` maps `plugin/<name>/v<x.y.z>` to one directory; `test/scripts/plugin-release.test.ts`)
 - [TC-009] [US-2#1] [FR-007] manual:external-system — the Antigravity package on npm → install-tested on a 1.6-synced project, `sync` shows no diff; verify: T035; record: `research.md`
 - [TC-010] [US-3#1] [FR-009] auto — the changelog and migration guide → list every moved id, its package and install line
 - [TC-011] [US-3#2] [FR-006] auto — `update` with a moved target → offers the install and config change and writes nothing user-level without consent
@@ -38,4 +38,4 @@ created: 2026-11-20
 
 ## Flags
 
-- US-2#1: "published under the project's npm scope" cannot be checked in this repository; covered by the plugin repo CI and TC-009.
+- US-2#1: "published under the project's npm scope" cannot be checked offline; the first publish (T034), the trusted publisher (T037) and TC-009 cover it.

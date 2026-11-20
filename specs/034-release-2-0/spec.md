@@ -94,6 +94,9 @@ out half done.
 - Given the tag, When the release is published, Then the existing workflow verifies the tag equals the package version and
   publishes with provenance through trusted publishing, with no stored token.
 - Given the published package, When it is installed fresh, Then `ambykit --version` prints 2.0.0 and the migrate command exists.
+- Given official plugins in `plugins/<name>/` (036), When the checklist is followed, Then the Antigravity plugin has been published
+  and install-tested before the built-in emitters are removed, and each plugin is released by its own tag
+  `plugin/<name>/v<x.y.z>` through `publish-plugins.yml`, never by the core release (the core workflow ignores `plugin/*` tags).
 
 ### US-5 — There is a way back  (priority: P2)
 
@@ -180,4 +183,5 @@ As a reader, I want every page to describe 2.0, so that nothing contradicts the 
 
 - Specs 030 to 033 are merged before the release branch is cut; this feature adds no product behaviour.
 - The release maintainer runs the person steps (the gate evidence and the publish); an assistant prepares the branch.
-- npm Trusted Publishing and the existing release workflow from 1.x are unchanged except for the Node version.
+- npm Trusted Publishing and the existing release workflow from 1.x are unchanged except for the Node version and a guard that ignores
+  `plugin/*` tags; plugins publish through the one extra workflow `publish-plugins.yml` (036), whose first publish per package is manual.

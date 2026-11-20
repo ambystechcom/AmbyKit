@@ -31,23 +31,27 @@ created: 2026-11-20
    function decides what is core. `sync`, `check` and `update` turn the existing warning into a per-target failure: the other targets still run,
    the exit code is non-zero, nothing is deleted (FR-004, FR-005). `init` and `add` list moved targets as "official plugin, install first"
    (FR-010); `update` offers the install and config change and writes nothing user-level without consent (FR-006).
-2. **Plugin repository (assumed default C-3: a sibling npm-workspaces repo, its own CI and Trusted Publishing).** One package per moved target,
+2. **Plugins in this repository (decided, C-3): `plugins/<name>/`, no npm workspaces, one deploy workflow.** One package per moved target,
    `@ambystech/ambykit-emitter-<target>`; the Antigravity package contains both harnesses and `export default (api) => …` built on
-   `api.SkillsEmitter`. Each package declares `ambykit.pluginApi`, carries its compatibility row and golden fixture, and runs the published
-   contract kit in CI. The Antigravity package is built first and is the only one that gates 2.0 (C-4); the long-tail packages follow.
+   `api.SkillsEmitter`, with only `import type` from `@ambystech/ambykit/plugin`. Each package declares `ambykit.pluginApi`, carries its
+   compatibility row and golden fixture, and its tests run in the root vitest with the published contract kit (`@ambystech/ambykit/testkit`).
+   `scripts/build-plugins.mjs` runs `tsc` per plugin (a no-op with none); `ci.yml` calls it. `publish-plugins.yml` (a Release tagged
+   `plugin/<name>/v<x.y.z>`, or a manual run with a `plugin` input) checks the tag against the package, runs typecheck, build, the plugin's
+   tests and the API-range check (`scripts/plugin-release.mjs`), then `npm publish --access public` with OIDC and provenance;
+   `publish.yml` skips `plugin/*` tags. The Antigravity package is built first and is the only one that gates 2.0 (C-4).
 3. **Removal is the last step.** The built-in Antigravity emitters are deleted from `TARGETS` only after the plugin is published and
    install-tested (a person task), so 2.0 can never ship with Antigravity in neither place. Until then both exist and the registry prefers
    the built-in.
 4. **Tests.** Generic behaviour (missing plugin, co-owned directory, installed plugin, outdated plugin) is tested in core with a **fixture
    plugin shaped like Antigravity** (`test/fixtures/plugins/skills-target/`), so core never depends on the published package. Antigravity's own
-   format tests and goldens move to the plugin repository (FR-012).
+   format tests and goldens move to `plugins/antigravity/test/` (FR-012).
 
 ## Phased approach
 
 - **Phase 0 — Research:** confirm coupling points (below), the API gaps and which tests reference Antigravity → `research.md`.
 - **Phase 1 — Foundation:** `targetStatus`, the fixture plugin, callers that need the registry.
 - **Phase 2 — US-1:** missing-plugin failure semantics, installed-plugin identity, co-owned `.agents/skills`.
-- **Phase 3 — US-2:** the plugin repository, the Antigravity package, contract runs, publish and install test (person tasks).
+- **Phase 3 — US-2:** the release workflow and its scripts, the Antigravity package in `plugins/antigravity/`, contract runs, first publish and install test (person tasks).
 - **Phase 4 — US-3:** `MOVED_TARGETS` entries, `init`/`update` messages, changelog and migration guide.
 - **Phase 5 — US-4 (gated by Phase 3):** remove the built-in Antigravity emitters, docs, goldens, rewrite or move the tests.
 - **Phase 6 — Integration and person gates:** goldens once, `sync` twice, full checks, confirm the defaults.
@@ -73,11 +77,11 @@ agent badges (`live-tokens.ts`) identify running processes and are unrelated to 
 | FR-009, US-3 | changelog and migration guide list ids, packages, install lines (Phase 4) |
 | FR-010 | `init` and `add` list moved targets as official plugins (Phase 4) |
 | FR-011 | `docs/tool-compatibility.md`, README, `docs/plugin-split.md` updated; doc-sync stays green (Phase 5) |
-| FR-012 | core goldens keep the built-in ids only; Antigravity goldens live in the plugin repo (Phase 5) |
+| FR-012 | core goldens keep the built-in ids only; Antigravity goldens live in `plugins/antigravity/test/` (Phase 5) |
 
 ## Risks & decisions
 
-- **D1 — Sibling repo for plugins (C-3, assumed).** Independent cadence (FR-008) over a single pull request. Revisit if two repos prove costly.
+- **D1 — Plugins in this repository (C-3, decided).** Core and plugin change in one pull request and share CI; independent versions (FR-008) come from per-plugin tags, not a second repository. No workspaces: plugins have no runtime dependencies. Cost: the first publish of each package is manual (npm cannot trust a package that does not exist yet) and a plugin release depends on this repository's workflow.
 - **D2 — Gate on Antigravity only (C-4, assumed).** Keeps 2.0 from waiting on seven low-use plugins; the cost is seven targets stay built in with a notice.
 - **D3 — Fixture plugin in core.** Core tests never need the published package, so core CI stays offline and fast (Principle 7).
 - **R1 — Plugin API gaps.** `MCP_COMMAND` and the `EmittedFile` / `RulesContext` types are not in `PluginApi`. They must be added (or the plugin

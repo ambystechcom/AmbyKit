@@ -10,8 +10,8 @@ created: 2026-11-20
 > Gate: no user-story task starts until Foundational completes. **Extra gates:** (1) **033's plugin-API freeze** (033 T040): any addition the
 > Antigravity plugin needs (`MCP_COMMAND`, the `EmittedFile` and `RulesContext` types) must be in `PluginApi` before that task; T003 records
 > the list; (2) Phase 5 (removing the built-in Antigravity emitters) starts only after the plugin is **published and install-tested** (person
-> tasks T034, T035); (3) the plugin repository is a **sibling repository** (assumed default C-3): its paths are written `ambykit-plugins:` and are
-> not in this repository. Tests name what they cover as `036:FR-###`.
+> tasks T034, T035, T037); (3) the official plugins live in this repository under `plugins/<name>/` (decided C-3) with one extra workflow,
+> `publish-plugins.yml`. Tests name what they cover as `036:FR-###`.
 > Story order: US-1 → US-2 → US-3 → US-4.
 > Written in the 1.x task format on purpose: the repo's own specs migrate last (030 T095).
 
@@ -39,17 +39,18 @@ created: 2026-11-20
 - **Verify:** `npx vitest run test/plugins` passes.
 - **Checkpoint:** US-1 done in core with the fixture plugin.
 
-## Phase 4 — User story US-2  (priority: P1; mostly in the plugin repository, ends in person gates)
+## Phase 4 — User story US-2  (priority: P1; ends in person gates)
 
-- [ ] [T030] [US2] **Plugin repo:** create the sibling repository as an npm-workspaces monorepo with CI and Trusted Publishing (ambykit-plugins: package.json, .github/workflows/)
-- [ ] [T031] [US2] **Plugin repo:** `@ambystech/ambykit-emitter-antigravity` with both harnesses on `api.SkillsEmitter`, declaring `ambykit.pluginApi` (ambykit-plugins: packages/emitter-antigravity/)
-- [ ] [T032] [US2] **Plugin repo:** the contract kit against the Antigravity row from `docs/tool-compatibility.md`, and the two goldens moved here from core — 036:FR-007, FR-012 (ambykit-plugins: packages/emitter-antigravity/test/)
-- [ ] [T033] [US2] **Plugin repo:** CI installs the core 2.0 release candidate and runs the kit; one package releases without the others — 036:FR-008 (ambykit-plugins: .github/workflows/)
-- [ ] [T034] [US2] **Person task:** publish `@ambystech/ambykit-emitter-antigravity` (ambykit-plugins: packages/emitter-antigravity/)
+- [ ] [T030] [US2] Release tooling for `plugins/<name>/`: `publish-plugins.yml` (tag `plugin/<name>/v<x.y.z>` or manual `plugin` input), the guard in `publish.yml`, `build:plugins` in `ci.yml`, `scripts/build-plugins.mjs`, `scripts/plugin-release.mjs` (tag parse, package and API-range checks), `docs/plugins-release.md` — 036:FR-007, FR-008 (.github/workflows/publish-plugins.yml, .github/workflows/publish.yml, .github/workflows/ci.yml, scripts/build-plugins.mjs, scripts/plugin-release.mjs, test/scripts/plugin-release.test.ts, docs/plugins-release.md)
+- [ ] [T031] [US2] **Plugin repo:** `@ambystech/ambykit-emitter-antigravity` with both harnesses on `api.SkillsEmitter`, declaring `ambykit.pluginApi` (plugins/antigravity/package.json, plugins/antigravity/tsconfig.json, plugins/antigravity/src/index.ts, plugins/antigravity/CHANGELOG.md)
+- [ ] [T032] [US2] The contract kit against the Antigravity row from `docs/tool-compatibility.md`, and the two goldens moved here from core — 036:FR-007, FR-012 (plugins/antigravity/test/)
+- [ ] [T033] [US2] CI builds and tests every plugin against the core of the same commit; releasing one plugin tag publishes only that package — 036:FR-008 (test/scripts/plugin-release.test.ts, .github/workflows/ci.yml)
+- [ ] [T034] [US2] **Person task:** first publish of `@ambystech/ambykit-emitter-antigravity` by hand from your machine (npm cannot trust a package that does not exist yet): `npm publish --access public` in `plugins/antigravity/` (plugins/antigravity/package.json)
+- [ ] [T037] [US2] **Person task:** on npmjs.com add the trusted publisher for the package (this repository, workflow filename `publish-plugins.yml`, case-sensitive, environment `Prod`; the entry is not validated when saved); then release the next version with tag `plugin/antigravity/v<x.y.z>` within 2 days to prove it (docs/plugins-release.md)
 - [ ] [T035] [US2] **Person task:** install-test on a project synced by 1.6 with `antigravity` and `antigravity-cli`: install the package, list it, run `ambykit sync`, expect no diff — 036:SC-001 (specs/036-core-and-plugin-targets/research.md)
-- [ ] [T036] [US2] Long-tail plugins (`gemini`, `llxprt`, `qwen`, `kilo`, `augment`, `windsurf`, `kiro`), one package each; **not a 2.0 gate** (ambykit-plugins: packages/)
-- **Verify:** the plugin repository's CI is green on the kit and goldens. ? unverified: T034 and T035 need a person; T036 is after 2.0.
-- **Checkpoint:** US-2 done for Antigravity when T034 and T035 pass; this unlocks Phase 6.
+- [ ] [T036] [US2] Long-tail plugins (`gemini`, `llxprt`, `qwen`, `kilo`, `augment`, `windsurf`, `kiro`), one package each; **not a 2.0 gate** (plugins/)
+- **Verify:** CI is green on the plugin build, the kit and the goldens. ? unverified: T034, T035 and T037 need a person; the publish workflow cannot run until a real release; T036 is after 2.0.
+- **Checkpoint:** US-2 done for Antigravity when T034, T035 and T037 pass; this unlocks Phase 6.
 
 ## Phase 5 — User story US-3  (priority: P1)
 
@@ -64,8 +65,8 @@ created: 2026-11-20
 
 - [ ] [T050] [US4] Remove the built-in Antigravity emitters from `TARGETS`; `TARGETS` is exactly the eight built-in ids — 036:FR-001, FR-002 (src/emitters/index.ts, src/emitters/antigravity.ts, src/emitters/antigravity-cli.ts, test/plugins/registry-core.test.ts)
 - [ ] [T051] [US4] Mark each target built in or official plugin, with its package, and update the earlier split page — 036:FR-011 (docs/tool-compatibility.md, README.md, docs/plugin-split.md)
-- [ ] [T052] [US4] Core goldens keep the built-in ids only; the Antigravity fixtures are removed (they live in the plugin repo) — 036:FR-012 (test/emitters-golden.test.ts, test/fixtures/emitters-golden/)
-- [ ] [T053] [US4] Rewrite or move the Antigravity-specific tests: generic behaviour uses the fixture plugin, format tests move to the plugin repo (test/antigravity-migration-018.test.ts, test/antigravity-shared-018.test.ts, test/antigravity-skills-018.test.ts, test/core/antigravity-identity-018.test.ts, test/mcp-emit-antigravity.test.ts, test/legacy.test.ts, test/emit-collision.test.ts, test/emit-mcp.test.ts, test/m3-emitters.test.ts, test/worker-emit.test.ts, test/ui/dashboard-agents.test.ts)
+- [ ] [T052] [US4] Core goldens keep the built-in ids only; the Antigravity fixtures are removed (they live in `plugins/antigravity/test/`) — 036:FR-012 (test/emitters-golden.test.ts, test/fixtures/emitters-golden/)
+- [ ] [T053] [US4] Rewrite or move the Antigravity-specific tests: generic behaviour uses the fixture plugin, format tests move to `plugins/antigravity/test/` (test/antigravity-migration-018.test.ts, test/antigravity-shared-018.test.ts, test/antigravity-skills-018.test.ts, test/core/antigravity-identity-018.test.ts, test/mcp-emit-antigravity.test.ts, test/legacy.test.ts, test/emit-collision.test.ts, test/emit-mcp.test.ts, test/m3-emitters.test.ts, test/worker-emit.test.ts, test/ui/dashboard-agents.test.ts)
 - [ ] [T054] [US4] The doc-sync check and the registry test agree on the built-in list — 036:FR-011 (scripts/check-docs-sync.mjs, test/check-docs-sync.test.ts)
 - **Verify:** `npx vitest run test/plugins test/check-docs-sync.test.ts test/emitters-golden.test.ts` pass and `ambykit trace 036` lists 12 of 12 requirements covered.
 - **Checkpoint:** US-4 done; core and docs match the split.
@@ -75,6 +76,6 @@ created: 2026-11-20
 - [ ] [T080] INTEGRATION STEP (once per batch, after merges, not in a lane branch): re-record the emitter goldens with `UPDATE_GOLDEN=1 npx vitest run test/emitters-golden.test.ts` (test/fixtures/emitters-golden/)
 - [ ] [T081] INTEGRATION STEP (once per batch, after merges): run `ambykit sync` twice; the second run is a no-op (.claude/, .agents/, .github/)
 - [ ] [T082] Full gate: `npm run typecheck`, `npm test`, `node scripts/check-docs-sync.mjs`, `ambykit trace 036` (test/check-docs-sync.test.ts)
-- [ ] [T094] **Person task:** confirm the assumed defaults C-2 (`pi` stays with `codex`), C-3 (one package per target, sibling repo) and C-4 (only Antigravity gates 2.0); record the answers in `spec.md` (specs/036-core-and-plugin-targets/spec.md)
+- [ ] [T094] **Person task:** confirm the assumed defaults C-2 (`pi` stays with `codex`), and C-4 (only Antigravity gates 2.0); C-3 (plugins in this repository, one package per target, no workspaces, one deploy workflow) is decided; record the answers in `spec.md` (specs/036-core-and-plugin-targets/spec.md)
 - **Verify:** `npm run typecheck` and `npm test` pass and `node dist/cli/index.js trace 036` shows every FR covered. ? unverified: T094 is a person task.
 - **Checkpoint:** feature complete except the person gates above.
