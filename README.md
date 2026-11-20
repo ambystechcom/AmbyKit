@@ -161,7 +161,8 @@ target is a thin `BaseEmitter` subclass.
 | `ambykit migrate [feature]` | Convert 1.x specs and task lists to the v2 format, safely (`--dry-run`, `--diff`, `--dual-write`); a second run changes nothing |
 | `ambykit edit <files\|verify\|status> <feature> …` | Set a task's files, a phase's Verify result or a story's status without hand-editing the file (1.x and v2) |
 
-See [`docs/cli-reference.md`](./docs/cli-reference.md).
+See [`docs/cli-reference.md`](./docs/cli-reference.md). What `ambykit run` and the plugin API promise not to break,
+and how a stable name is deprecated, is in [`docs/stability.md`](./docs/stability.md).
 
 ## Contributing
 
