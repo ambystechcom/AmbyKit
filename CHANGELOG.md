@@ -18,6 +18,10 @@ Plugins: affected, see the `[plugin-api]` line below.
 
 ### Added
 
+- Release tooling for the official plugins (feature 036, maintainers): plugins live in `plugins/<name>/` and are published by one extra
+  workflow, `publish-plugins.yml`, from a GitHub Release tagged `plugin/<name>/v<x.y.z>`; `publish.yml` ignores those tags, `ci.yml` runs
+  `npm run build:plugins`, and `scripts/plugin-release.mjs` checks the tag, the package and the plugin-API range before anything is
+  published. See `docs/plugins-release.md`. Nothing is published by this change.
 - Stability contract (feature 033): `docs/stability.md` lists the stable surface of `ambykit run` (flags, exit codes, printed lines,
   fleet state files, directive protocol) and of the plugin API and its test kit, with the policy for changing it (deprecate in a
   minor release with one stderr notice, remove in the next major). A test reads the list and checks every item against the

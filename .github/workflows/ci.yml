@@ -26,6 +26,9 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      # Official plugins (plugins/<name>/): a no-op until one exists.
+      - name: Build plugins
+        run: npm run build:plugins
       - name: Self-host check (generated files in sync)
         run: node dist/cli/index.js sync --check
       - name: Dependency-graph analysis

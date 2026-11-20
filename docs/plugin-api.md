@@ -3,7 +3,7 @@
 > **Stable from 2.0.** What [`stability.md`](./stability.md) lists does not change incompatibly within 2.x; additions are
 > allowed in a minor release. Plugins say which API range they support, and AmbyKit refuses a plugin outside it. Read
 > [`plugin-trust.md`](./plugin-trust.md) before you install one: a plugin is code that runs on your
-> machine.
+> machine. Maintainers releasing an official plugin: [`plugins-release.md`](./plugins-release.md).
 
 A plugin adds **emitter targets**: a new assistant that `ambykit sync` writes native command files for.
 Roles, phases and templates are not extensible yet (they ship in a later 1.x release).
