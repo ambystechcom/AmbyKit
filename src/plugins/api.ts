@@ -4,6 +4,7 @@ import {
   SkillsEmitter,
   TomlCommandEmitter,
 } from "../emitters/index.js";
+import { MCP_COMMAND, MCP_SERVER_NAME } from "../emitters/base-emitter.js";
 import { skillFrontmatter, skillName, skillPath } from "../emitters/skills-emitter.js";
 import { tomlBasic, tomlPrompt } from "../emitters/toml-command-emitter.js";
 
@@ -38,6 +39,13 @@ export interface PluginApi {
   skillFrontmatter: typeof skillFrontmatter;
   tomlBasic: typeof tomlBasic;
   tomlPrompt: typeof tomlPrompt;
+  /**
+   * The name AmbyKit's MCP server is registered under in a host's MCP config, and how the host starts it
+   * (feature 036, an addition to the 027 API). An emitter whose host has a project MCP file passes these to the
+   * inherited `mcpFile()` helper instead of copying the strings.
+   */
+  MCP_SERVER_NAME: typeof MCP_SERVER_NAME;
+  MCP_COMMAND: typeof MCP_COMMAND;
   /** The API version this AmbyKit provides. */
   apiVersion: string;
 }
@@ -56,6 +64,8 @@ export function createPluginApi(): PluginApi {
     skillFrontmatter,
     tomlBasic,
     tomlPrompt,
+    MCP_SERVER_NAME,
+    MCP_COMMAND,
     apiVersion: PLUGIN_API_VERSION,
   };
 }

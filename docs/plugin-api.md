@@ -59,6 +59,9 @@ Import from `@ambystech/ambykit/plugin`, or take them from the factory's `api` a
 - `skillName`, `skillPath`, `skillFrontmatter` — the skills helpers, for an emitter that cannot extend
   `SkillsEmitter`.
 - `tomlBasic`, `tomlPrompt` — TOML string helpers.
+- `MCP_SERVER_NAME`, `MCP_COMMAND` — the name AmbyKit's MCP server is registered under and how a host starts it, for an
+  emitter that writes a project MCP file through the inherited `mcpFile()` helper (override `mcpFiles()`; return `null`
+  from `mcpSkipReason()`).
 - `PLUGIN_API_VERSION`, `PLUGIN_API_EXPERIMENTAL` — the API version and the experimental flag.
 
 Types: `TargetDef`, `CommandSpec`, `CommandSurface`, `EmittedFile`, `RulesContext`, `Role`,
