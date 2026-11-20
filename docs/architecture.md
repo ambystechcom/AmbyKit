@@ -82,6 +82,21 @@ are buildable, what blocks a story, the critical path) live in `graph-paths.ts`,
 Mermaid formats in `graph-format.ts`. The interactive graph view loads only on the interactive dashboard,
 through a dynamic import, so one-shot and `--json` output stay inside the 1-second budget.
 
+## Multi-feature fleets
+
+A fleet is a thin layer **above** one `ambykit run`, not a second runner. `src/core/fleet-plan/` is pure: it reads
+features through the per-file spec reader and the dependency graph (`read.ts` is the only adapter, and a test keeps
+markdown and YAML parsing out of the directory), then selects, orders and schedules them. Ordering is the feature
+dependency graph plus serialization of features that share a file, ties broken by number; containment is a pure
+closure over those waits, recomputed every tick, so a resumed feature releases its dependents with no extra
+bookkeeping. `src/cli/run-fleet-loop.ts` is the tick loop: one 028 `Session` and `Supervisor` per feature
+(unchanged, each with its own run, lanes, gates and merge) behind a small `FeatureRun` interface, driven by one
+`FleetSupervisor` that owns start order, the fleet-wide caps (an optional `Session.slots` hook adds the other
+sessions' running lanes to `nextToStart`'s count, so a single run is untouched), the fleet budgets and the record.
+State is `.amby/fleet/fleet-<n>/`; `runDir` resolves a run inside it, so every existing reader and writer, including
+`report_activity`, follows a nested run, and the prompts name the run's real directory. See the CLI reference for the
+rules (what "merged" means, lane preparation, caps, containment).
+
 ## Non-destructive rules merge (brownfield)
 
 Generated **command** files are AmbyKit's alone and are overwritten. **Rules files** (`AGENTS.md`,
