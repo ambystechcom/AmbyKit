@@ -169,9 +169,10 @@ describe("workflow wiring (036:FR-008)", () => {
     expect(w).toContain("environment: Prod");
     expect(w).toContain("id-token: write");
     expect(w).toContain("npm publish --access public");
-    const code = w.split("
-").filter((l) => !l.trim().startsWith("#")).join("
-"); // comments may mention the token
+    const code = w
+      .split("\n")
+      .filter((l) => !l.trim().startsWith("#"))
+      .join("\n"); // comments may mention the token
     expect(code).not.toMatch(/NODE_AUTH_TOKEN|NPM_TOKEN/);
     // the verify step comes before anything is published
     expect(w.indexOf("scripts/plugin-release.mjs verify")).toBeGreaterThan(0);
