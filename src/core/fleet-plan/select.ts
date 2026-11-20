@@ -27,7 +27,8 @@ export function notReadyReason(m: FeatureModel): string | null {
   return null;
 }
 
-function resolve(arg: string, models: readonly FeatureModel[]): FeatureModel | undefined {
+/** A feature by directory name, number or reference; undefined when it matches none. */
+export function resolveFeature(arg: string, models: readonly FeatureModel[]): FeatureModel | undefined {
   const byName = models.find((m) => m.dir === arg);
   if (byName) return byName;
   if (/^\d+$/.test(arg)) return models.find((m) => Number(m.ref) === Number(arg));
@@ -51,7 +52,7 @@ export function selectFeatures(args: readonly string[], models: readonly Feature
 
   const seen = new Set<string>();
   for (const arg of args) {
-    const m = resolve(arg, models);
+    const m = resolveFeature(arg, models);
     if (!m) {
       errors.push({ kind: "not-found", feature: arg, message: `Feature '${arg}' not found. Use a feature number or directory name from specs/.` });
       continue;

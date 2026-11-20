@@ -4,7 +4,7 @@ import { createFleet, createRun, readFleetRecord, readRun, updateFleet, updateRu
 import { errorLines, planJson, planLines } from "../core/fleet-plan/format.js";
 import { buildFleetPlan } from "../core/fleet-plan/plan.js";
 import { readFleetInput } from "../core/fleet-plan/read.js";
-import { selectFeatures } from "../core/fleet-plan/select.js";
+import { resolveFeature, selectFeatures } from "../core/fleet-plan/select.js";
 import type { FleetBudgets, FleetFeature, FleetPlan, FleetRecord } from "../core/fleet-plan/types.js";
 import { assignAssistants } from "../core/run-launch-plan.js";
 import { laneRefs, type LaneRef } from "../core/query.js";
@@ -126,6 +126,12 @@ export async function runFleet(root: string, args: string[], opts: CliOptions, d
     }
   }
   const allReady = flag(opts, "all-ready") && !cont;
+  if (!cont && !allReady) {
+    // one distinct feature, however it is named or repeated, is a single run: unchanged, with no fleet readiness rules (FR-003, FR-019)
+    const found = args.map((a) => resolveFeature(a, input.models));
+    const distinct = new Set(found.filter((m) => m !== undefined).map((m) => m!.dir));
+    if (distinct.size === 1 && found.every((m) => m !== undefined)) return { single: [...distinct][0]! };
+  }
   const picked = selectFeatures(names, input.models, { ...(allReady ? { allReady: true } : {}) });
   const openTasks = picked.selected.reduce((n, m) => n + m.tasks.filter((t) => !t.done).length, 0);
   const budgets: FleetBudgets = existing?.budgets ?? { ...resolveBudgets({ openTasks, config: settings.budgets, flags: budgetFlags(opts) }) };

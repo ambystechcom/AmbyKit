@@ -96,8 +96,8 @@ created: 2026-11-19
 
 ## Phase 10 — User story US-9  (priority: P2)
 
-- [ ] [T085] [US9] Single feature and existing commands behave exactly as before: same output and events with and without the fleet code (test/cli/run-single-unchanged-031.test.ts)
-- **Verify:** `npx vitest run test/cli/run-single-unchanged-031.test.ts` passes and the full 028 run test files pass unchanged.
+- [x] [T085] [US9] Single feature and existing commands behave exactly as before: same output and events with and without the fleet code (test/cli/run-single-unchanged-031.test.ts) ↪ DEVIATION: one distinct feature, however named or repeated, now delegates to the unchanged single run BEFORE any fleet readiness rule (a draft-status feature can still be run alone, as in 028); found while writing this test
+- **Verify:** `npx vitest run test/cli/run-single-unchanged-031.test.ts` passes and the full 028 run test files pass unchanged. ✓ passed
 - **Checkpoint:** US-9 is verified.
 
 ## Phase 11 — Polish and integration
