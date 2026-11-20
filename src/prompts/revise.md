@@ -22,7 +22,9 @@ of `@.amby/templates/spec.md`. This command **extends** an existing feature — 
    feature is complete and to run `/amby.specify` for a new feature. Stop here.
 3. Otherwise **continue in place** (patch, never regenerate — Principle 3):
    - Add new user stories (`US-#`), requirements (`FR-###`), and success criteria (`SC-###`), each
-     taking the **next available number**. Preserve every existing id and its text verbatim.
+     taking the **next available number**. Preserve every existing id and its text verbatim. A new story
+     also gets an entry (`id`, `priority`, `status`, dependencies) in the frontmatter `stories:` list of a
+     v2 spec; change a story's status with `ambykit edit status <feature> US-# <status>`.
    - Refine existing items only where the author asked; keep their ids stable.
    - New requirements use EARS (SHALL / WHEN / WHILE / IF-THEN / WHERE); new acceptance criteria use
      Given/When/Then — consistent with `specify`.
@@ -35,4 +37,5 @@ of `@.amby/templates/spec.md`. This command **extends** an existing feature — 
    the author to run `/amby.design`.
 6. Keep edits minimal and token-frugal; cite the constitution by principle number where relevant.
 
-Report what you added or changed, by id.
+Run `ambykit analyze` and fix any `file:line` error it reports for this spec. Report what you added or
+changed, by id.

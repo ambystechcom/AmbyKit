@@ -3,7 +3,8 @@ import { join, relative } from "node:path";
 import { BaseCommand, flag, type CliOptions } from "./base-command.js";
 import { renderTable } from "./ui/table.js";
 import { loadConfig } from "../core/config.js";
-import { parseTasks, type TaskLine } from "../core/dashboard.js";
+import type { TaskLine } from "../core/dashboard.js";
+import { readTasks } from "../core/spec-format/dispatch.js";
 import { branchExists, git, gitWithInput, isDirty, isMerged, isRepo, worktreeList } from "../core/git.js";
 import { featureBranch, mergeLanes } from "../core/lane-merge.js";
 import {
@@ -299,7 +300,7 @@ export class LaneCommand extends BaseCommand {
 
 function readTasksFile(checkout: string, feature: string): TaskLine[] | null {
   const file = join(checkout, "specs", feature, "tasks.md");
-  return existsSync(file) ? parseTasks(readFileSync(file, "utf8")) : null;
+  return existsSync(file) ? readTasks(readFileSync(file, "utf8")).tasks : null;
 }
 
 /** The feature's tasks.md as committed/checked out on its branch; falls back to the main checkout. */
@@ -313,7 +314,7 @@ function readFeatureTasks(
     if (t) return t;
   }
   try {
-    return parseTasks(gitWithInput(root, ["show", `${fb.branch}:specs/${feature}/tasks.md`], "").toString("utf8"));
+    return readTasks(gitWithInput(root, ["show", `${fb.branch}:specs/${feature}/tasks.md`], "").toString("utf8")).tasks;
   } catch {
     return readTasksFile(root, feature);
   }

@@ -15,8 +15,9 @@ describe("lane prompts (feature 015)", () => {
 
   it("tasks command asks for comma-separated paths and [P] only without overlap (FR-003)", () => {
     const body = emitted("tasks");
-    expect(body).toContain("last parenthesized group");
-    expect(body).toContain("comma-separated");
+    // feature 030: ownership moved from the task line's trailing group to the phase's `files:` block
+    expect(body).toContain("`files:` block");
+    expect(body).toContain("never on the task");
     expect(body).toContain("no globs");
     expect(body).toContain("Mark `[P]` only when no other task in the");
   });

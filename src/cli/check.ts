@@ -4,6 +4,8 @@ import { BaseCommand, type CliOptions } from "./base-command.js";
 import { applyFiles } from "./io/fsops.js";
 import { buildEmittedFiles } from "../core/emit.js";
 import { loadConfig } from "../core/config.js";
+import { readFeatures } from "../core/features.js";
+import { activeTally, legacyEnabled, legacyFeatures } from "../core/spec-format/legacy.js";
 import { getTarget, sharedOutputs } from "../emitters/index.js";
 import { defaultBranch, isMerged, isRepo, worktreeList } from "../core/git.js";
 import { featureWorktrees } from "../core/worktree.js";
@@ -18,6 +20,11 @@ export class CheckCommand extends BaseCommand {
   readonly name = "check";
   readonly summary = "Verify the AmbyKit setup and report drift from the neutral source.";
   readonly usage = "ambykit check";
+
+  /** `check` lists the 1.x features itself (below), so the shared one-line warning is off. */
+  protected override get showsLegacyWarning(): boolean {
+    return false;
+  }
 
   protected async execute(opts: CliOptions): Promise<number> {
     const root = this.projectRoot(opts.cwd);
@@ -93,6 +100,15 @@ export class CheckCommand extends BaseCommand {
     // Stale feature worktrees (feature 012, FR-013): branch already merged into the default branch.
     for (const id of staleWorktrees(root)) {
       this.warn(`Worktree .worktrees/${id} is merged — run \`ambykit worktree remove ${id}\`.`);
+    }
+
+    // Feature 030 (US-6): features still on the 1.x spec format, as a notice. It never changes the exit status.
+    if (legacyEnabled(config)) {
+      readFeatures(root);
+      const old = legacyFeatures(activeTally());
+      if (old.length > 0) {
+        this.info(`Notice: ${old.length} feature${old.length === 1 ? "" : "s"} still use${old.length === 1 ? "s" : ""} the 1.x spec format (read as before): ${old.join(", ")}. Run \`ambykit migrate --dry-run\` to preview; support ends in 2.1.`);
+      }
     }
 
     if (ok) {

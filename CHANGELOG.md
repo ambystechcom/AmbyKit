@@ -14,6 +14,43 @@ Every release states whether plugins are affected, with such a line or with "Plu
 
 ## [Unreleased]
 
+Plugins: not affected.
+
+### Added
+
+- Spec format v2 (feature 030, **breaking in 2.0**): a spec's story data (priority, status, `depends-on`, `blocked-by`) lives
+  in the frontmatter `stories:` list, headings carry the title only, and each `tasks.md` phase ends with one `yaml` block
+  holding `files:` (what each task owns) and `verify:` (the phase's check and last result). Both files carry `format: 2`.
+  Prose, checkboxes, `[P]`/`[US#]` tags and the `⚠ BLOCKED:` / `↪ DEVIATION:` markers are unchanged. 2.0 reads 1.x and v2
+  files side by side, per file, including old revisions read from git history and other branches.
+- `ambykit migrate [feature] [--dry-run] [--diff] [--dual-write]` converts 1.x specs and task lists without rewriting prose. A
+  file that is not provably safe is left untouched and listed with the fix, every conversion is read back before it is
+  written, each file is written once (temp file, then rename) after checking nobody edited it, and a second run changes
+  nothing. `--dual-write` keeps the 1.x lines beside the v2 data for tools still on 1.x. See `docs/migration.md`: a 1.x
+  AmbyKit reads a v2 file without an error but loses statuses, dependencies, ownership and Verify results.
+- `ambykit edit files|verify|status` sets a task's files, a phase's Verify result or a story's status in the right place for
+  the file's format (1.x and v2), reads the file back, and refuses an unknown task, story or phase, an invalid status or
+  result, or a glob path. The phase prompts use it, so nobody hand-edits the YAML.
+- A feature can declare `depends-on: [019, 023-dependency-graph]` in its frontmatter: `ambykit graph` shows the declared
+  edges (JSON `declared`, text, Mermaid) and `ambykit analyze` reports a name that matches no feature.
+- `ambykit analyze` lists located problems in v2 files (file, line, kind) as `Spec format issues`; `--json` gains an
+  optional `formatIssues` key. Errors exit 1; warnings never change the exit status.
+- `.amby/config.json` gets a `schemaVersion` (2); a config without one is read as version 1 and only `migrate` upgrades it,
+  keeping every setting. A newer or unparseable config is left unmodified and reported.
+
+### Changed
+
+- **Node 22 or newer** (breaking): `engines` is `>=22`, CI no longer runs Node 20, and the `bin` entry checks the version
+  before the CLI loads, so an older Node exits with a message naming the required version.
+- Commands that read 1.x files print one line on stderr (once per run, never in `--json`) with the count and how to migrate;
+  silence it with `"legacyWarning": false` in `.amby/config.json` or `AMBYKIT_LEGACY_WARNING=0`. `ambykit check` lists the
+  features still on 1.x. From 2.1 1.x files are no longer read.
+- The spec and tasks templates and the `/amby.specify`, `/amby.tasks`, `/amby.implement`, `/amby.revise`, `/amby.converge` and
+  `/amby.run` prompts and the worker persona write v2 for new features and change statuses and Verify results through
+  `ambykit edit`; `/amby.converge` is also granted `ambykit edit` in Claude Code.
+- A migrated task's description no longer ends with its `(file/path)` group, so the dashboard's "Up next" lines and the
+  `upNext` descriptions in `--json --overview` show the description alone.
+
 ## [1.6.0] — 2026-11-18
 
 Plugins: not affected.

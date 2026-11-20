@@ -5,6 +5,8 @@ import type { AmbyConfig, FleetConfig } from "./types.js";
 
 const configSchema = z.object({
   version: z.string().default("0.0.0"),
+  schemaVersion: z.number().int().positive().optional(),
+  legacyWarning: z.boolean().optional(),
   tools: z.array(z.string()).default([]),
   manageRules: z.boolean().optional(),
   worktrees: z.boolean().optional(),

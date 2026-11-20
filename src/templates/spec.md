@@ -1,29 +1,35 @@
 ---
+format: 2
 feature: {{FEATURE_ID}}          # NNN-slug
 title: {{FEATURE_TITLE}}
 branch: {{BRANCH}}
 status: draft                     # draft | ready | in-progress | blocked | done
 created: {{DATE}}
+stories:                          # one entry per story; headings carry the title only
+  - id: US-1
+    priority: P1
+    status: draft                 # draft | ready | in-progress | blocked | done
+    depends-on: []                # e.g. [US-0, "019:US-1"]
+    blocked-by: []
 ---
 
 # Spec — {{FEATURE_TITLE}}
 
 > WHAT and WHY only. No technology decisions (those belong in `plan.md`).
 > Flag unknowns inline as `[NEEDS CLARIFICATION: …]` — never guess.
+> Story priority, status and dependencies live in the frontmatter `stories:` list. Change a status with
+> `ambykit edit status <feature> US-# <status>`.
 
 ## User scenarios & testing
 
 <!-- One block per story. Each story is independently testable and prioritized. -->
 
-### US-1 — {{STORY_TITLE}}  (priority: P1)
+### US-1 — {{STORY_TITLE}}
 
 As a {{ROLE}}, I want {{CAPABILITY}}, so that {{BENEFIT}}.
 
 - **Why this priority:** {{WHY_PRIORITY}}
 - **Independent test:** {{INDEPENDENT_TEST}}
-- **depends-on:** []            # e.g. [US-0]
-- **blocked-by:** []
-- **status:** draft
 
 **Acceptance criteria**
 - Given {{CONTEXT}}, When {{ACTION}}, Then {{OUTCOME}}.

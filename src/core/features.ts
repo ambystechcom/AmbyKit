@@ -2,8 +2,8 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import matter from "gray-matter";
 import { findClarifications } from "./clarifications.js";
-import { applyTasks, featureRefOf, parseStories, parseTasks, type TaskLine } from "./dashboard.js";
-import { parsePhases } from "./markers.js";
+import { applyTasks, featureRefOf, type TaskLine } from "./dashboard.js";
+import { readSpec, readTasks } from "./spec-format/dispatch.js";
 import type { FeatureSnapshot, ParseIssue, PhaseVerify } from "./overview-types.js";
 
 export interface ReadFeaturesResult {
@@ -41,15 +41,19 @@ export function readFeatures(projectRoot: string, opts: { only?: string } = {}):
 
     const spec = read("spec.md");
     if (spec === null) continue;
-    const stories = parseStories(spec, dir);
+    const specRead = readSpec(dir, spec, { file: rel("spec.md") });
+    const stories = specRead.stories;
+    const formatIssues = [...specRead.issues];
 
     let tasks: TaskLine[] | null = null;
     let verify: PhaseVerify[] | undefined;
     if (existsSync(join(specsRoot, dir, "tasks.md"))) {
       const body = read("tasks.md");
       if (body !== null) {
-        tasks = parseTasks(body);
-        verify = parsePhases(body);
+        const read = readTasks(body, { file: rel("tasks.md") });
+        tasks = read.tasks;
+        verify = read.phases;
+        formatIssues.push(...read.issues);
       }
     }
     applyTasks(stories, tasks ?? []);
@@ -74,7 +78,9 @@ export function readFeatures(projectRoot: string, opts: { only?: string } = {}):
       displayRef: ref,
       stories,
       tasks,
+      ...(specRead.dependsOn.length > 0 ? { dependsOn: specRead.dependsOn } : {}),
       ...(verify ? { verify } : {}),
+      ...(formatIssues.length > 0 ? { formatIssues } : {}),
       artifacts: {
         spec: true,
         ui: hasUi,
