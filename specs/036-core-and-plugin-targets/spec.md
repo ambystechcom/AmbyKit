@@ -2,7 +2,7 @@
 feature: 036-core-and-plugin-targets          # NNN-slug
 title: Core targets and official plugin targets
 branch: 036-core-and-plugin-targets
-status: draft                     # draft | ready | in-progress | blocked | done
+status: ready                     # draft | ready | in-progress | blocked | done
 created: 2026-11-20
 ---
 
@@ -11,7 +11,7 @@ created: 2026-11-20
 > WHAT and WHY only. No technology decisions (those belong in `plan.md`).
 > Flag unknowns inline as `[NEEDS CLARIFICATION: …]` — never guess.
 
-AmbyKit emits files for 15 assistant targets, and every upstream format change in any of them forces a core release.
+AmbyKit emits files for 18 registered target ids (`claude-vscode` and `pi` are aliases), and every upstream format change in any of them forces a core release.
 Spec 027 made the emitter plugin API and decided that long-tail targets move to official plugins; spec 033 makes that
 API stable in 2.0. This feature applies the split: the owner's decision of 2026-11-20 is that the targets built into
 the core for 2.0 are **Claude Code, Codex, Copilot, Cursor and OpenCode**, with their existing variants. Every other
@@ -34,7 +34,7 @@ of core to a plugin. That reverses the split recorded in 027:US-5, which kept An
 | OpenCode | `opencode` | built in |
 | Antigravity | `antigravity`, `antigravity-cli` | plugin (flagged above) |
 | Long tail | `gemini`, `llxprt`, `qwen`, `kilo`, `augment`, `windsurf`, `kiro` | plugin (027:US-5: "all other targets") |
-| Pi | `pi` (alias of the Codex emitter) | [NEEDS CLARIFICATION: stays an alias of built-in `codex`, or moves with the plugins?] |
+| Pi | `pi` (alias of the Codex emitter) | built in, an alias of `codex` (assumed default, confirm with owner: C-2) |
 
 ## User scenarios & testing
 
@@ -70,8 +70,8 @@ release.
 
 **Acceptance criteria**
 - Given a moved target, When its plugin is built, Then it is an `ambykit-emitter-*` package published under the
-  project's npm scope, with its API range declared. [NEEDS CLARIFICATION: package names, e.g.
-  `@ambystech/ambykit-emitter-antigravity`, and one package per target or one bundle]
+  project's npm scope, with its API range declared; one package per target (both Antigravity harnesses in one), for example
+  `@ambystech/ambykit-emitter-antigravity` (assumed default, confirm with owner: C-3).
 - Given the plugin, When the published contract kit runs, Then it passes the emitted-path, frontmatter and idempotence
   checks against the target's row in the compatibility doc.
 - Given an upstream format change for a moved target, When it is fixed, Then only that plugin is released.
@@ -117,7 +117,8 @@ is not.
 
 - FR-001  THE SYSTEM SHALL keep `claude`, `claude-vscode`, `codex`, `copilot`, `copilot-cli`, `cursor`, `cursor-cli` and
   `opencode` built in for 2.0.
-- FR-002  THE SYSTEM SHALL move every other registered target to an official plugin, subject to the clarifications above.
+- FR-002  THE SYSTEM SHALL move Antigravity (`antigravity`, `antigravity-cli`) to an official plugin, and SHALL move every other non-core
+  target to its official plugin once that plugin is published; until then such a target stays built in with a deprecation notice (C-4).
 - FR-003  WHERE a project lists a moved target and its plugin is installed and listed, THE SYSTEM SHALL emit files
   byte-identical to 1.x.
 - FR-004  IF a project lists a moved target whose plugin is not installed, THEN THE SYSTEM SHALL name the target, print
@@ -148,8 +149,8 @@ is not.
 - A plugin is installed but not listed in config, or listed with a version that does not match (027:FR-006).
 - `check` on a project whose moved-target plugin is installed but outdated for the stable API.
 - Offline or no registry access during `update`.
-- A moved target whose official plugin has not been published yet at 2.0: [NEEDS CLARIFICATION: is publishing every
-  plugin a 2.0 gate, or may a target stay built in until its plugin ships?]
+- A moved target whose official plugin has not been published yet at 2.0: Antigravity gates 2.0 (its plugin must be published and
+  install-tested first); a long-tail target stays built in with a deprecation notice until its plugin ships (C-4, assumed default).
 
 ## Assumptions
 
@@ -157,3 +158,21 @@ is not.
 - The contract kit (027, `@ambystech/ambykit/testkit`) is enough to prove a plugin; no new checks are required.
 - Plugin packages are maintained by the project, not third parties, and live under the project's npm scope.
 - The moved targets' file formats are those in `docs/tool-compatibility.md`; this feature does not change them.
+
+## Clarifications
+
+Decided by the owner (2026-11-20): the core targets are Claude Code, Codex, Copilot, Cursor and OpenCode with their variants, and
+both Antigravity harnesses move to a plugin. The rest are **assumed defaults, confirm with owner**, and are person task T094.
+
+- **C-1 Count.** The registry has 18 target ids (16 plus the aliases `claude-vscode` and `pi`), not 15.
+- **C-2 `pi`.** Stays an alias of the built-in `codex`, because it writes the same files from the same emitter.
+- **C-3 Packages and home.** One plugin package per moved target under `@ambystech`, named `ambykit-emitter-<target>` (one package covers
+  both Antigravity harnesses). The packages live in a sibling repository (an npm-workspaces monorepo with its own CI and npm Trusted
+  Publishing), not in this one. Trade-off: each plugin releases on its own cadence (FR-008) and the core stays small, at the price of a
+  second repository to maintain and golden fixtures that move there (FR-012); the alternative, a `plugins/` workspace in this repository,
+  keeps core and plugin changes in one pull request but ties plugin releases to this repository's release tooling.
+- **C-4 The 2.0 gate.** The Antigravity plugin must be **published and install-tested** before the built-in Antigravity emitters are
+  removed in 2.0. The long-tail targets (`gemini`, `llxprt`, `qwen`, `kilo`, `augment`, `windsurf`, `kiro`) follow the same rule but do
+  not gate 2.0: if a plugin is not ready they stay built in with a deprecation notice that names the package that will replace them.
+- **C-5 What the code already has.** `src/core/moved-targets.ts` (`MOVED_TARGETS`, `movedTargetNotices`) already prints the install
+  line from `sync` and `check` and deletes nothing, but only as a warning: FR-004's non-zero exit is new work.
