@@ -56,7 +56,16 @@ export function runFullscreen<S>(
   const { input, output } = io;
   let state = app.initial;
 
-  const frame = (): void => output.write(frameText(app.render(state))) as unknown as void;
+  // A frame identical to the one on screen is not written: the heartbeat re-renders every few seconds and most of
+  // those frames change nothing, so repainting them only makes the terminal flicker. `force` repaints regardless
+  // (the first frame, and a resize, which can leave the terminal's contents reflowed).
+  let lastPainted: string | null = null;
+  const frame = (force = false): void => {
+    const text = frameText(app.render(state));
+    if (!force && text === lastPainted) return;
+    lastPainted = text;
+    output.write(text);
+  };
 
   emitKeypressEvents(input);
   const wasRaw = Boolean(input.isRaw);
@@ -106,7 +115,7 @@ export function runFullscreen<S>(
       guarded(() => {
         if (finished) return;
         app.resize?.(output.columns ?? 80);
-        frame();
+        frame(true);
       });
 
     input.setRawMode?.(true);
@@ -117,7 +126,7 @@ export function runFullscreen<S>(
     process.on("SIGHUP", onSignal);
     input.on("end", onSignal);
     output.write(ENTER);
-    guarded(() => frame());
+    guarded(() => frame(true));
     if (finished) return;
     input.on("keypress", onKey);
     output.on?.("resize", onResize);

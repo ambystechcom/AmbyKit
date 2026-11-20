@@ -10,15 +10,21 @@ import { TOKENS } from "./tokens.js";
  * glyph legend, in a focused frame centered over the dimmed frame beneath. Pure.
  */
 
-export type HelpScreen = "overview" | "feature" | "story" | "graph" | "fleet";
+export type HelpScreen = "overview" | "feature" | "story" | "graph" | "fleet" | "quality";
 
-const KEYS: Record<HelpScreen, [string, string, string][]> = {
+/** The tab keys, listed on every screen (feature 032, FR-004); the reducer binds them with `tabForKey`. */
+const TAB_KEYS: [string, string, string] = ["1-4 / ] [", "1-4 / ] [", "switch tab: overview, fleet, graph, quality"];
+
+/** Every screen's keys in one map, which the `?` overlay renders (feature 032, FR-004). */
+export const KEY_MAP: Record<HelpScreen, [string, string, string][]> = {
   // [unicode key, ascii key, label]
   overview: [
+    TAB_KEYS,
     ["tab / ⇧tab", "tab / S-tab", "next / previous panel"],
     ["↑ ↓", "up / down", "move"],
     ["⏎", "enter", "open"],
-    ["f", "f", "filter by feature"],
+    ["f", "f", "filter by feature number or exact name"],
+    ["/", "/", "search feature names"],
     ["s", "s", "cycle status filter"],
     ["g", "g", "dependency graph"],
     ["l", "l", "fleet view (lanes of a run)"],
@@ -28,6 +34,7 @@ const KEYS: Record<HelpScreen, [string, string, string][]> = {
     ["q", "q", "quit"],
   ],
   feature: [
+    TAB_KEYS,
     ["↑ ↓", "up / down", "move"],
     ["⏎", "enter", "story detail"],
     ["esc", "esc", "back"],
@@ -35,14 +42,21 @@ const KEYS: Record<HelpScreen, [string, string, string][]> = {
     ["q", "q", "quit"],
   ],
   graph: [
+    TAB_KEYS,
     ["↑ ↓", "up / down", "move"],
     ["⏎", "enter", "open the story's feature"],
-    ["esc", "esc", "back"],
+    ["/", "/", "search stories (shared filter)"],
+    ["s", "s", "cycle the state filter"],
+    ["esc", "esc", "clear the filter, then back"],
     ["r", "r", "retry live updates (when paused)"],
     ["q", "q", "quit"],
   ],
   fleet: [
-    ["↑ ↓", "up / down", "select a lane"],
+    TAB_KEYS,
+    ["↑ ↓", "up / down", "select a lane (or feature, when grouped)"],
+    ["← →", "left / right", "collapse / expand a feature (fleets of 2+ features)"],
+    ["/", "/", "search lanes (shared filter)"],
+    ["s", "s", "cycle the state filter"],
     ["p / P", "p / P", "pause the lane / the whole run"],
     ["u / U", "u / U", "continue the lane / the whole run"],
     ["x / X", "x / X", "stop the lane / the whole run (asks to confirm)"],
@@ -51,7 +65,16 @@ const KEYS: Record<HelpScreen, [string, string, string][]> = {
     ["r", "r", "retry live updates (when paused)"],
     ["q", "q", "quit"],
   ],
+  quality: [
+    TAB_KEYS,
+    ["/", "/", "search features (shared filter)"],
+    ["s", "s", "cycle the state filter"],
+    ["esc", "esc", "clear the filter, then back"],
+    ["r", "r", "retry live updates (when paused)"],
+    ["q", "q", "quit"],
+  ],
   story: [
+    TAB_KEYS,
     ["↑ ↓", "up / down", "scroll tasks"],
     ["esc", "esc", "back"],
     ["r", "r", "retry live updates (when paused)"],
@@ -64,7 +87,7 @@ const LEGEND_AGENTS = ["claude", "codex", "opencode", "cursor", "copilot"];
 /** The overlay's body lines: keys, a blank line, the legend, then any skipped files. */
 export function helpLines(caps: Capabilities, screen: HelpScreen, skipped: string[] = []): string[] {
   const k = TOKENS.component["key-hints"];
-  const keys = KEYS[screen].map(([u, a, label]) => {
+  const keys = KEY_MAP[screen].map(([u, a, label]) => {
     const key = caps.unicode ? u : a;
     return `${paintToken(caps, k["key-fg"], key.padEnd(12))} ${paintToken(caps, k["label-fg"], label)}`;
   });

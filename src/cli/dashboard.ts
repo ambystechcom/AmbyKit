@@ -20,6 +20,7 @@ import type { Burndown, Checkout, FeatureSnapshot, Filters, ParseIssue } from ".
 import { applyFilters, computeOverview } from "../core/overview.js";
 import { fleetJson } from "../core/fleet-view/json.js";
 import { readFleet } from "../core/fleet-view/read.js";
+import type { FleetsView } from "../core/fleet/fleet-view.js";
 import { packageVersion } from "../core/paths.js";
 import { maxPeriodsFor } from "./ui/dashboard/burndown-chart.js";
 import type { HeaderMeta } from "./ui/dashboard/cards.js";
@@ -42,6 +43,7 @@ import {
   isOverviewDone,
   reduceOverviewTui,
   renderOverviewTui,
+  selectedFleetView,
   type OverviewTuiData,
   type OverviewTuiState,
 } from "./ui/interactive/overview.js";
@@ -54,7 +56,7 @@ export class DashboardCommand extends BaseCommand {
   readonly name = "dashboard";
   readonly summary = "Progress view over the story/task graph.";
   readonly usage =
-    "ambykit dashboard [story-id] [--interactive] [--stories] [--next=N] [--json [--overview]] [--status=X] [--feature=X] [--icons=nerd|unicode|ascii]";
+    "ambykit dashboard [story-id] [--interactive] [--stories] [--next=N] [--json [--overview] [--metrics]] [--status=X] [--feature=X] [--icons=nerd|unicode|ascii]";
 
   protected async execute(opts: CliOptions): Promise<number> {
     let root = this.projectRoot(opts.cwd);
@@ -74,11 +76,17 @@ export class DashboardCommand extends BaseCommand {
 
     if (flag(opts, "json")) {
       const stories = this.legacyStories(root, filters);
-      if (!flag(opts, "overview")) {
+      if (!flag(opts, "overview") && !flag(opts, "metrics")) {
         this.info(JSON.stringify(stories, null, 2));
         return 0;
       }
-      this.info(JSON.stringify(await this.overviewJson(root, filters, upNextCap, stories), null, 2));
+      const doc = (await this.overviewJson(root, filters, upNextCap, stories)) as Record<string, unknown>;
+      // Feature 032 (FR-010/FR-011): metrics are opt-in and additive; nothing is added, or loaded, without the flag.
+      if (flag(opts, "metrics")) {
+        const { readMetrics } = await import("../core/metrics/index.js");
+        doc["metrics"] = readMetrics(root);
+      }
+      this.info(JSON.stringify(doc, null, 2));
       return 0;
     }
 
@@ -265,7 +273,7 @@ export class DashboardCommand extends BaseCommand {
     const withBurndown = (d: Omit<OverviewTuiData, "burndownFor">): OverviewTuiData => ({
       ...d,
       burndownFor: (f) => {
-        const key = JSON.stringify([f.feature ?? null, f.status ?? null]);
+        const key = JSON.stringify([f.feature ?? null, f.search ?? null, f.status ?? null]);
         if (!cache.has(key)) cache.set(key, this.burndown(root, d.features, f, maxPeriods));
         return cache.get(key)!;
       },
@@ -274,11 +282,24 @@ export class DashboardCommand extends BaseCommand {
     const { graphViewApi } = await import("./ui/dashboard/graph-view.js");
     // Feature 029 (FR-012): the Fleet view is likewise loaded only here, never one-shot or --json.
     const { fleetViewApi } = await import("./ui/dashboard/fleet-view.js");
+    // Feature 032: the tabbed frame's grouped Fleet tab and spec 031's fleets, also interactive-only.
+    const { fleetTabApi } = await import("./ui/dashboard/fleet-tab.js");
+    const { fleetsView } = await import("../core/fleet/fleet-view.js");
+    const readFleets = (at: string, now?: number): FleetsView | null => {
+      try {
+        return fleetsView(at, now);
+      } catch {
+        return null;
+      }
+    };
     const terminalRows = (): number => process.stdout.rows ?? 24;
     let data = withBurndown({
       ...base,
       graphView: graphViewApi,
       fleetView: fleetViewApi,
+      fleetTab: fleetTabApi,
+      tabs: true,
+      fleets: readFleets(initialCheckouts.primary.root),
       fleet: readFleet(initialCheckouts.primary.root),
       rows: terminalRows(),
       presence: presenceOf(base.features, Date.now()),
@@ -316,7 +337,7 @@ export class DashboardCommand extends BaseCommand {
         const prev = data;
         cache.clear();
         const now = Date.now();
-        data = withBurndown({ ...prev, features: read.features, issues: read.issues, presence: presenceOf(read.features, now), fleet: readFleet(checkouts.primary.root, now), rows: terminalRows() });
+        data = withBurndown({ ...prev, features: read.features, issues: read.issues, presence: presenceOf(read.features, now), fleet: readFleet(checkouts.primary.root, now), fleets: readFleets(checkouts.primary.root, now), rows: terminalRows() });
         if (rearmNeeded()) arm();
         update?.((s) => ({ ...applyData(s, prev, data), now, live: { mode: watcher?.mode ?? "paused", lastChange: now } }));
       } catch {
@@ -333,13 +354,17 @@ export class DashboardCommand extends BaseCommand {
       }
       const now = Date.now();
       // The heartbeat also re-reads the run, so a quiet lane crosses the stall limit on screen without a file change (029 SC-002).
-      data = withBurndown({ ...data, presence: presenceOf(data.features, now), fleet: readFleet(checkouts.primary.root, now), rows: terminalRows() });
+      data = withBurndown({ ...data, presence: presenceOf(data.features, now), fleet: readFleet(checkouts.primary.root, now), fleets: readFleets(checkouts.primary.root, now), rows: terminalRows() });
       update?.((s) => ({ ...s, now, changed: new Set(), changedTasks: new Set() }));
       void scan().then((found) => {
         if (stopped || found === null) return;
-        matches = matchAgents(found, allCheckouts(checkouts), process.pid);
+        const next = matchAgents(found, allCheckouts(checkouts), process.pid);
+        // The scan returns a moment after the beat's own repaint: repaint again only when who is working changed,
+        // so a quiet heartbeat paints once, not twice.
+        const changed = JSON.stringify(next) !== JSON.stringify(matches);
+        matches = next;
         data = withBurndown({ ...data, presence: presenceOf(data.features, Date.now()) });
-        update?.((s) => ({ ...s }));
+        if (changed) update?.((s) => ({ ...s }));
       });
     };
 
@@ -356,9 +381,11 @@ export class DashboardCommand extends BaseCommand {
         const next = reduceOverviewTui({ ...data, rows: terminalRows() }, s, key);
         // Feature 029 (FR-006, FR-009): the pure reducer only records the confirmed intent; it is performed here, through
         // 025's directive writer or 028's approveGate, and the run is re-read so the row shows the result at once.
-        if (next.view === "fleet" && next.fleet?.intent && data.fleet) {
-          const out = fleetViewApi.perform(checkouts.primary.root, data.fleet, next.fleet.intent);
-          data = withBurndown({ ...data, fleet: readFleet(checkouts.primary.root) });
+        // In the grouped Fleet tab (feature 032) the intent belongs to the feature under the cursor, so its run is the target.
+        const target = next.view === "fleet" && next.fleet?.intent ? selectedFleetView(data, next) : null;
+        if (next.view === "fleet" && next.fleet?.intent && target) {
+          const out = fleetViewApi.perform(checkouts.primary.root, target, next.fleet.intent);
+          data = withBurndown({ ...data, fleet: readFleet(checkouts.primary.root), fleets: readFleets(checkouts.primary.root) });
           return { ...next, fleet: { ...next.fleet, intent: null, notice: out.message } };
         }
         return next;
@@ -375,6 +402,18 @@ export class DashboardCommand extends BaseCommand {
           data.burndownFor(filters);
           u((s) => ({ ...s, burndownReady: true }));
           beat();
+          // Feature 032 (US-4): metrics load after the first paint on their own async git reads, so nothing waits on
+          // them; a failure becomes a state, not an exception, and the other views keep working.
+          data = withBurndown({ ...data, metricsState: { status: "loading" } });
+          void import("../core/metrics/index.js")
+            .then(({ readMetricsAsync }) => readMetricsAsync(checkouts.primary.root))
+            .then((metrics) => ({ status: "ready", metrics }) as const)
+            .catch(() => ({ status: "failed" }) as const)
+            .then((metricsState) => {
+              if (stopped) return;
+              data = withBurndown({ ...data, metricsState });
+              update?.((s) => ({ ...s }));
+            });
         });
       },
       resize: (columns) => {
