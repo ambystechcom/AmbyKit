@@ -116,9 +116,9 @@ created: 2026-11-18
 
 - [ ] [T090] PERSON: confirm with the release maintainer the 2.1 gate wording and that CI drops Node 20; record the answer (specs/030-spec-v2-and-migrate/notes.md)
 - [ ] [T091] [US11] PERSON: assistant trial for SC-009: run one phase of a v2 feature on two assistants, check no file is left unreadable and every update used the writer or a checkbox, record the result (specs/030-spec-v2-and-migrate/notes.md)
-- [ ] [T092] INTEGRATION STEP (once per batch, after merges, not in a lane branch): re-record the emitter golden fixtures with `UPDATE_GOLDEN=1 npx vitest run test/emitters-golden.test.ts` and review that only the prompts and templates of Phase 7 changed (test/fixtures/emitters-golden/)
-- [ ] [T093] INTEGRATION STEP (once per batch, after merges, not in a lane branch): `ambykit sync` twice, the second a no-op (.claude/, .agents/, .amby/templates/)
-- [ ] [T094] INTEGRATION STEP (once per batch, after merges): `npm run typecheck`, `npm test`, `node scripts/check-docs-sync.mjs`, `ambykit sync --check` and `ambykit trace 030` (every FR covered, SC-006) all pass; record the Verify results of Phases 5 to 8 (specs/030-spec-v2-and-migrate/tasks.md)
+- [x] [T092] INTEGRATION STEP (once per batch, after merges, not in a lane branch): re-record the emitter golden fixtures with `UPDATE_GOLDEN=1 npx vitest run test/emitters-golden.test.ts` and review that only the prompts and templates of Phase 7 changed (test/fixtures/emitters-golden/)
+- [x] [T093] INTEGRATION STEP (once per batch, after merges, not in a lane branch): `ambykit sync` twice, the second a no-op (.claude/, .agents/, .amby/templates/)
+- [x] [T094] INTEGRATION STEP (once per batch, after merges): `npm run typecheck`, `npm test`, `node scripts/check-docs-sync.mjs`, `ambykit sync --check` and `ambykit trace 030` (every FR covered, SC-006) all pass; record the Verify results of Phases 5 to 8 (specs/030-spec-v2-and-migrate/tasks.md)
 - [ ] [T095] DOGFOOD GATE (SC-001, SC-002, SC-007, last commit only, after 031 and 032 and every pending spec are merged): `ambykit migrate --dry-run`, then `ambykit migrate` on AmbyKit's own `specs/`, second run a no-op, full suite and `analyze` on the migrated tree (specs/)
 - **Verify:** `ambykit migrate` on the repo reports 0 skipped and a second run reports 0 changes, `npm test` passes on the migrated tree, and the T091 trial result is recorded.
 - **Checkpoint:** the 2.0 spec-format gate is met.
