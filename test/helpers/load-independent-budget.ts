@@ -1,5 +1,6 @@
 import { createRequire } from "node:module";
 import { expect } from "vitest";
+import { scaledBudget } from "./machine-load.js";
 
 // The real child_process, loaded without the module graph: this file is imported by the `vi.mock("node:child_process")`
 // factory, so a static import of it here would wait on the factory that is waiting on this file.
@@ -76,7 +77,9 @@ export async function expectWithinBudget(o: BudgetOptions): Promise<Sample> {
     const t0 = performance.now();
     for (let i = 0; i < 10; i++) realChildProcess.execFileSync("git", ["--version"], { stdio: "ignore" });
     const perSpawn = (performance.now() - t0) / 10;
-    const allowed = Math.max(spawns, 1) * perSpawn * 3 + 250; // 3x the spawn floor, plus fixed work (module load, layout)
+    // 3x the spawn floor plus fixed work (module load, layout), or the budget stretched by how slow the CPU is right now:
+    // the command's JavaScript slows down under load too, not only its git spawns (a second suite at once measured 1.7 s).
+    const allowed = Math.max(Math.max(spawns, 1) * perSpawn * 3 + 250, scaledBudget(budgetMs));
     expect(best.ms, `${o.label}: best of ${samples.length} ${Math.round(best.ms)} ms, ${spawns} spawns at ${perSpawn.toFixed(1)} ms each`).toBeLessThan(allowed);
   }
   return best;

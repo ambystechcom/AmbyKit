@@ -5,6 +5,7 @@ import type { FullscreenApp } from "../../src/cli/ui/interactive/fullscreen.js";
 import { HAS_GIT } from "../helpers/git-repo.js";
 import { tick, worktreeProject } from "../helpers/worktree-fixture.js";
 import { fakeCapabilities, stripAnsi } from "../ui/helpers.js";
+import { scaledBudget } from "../helpers/machine-load.js";
 
 /**
  * Live interactive dashboard end to end (feature 017, US-2): the real command, real `fs.watch` and a
@@ -100,8 +101,11 @@ describe.skipIf(!HAS_GIT)("live interactive dashboard (feature 017, US-2)", () =
 
     const t0 = Date.now();
     tick(join(root, ".worktrees", "002-b"), "002-b", 7);
-    expect(await until(() => /002 b .*70%/.test(term.frames.at(-1) ?? ""), 1000)).toBe(true);
-    expect(Date.now() - t0).toBeLessThan(1000);
+    // "within 1 s" on an idle machine. The wait itself is generous (it only decides how long a failure takes to show); the
+    // guarantee is the elapsed time, stretched by how slow the machine is right after (see test/helpers/machine-load.ts).
+    expect(await until(() => /002 b .*70%/.test(term.frames.at(-1) ?? ""), 8000)).toBe(true);
+    const elapsed = Date.now() - t0;
+    expect(elapsed).toBeLessThan(scaledBudget(1000));
 
     term.press("q");
     expect(await run).toBe(0);

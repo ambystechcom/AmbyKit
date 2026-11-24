@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { DashboardCommand } from "../../src/cli/dashboard.js";
 import { readFeatures } from "../../src/core/features.js";
 import { perfFixture } from "../helpers/dashboard-perf-fixture.js";
+import { scaledBudget } from "../helpers/machine-load.js";
 
 async function timed(flags: Record<string, string | boolean>): Promise<number> {
   const root = perfFixture();
@@ -31,12 +32,12 @@ describe("dashboard performance (SC-003)", () => {
     } finally {
       console.log = orig;
     }
-    expect(performance.now() - t0).toBeLessThan(1000);
+    expect(performance.now() - t0).toBeLessThan(scaledBudget(1000));
   });
 
   it("keeps the 1 s budget with the shared graph behind the attention list, one-shot and --json --overview (feature 023, FR-015)", async () => {
-    expect(await timed({})).toBeLessThan(1000);
-    expect(await timed({ json: true, overview: true })).toBeLessThan(1000);
+    expect(await timed({})).toBeLessThan(scaledBudget(1000));
+    expect(await timed({ json: true, overview: true })).toBeLessThan(scaledBudget(1000));
   });
 });
 

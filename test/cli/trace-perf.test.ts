@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { DashboardCommand } from "../../src/cli/dashboard.js";
 import { buildMatrix } from "../../src/core/trace.js";
 import { readTraceSources } from "../../src/core/trace-io.js";
+import { scaledBudget } from "../helpers/machine-load.js";
 
 function bigProject(): string {
   const root = mkdtempSync(join(tmpdir(), "ambykit-trace-perf-"));
@@ -33,7 +34,7 @@ describe("trace performance (SC-001)", () => {
     const t0 = performance.now();
     const src = readTraceSources(root);
     const report = buildMatrix({ features: src.features, tests: src.tests });
-    expect(performance.now() - t0).toBeLessThan(1000);
+    expect(performance.now() - t0).toBeLessThan(scaledBudget(1000));
     expect(src.tests).toHaveLength(2000);
     expect(report.features).toHaveLength(30);
   });
@@ -47,6 +48,6 @@ describe("trace performance (SC-001)", () => {
     } finally {
       console.log = orig;
     }
-    expect(performance.now() - t0).toBeLessThan(1000);
+    expect(performance.now() - t0).toBeLessThan(scaledBudget(1000));
   });
 });

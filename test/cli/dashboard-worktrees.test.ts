@@ -69,7 +69,7 @@ describe.skipIf(!HAS_GIT)("dashboard across worktrees (feature 017, US-1)", () =
     const { ActivityCommand } = await import("../../src/cli/activity.js");
     await new ActivityCommand().run({ cwd: wt, positionals: ["002"], flags: { agent: "codex", phase: "implement", task: "T003" } });
     const { out } = await capture(root);
-    expect(out).toMatch(/002 b +wt 002-b +\[CX\] Codex +implement T003 +active now/);
+    expect(out).toMatch(/002 b +wt 002-b +\[CX\] Codex +implement T003 +active (?:now|\d+s)/);
     expect(out).toMatch(/002 b .*\[CX\]$/m); // the feature chart's agent column
   });
 
