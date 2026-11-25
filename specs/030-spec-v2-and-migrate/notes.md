@@ -58,7 +58,11 @@ tenth of the budget. `migrate` itself converts all 60 own files in about 370 ms.
 
 ## Person tasks (open)
 
-- **T090** — confirm with the release maintainer the 2.1 gate wording and that CI drops Node 20. *Not done.*
+- **T090** — confirm with the release maintainer the 2.1 gate wording and that CI drops Node 20. *Done 2026-11-25 (owner):*
+  - 2.1 gate wording (035 D-1): "2.1 stops reading 1.x once 2.0 has been out for the adoption window, `migrate` has had no open
+    data-loss issue in it, and `docs/migration.md` documents the path." The window is at least 8 weeks and one 2.0.x patch (035 D-6).
+  - Node 20 (034 D-1): CI builds and tests on Node 22 only; one Node 20 step stays as a negative check of the
+    "Node.js 22 or newer" message.
 - **T091** — assistant trial for SC-009 on two assistants. *Not done.*
 - **T095** — dogfood migrate of AmbyKit's own `specs/`, after 031, 032 and every pending spec are merged. *Not done; this repo's specs are
   untouched.*

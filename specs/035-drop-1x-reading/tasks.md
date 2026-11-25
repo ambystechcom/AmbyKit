@@ -17,7 +17,7 @@ created: 2026-11-25
 ## Phase 1 — Setup
 
 - [ ] [T001] Research: (a) split `parseStories`/`parseTasks`/`parsePhases` into the parts the v2 readers use and the 1.x-only parts; (b) list every test file and fixture helper that writes 1.x text, grouped by helper; (c) how burndown, lane and metrics read history today; (d) record the 2.0 timings of dashboard one-shot and `--json` and of the full suite (specs/035-drop-1x-reading/research.md)
-- [ ] [T002] PERSON: answer D-1 to D-8 from the plan (gate wording with 030 T090, history readers, refusal target, env var, dual-write, adoption window, exit code, switch before 2.0); record them with `/amby.revise` in `spec.md`, reword FR-007/US-3/SC-003 if D-2 changes them, set `status: ready` (specs/035-drop-1x-reading/spec.md)
+- [x] [T002] PERSON: answer D-1 to D-8 from the plan (gate wording with 030 T090, history readers, refusal target, env var, dual-write, adoption window, exit code, switch before 2.0); record them with `/amby.revise` in `spec.md`, reword FR-007/US-3/SC-003 if D-2 changes them, set `status: ready` (specs/035-drop-1x-reading/spec.md)
 - **Verify:** `research.md` has the four inventories and the timing baseline; `spec.md` records D-1 to D-8 and is `status: ready`.
 
 ## Phase 2 — User story US-1  (priority: P1)  — the go decision
@@ -49,8 +49,8 @@ created: 2026-11-25
 
 - [ ] [T040] [US3] Remove the v1 branch of `readSpec`/`readTasks` (a 1.x file returns only the refusal issue), the tally, `printLegacyWarning`, `showsLegacyWarning`, `check`'s 1.x notice, `legacyEnabled`, `legacyWarningLine` and `AMBYKIT_LEGACY_WARNING` (D-4) — 035:FR-006 (src/core/spec-format/dispatch.ts, src/core/spec-format/legacy.ts, src/core/spec-format/model.ts, src/cli/base-command.ts, src/cli/check.ts, src/cli/mcp.ts, src/cli/migrate.ts)
 - [ ] [T041] [US3] Config: `legacyWarning` stays accepted by the schema and is ignored with one notice per run naming the key — 035:FR-006 (src/core/config.ts, src/core/types.ts, test/core/config-legacy-key.test.ts)
-- [ ] [T042] [US3] History readers per D-2: burndown skips and counts a 1.x revision instead of counting zero tasks; `lane` reports a 1.x branch as unreadable; metrics drops `HISTORY_VERSION` (or, if D-2 says keep history, all three read old revisions through `migrate`'s 1.x reader) — 035:FR-007 (src/core/burndown.ts, src/cli/lane.ts, src/core/metrics/model.ts, test/core/history-legacy.test.ts)
-- [ ] [T043] [US3] Guard test: only `src/core/migrate/` imports the 1.x reader (plus the history readers if D-2 keeps history); no source file outside it parses heading priority, story bullets or Verify lines — 035:FR-006 (test/core/spec-format-guard.test.ts)
+- [ ] [T042] [US3] History readers per D-2 (keep history): burndown, `lane` and metrics read earlier 1.x revisions through `migrate`'s 1.x reader, so a 1.x revision never counts as zero tasks and history from before the migration is kept — 035:FR-007 (src/core/burndown.ts, src/cli/lane.ts, src/core/metrics/model.ts, test/core/history-legacy.test.ts)
+- [ ] [T043] [US3] Guard test: only `src/core/migrate/` imports the 1.x reader (plus the history readers, D-2); no source file outside it parses heading priority, story bullets or Verify lines — 035:FR-006 (test/core/spec-format-guard.test.ts)
 - [ ] [T044] [US3] Budget: dashboard one-shot and `--json` reuse the preflight's reads; compare with the 2.0 timings from T001 and record the numbers — 035:FR-011 (src/core/dashboard.ts, src/cli/dashboard.ts, specs/035-drop-1x-reading/research.md)
 - **Checkpoint:** US-3 is done: the 1.x path is gone outside `migrate`.
 - **Verify:** `npx vitest run test/core test/cli/dashboard-perf.test.ts test/cli/dashboard-fleet-perf.test.ts` passes and `research.md` records one-shot and `--json` no slower than 2.0.

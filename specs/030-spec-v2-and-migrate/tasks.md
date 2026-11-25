@@ -114,7 +114,7 @@ created: 2026-11-18
 
 ## Phase 9 — Release gates  (person tasks, integration batch, dogfood; last)
 
-- [ ] [T090] PERSON: confirm with the release maintainer the 2.1 gate wording and that CI drops Node 20; record the answer (specs/030-spec-v2-and-migrate/notes.md)
+- [x] [T090] PERSON: confirm with the release maintainer the 2.1 gate wording and that CI drops Node 20; record the answer (specs/030-spec-v2-and-migrate/notes.md) ↪ done 2026-11-25: wording from 035 D-1, Node 22 from 034 D-1 (notes.md)
 - [ ] [T091] [US11] PERSON: assistant trial for SC-009: run one phase of a v2 feature on two assistants, check no file is left unreadable and every update used the writer or a checkbox, record the result (specs/030-spec-v2-and-migrate/notes.md)
 - [x] [T092] INTEGRATION STEP (once per batch, after merges, not in a lane branch): re-record the emitter golden fixtures with `UPDATE_GOLDEN=1 npx vitest run test/emitters-golden.test.ts` and review that only the prompts and templates of Phase 7 changed (test/fixtures/emitters-golden/)
 - [x] [T093] INTEGRATION STEP (once per batch, after merges, not in a lane branch): `ambykit sync` twice, the second a no-op (.claude/, .agents/, .amby/templates/)

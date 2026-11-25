@@ -66,8 +66,8 @@ created: 2026-11-25
 5. **The 1.x path goes (US-3; FR-006, FR-007, FR-011).** The dispatcher loses its v1 branch: `readSpec`/`readTasks` on a 1.x file return the
    `legacy-format-refused` issue (defence in depth behind the preflight). Removed: the tally, `printLegacyWarning`, `showsLegacyWarning`,
    `check`'s notice, `legacyEnabled`, `legacyWarningLine`, `AMBYKIT_LEGACY_WARNING`. `legacyWarning` stays in the zod schema as an accepted,
-   ignored key; `loadConfig` reports it with one notice per run. History readers follow D-2. The default in this plan is the spec's: skip and
-   count (burndown gets a `skipped` count like metrics; `lane` reports a 1.x branch as unreadable). `spec-format-guard.test.ts` is rewritten:
+   ignored key; `loadConfig` reports it with one notice per run. History readers follow D-2 (answered: keep history): burndown, `lane` and
+   metrics read earlier 1.x revisions through `migrate`'s 1.x reader; only the current files are refused. `spec-format-guard.test.ts` is rewritten:
    only `src/core/migrate/` may import the 1.x reader.
 6. **Tests: convert first, then delete (US-4; FR-008).** The fixture helpers (`tasks-fixture`, `spec-project`, `dashboard-fixture`,
    `dashboard-perf-fixture`, `fleet-*`, `lane-fixture`, `trace-fixture`, `graph-fixtures`, `worktree-fixture`, `git-history-fixture`,
@@ -101,13 +101,15 @@ created: 2026-11-25
 | FR-004 | preflight in `BaseCommand.run`, message with file and both migrate commands, exit 1, nothing written | `test/cli/legacy-refused.test.ts` (tree hash before/after) |
 | FR-005 | one message listing every 1.x file, grouped by feature; v2 features not processed | same test, mixed project |
 | FR-006 | v1 branch, notice, tally, env var removed; `legacyWarning` accepted and ignored with one notice | `test/core/config-legacy-key.test.ts`, guard test |
-| FR-007 | history readers per D-2 (default: skip and count) | `burndown` and `lane` tests with a 1.x revision |
+| FR-007 | history readers read 1.x revisions through `migrate`'s 1.x reader (D-2) | `burndown` and `lane` tests with a 1.x revision |
 | FR-008 | fixtures converted, 1.x-only tests deleted and listed, `trace` compared | `research.md` table + `trace` diff (T053) |
 | FR-009 | `migrate/v1-reader.ts`, same safety rules | existing migrate tests + `test/cli/migrate-2-1.test.ts` |
 | FR-010 | `docs/format-1x.md` | `test/docs/format-1x.test.ts` (page exists, linked, names every 1.x element) |
 | FR-011 | preflight shares the file list with the readers; budget tests unchanged | `dashboard-perf`, `dashboard-fleet-perf` + T044 comparison |
 
 ## Risks & decisions (owner)
+
+**D-1..D-8 are answered (2026-11-25); see `spec.md` Clarifications.** D-2 keeps history; every other decision follows the recommendation below.
 
 - **D-1: the go decision and the gate wording.** 030 T090 is still open; US-1 cannot be written without it. Recommended: confirm it together with
   T002, worded as "2.1 stops reading 1.x once 2.0 has been out for the adoption window, `migrate` has had no open data-loss issue in it, and
