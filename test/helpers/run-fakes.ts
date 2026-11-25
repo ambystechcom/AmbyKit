@@ -25,8 +25,8 @@ export function fakeRegistry(ids: string[] = ["claude", "codex"], usage = false)
 
 export interface FakeHandle extends ProcessHandle {
   spec: SpawnSpec;
-  /** Finish the process as if it exited. */
-  finish(code?: number | null, signal?: string | null): void;
+  /** Finish the process as if it exited; `stdout` is what a capturing spawn hands back. */
+  finish(code?: number | null, signal?: string | null, stdout?: string): void;
   killed: string[];
 }
 
@@ -54,11 +54,11 @@ export class FakePort implements ProcessPort {
         handle.killed.push(signal);
         handle.finish(null, signal);
       },
-      finish: (code = 0, signal = null) => {
+      finish: (code = 0, signal = null, stdout?: string) => {
         if (done) return;
         done = true;
         this.live.delete(pid);
-        resolveExit({ code, signal });
+        resolveExit({ code, signal, ...(stdout !== undefined ? { stdout } : {}) });
       },
     };
     this.starts.push(handle);

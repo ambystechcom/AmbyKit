@@ -17,6 +17,13 @@ export function addTaskEvents(s: Session, n: number): void {
   writeBudget(s.root, s.run, { ...b, tasksUsed: b.tasksUsed + n });
 }
 
+/** Add the tokens a runner reported for one process (033: the claude runner's JSON result), so a token ceiling holds. */
+export function addTokens(s: Session, n: number): void {
+  if (!(n > 0)) return;
+  const b = readBudget(s.root, s.run);
+  writeBudget(s.root, s.run, { ...b, tokensUsed: (b.tokensUsed ?? 0) + n });
+}
+
 /**
  * Advance the meter: add elapsed time, count newly checked tasks once (a continued run does not count them
  * again) and release their claims (spec 025: claims are advisory and end at check-off).

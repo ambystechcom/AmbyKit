@@ -21,6 +21,16 @@ describe("process edge (feature 028)", () => {
     expect(realpathSync(rec.cwd).toLowerCase()).toBe(realpathSync(dir).toLowerCase());
   });
 
+  it("033:FR-004: a capturing spawn hands back the process's stdout with its exit; without capture there is none", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "ambykit-proc-"));
+    const script = 'process.stdin.resume(); process.stdin.on("end", () => { console.log("noise"); console.log(JSON.stringify({ type: "result", subtype: "success" })); });';
+    const captured = await nodeProcessPort.spawn({ exe: process.execPath, args: ["-e", script], cwd: dir, stdin: "x", captureStdout: true }).exited;
+    expect(captured.code).toBe(0);
+    expect(captured.stdout).toContain('{"type":"result","subtype":"success"}');
+    const plain = await nodeProcessPort.spawn({ exe: process.execPath, args: ["-e", script], cwd: dir, stdin: "x" }).exited;
+    expect(plain.stdout).toBeUndefined();
+  });
+
   it("028:FR-008: a hung process is alive until it is killed", async () => {
     const dir = mkdtempSync(join(tmpdir(), "ambykit-proc-"));
     const record = join(dir, "record.jsonl");

@@ -43,7 +43,9 @@ describe("ambykit run --runners shows platforms and version ranges (feature 033)
 
   it("033:FR-004: a runner with no record keeps the 1.6 listing text exactly", async () => {
     const r = await runCommand(new RunCommand(), gitProject([F]), [], { runners: true });
-    expect(r.out).toMatch(/ {2}claude {2}Claude Code {2}unverified {2}usage not reported {2}not runnable/);
+    // the claude runner reports usage since its JSON result is read (live check); the listing format is unchanged
+    expect(r.out).toMatch(/ {2}claude {2}Claude Code {2}unverified {2}usage reported {2}not runnable/);
+    expect(r.out).toMatch(/ {2}codex {2}Codex {2}unverified {2}usage not reported {2}not runnable/);
     expect(r.out).not.toMatch(/verified[^\n]* on (linux|darwin|win32|aix)/);
   });
 });

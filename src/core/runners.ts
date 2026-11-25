@@ -7,6 +7,7 @@
  */
 
 import { satisfies } from "../plugins/semver.js";
+import { parseClaudeResult, type RunnerResult } from "./run-result.js";
 
 export interface RunnerJob {
   /** The full prompt text (IDs, `@` references, ownership). */
@@ -33,6 +34,11 @@ export interface RunnerSpec {
   exit: string;
   /** Whether the process reports token usage, so a token ceiling can be enforced. */
   reportsUsage: boolean;
+  /**
+   * Reads the process's captured stdout once it exits: usage and the signs of a failed turn. Absent for a runner whose
+   * output is not read (its exit code and the task list decide, as in 1.6); `undefined` from it means the same.
+   */
+  readResult?: (stdout: string) => RunnerResult | undefined;
   verified: boolean;
   /** The CLI version the command was verified against; present only when `verified`. */
   verifiedVersion?: string;
@@ -66,8 +72,9 @@ export const RUNNERS: RunnerSpec[] = [
       args: ["-p", "--permission-mode", "acceptEdits", "--allowedTools", CLAUDE_ALLOWED_TOOLS, "--output-format", "json", ...(job.model ? ["--model", job.model] : [])],
       stdin: job.prompt,
     }),
-    exit: "0 = finished its turn; non-zero = failed",
-    reportsUsage: false,
+    exit: "0 = finished its turn; non-zero, an error result or refused tools with tasks left open = failed",
+    reportsUsage: true,
+    readResult: parseClaudeResult,
     verified: false,
     toVerify: "the permission flags let a lane edit its files and run `ambykit activity` (Bash and PowerShell), the JSON result's usage and failure fields, a failed turn's exit code",
   },
