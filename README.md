@@ -159,7 +159,7 @@ target is a thin `BaseEmitter` subclass.
 | `ambykit mcp` | Serve state tools (next task, story status, tick, report, claim) to an assistant over MCP; opt-in with `mcp.enabled` |
 | `ambykit directive <feature> <lane>` | Tell a fleet lane to `pause`, `resume` or `stop` (obeyed at its next report) |
 | `ambykit run <feature>` | (experimental) Run the prepared lanes headless: print the commands, `--yes` to launch, supervise, review and merge |
-| `ambykit migrate [feature]` | Convert 1.x specs and task lists to the v2 format, safely (`--dry-run`, `--diff`, `--dual-write`); a second run changes nothing |
+| `ambykit migrate [feature]` | Convert 1.x specs and task lists to the v2 format, safely (`--dry-run`, `--diff`, `--dual-write`); a second run changes nothing; 1.x files are still read until 2.1 |
 | `ambykit edit <files\|verify\|status> <feature> …` | Set a task's files, a phase's Verify result or a story's status without hand-editing the file (1.x and v2) |
 
 See [`docs/cli-reference.md`](./docs/cli-reference.md). What `ambykit run` and the plugin API promise not to break,

@@ -370,8 +370,8 @@ waits for a decision. Pause, resume and stop go through the same writer as `amby
 ## `ambykit run <feature>` (experimental)
 
 Run a feature's **prepared lanes** headless: one assistant per lane, in that lane's worktree, supervised,
-merged and reviewed, without a person at the keyboard. **Experimental in 1.6** (the flags and the runner
-commands may change before it is stable in 2.0; what it will promise is listed in [`stability.md`](./stability.md), and
+merged and reviewed, without a person at the keyboard. **Experimental** until one fleet has built two dependent features of this
+repository with a verified runner (the flags and the runner commands may change until then; what it will promise is listed in [`stability.md`](./stability.md), and
 `ambykit run --runners` shows where and for which versions each runner was verified). Launching processes that edit code is the riskiest thing
 AmbyKit does, so nothing starts without `--yes`, and an assistant without a **verified** runner is refused.
 
