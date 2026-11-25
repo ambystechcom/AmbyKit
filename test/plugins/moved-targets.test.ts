@@ -56,7 +56,7 @@ describe("moved targets (feature 027, US-5)", () => {
     for (const t of TARGETS) expect(doc, t.id).toMatch(new RegExp(`\\| \`${t.id}\` \\|`));
     const rows = doc.split("\n").filter((l) => /^\| `[a-z-]+` \|/.test(l));
     expect(rows).toHaveLength(18);
-    for (const row of rows) expect(row, row).toMatch(/built in|plugin candidate/);
+    for (const row of rows) expect(row, row).toMatch(/built in|plugin candidate|official plugin/);
     expect(doc).toMatch(/2\.0 gate/);
   });
 });

@@ -128,9 +128,10 @@ work can be ordered and blocked; `ambykit dashboard` reports progress across the
 
 ## Supported tools
 
-Claude Code (CLI + VS Code), GitHub Copilot (VS Code + CLI), OpenCode, Cursor (+ CLI),
-Antigravity (IDE + CLI), Codex CLI, Gemini CLI, Windsurf, Qwen Code, Kiro, Kilo Code, Augment Code,
-LLxprt Code and Pi (eighteen selectable targets). See [`docs/tool-compatibility.md`](./docs/tool-compatibility.md).
+**Built in:** Claude Code (CLI + VS Code), GitHub Copilot (VS Code + CLI), OpenCode, Cursor (+ CLI), Codex CLI and Pi.
+**Official plugin:** Antigravity (IDE + CLI), `@ambystech/ambykit-emitter-antigravity` (install it once, see
+[`docs/migration.md`](./docs/migration.md)). **Bundled for now, moving to plugins:** Gemini CLI, Windsurf, Qwen Code, Kiro,
+Kilo Code, Augment Code and LLxprt Code (sixteen selectable built-in targets plus the plugin's two). See [`docs/tool-compatibility.md`](./docs/tool-compatibility.md).
 
 Antigravity uses skills (`.agents/skills/`), since it retired workflows on 2026-10-19. If you synced with an
 earlier release, run `ambykit sync --prune-legacy` to remove the old `.agents/workflows/amby.*.md` files.
