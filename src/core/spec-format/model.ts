@@ -57,6 +57,6 @@ export interface ReadCtx {
   file?: string;
   /** Where to record the format; defaults to the tally of the running command (see `beginTally`). */
   tally?: FormatTally;
-  /** The version that decides whether 1.x files are refused (tests inject it); default is the installed version. */
-  version?: string;
+  /** Whether 1.x files are read (tests inject it); default is the `LEGACY_READING` switch (035:FR-002). */
+  legacyReading?: "on" | "off";
 }

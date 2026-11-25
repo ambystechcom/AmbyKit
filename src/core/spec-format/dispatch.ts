@@ -3,7 +3,6 @@
 // content of each file, never from the project.
 import { parseStories, parseTasks } from "../dashboard.js";
 import { parsePhases } from "../markers.js";
-import { packageVersion } from "../paths.js";
 import { detectSpecFormat, detectTasksFormat } from "./detect.js";
 import { LEGACY_REFUSED_KIND, activeTally, legacyRefusedMessage, refuseLegacy } from "./legacy.js";
 import type { Format, FormatIssue, ReadCtx, SpecRead, TasksRead } from "./model.js";
@@ -11,13 +10,9 @@ import { readSpecMeta } from "./meta.js";
 import { readSpecV2 } from "./read-spec.js";
 import { readTasksV2 } from "./read-tasks.js";
 
-let installed: boolean | null = null;
-
-/** Whether this version refuses 1.x files (memoized for the installed version; an injected version is evaluated each time). */
+/** Whether 1.x files are refused: the `LEGACY_READING` switch, or the setting a test injects (035:FR-002). Never the version. */
 function refusesLegacy(ctx: ReadCtx | undefined): boolean {
-  if (ctx?.version !== undefined) return refuseLegacy(ctx.version);
-  if (installed === null) installed = refuseLegacy(packageVersion());
-  return installed;
+  return refuseLegacy(ctx?.legacyReading);
 }
 
 /** Record the format of a read file, when the caller named it, in the explicit or the running command's tally. */
