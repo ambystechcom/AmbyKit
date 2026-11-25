@@ -76,6 +76,6 @@ created: 2026-11-20
 - [x] [T080] INTEGRATION STEP (once per batch, after merges, not in a lane branch): re-record the emitter goldens with `UPDATE_GOLDEN=1 npx vitest run test/emitters-golden.test.ts` (test/fixtures/emitters-golden/)
 - [x] [T081] INTEGRATION STEP (once per batch, after merges): run `ambykit sync` twice; the second run is a no-op (.claude/, .agents/, .github/)
 - [x] [T082] Full gate: `npm run typecheck`, `npm test`, `node scripts/check-docs-sync.mjs`, `ambykit trace 036` (test/check-docs-sync.test.ts)
-- [ ] [T094] **Person task:** confirm the assumed defaults C-2 (`pi` stays with `codex`), and C-4 (only Antigravity gates 2.0); C-3 (plugins in this repository, one package per target, no workspaces, one deploy workflow) is decided; record the answers in `spec.md` (specs/036-core-and-plugin-targets/spec.md)
+- [x] [T094] **Person task:** confirm the assumed defaults C-2 (`pi` stays with `codex`), and C-4 (only Antigravity gates 2.0); C-3 (plugins in this repository, one package per target, no workspaces, one deploy workflow) is decided; record the answers in `spec.md` (specs/036-core-and-plugin-targets/spec.md) ↪ done 2026-11-25: C-2 and C-4 confirmed as written; C-3 was already decided (spec.md)
 - **Verify:** `npm run typecheck` and `npm test` pass and `node dist/cli/index.js trace 036` shows every FR covered. ? unverified: T094 is a person task.
 - **Checkpoint:** feature complete except the person gates above.

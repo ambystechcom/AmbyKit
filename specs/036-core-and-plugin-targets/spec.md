@@ -182,5 +182,6 @@ both Antigravity harnesses move to a plugin. The rest are **assumed defaults, co
 - **C-4 The 2.0 gate.** The Antigravity plugin must be **published and install-tested** before the built-in Antigravity emitters are
   removed in 2.0. The long-tail targets (`gemini`, `llxprt`, `qwen`, `kilo`, `augment`, `windsurf`, `kiro`) follow the same rule but do
   not gate 2.0: if a plugin is not ready they stay built in with a deprecation notice that names the package that will replace them.
+- **Confirmed.** The owner confirmed C-2 (`pi` stays an alias of `codex`) and C-4 (only Antigravity gates 2.0) as written, 2026-11-25 (T094).
 - **C-5 What the code already has.** `src/core/moved-targets.ts` (`MOVED_TARGETS`, `movedTargetNotices`) already prints the install
   line from `sync` and `check` and deletes nothing, but only as a warning: FR-004's non-zero exit is new work.

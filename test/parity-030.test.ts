@@ -185,7 +185,11 @@ describe("a mixed project reads together (030, SC-005)", () => {
     for (const f of all.slice(0, Math.ceil(all.length / 2))) migrateProject(mixed, { feature: f });
     const a = await runCommand(new DashboardCommand(), v1, [], { json: true, overview: true });
     const b = await runCommand(new DashboardCommand(), mixed, [], { json: true, overview: true });
-    expect(normalize(b.out, mixed)).toBe(normalize(a.out, v1));
+    // Known and documented (as in SC-003 above): a migrated task's description no longer ends with its `(file/path)` group,
+    // so an open task of a migrated feature differs only there. Which features fall in the migrated half moves as specs are
+    // added, so the comparison must not depend on whether one of them has open tasks.
+    const noGroupJson = (s: string): string => s.replace(/(?: \([^()"\n]*\))+"/g, '"');
+    expect(noGroupJson(normalize(b.out, mixed))).toBe(noGroupJson(normalize(a.out, v1)));
     const report = analyzeProject(mixed);
     const reference = analyzeProject(v1);
     expect(report.total).toBe(reference.total);
