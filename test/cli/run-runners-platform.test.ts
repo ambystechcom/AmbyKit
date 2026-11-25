@@ -3,6 +3,7 @@ import { RunCommand } from "../../src/cli/run.js";
 import { gitProject } from "../helpers/git-repo.js";
 import { runCommand } from "../helpers/run-command.js";
 import { runner } from "../helpers/runner-registry-fixture.js";
+import { unverifiedRegistry } from "../helpers/run-fakes.js";
 
 /**
  * Feature 033 (US-2, FR-004, FR-005): `run --runners` and a refused lane say where and for which versions a runner was verified, and
@@ -42,7 +43,7 @@ describe("ambykit run --runners shows platforms and version ranges (feature 033)
   });
 
   it("033:FR-004: a runner with no record keeps the 1.6 listing text exactly", async () => {
-    const r = await runCommand(new RunCommand(), gitProject([F]), [], { runners: true });
+    const r = await runCommand(new RunCommand({ registry: unverifiedRegistry() }), gitProject([F]), [], { runners: true });
     // the claude runner reports usage since its JSON result is read (live check); the listing format is unchanged
     expect(r.out).toMatch(/ {2}claude {2}Claude Code {2}unverified {2}usage reported {2}not runnable/);
     expect(r.out).toMatch(/ {2}codex {2}Codex {2}unverified {2}usage not reported {2}not runnable/);

@@ -204,7 +204,7 @@ install (the manual tasks T044 and T045 of spec 028), with the CLI version recor
 
 | Runner | Command (prompt on stdin) | Exit behaviour | Reports usage | Status | Version |
 | --- | --- | --- | --- | --- | --- |
-| `claude` | `claude -p --permission-mode acceptEdits --allowedTools Bash(ambykit:*),PowerShell(ambykit:*) --output-format json` | 0 = finished its turn; non-zero, an error result or refused tools with tasks left open = failed | yes | unverified | — |
+| `claude` | `claude -p --permission-mode acceptEdits --allowedTools Bash(ambykit:*),PowerShell(ambykit:*) --output-format json` | 0 = finished its turn; non-zero, an error result or refused tools with tasks left open = failed | yes | verified | 2.1.332 |
 | `codex` | `codex exec -` | 0 = finished; non-zero = failed | no | unverified | — |
 
 The `claude` command was changed after a live check on Windows (claude 2.1.332): plain `claude -p` exited 0 having

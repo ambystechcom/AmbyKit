@@ -75,7 +75,11 @@ export const RUNNERS: RunnerSpec[] = [
     exit: "0 = finished its turn; non-zero, an error result or refused tools with tasks left open = failed",
     reportsUsage: true,
     readResult: parseClaudeResult,
-    verified: false,
+    // 033 T063: live check on Windows, signed off by the owner 2026-11-25 (specs/033-stable-run-and-plugin-api/verification/claude-windows.md).
+    verified: true,
+    verifiedVersion: "2.1.332",
+    verifiedOn: ["win32"],
+    verifiedRange: ">=2.1.332 <3.0.0",
     toVerify: "the permission flags let a lane edit its files and run `ambykit activity` (Bash and PowerShell), the JSON result's usage and failure fields, a failed turn's exit code",
   },
   {

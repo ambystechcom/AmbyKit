@@ -11,9 +11,23 @@ import { phase, tasksMd, type TaskDef } from "./tasks-fixture.js";
 export const FAKE_RUNNER = resolve(__dirname, "..", "fixtures", "fake-runner.mjs");
 
 /** Verified registry entries that run the fake runner instead of a real assistant. */
+/** The shipped runner shape without its live-check record (platforms, range), so a fake is the same on every OS. */
+function bareRunner(r: RunnerSpec): RunnerSpec {
+  const { verifiedOn: _on, verifiedRange: _range, verifiedVersion: _version, ...rest } = r;
+  return rest;
+}
+
+/**
+ * The shipped registry with every runner unverified, whatever the live records say: tests of the refusal path use it,
+ * so they do not depend on which runners have been verified, or on the OS the suite runs on.
+ */
+export function unverifiedRegistry(): RunnerSpec[] {
+  return RUNNERS.map((r) => ({ ...bareRunner(r), verified: false }));
+}
+
 export function fakeRegistry(ids: string[] = ["claude", "codex"], usage = false): RunnerSpec[] {
   return ids.map((id) => ({
-    ...(RUNNERS[0] as RunnerSpec),
+    ...bareRunner(RUNNERS[0] as RunnerSpec),
     id,
     label: id,
     verified: true,
