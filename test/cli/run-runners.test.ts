@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { RunCommand } from "../../src/cli/run.js";
 import { FAST_FAILURE_SECONDS, isImmediateFailure } from "../../src/core/run-supervise.js";
 import { gitProject } from "../helpers/git-repo.js";
-import { fakeRegistry } from "../helpers/run-fakes.js";
+import { fakeRegistry, unverifiedRegistry } from "../helpers/run-fakes.js";
 import { runCommand } from "../helpers/run-command.js";
 
 const F = "028-ambykit-run";
@@ -20,7 +20,7 @@ describe("ambykit run --runners (feature 028)", () => {
 
   it("028:SC-006: with no verified runner the runnable list is empty", async () => {
     const root = gitProject([F]);
-    const r = await runCommand(new RunCommand(), root, [], { runners: true, json: true });
+    const r = await runCommand(new RunCommand({ registry: unverifiedRegistry() }), root, [], { runners: true, json: true });
     const rows = JSON.parse(r.out) as { id: string; runnable: boolean }[];
     expect(rows.map((x) => x.id)).toEqual(["claude", "codex"]);
     expect(rows.some((x) => x.runnable)).toBe(false);

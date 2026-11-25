@@ -127,7 +127,7 @@ export interface BudgetFile {
   elapsedMs: number;
   /** Task events used: check-offs seen, plus restarts and fix rounds. */
   tasksUsed: number;
-  /** Tokens used, only for runners that report usage (none do at 1.6, so this stays absent). */
+  /** Tokens used, only for runners that report usage (input plus output tokens from each process's result). */
   tokensUsed?: number;
   /** Check-offs already counted, so a continued run does not count them twice. */
   counted: string[];

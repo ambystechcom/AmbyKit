@@ -46,8 +46,12 @@ describe("headless runner doc-sync (feature 028)", () => {
 
   it("028:SC-006: a row that says unverified is never runnable, and a verified row always records its version", () => {
     for (const row of rows()) {
-      const can = runnable(row.id);
-      expect(can.ok).toBe(row.status === "verified");
+      // A verified runner is runnable on the platforms its record lists (all of them when it lists none), so the check does not
+      // depend on the operating system the suite runs on.
+      const where = RUNNERS.find((r) => r.id === row.id)?.verifiedOn ?? (["linux", "darwin", "win32"] as NodeJS.Platform[]);
+      for (const platform of ["linux", "darwin", "win32"] as const) {
+        expect(runnable(row.id, { platform }).ok).toBe(row.status === "verified" && where.includes(platform));
+      }
       if (row.status === "verified") expect(row.version).not.toBe("—");
     }
   });

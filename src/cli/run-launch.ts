@@ -31,12 +31,18 @@ export function startJob(s: Session, rt: LaneRuntime, job: JobKind, opts: { find
   }
   const prompt =
     job === "worker"
-      ? lanePromptText(rt.ref, s.run, laneOpenTasks(rt.ref), opts.findings, runDirRel(s.root, s.run))
+      ? lanePromptText(rt.ref, s.run, laneOpenTasks(rt.ref), opts.findings, runDirRel(s.root, s.run), rt.assistant)
       : rolePromptText(s, rt, job);
   const file = writePromptFile(s.root, s.run, job === "worker" ? rt.file.lane : `${rt.file.lane}.${job}.${rt.round}`, prompt);
   const command = can.runner.invoke({ prompt, promptFile: file, ...(s.settings.workerModel ? { model: s.settings.workerModel } : {}) });
   try {
-    rt.handle = s.port.spawn({ exe: command.exe, args: command.args, cwd: rt.ref.root, ...(command.stdin !== undefined ? { stdin: command.stdin } : {}) });
+    rt.handle = s.port.spawn({
+      exe: command.exe,
+      args: command.args,
+      cwd: rt.ref.root,
+      ...(command.stdin !== undefined ? { stdin: command.stdin } : {}),
+      ...(can.runner.readResult ? { captureStdout: true } : {}),
+    });
   } catch (err) {
     rt.file.status = "failed";
     rt.file.reason = `could not start ${rt.assistant}: ${(err as Error).message}`;

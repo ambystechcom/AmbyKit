@@ -15,12 +15,19 @@ export interface SpawnSpec {
   env?: Record<string, string>;
   /** Written to the process's stdin, then closed. */
   stdin?: string;
+  /** Keep the process's stdout (its last `STDOUT_LIMIT` characters) and hand it back with the exit. */
+  captureStdout?: boolean;
 }
 
 export interface ExitInfo {
   code: number | null;
   signal: string | null;
+  /** The captured stdout, when the spawn asked for it. */
+  stdout?: string;
 }
+
+/** A result object is small; the cap only stops a runaway process from growing memory without bound. */
+export const STDOUT_LIMIT = 1_000_000;
 
 export interface ProcessHandle {
   pid: number | undefined;
@@ -67,15 +74,24 @@ export function windowsCommand(resolved: string, args: string[]): { exe: string;
 class NodeHandle implements ProcessHandle {
   private done = false;
   readonly exited: Promise<ExitInfo>;
-  constructor(private readonly child: ChildProcess) {
+  constructor(private readonly child: ChildProcess, capture = false) {
+    let out = "";
+    if (capture) {
+      child.stdout?.setEncoding("utf8");
+      child.stdout?.on("data", (d: string) => {
+        out += d;
+        if (out.length > STDOUT_LIMIT) out = out.slice(-STDOUT_LIMIT);
+      });
+    }
     this.exited = new Promise((resolve) => {
       child.once("error", () => {
         this.done = true;
         resolve({ code: 127, signal: null });
       });
-      child.once("exit", (code, signal) => {
+      // `close` comes after stdout has ended, so a captured result is complete; without capture `exit` is enough.
+      child.once(capture ? "close" : "exit", (code: number | null, signal: NodeJS.Signals | null) => {
         this.done = true;
-        resolve({ code, signal });
+        resolve({ code, signal, ...(capture ? { stdout: out } : {}) });
       });
     });
   }
@@ -106,13 +122,13 @@ export const nodeProcessPort: ProcessPort = {
     const child = spawn(resolved.exe, resolved.args, {
       cwd: spec.cwd,
       env: { ...process.env, ...(spec.env ?? {}) },
-      stdio: ["pipe", "ignore", "ignore"],
+      stdio: ["pipe", spec.captureStdout ? "pipe" : "ignore", "ignore"],
       windowsHide: true,
       windowsVerbatimArguments: resolved.verbatim,
     });
     child.stdin?.on("error", () => undefined);
     child.stdin?.end(spec.stdin ?? "");
-    return new NodeHandle(child);
+    return new NodeHandle(child, spec.captureStdout === true);
   },
   isAlive(pid) {
     try {
