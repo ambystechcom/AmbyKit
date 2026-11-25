@@ -15,6 +15,10 @@ export interface RunnerJob {
   /** The same prompt as a file under the run directory, for runners that take a file reference. */
   promptFile: string;
   model?: string;
+  /** Shell commands the job may run besides `ambykit` (`fleet.allowedCommands`); absent = the defaults. */
+  allowedCommands?: readonly string[];
+  /** Directories outside the job's working directory it must write to (a reviewer's verdict file in the run directory). */
+  addDirs?: readonly string[];
 }
 
 export interface RunnerCommand {
@@ -60,7 +64,19 @@ export interface RunnerSpec {
  * PowerShell on Windows); everything else stays denied. `--output-format json` ends the run with one JSON result that
  * carries usage, `is_error`, `subtype` and `permission_denials` (read by `src/core/run-result.ts`).
  */
-export const CLAUDE_ALLOWED_TOOLS = "Bash(ambykit:*),PowerShell(ambykit:*)";
+export const DEFAULT_ALLOWED_COMMANDS: readonly string[] = ["npm test", "npx vitest", "npm run typecheck"];
+
+/**
+ * The `--allowedTools` value: `ambykit` plus each allowed command, as a prefix rule on both shell tools. One
+ * comma-separated argument, so the multi-value flag cannot absorb the arguments after it.
+ */
+export function claudeAllowedTools(commands: readonly string[] = DEFAULT_ALLOWED_COMMANDS): string {
+  const all = ["ambykit", ...commands.map((c) => c.trim()).filter((c) => c.length > 0 && c !== "ambykit")];
+  return all.flatMap((c) => [`Bash(${c}:*)`, `PowerShell(${c}:*)`]).join(",");
+}
+
+/** The 1.6-to-2.0 value with no extra commands, kept for callers that need only the status reports. */
+export const CLAUDE_ALLOWED_TOOLS = claudeAllowedTools([]);
 
 export const RUNNERS: RunnerSpec[] = [
   {
@@ -69,7 +85,17 @@ export const RUNNERS: RunnerSpec[] = [
     executable: "claude",
     invoke: (job) => ({
       exe: "claude",
-      args: ["-p", "--permission-mode", "acceptEdits", "--allowedTools", CLAUDE_ALLOWED_TOOLS, "--output-format", "json", ...(job.model ? ["--model", job.model] : [])],
+      args: [
+        "-p",
+        "--permission-mode",
+        "acceptEdits",
+        "--allowedTools",
+        claudeAllowedTools(job.allowedCommands),
+        "--output-format",
+        "json",
+        ...(job.addDirs ?? []).flatMap((d) => ["--add-dir", d]),
+        ...(job.model ? ["--model", job.model] : []),
+      ],
       stdin: job.prompt,
     }),
     exit: "0 = finished its turn; non-zero, an error result or refused tools with tasks left open = failed",

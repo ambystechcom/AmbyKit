@@ -46,7 +46,15 @@ export interface PlanContext {
   assignment?: Map<string, string>;
 }
 
-export function lanePromptText(lane: LaneRef, run: string, open?: string[], findings?: string[], runDir?: string, assistant?: string): string {
+export function lanePromptText(
+  lane: LaneRef,
+  run: string,
+  open?: string[],
+  findings?: string[],
+  runDir?: string,
+  assistant?: string,
+  commands?: readonly string[],
+): string {
   return buildLanePrompt(
     { feature: lane.manifest.feature, lane: lane.name, phase: lane.manifest.phase, tasks: lane.manifest.tasks },
     {
@@ -57,6 +65,7 @@ export function lanePromptText(lane: LaneRef, run: string, open?: string[], find
       protocol: PROTOCOL,
       ...(runDir ? { runDir } : {}),
       ...(assistant ? { assistant } : {}),
+      ...(commands && commands.length > 0 ? { commands } : {}),
     },
   );
 }
@@ -67,11 +76,18 @@ export function buildLaunchPlan(ctx: PlanContext): LaunchEntry[] {
   const promptDir = ctx.promptDir ?? join(runDir(ctx.root, ctx.run), "prompts");
   const lanes = ctx.lanes.map((l) => {
     const assistant = assign.get(l.short) ?? ctx.assistants[0] ?? "claude";
-    return { lane: l.short, full: l.name, cwd: l.root, assistant, prompt: lanePromptText(l, ctx.run, undefined, undefined, undefined, assistant) };
+    return {
+      lane: l.short,
+      full: l.name,
+      cwd: l.root,
+      assistant,
+      prompt: lanePromptText(l, ctx.run, undefined, undefined, undefined, assistant, ctx.settings.allowedCommands),
+    };
   });
   return launchPlan(lanes, {
     promptFileFor: (lane) => join(promptDir, `${lane}.md`),
     registry: ctx.registry ?? RUNNERS,
     ...(ctx.settings.workerModel ? { model: ctx.settings.workerModel } : {}),
+    allowedCommands: ctx.settings.allowedCommands,
   });
 }

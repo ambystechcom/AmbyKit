@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { isAbsolute, join, resolve } from "node:path";
 import { RUNNERS, type RunnerSpec } from "../../src/core/runners.js";
 import type { ExitInfo, ProcessHandle, ProcessPort, SpawnSpec } from "../../src/cli/run-process.js";
 import { LaneCommand } from "../../src/cli/lane.js";
@@ -220,7 +220,8 @@ export function script(h: Pick<Harness, "port">, p: LaneProject, how: Script | (
     if (review) {
       const v = plan.verdict ?? "pass";
       if (v !== "none") {
-        const file = join(primaryRoot(p.root), review[1]!);
+        // the prompt names the run directory by its absolute path (the reviewer runs in the lane's checkout)
+        const file = isAbsolute(review[1]!) ? review[1]! : join(primaryRoot(p.root), review[1]!);
         mkdirSync(join(file, ".."), { recursive: true });
         writeFileSync(
           file,

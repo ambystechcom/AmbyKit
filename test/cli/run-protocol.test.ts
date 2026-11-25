@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { isAbsolute, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { readEvents, readLaneFile } from "../../src/cli/run-files.js";
 import { claimFiles, readClaims, readRun } from "../../src/core/fleet/index.js";
@@ -110,7 +110,7 @@ describe.skipIf(!HAS_GIT)("review loop as processes (feature 028)", () => {
     h.port.onSpawn = (proc) => {
       orig(proc);
       if (/reviewer:/.test(proc.spec.stdin ?? "")) {
-        const file = join(p.root, /Write your verdict to (\S+) as JSON/.exec(proc.spec.stdin ?? "")![1]!);
+        const file = /Write your verdict to (\S+) as JSON/.exec(proc.spec.stdin ?? "")![1]!; // absolute: the run directory
         require("node:fs").writeFileSync(file, "this is not json");
       }
     };
@@ -166,5 +166,42 @@ describe.skipIf(!HAS_GIT)("review loop as processes (feature 028)", () => {
     await h.step();
     await h.step();
     expect(h.port.starts.every((x) => !/reviewer:/.test(x.spec.stdin ?? ""))).toBe(true);
+  });
+});
+
+describe("reviewer verdicts and the lane checkout (the 2.0 dogfood)", () => {
+  it("028:FR-018: the reviewer prompt names the verdict file by its absolute path in the project's run directory", async () => {
+    const p = await preparedProject(F, 2, 1);
+    const h = harness(p, { review: true, assistants: ["claude"] });
+    const prompts: string[] = [];
+    script(h, p, (_cwd, prompt) => (prompts.push(prompt), { work: true, verdict: "pass" }));
+    await until(h, (o) => o !== null);
+    const review = prompts.find((x) => /reviewer:/.test(x))!;
+    const path = /Write your verdict to (\S+) as JSON/.exec(review)![1]!;
+    expect(isAbsolute(path)).toBe(true);
+    expect(path.replace(/\\/g, "/")).toContain(`${p.root.replace(/\\/g, "/")}/.amby/fleet/`);
+  });
+
+  it("028:FR-018: a verdict a reviewer wrote inside the lane checkout (a relative path) is still read", async () => {
+    const p = await preparedProject(F, 2, 1);
+    const h = harness(p, { review: true, assistants: ["claude"] });
+    script(h, p, { work: true, verdict: "none" });
+    const orig = h.port.onSpawn!;
+    h.port.onSpawn = (proc) => {
+      const prompt = proc.spec.stdin ?? "";
+      if (/reviewer:/.test(prompt)) {
+        // what the dogfood's reviewer did: the run-relative path, written under the lane's own checkout
+        const abs = /Write your verdict to (\S+) as JSON/.exec(prompt)![1]!.replace(/\\/g, "/");
+        const rel = abs.slice(abs.indexOf(".amby/fleet/"));
+        const file = join(proc.spec.cwd, rel);
+        require("node:fs").mkdirSync(join(file, ".."), { recursive: true });
+        require("node:fs").writeFileSync(file, JSON.stringify({ verdict: "pass", findings: [] }));
+        proc.finish(0);
+        return;
+      }
+      orig(proc);
+    };
+    const out = await until(h, (o) => o !== null);
+    expect(out).toMatchObject({ kind: "done" });
   });
 });

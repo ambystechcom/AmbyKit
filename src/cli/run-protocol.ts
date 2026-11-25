@@ -1,6 +1,6 @@
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
-import { parseVerdict, readRun, runDir, updateRun } from "../core/fleet/index.js";
+import { existsSync, mkdirSync, readFileSync, renameSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { parseVerdict, readRun, runDir, runDirRel, updateRun } from "../core/fleet/index.js";
 import { escalate } from "../core/run-gate-actions.js";
 import { reviewStep } from "../core/run-review.js";
 import { addTaskEvents } from "./run-budget.js";
@@ -45,6 +45,23 @@ function recordStage(s: Session, rt: LaneRuntime): void {
   updateRun(s.root, s.run, { stage: rt.stage ?? "working", round: rt.round });
 }
 
+/**
+ * Where the reviewer's verdict is: the run directory (the prompt gives its absolute path), or, when a reviewer wrote the
+ * same relative path inside the lane's checkout it runs in, that copy (the 2.0 dogfood: a relative path in the prompt
+ * made every verdict land in the lane, and the run reported "no verdict"). A copy in the lane is moved into the run
+ * directory, so the lane's checkout stays clean and can merge. Null when neither exists.
+ */
+export function verdictLocation(s: Session, rt: LaneRuntime, role: "qa" | "architect"): string | null {
+  const name = verdictFile(rt, role, rt.round);
+  const main = join(runDir(s.root, s.run), name);
+  if (existsSync(main)) return main;
+  const inLane = join(rt.ref.root, runDirRel(s.root, s.run), name);
+  if (!existsSync(inLane)) return null;
+  mkdirSync(dirname(main), { recursive: true });
+  renameSync(inLane, main);
+  return main;
+}
+
 function judge(s: Session, rt: LaneRuntime): void {
   if (s.stopReason) {
     // the reviewer was stopped, not finished: review this lane again when the run is continued
@@ -57,8 +74,8 @@ function judge(s: Session, rt: LaneRuntime): void {
   }
   const role = rt.stage ?? "qa";
   const limit = readRun(s.root, s.run)?.limit || s.settings.roundLimit;
-  const path = join(runDir(s.root, s.run), verdictFile(rt, role, rt.round));
-  const verdict = existsSync(path) ? parseVerdict(readFileSync(path, "utf8")) : null;
+  const path = verdictLocation(s, rt, role);
+  const verdict = path ? parseVerdict(readFileSync(path, "utf8")) : null;
   const step = reviewStep({ stage: role, round: rt.round, failedRounds: rt.file.failedRounds ?? 0, limit, reviewerDone: true, verdict });
   delete rt.exit;
   delete rt.handle;
