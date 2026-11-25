@@ -46,7 +46,7 @@ export const PLANNED_DEPRECATED_TARGETS: Readonly<Record<string, DeprecatedTarge
  * target that still works. Task T050 removes the built-in Antigravity emitters from `TARGETS`, flips this to `true` in the same
  * commit, and updates the pinned test (test/plugins/moved-switch.test.ts). Nothing else reads this constant.
  */
-export const SPLIT_ACTIVE = false;
+export const SPLIT_ACTIVE = true;
 
 /** What the commands consult. Empty until the switch is on; tests add entries to exercise the mechanism. */
 export const MOVED_TARGETS: Record<string, MovedTarget> = SPLIT_ACTIVE ? { ...PLANNED_MOVED_TARGETS } : {};

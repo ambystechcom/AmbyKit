@@ -26,19 +26,24 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const pluginPackage = JSON.parse(readFileSync(join(ROOT, "plugins", "antigravity", "package.json"), "utf8")) as { name: string; version: string };
 
 describe("the split switch (036:FR-001, FR-002)", () => {
-  it("036:FR-002: it is off while core still bundles the Antigravity emitters, so nothing has moved yet (T050 flips it)", () => {
-    expect(SPLIT_ACTIVE).toBe(false);
-    expect(MOVED_TARGETS).toEqual({});
-    expect(DEPRECATED_TARGETS).toEqual({});
-    expect(TARGETS.map((t) => t.id)).toContain("antigravity");
-    expect(TARGETS.map((t) => t.id)).toContain("antigravity-cli");
+  it("036:FR-002: it is on: the Antigravity emitters are gone from the registry and both ids are moved, the long tail deprecated", () => {
+    expect(SPLIT_ACTIVE).toBe(true);
+    expect(MOVED_TARGETS).toEqual(PLANNED_MOVED_TARGETS);
+    expect(DEPRECATED_TARGETS).toEqual(PLANNED_DEPRECATED_TARGETS);
+    expect(TARGETS.map((t) => t.id)).not.toContain("antigravity");
+    expect(TARGETS.map((t) => t.id)).not.toContain("antigravity-cli");
+    expect(TARGETS.map((t) => t.id).sort()).toEqual(
+      ["claude", "claude-vscode", "codex", "copilot", "copilot-cli", "cursor", "cursor-cli", "opencode", "pi", ...Object.keys(PLANNED_DEPRECATED_TARGETS)].sort(),
+    );
   });
 
-  it("036:FR-002: with the switch off every bundled target is built in and the commands have nothing to say", () => {
-    for (const t of TARGETS) expect(targetStatus(t.id), t.id).toEqual({ state: "built-in" });
-    expect(movedTargetRefusals(["antigravity", "gemini", "claude"], () => true)).toEqual([]);
-    expect(movedTargetChoices(() => false)).toEqual([]);
-    expect(deprecatedTargetNotices(["gemini", "kiro"])).toEqual([]);
+  it("036:FR-002: every registered target is built in or deprecated, and a moved id with no plugin is refused", () => {
+    for (const t of TARGETS) expect(targetStatus(t.id).state, t.id).toBe(t.id in PLANNED_DEPRECATED_TARGETS ? "deprecated" : "built-in");
+    const refusals = movedTargetRefusals(["antigravity", "gemini", "claude"], () => false);
+    expect(refusals).toHaveLength(1);
+    expect(refusals[0]).toContain("@ambystech/ambykit-emitter-antigravity");
+    expect(movedTargetChoices(() => false).map((c) => c.value).sort()).toEqual(["antigravity", "antigravity-cli"]);
+    expect(deprecatedTargetNotices(["gemini", "kiro"])).toHaveLength(2);
   });
 });
 

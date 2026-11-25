@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { AddCommand } from "../../src/cli/add.js";
 import { InitCommand } from "../../src/cli/init.js";
 import { SyncCommand } from "../../src/cli/sync.js";
@@ -30,10 +30,19 @@ const project = (tools: string[]): string => {
 };
 const configOf = (root: string): string => readFileSync(join(root, ".amby", "config.json"), "utf8");
 
+// The real 2.0 table (Antigravity moved, the long tail deprecated) is switched on; these tests exercise the mechanism with their own
+// stand-in entries, so each starts from an empty table and the real one is put back afterwards.
+const REAL_MOVED = { ...MOVED_TARGETS };
+const REAL_DEPRECATED = { ...DEPRECATED_TARGETS };
+beforeEach(() => {
+  for (const id of Object.keys(MOVED_TARGETS)) delete MOVED_TARGETS[id];
+  for (const id of Object.keys(DEPRECATED_TARGETS)) delete DEPRECATED_TARGETS[id];
+});
 afterEach(() => {
-  delete MOVED_TARGETS["gone-a"];
-  delete MOVED_TARGETS["skills-target"];
-  for (const id of Object.keys(PLANNED_DEPRECATED_TARGETS)) delete DEPRECATED_TARGETS[id];
+  for (const id of Object.keys(MOVED_TARGETS)) delete MOVED_TARGETS[id];
+  for (const id of Object.keys(DEPRECATED_TARGETS)) delete DEPRECATED_TARGETS[id];
+  Object.assign(MOVED_TARGETS, REAL_MOVED);
+  Object.assign(DEPRECATED_TARGETS, REAL_DEPRECATED);
 });
 
 describe("the tool pickers (036:FR-010)", () => {

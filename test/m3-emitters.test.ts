@@ -2,8 +2,6 @@ import { describe, expect, it } from "vitest";
 import { OpenCodeEmitter } from "../src/emitters/opencode.js";
 import { CursorEmitter } from "../src/emitters/cursor.js";
 import { CursorCliEmitter } from "../src/emitters/cursor-cli.js";
-import { AntigravityEmitter } from "../src/emitters/antigravity.js";
-import { AntigravityCliEmitter } from "../src/emitters/antigravity-cli.js";
 import { CodexEmitter } from "../src/emitters/codex.js";
 import type { CommandSpec, RulesContext } from "../src/core/types.js";
 
@@ -51,26 +49,6 @@ describe("CursorCliEmitter (surface: none)", () => {
     const files = new CursorCliEmitter().emit([spec], ctx(true));
     expect(files.every((f) => !f.path.includes("/commands/"))).toBe(true);
     expect(files.find((f) => f.path.endsWith(".mdc"))).toBeDefined();
-  });
-});
-
-describe("AntigravityEmitter (surface: skills, feature 018)", () => {
-  it("emits a skill at .agents/skills/<name>/SKILL.md with name + description frontmatter", () => {
-    const file = new AntigravityEmitter().emit([spec], ctx(false))[0]!;
-    expect(file.path).toBe(".agents/skills/amby-specify/SKILL.md");
-    expect(file.contents).toContain("name: amby-specify");
-    expect(file.contents).toContain('description: "Turn a feature idea into a spec."');
-    expect(file.contents).not.toContain("agent:");
-    expect(file.contents).not.toContain("$ARGUMENTS");
-  });
-});
-
-describe("AntigravityCliEmitter", () => {
-  it("reuses the IDE emitter's skill output", () => {
-    const ide = new AntigravityEmitter().emit([spec], ctx(false))[0]!;
-    const cli = new AntigravityCliEmitter().emit([spec], ctx(false))[0]!;
-    expect(cli.path).toBe(ide.path);
-    expect(cli.contents).toBe(ide.contents);
   });
 });
 

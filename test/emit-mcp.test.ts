@@ -1,19 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { buildEmittedFiles, mcpUnwritten } from "../src/core/emit.js";
-import { TARGETS } from "../src/emitters/index.js";
+import { standInRegistry } from "./helpers/antigravity-standin.js";
 import { tempProject } from "./helpers/emit-target.js";
 
-const ALL = TARGETS.map((t) => t.id);
+// Every built-in target plus the Antigravity stand-in (a plugin since 2.0, feature 036), through one registry.
+const ALL = standInRegistry.targets.map((t) => t.id);
 const config = (tools: string[], mcp?: { enabled: boolean }) => ({ version: "0.0.0", tools, ...(mcp ? { mcp } : {}) });
 const jsonFiles = (tools: string[], mcp?: { enabled: boolean }) =>
-  buildEmittedFiles(tempProject(), config(tools, mcp)).filter((f) => f.merge === "json");
+  buildEmittedFiles(tempProject(), config(tools, mcp), standInRegistry).filter((f) => f.merge === "json");
 
 describe("MCP emission is opt-in and per tool (feature 025)", () => {
   it("025:FR-017: without mcp.enabled no target emits anything MCP, and the output is the same as before", () => {
     expect(jsonFiles(ALL)).toEqual([]);
     expect(jsonFiles(ALL, { enabled: false })).toEqual([]);
-    const off = buildEmittedFiles(tempProject(), config(ALL));
-    const explicitOff = buildEmittedFiles(tempProject(), config(ALL, { enabled: false }));
+    const off = buildEmittedFiles(tempProject(), config(ALL), standInRegistry);
+    const explicitOff = buildEmittedFiles(tempProject(), config(ALL, { enabled: false }), standInRegistry);
     expect(explicitOff.map((f) => [f.path, f.contents])).toEqual(off.map((f) => [f.path, f.contents]));
   });
 
@@ -39,7 +40,7 @@ describe("MCP emission is opt-in and per tool (feature 025)", () => {
   });
 
   it("025:FR-018: mcpUnwritten names each enabled target with no verified format, and the reason", () => {
-    const gaps = mcpUnwritten(config(["claude", "opencode", "codex", "antigravity", "antigravity-cli"], { enabled: true }));
+    const gaps = mcpUnwritten(config(["claude", "opencode", "codex", "antigravity", "antigravity-cli"], { enabled: true }), standInRegistry);
     expect(gaps.map((g) => g.tool).sort()).toEqual(["antigravity", "codex", "opencode"]);
     expect(gaps.every((g) => g.reason.length > 10)).toBe(true);
     expect(mcpUnwritten(config(["claude", "opencode"]))).toEqual([]); // disabled: nothing to say
@@ -48,7 +49,7 @@ describe("MCP emission is opt-in and per tool (feature 025)", () => {
   it("025:FR-018: every target is either verified (a file) or has a stated reason, never both, never neither", () => {
     for (const id of ALL) {
       const files = jsonFiles([id], { enabled: true });
-      const gaps = mcpUnwritten(config([id], { enabled: true }));
+      const gaps = mcpUnwritten(config([id], { enabled: true }), standInRegistry);
       expect(files.length > 0 !== gaps.length > 0, id).toBe(true);
     }
   });

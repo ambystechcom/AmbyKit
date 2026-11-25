@@ -9,12 +9,14 @@ vi.mock("../../src/plugins/loader.js", () => {
 
 import { SyncCommand } from "../../src/cli/sync.js";
 import { buildEmittedFiles } from "../../src/core/emit.js";
+import { PLANNED_DEPRECATED_TARGETS } from "../../src/core/moved-targets.js";
 import { TARGETS } from "../../src/emitters/index.js";
 import { loadPluginSession } from "../../src/plugins/session.js";
 import { pluginProject } from "../helpers/plugin-project.js";
 import { runCommand } from "../helpers/run-command.js";
 
-const ALL = TARGETS.map((t) => t.id);
+// The built-in targets that are not announced as moving (a deprecation notice names a plugin package, which is not what this test is about).
+const ALL = TARGETS.map((t) => t.id).filter((id) => !(id in PLANNED_DEPRECATED_TARGETS));
 const text = (r: { out: string; err: string }) => `${r.out}\n${r.err}`;
 
 describe("projects with no plugins are unchanged (feature 027, US-8)", () => {

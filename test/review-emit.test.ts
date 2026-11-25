@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadCommandSpecs } from "../src/core/command-spec.js";
 import {
-  AntigravityCliEmitter,
-  AntigravityEmitter,
   ClaudeEmitter,
   CodexEmitter,
   CopilotCliEmitter,
@@ -38,8 +36,6 @@ describe("review command (feature 013)", () => {
       new OpenCodeEmitter(),
       new CursorEmitter(),
       new CursorCliEmitter(),
-      new AntigravityEmitter(),
-      new AntigravityCliEmitter(),
       new CodexEmitter(),
     ]) {
       const has = emitter.emit(specs, ctx).some((f) => /review/.test(f.path));

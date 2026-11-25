@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadCommandSpecs } from "../src/core/command-spec.js";
 import {
-  AntigravityCliEmitter,
-  AntigravityEmitter,
   ClaudeEmitter,
   CodexEmitter,
   CopilotCliEmitter,
@@ -36,8 +34,6 @@ describe("converge command (feature 011)", () => {
       new OpenCodeEmitter(),
       new CursorEmitter(),
       new CursorCliEmitter(),
-      new AntigravityEmitter(),
-      new AntigravityCliEmitter(),
       new CodexEmitter(),
     ];
     for (const emitter of emitters) {

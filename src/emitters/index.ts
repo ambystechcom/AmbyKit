@@ -5,8 +5,6 @@ import { CopilotCliEmitter } from "./copilot-cli.js";
 import { OpenCodeEmitter } from "./opencode.js";
 import { CursorEmitter } from "./cursor.js";
 import { CursorCliEmitter } from "./cursor-cli.js";
-import { AntigravityEmitter } from "./antigravity.js";
-import { AntigravityCliEmitter } from "./antigravity-cli.js";
 import { CodexEmitter } from "./codex.js";
 import { GeminiEmitter } from "./gemini.js";
 import { LlxprtEmitter } from "./llxprt.js";
@@ -23,8 +21,6 @@ export { CopilotCliEmitter } from "./copilot-cli.js";
 export { OpenCodeEmitter } from "./opencode.js";
 export { CursorEmitter } from "./cursor.js";
 export { CursorCliEmitter } from "./cursor-cli.js";
-export { AntigravityEmitter } from "./antigravity.js";
-export { AntigravityCliEmitter } from "./antigravity-cli.js";
 export { CodexEmitter } from "./codex.js";
 export { GeminiEmitter } from "./gemini.js";
 export { LlxprtEmitter } from "./llxprt.js";
@@ -53,8 +49,6 @@ const copilotCli = new CopilotCliEmitter();
 const opencode = new OpenCodeEmitter();
 const cursor = new CursorEmitter();
 const cursorCli = new CursorCliEmitter();
-const antigravity = new AntigravityEmitter();
-const antigravityCli = new AntigravityCliEmitter();
 const codex = new CodexEmitter();
 const gemini = new GeminiEmitter();
 const llxprt = new LlxprtEmitter();
@@ -76,8 +70,6 @@ export const TARGETS: TargetDef[] = [
   { id: "opencode", displayName: "OpenCode", emitter: opencode },
   { id: "cursor", displayName: "Cursor", emitter: cursor },
   { id: "cursor-cli", displayName: "Cursor CLI", emitter: cursorCli },
-  { id: "antigravity", displayName: "Antigravity (IDE)", emitter: antigravity },
-  { id: "antigravity-cli", displayName: "Antigravity CLI", emitter: antigravityCli },
   { id: "codex", displayName: "Codex CLI", emitter: codex },
   { id: "gemini", displayName: "Gemini CLI", emitter: gemini },
   { id: "llxprt", displayName: "LLxprt Code", emitter: llxprt },
@@ -103,9 +95,7 @@ export function getTarget(id: string, source?: TargetSource): TargetDef | undefi
 
 /**
  * Targets whose emitters write the same command directory share its output files (feature 016,
- * FR-007; by directory since 018, so Antigravity and Codex, which are separate emitters, list as
  * co-owners): one entry per directory with two or more configured owners, e.g. `pi` + `codex` +
- * `antigravity` → `.agents/skills`. Files are written once; removing one owner leaves them for the rest.
  */
 export function sharedOutputs(ids: string[], source?: TargetSource): { dir: string; owners: string[] }[] {
   const byDir = new Map<string, { dir: string; owners: string[] }>();

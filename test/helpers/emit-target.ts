@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildEmittedFiles } from "../../src/core/emit.js";
 import type { EmittedFile } from "../../src/core/types.js";
+import type { TargetRegistry } from "../../src/plugins/registry.js";
 
 /** Two fixed roles so persona files are covered too (feature 013). */
 const ROLES: Record<string, string> = {
@@ -26,9 +27,9 @@ export function tempProject(opts: EmitOptions = {}): string {
 }
 
 /** The files emitted for `tools`, as a path → contents map (insertion order = emit order). */
-export function emitFiles(tools: string[], opts: EmitOptions = {}): EmittedFile[] {
+export function emitFiles(tools: string[], opts: EmitOptions = {}, registry?: TargetRegistry): EmittedFile[] {
   const root = tempProject(opts);
-  return buildEmittedFiles(root, { version: "0.0.0", tools, manageRules: opts.manageRules ?? true });
+  return buildEmittedFiles(root, { version: "0.0.0", tools, manageRules: opts.manageRules ?? true }, registry);
 }
 
 /** `emitFiles` as a path → contents record, sorted by path for stable comparison. */

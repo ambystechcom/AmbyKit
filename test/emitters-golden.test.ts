@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { emitTarget } from "./helpers/emit-target.js";
 
 /**
- * Golden output of the ten pre-existing targets (feature 016, FR-010 / SC-004). Recorded before the
+ * Golden output of the pre-existing built-in targets (feature 016, FR-010 / SC-004). Recorded before the
  * emitter refactor; every later change must leave these files byte-identical. To re-record after an
  * intentional change to a neutral prompt: `UPDATE_GOLDEN=1 npx vitest run test/emitters-golden.test.ts`.
  */
@@ -18,8 +18,6 @@ const EXISTING = [
   "opencode",
   "cursor",
   "cursor-cli",
-  "antigravity",
-  "antigravity-cli",
   "codex",
 ];
 

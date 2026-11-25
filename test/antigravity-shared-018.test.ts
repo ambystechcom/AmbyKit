@@ -1,11 +1,11 @@
-import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { CheckCommand } from "../src/cli/check.js";
 import { SyncCommand } from "../src/cli/sync.js";
 import { buildEmittedFiles } from "../src/core/emit.js";
-import { emitFiles } from "./helpers/emit-target.js";
+import { STANDIN, emitFilesWithStandIn as emitFiles } from "./helpers/antigravity-standin.js";
+import { pluginProject } from "./helpers/plugin-project.js";
 import { runCommand } from "./helpers/run-command.js";
 
 /** Antigravity sharing `.agents/skills/` with Codex and Pi (feature 018, US-3). */
@@ -14,10 +14,7 @@ const SPECIFY = ".agents/skills/amby-specify/SKILL.md";
 const contents = (tools: string[]): string => emitFiles(tools).find((f) => f.path === SPECIFY)!.contents;
 
 function project(tools: string[]): string {
-  const root = mkdtempSync(join(tmpdir(), "ambykit-shared-"));
-  mkdirSync(join(root, ".amby"), { recursive: true });
-  writeFileSync(join(root, ".amby", "config.json"), JSON.stringify({ version: "0.0.0", tools, manageRules: false }));
-  return root;
+  return pluginProject({ tools, plugins: { [STANDIN]: "1.0.0" }, config: { manageRules: false } });
 }
 
 describe("shared skills output", () => {
