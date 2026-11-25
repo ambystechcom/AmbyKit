@@ -20,10 +20,12 @@ One record per runner and operating system, in `specs/033-stable-run-and-plugin-
 For each of `claude` and `codex`, on each OS you vouch for:
 
 1. `ambykit run --runners` shows the runner, the version it found and `unverified`.
-2. Prepare a small feature with tasks, then `ambykit run <feature> --emit-script > run.sh` (or `.ps1`) and read the command it would run.
-   `ambykit run` itself refuses an unverified runner, so the live check is this script.
-3. Run the script yourself and note: the invocation (on Windows, the `.cmd` shim), how the prompt was delivered,
-   the exit code of a finished turn and of a failed one, whether usage was reported.
+2. In a scratch project, prepare a small feature with `[P]` tasks, then `ambykit worktree <feature>` and `ambykit lane <feature>`.
+   `ambykit run` and `--emit-script` both refuse an unverified runner, so the live check runs the runner's own command
+   (`RUNNERS[...].invoke` in `src/core/runners.ts`) in a lane directory with the lane prompt `lanePromptText` builds, on stdin.
+3. Note: the invocation (on Windows, whether it is `claude.exe` or a `.cmd` shim), how the prompt was delivered, the exit code of a
+   finished turn and of a failed one, whether usage was reported, and **whether the edits and the `ambykit activity` reports
+   happened** (exit 0 alone does not prove the lane did its work).
 4. Write the record, then in `src/core/runners.ts` set `verified: true`, `verifiedOn` (Node names: `linux`, `darwin`, `win32`),
    `verifiedVersion` and `verifiedRange`. `test/core/runner-records.test.ts` fails if a record is missing or incomplete.
 5. Update the runner row in `docs/tool-compatibility.md`.
