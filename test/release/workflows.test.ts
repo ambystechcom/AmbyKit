@@ -60,3 +60,21 @@ describe("publish (034, US-4, US-6)", () => {
     expect(gate).toBeGreaterThan(publish.indexOf("name: Build"));
   });
 });
+
+describe("specs-only changes (034, US-4)", () => {
+  const specs = wf("specs.yml");
+  const on = (w: string): string => w.slice(w.indexOf("\non:"), w.indexOf("\npermissions:") > 0 ? w.indexOf("\npermissions:") : w.indexOf("\njobs:"));
+
+  it("034:FR-007: the full matrix skips a change that touches only specs/, on push and on pull requests", () => {
+    expect(on(ci)).toMatch(/push:\n\s+branches: \[main\]\n\s+paths-ignore:\n\s+- "specs\/\*\*"/);
+    expect(on(ci)).toMatch(/pull_request:\n\s+paths-ignore:\n\s+- "specs\/\*\*"/);
+  });
+
+  it("034:FR-007: such a change still builds, runs analyze and the full test suite on Linux and Node 22", () => {
+    expect(on(specs)).toMatch(/push:\n\s+branches: \[main\]\n\s+paths:\n\s+- "specs\/\*\*"/);
+    expect(on(specs)).toMatch(/pull_request:\n\s+paths:\n\s+- "specs\/\*\*"/);
+    expect(specs).toContain("runs-on: ubuntu-latest");
+    expect(specs).toContain("node-version: 22");
+    for (const step of ["npm ci", "npm run build", "dist/cli/index.js analyze", "npm test"]) expect(specs).toContain(step);
+  });
+});
