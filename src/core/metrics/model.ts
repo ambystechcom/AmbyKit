@@ -4,9 +4,10 @@ import type { FeatureHistory, RevisionModel } from "./types.js";
 /**
  * What the metrics learn from one historical revision, read through spec 030's per-file reader (026:D-9, 032:FR-019),
  * so a 1.x revision and a 2.x revision of the same file give the same answer. History is always readable: the reader
- * is given a version below the 1.x refusal, because an old revision is data, not a file this run would write.
+ * keeps reading 1.x whatever `LEGACY_READING` says, because an old revision is data, not a file this run would write
+ * (035 decision D-2: history from before the migration is kept).
  */
-const HISTORY_VERSION = "2.0.0";
+const HISTORY_READING = "on" as const;
 
 /** A task line that closes a requirement is a gap task appended by `/amby.converge` (`(closes FR-###)`). */
 const GAP = /\(closes\s+(?:FR|SC)-\d+/i;
@@ -50,11 +51,11 @@ export function modelHistory(h: FeatureHistory, read: Reader = readRevisionModel
 export function readRevisionModel(kind: RevisionKind, text: string, feature = "feature"): RevisionModel {
   try {
     if (kind === "spec") {
-      const spec = readSpec(feature, text, { version: HISTORY_VERSION });
+      const spec = readSpec(feature, text, { legacyReading: HISTORY_READING });
       if (spec.issues.some((i) => i.severity === "error")) return { unreadable: true };
       return { status: spec.meta.status, requirements: (text.match(REQUIREMENT) ?? []).length };
     }
-    const read = readTasks(text, { version: HISTORY_VERSION });
+    const read = readTasks(text, { legacyReading: HISTORY_READING });
     if (read.issues.some((i) => i.severity === "error")) return { unreadable: true };
     const gap = read.tasks.filter((t) => GAP.test(t.description));
     return {
