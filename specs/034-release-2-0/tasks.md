@@ -69,9 +69,9 @@ created: 2026-11-24
 
 ## Phase 8 — User story US-7  (priority: P2)
 
-- [ ] [T070] [P] [US7] Label test: no unqualified "experimental" on `ambykit run` or the plugin API when `RUN_STABILITY` is `"stable"`; when it is `"experimental"` the only label left is the one 033 emits, and the changelog says so (per D-5); README, `docs/` and `site/src/content/docs` say 1.x is supported until 2.1 — 034:FR-012 (test/release/stable-labels.test.ts)
-- [ ] [T071] [US7] Sweep README, docs and site per the T001 inventory: describe format v2 as the format, mention 1.x only as supported until 2.1, drop the labels the outcome of 033 T072 allows — 034:FR-012 (README.md, docs/, site/src/content/docs/)
-- [ ] [T072] [US7] `node scripts/check-docs-sync.mjs` passes and the CLI reference matches `ambykit --help` — 034:FR-012 (docs/cli-reference.md, scripts/check-docs-sync.mjs)
+- [x] [T070] [P] [US7] Label test: no unqualified "experimental" on `ambykit run` or the plugin API when `RUN_STABILITY` is `"stable"`; when it is `"experimental"` the only label left is the one 033 emits, and the changelog says so (per D-5); README, `docs/` and `site/src/content/docs` say 1.x is supported until 2.1 — 034:FR-012 (test/release/stable-labels.test.ts)
+- [x] [T071] [US7] Sweep README, docs and site per the T001 inventory: describe format v2 as the format, mention 1.x only as supported until 2.1, drop the labels the outcome of 033 T072 allows — 034:FR-012 (README.md, docs/, site/src/content/docs/) ↪ DEVIATION: with `RUN_STABILITY` still `"experimental"` (D-5) the `run` labels stay; "Experimental in 1.6" became "Experimental until one fleet has built two dependent features with a verified runner" (docs/cli-reference.md, site CLI page); the tool-compatibility heading now ends with the same `(experimental)` label 033 emits; README and the site's migrate entry say 1.x is read until 2.1; AGENTS.md's structure map no longer calls the plugin API experimental. When 033 T072 flips the constant, `test/release/stable-labels.test.ts` lists every label left to drop
+- [x] [T072] [US7] `node scripts/check-docs-sync.mjs` passes and the CLI reference matches `ambykit --help` — 034:FR-012 (docs/cli-reference.md, scripts/check-docs-sync.mjs) ↪ DEVIATION: `check-docs-sync` passes (13 phases, 19 verbs, 16 targets) and `sync --check` is clean; no prompt or template changed, so no sync run was needed
 - **Verify:** `npx vitest run test/release/stable-labels.test.ts` and `node scripts/check-docs-sync.mjs` pass.
 
 ## Phase 9 — Release  (integration, person-run, only after Phases 1 to 8)

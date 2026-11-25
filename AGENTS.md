@@ -37,7 +37,7 @@ prompts) is translated by per-tool **emitters** into each assistant's native com
 src/cli/         BaseCommand + activity/add/analyze/check/dashboard/directive/edit/fleet/graph/init/lane/mcp/migrate/restore/run/sync/trace/update/worktree + registry
 src/core/        CommandSpec model, template loader, feature-dir/numbering, dependency graph
 src/emitters/    BaseEmitter + per-tool subclasses + registry (target→emitter map)
-src/plugins/     emitter plugin API, loader, registry (experimental); src/testkit/ = published contract kit
+src/plugins/     emitter plugin API (stable from 2.0), loader, registry; src/testkit/ = published contract kit
 src/templates/   neutral artifact templates (constitution, spec, ui, design-tokens, plan, tasks)
 src/prompts/     neutral phase CommandSpecs (constitution → implement)
 .claude/commands/amby.*.md   generated Claude Code commands (from src/prompts/) — do not hand-edit
