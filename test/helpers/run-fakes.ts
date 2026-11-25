@@ -111,6 +111,7 @@ import { mkdirSync } from "node:fs";
 import { bootstrapRun, readLaneFile, writeLaneFile, type LaneFile } from "../../src/cli/run-files.js";
 import { Supervisor } from "../../src/cli/run-loop.js";
 import { preparedLanes } from "../../src/cli/run.js";
+import { stagePreparer } from "../../src/cli/run-stages.js";
 import type { LaneRuntime, Session } from "../../src/cli/run-session.js";
 import { fleetSettings, loadConfig, type FleetSettings } from "../../src/core/config.js";
 import { resolveBudgets, type Budgets } from "../../src/core/run-supervise.js";
@@ -136,6 +137,8 @@ export interface HarnessOptions {
   budgets?: Partial<Budgets>;
   usage?: boolean;
   unattended?: boolean;
+  /** Prepare each next stage after a merge, as `ambykit run` does (sequential tasks included). */
+  stages?: boolean;
 }
 
 export const flush = (): Promise<void> => new Promise((r) => setImmediate(r));
@@ -179,6 +182,7 @@ export function harness(p: LaneProject, opts: HarnessOptions = {}): Harness {
     lanes: runtimes,
     unattended: opts.unattended ?? false,
     reportsUsage: opts.usage ?? false,
+    ...(opts.stages ? { prepareNext: stagePreparer(root, feature, { lanes: 2, assistants }) } : {}),
   };
   const sup = new Supervisor(s, opts.review ?? false);
   return {

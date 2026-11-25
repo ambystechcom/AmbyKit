@@ -177,6 +177,55 @@ export function planLanes(
   return { ...base, status: "planned", lanes, stays };
 }
 
+// ── Stages: every open task, in order (the 2.0 dogfood) ────────────────────────────────────────
+
+/**
+ * What runs next for a feature (`ambykit run`, `ambykit lane --next`). `planLanes` only lanes `[P]` tasks, so a run
+ * built from it skipped every sequential task (the 2.0 dogfood: 037's Phase 1 and T010 never ran and Phase 2's lanes
+ * started anyway). A stage is the next run of consecutive open tasks of the lowest phase that has open tasks, in
+ * `tasks.md` order: consecutive non-`[P]` tasks form a `serial` stage (one lane, one worker, tasks in order);
+ * consecutive `[P]` tasks form a `parallel` stage (round-robin into up to `lanes` lanes). The next stage is planned
+ * only after the previous one merged, so it starts from the merged code. `done` = no open task is left.
+ */
+export interface StagePlan {
+  feature: string;
+  status: "planned" | "done" | "conflict";
+  phase: number;
+  kind: "serial" | "parallel";
+  lanes: PlannedLane[];
+  conflicts: LaneConflict[];
+}
+
+export function planNextStage(
+  feature: string,
+  tasks: TaskLine[],
+  opts: { lanes?: number; firstIndex?: number; done?: ReadonlySet<string> } = {},
+): StagePlan {
+  // `done`: tasks already merged by this run's lanes, counted done even if a hand-resolved merge lost their tick
+  const open = tasks.filter((t) => !t.done && !opts.done?.has(t.id));
+  const none: StagePlan = { feature, status: "done", phase: 0, kind: "serial", lanes: [], conflicts: [] };
+  if (open.length === 0) return none;
+  const phase = Math.min(...open.map((t) => t.phase));
+  const inPhase = open.filter((t) => t.phase === phase); // tasks.md order
+  const kind: StagePlan["kind"] = inPhase[0]!.parallel ? "parallel" : "serial";
+  const stage: TaskLine[] = [];
+  for (const t of inPhase) {
+    if (t.parallel !== (kind === "parallel")) break;
+    stage.push(t);
+  }
+  const first = Math.max(1, Math.floor(opts.firstIndex ?? 1));
+  const base = { feature, phase, kind, lanes: [] as PlannedLane[], conflicts: [] as LaneConflict[] };
+  if (kind === "serial") {
+    return { ...base, status: "planned", lanes: [{ name: laneName(feature, phase, first), index: first, tasks: stage.map((t) => ({ id: t.id, paths: t.paths })) }] };
+  }
+  const conflicts = laneConflicts(feature, stage);
+  if (conflicts.length > 0) return { ...base, status: "conflict", conflicts };
+  const n = Math.min(Math.max(1, Math.floor(opts.lanes ?? 2)), stage.length);
+  const lanes: PlannedLane[] = Array.from({ length: n }, (_, i) => ({ name: laneName(feature, phase, first + i), index: first + i, tasks: [] }));
+  stage.forEach((t, i) => lanes[i % n]!.tasks.push({ id: t.id, paths: t.paths }));
+  return { ...base, status: "planned", lanes };
+}
+
 // ── Check-off merge ─────────────────────────────────────────────────────────────────────────────
 
 const CHECKBOX = /^(\s*-\s*)\[[ xX]\]/;

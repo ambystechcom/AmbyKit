@@ -156,6 +156,7 @@ files, then merge them back. Lane `k` of phase `p` is the worktree and branch
 ```bash
 ambykit lane 015-slug                          # 2 lanes from the first phase with open [P] tasks
 ambykit lane 015-slug --phase=3 --lanes=3      # choose the phase and lane count
+ambykit lane 015-slug --next                   # the next stage of open tasks, sequential ones included (what `ambykit run` uses)
 ambykit lane list [015-slug]                   # tasks, done/total, clean/dirty/merged, drift
 ambykit lane merge 015-slug [3-1]              # merge finished lanes into the feature branch
 ambykit lane remove 015-slug [3-1] [--force]   # remove working copies (branches are kept)
@@ -386,9 +387,16 @@ ambykit run approve|reject <run> [--gate=<id>] [--reason=<text>]
 ambykit run approve <run> --reassign=lane-1-1:codex  # a person's approval to move a lane to another assistant
 ```
 
-- **Prepare first.** `ambykit lane <feature>` creates the lanes; `run` never creates or removes them. It runs
-  the prepared sets in ascending phase order and starts a run only on this explicit request, named
-  `<feature>.<n>`. A second `run` on a feature with an unfinished run refuses and points at `--continue-run`.
+- **Every task, in order.** A run covers every open task of the feature, stage by stage. A stage is the next run
+  of consecutive open tasks of the lowest phase, in `tasks.md` order: consecutive tasks without `[P]` run as one serial
+  lane (one worker, in order), consecutive `[P]` tasks run as parallel lanes. The next stage is prepared
+  (`ambykit lane <feature> --next`) only after the previous one merged, so it starts from the merged code; story
+  checkpoints still come between phases. With no prepared lanes, `--yes` prepares the first stage; lanes prepared by
+  hand (`ambykit lane`) run first. A run is named `<feature>.<n>` and starts only on this explicit request; a second
+  `run` on a feature with an unfinished run refuses and points at `--continue-run`.
+- **What a lane may run.** `ambykit` (its status reports) and the check commands in `fleet.allowedCommands` (default
+  `npm test`, `npx vitest`, `npm run typecheck`), so a worker tests its work before ticking a task and QA runs the
+  phase's Verify check. Every other shell command is refused.
 - **What a lane gets.** Its task IDs, the artifacts by `@path` reference, the files it owns and the report
   protocol: nothing else is copied in. A restart lists only the tasks still unchecked.
 - **Caps.** `fleet.concurrency` (default 3 in total, 2 of one assistant). Lanes beyond the cap start as slots free.
@@ -443,9 +451,11 @@ ambykit fleet fleets [fleet-1] [--json] # every feature's run and lanes, why a f
   feature into `main` stays a person's decision. Before a dependent (or a serialized feature) starts, the finished
   feature's branch is merged into its branch and its prepared lanes are brought up to date; a conflict pauses that
   feature only and is never resolved automatically.
-- **Lanes.** A feature with no prepared lanes gets them from `ambykit lane` when it starts (2 lanes, after its
-  dependencies are merged, so they branch from the merged result); when that fails the feature pauses with the exact
-  `ambykit lane` command to run by hand. Only the next set is prepared: prepare later phases yourself.
+- **Lanes.** A feature with no worktree gets one (`ambykit worktree`) when it starts. A feature with no prepared lanes
+  gets its first stage from `ambykit lane --next` when it starts (up to 2 lanes, after its dependencies are merged, so
+  they branch from the merged result), and each later stage after the previous one merged, as for a single run; when
+  that fails the feature pauses with the exact command to run by hand. `--continue-fleet` previews like a new fleet and
+  launches only with `--yes`.
 - **Caps and budgets are fleet-wide.** `fleet.concurrency` (default 3 in total, 2 of one assistant) counts the lanes
   of every feature, and overrides the per-feature use of the same setting, which applies only when a feature runs
   alone. Wall-clock, task events and the token ceiling are the fleet's: task events and tokens are summed,

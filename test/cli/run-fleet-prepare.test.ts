@@ -25,7 +25,7 @@ describe("fleet lane preparation (feature 031, clarification C-2)", () => {
     expect(calls).toEqual([["031-a"], ["032-b"]]);
     expect(out[0]).toMatchObject({ ok: false });
     expect(out[0]!.reason).toContain("No branch for 031-a");
-    expect(out[0]!.reason).toContain("ambykit lane 031-a --lanes=2");
+    expect(out[0]!.reason).toContain("ambykit lane 031-a --next --lanes=2");
   });
 
   it("031:FR-001: preparing is idempotent: lanes that exist are not created twice", async () => {

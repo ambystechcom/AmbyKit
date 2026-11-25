@@ -33,7 +33,7 @@ export function fleetRun(
 // --- real git: several features with their own worktrees (feature 031) ---------------------------
 
 import { writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { isAbsolute, join } from "node:path";
 import { gitProject, gitRun } from "./git-repo.js";
 import { commitFile } from "./lane-fixture.js";
 import { writeFeatureFiles, type FeatureDef } from "./fleet-plan-fixture.js";
@@ -104,7 +104,7 @@ export function scriptWorkers(
     const review = VERDICT.exec(prompt);
     if (review) {
       log.jobs.push(`${feature}:review`);
-      const file = join(primaryRoot(root), review[1]!);
+      const file = isAbsolute(review[1]!) ? review[1]! : join(primaryRoot(root), review[1]!);
       mkdirSync(join(file, ".."), { recursive: true });
       writeFileSync(file, JSON.stringify({ verdict: "pass", findings: [] }));
       proc.finish(0);
@@ -162,7 +162,7 @@ export function deferredWorkers(port: FakePort, root: string): DeferredWorkers {
     const feature = featureOfCwd(proc.spec.cwd);
     const review = VERDICT.exec(prompt);
     if (review) {
-      const file = join(primaryRoot(root), review[1]!);
+      const file = isAbsolute(review[1]!) ? review[1]! : join(primaryRoot(root), review[1]!);
       mkdirSync(join(file, ".."), { recursive: true });
       writeFileSync(file, JSON.stringify({ verdict: "pass", findings: [] }));
       proc.finish(0);

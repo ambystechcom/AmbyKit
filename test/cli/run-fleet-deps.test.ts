@@ -66,7 +66,8 @@ describe("a dependent feature waits for the one it depends on, end to end (featu
     const r = await fleetRun(p.root, ["031", "032"], { yes: true, assistant: "claude" }, { port, deps: { sleep: g.sleep } });
     expect(r.code, r.err).toBe(0);
     const nested = readFileSync(join(fleetRoot(p.root), "fleet-1", "031-a.1", "prompts", "lane-1-1.qa.1.md"), "utf8");
-    expect(nested).toContain("Write your verdict to .amby/fleet/fleet-1/031-a.1/verdicts/");
+    // the absolute path of the nested run directory (the reviewer runs in the lane's checkout)
+    expect(nested).toMatch(/Write your verdict to \S*\/\.amby\/fleet\/fleet-1\/031-a\.1\/verdicts\//);
     expect(existsSync(join(fleetRoot(p.root), "031-a.1"))).toBe(false); // nothing was written to a flat run directory
   }, 120_000);
 

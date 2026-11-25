@@ -13,6 +13,7 @@ import {
   manifestDrift,
   matchLane,
   planLanes,
+  planNextStage,
   readManifest,
   writeManifest,
   type LaneManifest,
@@ -35,7 +36,7 @@ export class LaneCommand extends BaseCommand {
   readonly name = "lane";
   readonly summary = "Split a phase's parallel tasks into isolated lanes, then merge them back.";
   readonly usage =
-    "ambykit lane <feature> [--phase=N] [--lanes=N] | list [<feature>] | remove <feature> [<lane>] [--force] | merge <feature> [<lane>] [--json] [--dry-run]";
+    "ambykit lane <feature> [--phase=N] [--lanes=N] [--next] | list [<feature>] | remove <feature> [<lane>] [--force] | merge <feature> [<lane>] [--json] [--dry-run]";
 
   protected async execute(opts: CliOptions): Promise<number> {
     const root = this.projectRoot(opts.cwd);
@@ -91,6 +92,7 @@ export class LaneCommand extends BaseCommand {
       this.error(`${feature} has no tasks.md — run /amby.tasks first.`);
       return 1;
     }
+    if (flag(opts, "next")) return this.next(root, feature, opts, json);
 
     const phaseFlag = opts.flags["phase"];
     const lanesFlag = opts.flags["lanes"];
@@ -159,6 +161,26 @@ export class LaneCommand extends BaseCommand {
     }
     if (plan.stays.length > 0) this.info(`  Stay in the feature checkout: ${plan.stays.join(", ")}`);
     this.info("  Work each lane with /amby.implement inside its directory, then `ambykit lane merge " + feature + "`.");
+    return 0;
+  }
+
+  /** `--next`: the lanes of the feature's next stage, sequential tasks included (see `planNextStage`). */
+  private next(root: string, feature: string, opts: CliOptions, json: boolean): number {
+    const lanesFlag = opts.flags["lanes"];
+    const out = createNextStage(root, feature, { lanes: typeof lanesFlag === "string" ? Number(lanesFlag) : undefined, dryRun: this.dryRun });
+    if (!out.ok) {
+      this.error(out.error);
+      return 1;
+    }
+    if (json) {
+      console.log(JSON.stringify(out.status === "done" ? { action: "done", feature, lanes: [] } : { action: "planned", feature, phase: out.phase, kind: out.kind, lanes: out.lanes }));
+      return 0;
+    }
+    if (out.status === "done") {
+      this.info(`Every task of ${feature} is done — nothing to lane.`);
+      return 0;
+    }
+    for (const l of out.lanes) this.success(`${this.dryRun ? "Would create" : "Created"} ${rel(root, l.path)} — ${l.tasks.join(", ")} (phase ${out.phase}, ${out.kind})`);
     return 0;
   }
 
@@ -318,6 +340,78 @@ function readFeatureTasks(
   } catch {
     return readTasksFile(root, feature);
   }
+}
+
+export type NextStageResult =
+  | { ok: true; status: "done" }
+  | { ok: true; status: "planned"; phase: number; kind: "serial" | "parallel"; lanes: { name: string; path: string; tasks: string[] }[] }
+  | { ok: false; error: string };
+
+/**
+ * Create the worktrees of a feature's next stage (`planNextStage`): every open task is covered, sequential ones as one
+ * serial lane. Lane indexes continue after every lane the phase already had (worktree or branch), so a stage never
+ * reuses the name of a merged lane. Used by `ambykit lane --next` and by `ambykit run` after each stage merges.
+ */
+export function createNextStage(
+  root: string,
+  feature: string,
+  opts: { lanes?: number; dryRun?: boolean; done?: ReadonlySet<string> } = {},
+): NextStageResult {
+  if (loadConfig(root).worktrees !== true) {
+    return { ok: false, error: 'Lanes need worktrees enabled — set `"worktrees": true` in .amby/config.json (or run `ambykit init`).' };
+  }
+  const fb = featureBranch(root, feature);
+  if (!fb) return { ok: false, error: `No branch for ${feature} — create it with \`ambykit worktree ${feature}\` first.` };
+  const tasks = readFeatureTasks(root, feature, fb);
+  if (tasks === null) return { ok: false, error: `${feature} has no tasks.md — run /amby.tasks first.` };
+  const probe = planNextStage(feature, tasks, { lanes: opts.lanes ?? 2, ...(opts.done ? { done: opts.done } : {}) });
+  if (probe.status === "done") return { ok: true, status: "done" };
+  if (probe.status === "conflict") {
+    return { ok: false, error: `Phase ${probe.phase} has path conflicts among its parallel tasks — no lanes created: ${probe.conflicts.map(describeConflict).join(" ")}` };
+  }
+  const worktrees = worktreeList(root);
+  // idempotent: lanes that already hold this stage's open tasks are the stage (a run resumed, or prepared twice)
+  const wanted = new Set(probe.lanes.flatMap((l) => l.tasks.map((t) => t.id)));
+  const existing = laneWorktrees(root, worktrees)
+    .filter((l) => l.feature === feature)
+    .map((l) => ({ path: l.worktree.path, manifest: readManifest(l.worktree.path) }))
+    .filter((l) => l.manifest !== null && l.manifest.tasks.some((t) => wanted.has(t.id)));
+  if (existing.length > 0) {
+    return {
+      ok: true,
+      status: "planned",
+      phase: probe.phase,
+      kind: probe.kind,
+      lanes: existing.map((l) => ({ name: l.manifest!.lane, path: l.path, tasks: l.manifest!.tasks.map((t) => t.id) })),
+    };
+  }
+  const prefix = `${feature}.lane-${probe.phase}-`;
+  const taken = [
+    ...worktrees.map((w) => w.branch ?? ""),
+    ...git(root, ["branch", "--list", `${prefix}*`, "--format=%(refname:short)"]).split(/\r?\n/),
+  ]
+    .filter((b) => b.startsWith(prefix))
+    .map((b) => Number(b.slice(prefix.length)))
+    .filter((n) => Number.isInteger(n));
+  const plan = planNextStage(feature, tasks, { lanes: opts.lanes ?? 2, firstIndex: taken.length > 0 ? Math.max(...taken) + 1 : 1, ...(opts.done ? { done: opts.done } : {}) });
+  if (plan.status !== "planned") return { ok: true, status: "done" };
+  const baseHead = git(root, ["rev-parse", fb.branch]);
+  if (!opts.dryRun) {
+    const path = join(root, ".gitignore");
+    const before = existsSync(path) ? readFileSync(path, "utf8") : "";
+    const { text, changed } = ensureGitignore(before);
+    if (changed) writeFileSync(path, text, "utf8");
+  }
+  const lanes: { name: string; path: string; tasks: string[] }[] = [];
+  for (const lane of plan.lanes) {
+    const path = join(root, WORKTREES_DIR, lane.name);
+    if (!opts.dryRun) {
+      git(root, ["worktree", "add", "-b", lane.name, path, fb.branch]);
+      writeManifest(path, { version: 1, feature, phase: plan.phase, lane: lane.name, base: fb.branch, baseHead, tasks: lane.tasks });
+    }
+    lanes.push({ name: lane.name, path, tasks: lane.tasks.map((t) => t.id) });
+  }
+  return { ok: true, status: "planned", phase: plan.phase, kind: plan.kind, lanes };
 }
 
 function rel(root: string, path: string): string {

@@ -1,4 +1,5 @@
-import { updateRun } from "../core/fleet/index.js";
+import { readRun, updateRun } from "../core/fleet/index.js";
+import { writeLaneFile } from "./run-files.js";
 import { enforceBudgets, meter, stopAll } from "./run-budget.js";
 import { applyDirectives, applyReassignments, heldByDirective } from "./run-control.js";
 import { afterPhase } from "./run-gates.js";
@@ -66,7 +67,11 @@ export class Supervisor {
     if (s.stopReason) return this.stopping();
 
     const phase = this.currentPhase();
-    if (phase === null) return this.finish();
+    if (phase === null) {
+      // every prepared lane merged: the next stage (sequential tasks included) is prepared from the merged code
+      const next = this.prepareNext();
+      return next === "continue" ? null : (next ?? this.finish());
+    }
 
     // The current phase's lanes are all merged only when `phase` moved on; gate between sets.
     const gate = this.phaseGate(phase);
@@ -101,6 +106,36 @@ export class Supervisor {
       event(s, "gate-waiting", undefined, out.gate);
     }
     return "continue";
+  }
+
+  /** Add the next stage's lanes; "continue" when lanes were added, an outcome when a person must act, null when nothing is left. */
+  private prepareNext(): Outcome | "continue" | null {
+    const s = this.s;
+    if (!s.prepareNext) return null;
+    // every task of a lane this run merged counts as done (a hand-resolved merge may have lost its tick)
+    const merged = new Set(s.lanes.filter((l) => l.file.status === "merged").flatMap((l) => l.ref.manifest.tasks.map((t) => t.id)));
+    const next = s.prepareNext(merged);
+    if (next.kind === "none") return null;
+    if (next.kind === "failed") {
+      updateRun(s.root, s.run, { status: "waiting-person", needsDecision: true });
+      event(s, "stage-failed", undefined, next.reason);
+      return { kind: "attention", message: `Run ${s.run} cannot prepare its next stage: ${next.reason}` };
+    }
+    const rec = readRun(s.root, s.run);
+    const added = next.lanes.filter((l) => !s.lanes.some((x) => x.ref.name === l.ref.name));
+    for (const l of added) {
+      const file = { lane: l.ref.short, full: l.ref.name, assistant: l.assistant, status: "queued" as const, restarts: 0 };
+      writeLaneFile(s.root, s.run, file);
+      s.lanes.push({ ref: l.ref, assistant: l.assistant, file, job: "worker", round: 1 });
+    }
+    if (rec) {
+      const lanes = [...rec.lanes, ...added.map((l) => ({ lane: l.ref.name, assistant: l.assistant, tasks: l.ref.manifest.tasks.map((t) => t.id) }))];
+      updateRun(s.root, s.run, { lanes });
+    }
+    const detail = `phase ${next.phase}, ${next.stage}: ${added.map((l) => `${l.ref.short} (${l.ref.manifest.tasks.map((t) => t.id).join(", ")})`).join("; ")}`;
+    event(s, "stage-prepared", undefined, detail);
+    s.say(`Next stage ${detail}`);
+    return added.length > 0 ? "continue" : null;
   }
 
   private stopping(): Outcome | null {

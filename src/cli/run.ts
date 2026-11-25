@@ -13,6 +13,8 @@ import { acquireRunLock, bootstrapRun, openRun, readLaneFile, releaseRunLock, wr
 import { reviveForContinue } from "./run-control.js";
 import { Supervisor, superviseRun, type Outcome } from "./run-loop.js";
 import type { LaneRuntime, Session } from "./run-session.js";
+import { stagePreparer } from "./run-stages.js";
+import { createNextStage } from "./lane.js";
 import { primaryRoot } from "../core/checkouts.js";
 import { refusals, type LaunchEntry } from "../core/run-launch-plan.js";
 import { laneRefs, type LaneRef } from "../core/query.js";
@@ -122,9 +124,22 @@ export class RunCommand extends BaseCommand {
     }
     if (!flag(opts, "json") && !warned && isExperimental()) this.warn(EXPERIMENTAL_NOTE);
 
-    const lanes = preparedLanes(root, feature);
+    let lanes = preparedLanes(root, feature);
+    if (lanes.length === 0 && this.assumeYes && !flag(opts, "emit-script") && !cont) {
+      // nothing prepared: with --yes the run prepares its first stage itself (sequential tasks included)
+      const first = createNextStage(primaryRoot(root), feature, {});
+      if (!first.ok) {
+        this.error(first.error);
+        return 1;
+      }
+      if (first.status === "done") {
+        this.success(`Every task of ${feature} is done — nothing to run.`);
+        return 0;
+      }
+      lanes = preparedLanes(root, feature);
+    }
     if (lanes.length === 0) {
-      this.error(`${feature} has no prepared lanes.`, `Create them first with: ambykit lane ${feature}`);
+      this.error(`${feature} has no prepared lanes.`, `Re-run with --yes to prepare its next stage, or create it with: ambykit lane ${feature} --next`);
       return 1;
     }
     return this.start(root, feature, lanes, opts);
@@ -272,6 +287,8 @@ export class RunCommand extends BaseCommand {
       unattended: ctx.unattended,
       reportsUsage: lanes.every((l) => this.deps.registry.find((r) => r.id === l.assistant)?.reportsUsage === true),
       ...(this.deps.ask ? { ask: this.deps.ask } : {}),
+      // after each stage merges, the next one (sequential tasks included) is prepared from the merged code
+      prepareNext: stagePreparer(ctx.root, ctx.feature, { lanes: Math.max(2, ctx.lanes.length), assistants: ctx.assistants }),
     };
   }
 
