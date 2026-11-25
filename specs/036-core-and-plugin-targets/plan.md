@@ -35,10 +35,12 @@ created: 2026-11-20
    `@ambystech/ambykit-emitter-<target>`; the Antigravity package contains both harnesses and `export default (api) => …` built on
    `api.SkillsEmitter`, with only `import type` from `@ambystech/ambykit/plugin`. Each package declares `ambykit.pluginApi`, carries its
    compatibility row and golden fixture, and its tests run in the root vitest with the published contract kit (`@ambystech/ambykit/testkit`).
-   `scripts/build-plugins.mjs` runs `tsc` per plugin (a no-op with none); `ci.yml` calls it. `publish-plugins.yml` (a Release tagged
-   `plugin/<name>/v<x.y.z>`, or a manual run with a `plugin` input) checks the tag against the package, runs typecheck, build, the plugin's
-   tests and the API-range check (`scripts/plugin-release.mjs`), then `npm publish --access public` with OIDC and provenance;
-   `publish.yml` skips `plugin/*` tags. The Antigravity package is built first and is the only one that gates 2.0 (C-4).
+   `scripts/build-plugins.mjs` runs `tsc` per plugin (a no-op with none); `ci.yml` calls it. `publish-plugins.yml` (a push to `main`
+   that changes `plugins/**`, publishing each plugin whose version is not on npm yet, or a manual run with a `plugin` input) runs typecheck,
+   build, the plugin's tests and the package and API-range check (`scripts/plugin-release.mjs`), then `npm publish --access public` with
+   OIDC and provenance, then tags `plugin/<name>/v<x.y.z>` with a Release from `GITHUB_TOKEN` (which starts no other workflow);
+   `publish.yml` also skips `plugin/*` tags. (Changed after 1.0.1: the first design published from a Release, which started a skipped
+   `publish.yml` run, and every core release started a skipped plugin run.) The Antigravity package is built first and is the only one that gates 2.0 (C-4).
 3. **Removal is the last step.** The built-in Antigravity emitters are deleted from `TARGETS` only after the plugin is published and
    install-tested (a person task), so 2.0 can never ship with Antigravity in neither place. Until then both exist and the registry prefers
    the built-in.

@@ -7,14 +7,20 @@
  * passed in, so tests need no build; the command line loads them from the built core (`dist/`).
  *
  *   node scripts/plugin-release.mjs verify <refName | pluginName>
+ *   node scripts/plugin-release.mjs pending
+ *
+ * `pending` prints the plugins whose `package.json` version is not on npm yet (the ones a push to main publishes) and, under
+ * GitHub Actions, writes them to $GITHUB_OUTPUT as a JSON array, `plugins=[...]`.
  *
  * `refName` is a release tag `plugin/<name>/v<x.y.z>` (the tag version must equal the package version); a bare `<name>` is a manual
  * run, which checks the package only. On success it prints the plugin's directory, name and version and, under GitHub Actions,
  * writes them to $GITHUB_OUTPUT. On failure it prints one `::error::` line per problem and exits 1.
  */
+import { execFileSync } from "node:child_process";
 import { appendFileSync, existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { listPlugins } from "./build-plugins.mjs";
 
 export const PLUGIN_SCOPE = "@ambystech";
 export const PLUGIN_PREFIX = "ambykit-emitter-";
@@ -91,6 +97,37 @@ export function verifyPackage(dir, tagVersion, core, fs = { existsSync, readFile
   return { ok: errors.length === 0, name: pkg.name ?? null, version: pkg.version ?? null, errors };
 }
 
+/**
+ * The plugins under `root/plugins` whose package version is not published yet, in name order. `isPublished(pkg, version)` answers
+ * from the registry (injected so tests need no network). A plugin without a readable name and version is listed, so its publish
+ * job runs and `verify` reports the problem instead of the plugin being skipped silently.
+ */
+export function pendingPlugins(root, isPublished, fs = { readFileSync }) {
+  const pending = [];
+  for (const name of listPlugins(root)) {
+    let pkg;
+    try {
+      pkg = JSON.parse(fs.readFileSync(join(pluginDir(root, name), "package.json"), "utf8"));
+    } catch {
+      pending.push(name);
+      continue;
+    }
+    if (typeof pkg.name !== "string" || typeof pkg.version !== "string" || !isPublished(pkg.name, pkg.version)) pending.push(name);
+  }
+  return pending;
+}
+
+/** True when `pkg@version` is on npm: `npm view` prints the version, and prints nothing or fails for one that does not exist. */
+function npmHasVersion(pkg, version) {
+  try {
+    const win = process.platform === "win32";
+    const out = execFileSync(win ? "npm.cmd" : "npm", ["view", `${pkg}@${version}`, "version"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], shell: win });
+    return out.trim() !== "";
+  } catch {
+    return false;
+  }
+}
+
 async function loadCore(root) {
   const api = await import(pathToFileURL(join(root, "dist", "plugins", "api.js")).href);
   const semver = await import(pathToFileURL(join(root, "dist", "plugins", "semver.js")).href);
@@ -99,11 +136,18 @@ async function loadCore(root) {
 
 async function main(argv) {
   const [command, input] = argv;
+  const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+  if (command === "pending" && !input) {
+    const plugins = pendingPlugins(root, npmHasVersion);
+    console.log(plugins.length ? `to publish: ${plugins.join(", ")}` : "every plugin version is already on npm");
+    if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `plugins=${JSON.stringify(plugins)}
+`);
+    return 0;
+  }
   if (command !== "verify" || !input) {
-    console.error("usage: node scripts/plugin-release.mjs verify <plugin/<name>/v<x.y.z> | <name>>");
+    console.error("usage: node scripts/plugin-release.mjs verify <plugin/<name>/v<x.y.z> | <name>> | pending");
     return 2;
   }
-  const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   const parsed = input.startsWith("plugin/") ? parseTag(input) : parsePluginName(input);
   if (!parsed.ok) {
     console.log(`::error::${parsed.reason}`);
