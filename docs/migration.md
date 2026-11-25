@@ -4,6 +4,47 @@ AmbyKit 2.0 stores a spec's machine-read data in structured form instead of scat
 parentheses. `ambykit migrate` converts your existing `spec.md` and `tasks.md` files for you, without rewriting any
 prose. This page says what changes, how to run it safely, and what to do when it skips a file.
 
+## Upgrade a 1.x project to 2.0
+
+Do these steps in order. Each links to the section with the detail.
+
+1. **Node 22 or newer.** Run AmbyKit on Node 22 or newer, locally and in CI; an older Node exits with a message naming the required
+   version ([Also in 2.0](#also-in-20)).
+2. **Upgrade every tool that reads your specs first.** Local installs, CI and teammates move to 2.0 **before** you commit migrated
+   files: a 1.x AmbyKit reads a v2 file without an error but loses data ([A 1.x AmbyKit loses data on a v2 file](#a-1x-ambykit-loses-data-on-a-v2-file)).
+   Check with `ambykit --version`.
+3. **Preview.** Commit your work, then:
+
+   ```bash
+   ambykit migrate --dry-run
+   ```
+
+   It writes nothing and lists each file it would convert or skip. Fix every skipped file using the table in
+   [When it skips a file](#when-it-skips-a-file).
+4. **Migrate.**
+
+   ```bash
+   ambykit migrate
+   ```
+
+   Running it again changes nothing. It also adds `"schemaVersion": 2` to `.amby/config.json` ([Migrate in four steps](#migrate-in-four-steps)).
+5. **Review.** `git diff`, then confirm both are clean:
+
+   ```bash
+   ambykit check
+   ambykit analyze
+   ```
+
+6. **Antigravity users: install the plugin.** If `.amby/config.json` lists `antigravity` or `antigravity-cli`, follow
+   [Antigravity is a plugin in 2.0](#antigravity-is-a-plugin-in-20), then run `ambykit sync`.
+7. **What `run` and the plugin API now promise.** The plugin API is stable from 2.0; `ambykit run` keeps its experimental label until
+   one fleet of this repository has built two dependent features with a verified runner. Both promise only what
+   [the stability contract](./stability.md) lists, and a change follows its deprecation policy.
+8. **A CI pinned to 1.x.** If some reader must stay on 1.x for a while, migrate with `ambykit migrate --dual-write` instead, and run
+   `ambykit migrate` without the flag once everything is on 2.x ([A 1.x AmbyKit loses data on a v2 file](#a-1x-ambykit-loses-data-on-a-v2-file)).
+
+1.x files are still read until 2.1 ([Timeline](#timeline)).
+
 ## What changes
 
 | | 1.x | v2 |

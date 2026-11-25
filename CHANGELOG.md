@@ -16,6 +16,29 @@ Every release states whether plugins are affected, with such a line or with "Plu
 
 Plugins: affected, see the `[plugin-api]` line below.
 
+### Breaking changes
+
+AmbyKit 2.0 breaks compatibility on purpose. Upgrade with
+[Upgrade a 1.x project to 2.0](docs/migration.md#upgrade-a-1x-project-to-20); the entries under Added and Changed give the detail.
+
+- **Spec format v2 and `ambykit migrate`.** Who is affected: every project with specs written by 1.x. What to do: upgrade every
+  tool that reads your specs to 2.0, then run `ambykit migrate --dry-run` and `ambykit migrate`. 2.0 still reads 1.x files
+  (until 2.1), but a 1.x AmbyKit loses statuses, dependencies, ownership and Verify results on a v2 file; `--dual-write` keeps both.
+- **Config schema version.** Who is affected: every project with `.amby/config.json`. What to do: nothing by hand; `migrate` adds
+  `"schemaVersion": 2` and keeps every setting. A config from a newer AmbyKit is left untouched and reported.
+- **Node 22 or newer.** Who is affected: anyone running AmbyKit on Node 20 or older, locally or in CI. What to do: move to Node 22;
+  an older Node exits with a message naming the required version.
+- **`ambykit run` and its fleets.** Who is affected: scripts and CI that call `ambykit run` or read `.amby/fleet/`. What to do: rely
+  only on the surface listed in `docs/stability.md`. `run` is still labelled experimental in 2.0: it becomes stable once one fleet
+  has built two dependent features of this repository with a verified runner, and from then on a change follows the same
+  deprecation policy as the plugin API.
+- **Plugin API stable (2.0.0).** Who is affected: authors of emitter plugins. What to do: stop reading `PLUGIN_API_EXPERIMENTAL`
+  (removed) and declare `"ambykit": { "pluginApi": "^2" }`; a `^1` plugin still loads with a one-line note. A stable name is
+  deprecated in a minor release with one stderr notice and removed only in the next major (`docs/stability.md`).
+- **Antigravity targets moved to an official plugin.** Who is affected: projects whose `.amby/config.json` lists `antigravity` or
+  `antigravity-cli`. What to do: `npm install --save-exact @ambystech/ambykit-emitter-antigravity`, list it under `plugins`, run
+  `ambykit sync` (no file changes). Until then those targets fail with the install lines and nothing they wrote is deleted.
+
 ### Added
 
 - Official Antigravity plugin (feature 036): `@ambystech/ambykit-emitter-antigravity`, in `plugins/antigravity/`, provides both

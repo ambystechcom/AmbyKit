@@ -56,6 +56,17 @@ jobs:
       - name: Build
         run: npm run build
 
+      # A prerelease (2.0.0-rc.1) goes to the `next` dist-tag, a plain version to `latest` (034:FR-009). npm refuses a prerelease
+      # without an explicit tag, so the tag is always passed.
+      - name: Choose the npm dist-tag
+        id: disttag
+        run: echo "tag=$(node scripts/release-tag.mjs)" >> "$GITHUB_OUTPUT"
+
+      # A final 2.0.x version publishes only when every gate condition in specs/034-release-2-0/gate.md is met and the
+      # preconditions hold (034:FR-004). Any other version (a candidate, a 1.x patch) passes straight through.
+      - name: Release gate
+        run: node scripts/release-gate.mjs
+
       # The same version can reach this workflow twice — e.g. a manual dispatch publishes it, then
       # the GitHub Release for that version fires `release: published`. npm rejects the second
       # attempt (EPUBLISHCONFLICT), so detect it and skip rather than fail the release.
@@ -74,4 +85,4 @@ jobs:
       # Trusted Publishing: npm uses the id-token (OIDC) — no NODE_AUTH_TOKEN. Provenance is automatic.
       - name: Publish
         if: steps.published.outputs.exists != 'true'
-        run: npm publish --access public
+        run: npm publish --access public --tag "${{ steps.disttag.outputs.tag }}"

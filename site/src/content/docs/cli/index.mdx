@@ -228,7 +228,8 @@ frontmatter, each phase's file ownership and Verify line move into one `yaml` bl
 checkboxes are never rewritten. A file that is not provably safe is left untouched and listed with the fix, every conversion is
 read back before it is written, each file is written once, and a second run changes nothing. `--dry-run` writes nothing,
 `--diff` prints each change, `--dual-write` keeps the 1.x lines beside the v2 data. A 1.x AmbyKit loses statuses,
-dependencies, ownership and Verify results on a v2 file without an error, so upgrade your tools first.
+dependencies, ownership and Verify results on a v2 file without an error, so upgrade your tools first. 2.0 still reads
+1.x files until 2.1.
 
 ## `ambykit edit`
 
@@ -304,7 +305,8 @@ waits for a decision. Pause, resume and stop go through the same writer as `amby
 
 ## `ambykit run` (experimental)
 
-Run a feature's prepared lanes headless, one assistant per lane. Experimental in 1.6. Nothing launches without
+Run a feature's prepared lanes headless, one assistant per lane. Experimental until one fleet has built two dependent features with a verified
+runner. Nothing launches without
 `--yes`, and only a verified runner is ever launched.
 
 ```text

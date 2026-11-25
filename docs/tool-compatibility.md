@@ -195,7 +195,7 @@ currently affect only the worktree tag, which uses Octicons `oct-git_branch` U+F
 Unicode in every mode: the brand glyphs (`cod-claude` U+EC82, `cod-openai` U+EC81) only arrived in
 recent Nerd Fonts (present in v3.5.1), and older installs render them as empty boxes.
 
-## Headless runners (`ambykit run`, feature 028, experimental)
+## Headless runners (`ambykit run`, feature 028) (experimental)
 
 `ambykit run` launches one assistant per lane without a person at the keyboard. Only a **verified** runner is
 ever launched (Principle 4); the registry in `src/core/runners.ts` and this table carry the same rows, and a

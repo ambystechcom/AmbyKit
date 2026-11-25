@@ -63,6 +63,7 @@
     "dev": "tsc -p tsconfig.json --watch",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "build:plugins": "node scripts/build-plugins.mjs",
+    "release:check": "node scripts/release-gate.mjs --version 2.0.0",
     "test": "vitest run",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
