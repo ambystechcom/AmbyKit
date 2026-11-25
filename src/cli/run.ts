@@ -22,6 +22,11 @@ import { RUNNERS, listRunners, type RunnerSpec } from "../core/runners.js";
 import { resolveBudgets, type Budgets } from "../core/run-supervise.js";
 import { isExperimental, stabilityLabel, withStability } from "../core/run-stability.js";
 import { featureDirOf } from "../core/tasks-edit.js";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { featureBranch } from "../core/lane-merge.js";
+import { readTasks } from "../core/spec-format/dispatch.js";
+import { readBudget } from "./run-files.js";
 
 /**
  * `ambykit run <feature>` — headless lane orchestration (feature 028). **Experimental in 1.6** (FR-019): the
@@ -169,8 +174,10 @@ export class RunCommand extends BaseCommand {
       assignment = new Map(opened.record.lanes.map((l) => [l.lane.slice(l.lane.lastIndexOf(".lane-") + 1), l.assistant]));
       if (opened.rebuilt && !json) this.warn(`Run ${cont} had missing state and was rebuilt from tasks.md; checked tasks stay checked.`);
     }
+    // The task budget covers the whole feature, not only the stage prepared so far (a run prepares one stage at a time),
+    // and a continued run keeps the task events it already used, so its default budget adds them back.
     const budgets = resolveBudgets({
-      openTasks: lanes.reduce((n, l) => n + laneOpenTasks(l).length, 0),
+      openTasks: Math.max(featureOpenTasks(root, feature), lanes.reduce((n, l) => n + laneOpenTasks(l).length, 0)) + (cont ? readBudget(root, run).tasksUsed : 0),
       config: settings.budgets,
       flags: budgetFlags(opts),
     });
@@ -446,4 +453,12 @@ function budgetFlags(opts: CliOptions): Partial<Budgets> {
   if (t !== undefined) out.maxTasks = t;
   if (k !== undefined) out.maxTokens = k;
   return out;
+}
+
+/** Open tasks of the whole feature, read from its checkout (where lane check-offs are merged), else from this checkout. */
+export function featureOpenTasks(root: string, feature: string): number {
+  const checkout = featureBranch(root, feature)?.checkout ?? root;
+  const file = join(checkout, "specs", feature, "tasks.md");
+  if (!existsSync(file)) return 0;
+  return readTasks(readFileSync(file, "utf8")).tasks.filter((t) => !t.done).length;
 }

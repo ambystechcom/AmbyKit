@@ -29,6 +29,20 @@ describe.skipIf(!HAS_GIT)("merger (feature 028)", () => {
     expect(log.indexOf("Merge lane 028-ambykit-run.lane-1-2")).toBeLessThan(log.indexOf("Merge lane 028-ambykit-run.lane-1-1"));
   }, 60_000);
 
+  it("028:FR-011: a worker leaves its work uncommitted (it may not run git); the run commits it in the lane after the reviews pass and merges it", async () => {
+    const p = await preparedProject(F, 2, 1);
+    const h = harness(p);
+    script(h, p, { work: true, uncommitted: true });
+    await h.step();
+    await h.step();
+    expect(h.lane("lane-1-1").file.status).toBe("merged");
+    const lane = h.lane("lane-1-1").ref.root;
+    expect(gitRun(lane, ["status", "--porcelain"])).toBe("");
+    expect(gitRun(lane, ["log", "--format=%s", "-1"])).toMatch(new RegExp(`^${F} lane-1-1: T001, T002 \\(ambykit run `));
+    expect(gitRun(p.featureRoot, ["status", "--porcelain"])).toBe("");
+    expect(readEvents(p.root, h.run).some((e) => e.kind === "committed" && e.lane === "lane-1-1")).toBe(true);
+  }, 60_000);
+
   // Test 3 (the conflict pauses the second lane, intact, with the feature clean) shared this setup: its assertions run before the resolve step.
   it("028:FR-012: conflict: the first lane merges, the second pauses with the lane intact and the feature clean, and a person resolves it and the run carries on without a restart", async () => {
     const p = await preparedProject(F, 4, 2);

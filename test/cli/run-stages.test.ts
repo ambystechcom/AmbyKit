@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { LaneCommand } from "../../src/cli/lane.js";
+import { RunCommand } from "../../src/cli/run.js";
+import { FakePort, fakeRegistry } from "../helpers/run-fakes.js";
 import { laneProject, type LaneProject } from "../helpers/lane-fixture.js";
 import { harness, readLaneFile, script, type Harness } from "../helpers/run-fakes.js";
 import { runCommand } from "../helpers/run-command.js";
@@ -79,5 +81,10 @@ describe.skipIf(!HAS_GIT)("run executes sequential tasks, in order (the 2.0 dogf
     const out = await runToEnd(h);
     expect(out).not.toBeNull();
     expect(h.s.lanes.map((l) => l.file.lane)).toEqual(["lane-1-1"]);
+  });
+  it("the default task budget covers the whole feature, not only the first stage (found by the live check: 1 of 2 used stopped a continued run)", async () => {
+    const p = await project(); // only stage 1 (T001, T002) is prepared; the feature has 5 open tasks
+    const r = await runCommand(new RunCommand({ registry: fakeRegistry(), port: new FakePort() }), p.root, [F], {});
+    expect(r.out).toContain("10 task events"); // twice the feature's 5 open tasks
   });
 });

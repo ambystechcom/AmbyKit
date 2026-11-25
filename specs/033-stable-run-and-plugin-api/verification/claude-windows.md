@@ -25,5 +25,6 @@ directory, with the prompt `lanePromptText` builds, on stdin.
 | 2 | plus `--permission-mode acceptEdits --allowedTools "Bash(ambykit:*)" --output-format json` | exit 0 in 20 s, file written, task ticked; PowerShell `ambykit` calls denied (listed in `permission_denials`), Bash ones allowed; found the missing `--agent` in the worker prompt |
 | 3 | this branch's runner command and worker prompt | exit 0 in 13 s, file written, task ticked, both `ambykit activity` reports accepted, `permission_denials` empty |
 | 4 | `claude -p --model no-such-model-xyz --output-format json` | exit 1, `is_error: true`, `terminal_reason: "api_error"` |
+| 5 | a full `ambykit run 001 --assistant=claude --unattended --yes` session (branch `fix/run-sequential`: stages, allowed check commands, `--add-dir` for reviewers, run commits lane work) | stage 1 (T001+T002, one serial lane) and stage 2 (T010, T011, two parallel lanes) each built, reviewed by QA and architect (verdicts read), committed and merged; feature checkout clean, all four tasks ticked; about 0.61 USD for the workers plus the reviews |
 
-Not yet observed: a full `ambykit run` session (supervisor, budget, merge) with this runner. That is the dogfood (031 T094, 033 T071).
+Run 5 is a full supervised session on a scratch project (stages, reviews, budget, commit and merge). The dogfood (031 T094, 033 T071) is the same on this repository.

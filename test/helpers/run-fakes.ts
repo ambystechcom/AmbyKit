@@ -210,6 +210,8 @@ export interface Script {
   hang?: boolean;
   /** Reviewer verdict: pass, fail with these finding ids, or write nothing. */
   verdict?: "pass" | "none" | string[];
+  /** Leave the work uncommitted, as a real worker does (it may not run git); default false: the fake commits it. */
+  uncommitted?: boolean;
 }
 
 const IDS = /check each off in tasks\.md: ([T0-9, ]+)\./;
@@ -238,7 +240,11 @@ export function script(h: Pick<Harness, "port">, p: LaneProject, how: Script | (
     const m = IDS.exec(prompt);
     if (plan.work !== false && m) {
       tickIn(proc.spec.cwd, p.feature, m[1]!.split(",").map((x) => x.trim()));
-      commitFile(proc.spec.cwd, `src/${proc.spec.cwd.split(/[\\/]/).pop()}.ts`, "work\n", "worker commit");
+      const rel = `src/${proc.spec.cwd.split(/[\\/]/).pop()}.ts`;
+      if (plan.uncommitted) {
+        mkdirSync(join(proc.spec.cwd, "src"), { recursive: true });
+        writeFileSync(join(proc.spec.cwd, rel), "work\n");
+      } else commitFile(proc.spec.cwd, rel, "work\n", "worker commit");
     }
     if (!plan.hang) proc.finish(plan.exit ?? 0);
   };
