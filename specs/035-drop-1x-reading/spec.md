@@ -2,7 +2,7 @@
 feature: 035-drop-1x-reading          # NNN-slug
 title: Drop reading of 1.x specs
 branch: 035-drop-1x-reading
-status: draft                     # draft | ready | in-progress | blocked | done
+status: ready                     # draft | ready | in-progress | blocked | done
 created: 2026-11-20
 ---
 
@@ -72,8 +72,8 @@ As a maintainer, I want the 1.x reading code removed, so that every reader is si
 - Given the source, When it is searched, Then the dispatcher has no 1.x reading branch, the 1.x notice from `check` and the
   `legacyWarning` config key are gone, and no module imports the removed parsers.
 - Given a config file that still sets `legacyWarning`, When it is loaded, Then it is accepted and ignored with one notice, not rejected.
-- Given the history readers (burndown, lanes reading a branch), When they meet a 1.x revision, Then they skip it and count it,
-  as they do for any unreadable revision, and do not fail.
+- Given the history readers (burndown, lanes reading a branch, metrics), When they meet an earlier 1.x revision, Then they read it
+  through `migrate`'s 1.x reader, so history from before the migration is kept, and they do not fail.
 - Given the removal, When the one-shot dashboard and `--json` output are measured, Then they are not slower than in 2.0.
 
 ### US-4 — The tests that only guarded 1.x reading are removed, coverage stays  (priority: P2)
@@ -120,7 +120,7 @@ As a user with an old project, I want `migrate` to keep working after 2.1, so th
 - FR-005  WHEN a project mixes formats, THE SYSTEM SHALL list every 1.x feature in one message and process none half way.
 - FR-006  THE SYSTEM SHALL remove the 1.x reading branch of the per-file reader, the 1.x notice and the `legacyWarning` key, and
   SHALL accept a config that still sets the key, ignoring it with one notice.
-- FR-007  WHEN a history reader meets a 1.x revision, THE SYSTEM SHALL skip and count it instead of failing.
+- FR-007  WHEN a history reader meets an earlier 1.x revision, THE SYSTEM SHALL read it through `migrate`'s 1.x reader instead of skipping or failing, so history from before the migration is kept.
 - FR-008  THE SYSTEM SHALL delete the tests that only guard 1.x reading, SHALL list them, and SHALL NOT remove the last test of any
   requirement (Principle 5).
 - FR-009  THE SYSTEM SHALL keep `migrate` converting 1.x projects with the same safety rules, using a reader of its own.
@@ -131,7 +131,7 @@ As a user with an old project, I want `migrate` to keep working after 2.1, so th
 
 - SC-001  The decision record exists with dated evidence for every condition before the first line is removed.
 - SC-002  Running any command on a 1.x project in 2.1 stops with the migrate instructions and changes no file.
-- SC-003  No 1.x parser, notice or `legacyWarning` handling is left in the source except inside `migrate`.
+- SC-003  No 1.x parser, notice or `legacyWarning` handling is left in the source except inside `migrate`, whose 1.x reader the history readers also use.
 - SC-004  `trace` shows no requirement that lost its only test, and the suite is faster than in 2.0 by the removed tests' share.
 - SC-005  A 1.x project migrated by 2.1's `migrate` passes `check` and `analyze`.
 - SC-006  `npm run typecheck` and `npm test` pass, and every FR maps to at least one test (Principle 5).
@@ -141,7 +141,7 @@ As a user with an old project, I want `migrate` to keep working after 2.1, so th
 - A project that never migrated and pins 2.0.x: nothing changes for it.
 - A project with one 1.x feature among many v2 features: one message, nothing processed.
 - A 1.x file with syntax `migrate` skips (the skip-and-list conditions of 030): `migrate` lists it and 2.1 still refuses to read it.
-- Git history that contains 1.x revisions: skipped and counted by history readers, never an error.
+- Git history that contains 1.x revisions: read by the history readers through `migrate`'s 1.x reader, never an error.
 - The adoption window is judged met but a data-loss defect in `migrate` is reported later: removal is paused.
 
 ## Assumptions
@@ -150,3 +150,18 @@ As a user with an old project, I want `migrate` to keep working after 2.1, so th
 - The removal ships as 2.1, a minor release that is allowed to end 1.x reading because the 2.0 notices said so (spec 033's deprecation
   policy applies to the stable run and plugin surfaces, not to the spec format, which 2.0 announced).
 - Public information (download counts, issues) is enough evidence; asking users for usage data is out of the question.
+
+## Clarifications
+
+Owner decisions, 2026-11-25 (035 T002):
+
+- D-1: the go decision uses the gate wording drafted in the plan: "2.1 stops reading 1.x once 2.0 has been out for the adoption window,
+  `migrate` has had no open data-loss issue in it, and `docs/migration.md` documents the path." This is also the wording for 030 T090.
+- D-2: history is kept. History readers (burndown, lane, metrics) keep reading earlier 1.x revisions through `migrate`'s 1.x reader;
+  only the current files of a project are refused. FR-007, US-3 and SC-003 are reworded for this.
+- D-3: the refusal points to `ambykit migrate` in 2.1 (not to 2.0).
+- D-4: `AMBYKIT_LEGACY_WARNING` is ignored silently in 2.1.
+- D-5: `migrate --dual-write` stays in 2.1.
+- D-6: the adoption window is at least 8 weeks and at least one 2.0.x patch release after 2.0.0.
+- D-7: the refusal exits 1; `--json` returns an error object; MCP returns the error for each call.
+- D-8: the explicit switch that replaces the version gate (T021) lands before the 2.0 cut, as a small 2.0 change.
