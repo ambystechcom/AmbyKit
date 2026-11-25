@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { assignAssistants, launchPlan, refusals, type LaunchLane } from "../../src/core/run-launch-plan.js";
-import { RUNNERS } from "../../src/core/runners.js";
-import { fakeRegistry } from "../helpers/run-fakes.js";
+import { fakeRegistry, unverifiedRegistry } from "../helpers/run-fakes.js";
 
 const lane = (n: number, assistant: string): LaunchLane => ({
   lane: `lane-1-${n}`,
@@ -24,7 +23,7 @@ describe("launch plan (feature 028)", () => {
   });
 
   it("028:FR-006: a lane whose assistant has no verified runner is refused with the reason, not given a command", () => {
-    const plan = launchPlan([lane(1, "claude")], { ...opts, registry: RUNNERS });
+    const plan = launchPlan([lane(1, "claude")], { ...opts, registry: unverifiedRegistry() });
     expect(plan[0]!.command).toBeUndefined();
     expect(plan[0]!.refused).toContain("not verified");
     expect(plan[0]!.display).toContain("REFUSED");
@@ -38,7 +37,7 @@ describe("launch plan (feature 028)", () => {
   });
 
   it("028:FR-004: the configured model is passed to the runner", () => {
-    const plan = launchPlan([lane(1, "claude")], { ...opts, registry: [{ ...RUNNERS[0]!, verified: true }], model: "opus-x" });
+    const plan = launchPlan([lane(1, "claude")], { ...opts, registry: [{ ...unverifiedRegistry()[0]!, verified: true }], model: "opus-x" });
     expect(plan[0]!.command!.args).toContain("opus-x");
   });
 

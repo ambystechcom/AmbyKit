@@ -11,9 +11,23 @@ import { phase, tasksMd, type TaskDef } from "./tasks-fixture.js";
 export const FAKE_RUNNER = resolve(__dirname, "..", "fixtures", "fake-runner.mjs");
 
 /** Verified registry entries that run the fake runner instead of a real assistant. */
+/** The shipped runner shape without its live-check record (platforms, range), so a fake is the same on every OS. */
+function bareRunner(r: RunnerSpec): RunnerSpec {
+  const { verifiedOn: _on, verifiedRange: _range, verifiedVersion: _version, ...rest } = r;
+  return rest;
+}
+
+/**
+ * The shipped registry with every runner unverified, whatever the live records say: tests of the refusal path use it,
+ * so they do not depend on which runners have been verified, or on the OS the suite runs on.
+ */
+export function unverifiedRegistry(): RunnerSpec[] {
+  return RUNNERS.map((r) => ({ ...bareRunner(r), verified: false }));
+}
+
 export function fakeRegistry(ids: string[] = ["claude", "codex"], usage = false): RunnerSpec[] {
   return ids.map((id) => ({
-    ...(RUNNERS[0] as RunnerSpec),
+    ...bareRunner(RUNNERS[0] as RunnerSpec),
     id,
     label: id,
     verified: true,
@@ -25,8 +39,8 @@ export function fakeRegistry(ids: string[] = ["claude", "codex"], usage = false)
 
 export interface FakeHandle extends ProcessHandle {
   spec: SpawnSpec;
-  /** Finish the process as if it exited. */
-  finish(code?: number | null, signal?: string | null): void;
+  /** Finish the process as if it exited; `stdout` is what a capturing spawn hands back. */
+  finish(code?: number | null, signal?: string | null, stdout?: string): void;
   killed: string[];
 }
 
@@ -54,11 +68,11 @@ export class FakePort implements ProcessPort {
         handle.killed.push(signal);
         handle.finish(null, signal);
       },
-      finish: (code = 0, signal = null) => {
+      finish: (code = 0, signal = null, stdout?: string) => {
         if (done) return;
         done = true;
         this.live.delete(pid);
-        resolveExit({ code, signal });
+        resolveExit({ code, signal, ...(stdout !== undefined ? { stdout } : {}) });
       },
     };
     this.starts.push(handle);

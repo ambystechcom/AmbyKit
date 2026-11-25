@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { RunCommand } from "../../src/cli/run.js";
 import { listRuns } from "../../src/core/fleet/index.js";
 import { HAS_GIT } from "../helpers/git-repo.js";
-import { FakePort, fakeRegistry, preparedProject } from "../helpers/run-fakes.js";
+import { FakePort, fakeRegistry, preparedProject, unverifiedRegistry } from "../helpers/run-fakes.js";
 import { runCommand } from "../helpers/run-command.js";
 
 const F = "028-ambykit-run";
@@ -85,7 +85,7 @@ describe.skipIf(!HAS_GIT)("ambykit run preview, --yes and --emit-script (feature
 
   it("028:FR-006: --yes with an unverified assistant is refused with the reason and launches nothing", async () => {
     const p = await preparedProject(F);
-    const cmd = new Spy({ port: new FakePort() });
+    const cmd = new Spy({ registry: unverifiedRegistry(), port: new FakePort() });
     const r = await runCommand(cmd, p.root, [F], { yes: true });
     expect(r.code).toBe(1);
     expect(r.err).toContain("not verified");
@@ -94,14 +94,14 @@ describe.skipIf(!HAS_GIT)("ambykit run preview, --yes and --emit-script (feature
 
   it("028:FR-006: the preview of an unverified assistant shows the refusal and still exits 0", async () => {
     const p = await preparedProject(F);
-    const r = await runCommand(new Spy({ port: new FakePort() }), p.root, [F]);
+    const r = await runCommand(new Spy({ registry: unverifiedRegistry(), port: new FakePort() }), p.root, [F]);
     expect(r.code).toBe(0);
     expect(r.out).toContain("REFUSED");
   });
 
   it("028:FR-006: --emit-script refuses too, so no script ever names an unverified runner", async () => {
     const p = await preparedProject(F);
-    const r = await runCommand(new Spy({ port: new FakePort() }), p.root, [F], { "emit-script": true });
+    const r = await runCommand(new Spy({ registry: unverifiedRegistry(), port: new FakePort() }), p.root, [F], { "emit-script": true });
     expect(r.code).toBe(1);
     expect(existsSync(join(p.root, ".amby", "fleet", `${F}.scripts`, "launch.sh"))).toBe(false);
   });

@@ -5,7 +5,7 @@ import { isImmediateFailure, mustTerminate, restartDecision } from "../core/run-
 import { startJob } from "./run-launch.js";
 import { laneOpenTasks } from "./run-plan.js";
 import { event, isRunning, save, stopProcess, type LaneRuntime, type Session } from "./run-session.js";
-import { addTaskEvents } from "./run-budget.js";
+import { addTaskEvents, addTokens } from "./run-budget.js";
 
 /**
  * The supervisor (feature 028, FR-008..FR-010): what happens when a lane's process ends, and when it goes
@@ -25,10 +25,24 @@ export function collectExits(s: Session): void {
     delete rt.handle;
     delete rt.file.pid;
     const open = laneOpenTasks(rt.ref);
-    if (open.length === 0) {
+    // 033 (live check): the runner's own result, when it writes one. Exit 0 alone does not prove the lane did its work.
+    const runner = s.registry.find((r) => r.id === rt.assistant);
+    const result = runner?.readResult && exit.stdout !== undefined ? runner.readResult(exit.stdout) : undefined;
+    if (result?.usage) {
+      addTokens(s, result.usage.tokens);
+      const cost = result.usage.costUSD !== undefined ? `, $${result.usage.costUSD.toFixed(4)}` : "";
+      event(s, "usage", rt, `${result.usage.tokens} tokens (${result.usage.inputTokens} in, ${result.usage.outputTokens} out${cost})`);
+    }
+    const denied = result && result.deniedTools.length > 0 ? result.deniedTools.join(", ") : undefined;
+    if (result?.failed && rt.stopAskedMs === undefined) {
+      rt.file.status = "failed";
+      rt.file.reason = `the ${rt.assistant} turn failed: ${result.failed}${denied ? `; refused tools: ${denied}` : ""}`;
+      event(s, "failed", rt, rt.file.reason);
+      s.say(`${rt.file.lane}: ${rt.file.reason}. It will not be merged.`);
+    } else if (open.length === 0) {
       rt.file.status = "finished";
       rt.round = rt.round || 1;
-      event(s, "finished", rt, "every task is checked off");
+      event(s, "finished", rt, denied ? `every task is checked off (refused along the way: ${denied})` : "every task is checked off");
       s.say(`${rt.file.lane}: finished`);
     } else if (rt.stopAskedMs !== undefined) {
       // asked to stop (a directive or a budget): the exit is the obeying, not a failure
@@ -40,6 +54,12 @@ export function collectExits(s: Session): void {
       rt.file.status = d.action === "stop" ? "stopped" : "paused";
       rt.file.pausedAt = d.at;
       event(s, "exited", rt, `after a ${d.action} directive, ${open.length} task(s) open`);
+    } else if (denied) {
+      // the assistant ended its turn because it could not do the work: say which tools, so the runner command can be fixed
+      rt.file.status = "failed";
+      rt.file.reason = `the ${rt.assistant} turn ended with ${open.length} task(s) still open after these tools were refused: ${denied}`;
+      event(s, "failed", rt, rt.file.reason);
+      s.say(`${rt.file.lane}: ${rt.file.reason}. It will not be merged.`);
     } else if (isImmediateFailure({ code: exit.code, ranMs })) {
       rt.file.status = "failed";
       rt.file.reason = `the ${rt.assistant} command exited at once with code ${exit.code ?? "none"}; its recorded command may no longer match the installed version (see docs/tool-compatibility.md)`;

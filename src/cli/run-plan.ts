@@ -46,10 +46,18 @@ export interface PlanContext {
   assignment?: Map<string, string>;
 }
 
-export function lanePromptText(lane: LaneRef, run: string, open?: string[], findings?: string[], runDir?: string): string {
+export function lanePromptText(lane: LaneRef, run: string, open?: string[], findings?: string[], runDir?: string, assistant?: string): string {
   return buildLanePrompt(
     { feature: lane.manifest.feature, lane: lane.name, phase: lane.manifest.phase, tasks: lane.manifest.tasks },
-    { run, artifacts: laneArtifacts(lane), open: open ?? laneOpenTasks(lane), ...(findings ? { findings } : {}), protocol: PROTOCOL, ...(runDir ? { runDir } : {}) },
+    {
+      run,
+      artifacts: laneArtifacts(lane),
+      open: open ?? laneOpenTasks(lane),
+      ...(findings ? { findings } : {}),
+      protocol: PROTOCOL,
+      ...(runDir ? { runDir } : {}),
+      ...(assistant ? { assistant } : {}),
+    },
   );
 }
 
@@ -57,13 +65,10 @@ export function lanePromptText(lane: LaneRef, run: string, open?: string[], find
 export function buildLaunchPlan(ctx: PlanContext): LaunchEntry[] {
   const assign = ctx.assignment ?? assignAssistants(ctx.lanes.map((l) => l.short), ctx.assistants.length > 0 ? ctx.assistants : ["claude"]);
   const promptDir = ctx.promptDir ?? join(runDir(ctx.root, ctx.run), "prompts");
-  const lanes = ctx.lanes.map((l) => ({
-    lane: l.short,
-    full: l.name,
-    cwd: l.root,
-    assistant: assign.get(l.short) ?? ctx.assistants[0] ?? "claude",
-    prompt: lanePromptText(l, ctx.run),
-  }));
+  const lanes = ctx.lanes.map((l) => {
+    const assistant = assign.get(l.short) ?? ctx.assistants[0] ?? "claude";
+    return { lane: l.short, full: l.name, cwd: l.root, assistant, prompt: lanePromptText(l, ctx.run, undefined, undefined, undefined, assistant) };
+  });
   return launchPlan(lanes, {
     promptFileFor: (lane) => join(promptDir, `${lane}.md`),
     registry: ctx.registry ?? RUNNERS,
