@@ -1,0 +1,33 @@
+name: Specs
+
+# Runs for changes under specs/, which the full CI matrix (ci.yml) skips when nothing else changed. One Linux job is
+# enough: specs are text, but tests and the dependency-graph analysis read the repository's own specs (the spec-model
+# baseline, gate and dogfood records), so a spec change can still break them.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "specs/**"
+  pull_request:
+    paths:
+      - "specs/**"
+
+permissions:
+  contents: read
+
+jobs:
+  specs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Dependency-graph analysis
+        run: node dist/cli/index.js analyze
+      - name: Test
+        run: npm test

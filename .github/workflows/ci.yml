@@ -1,9 +1,15 @@
 name: CI
 
 on:
+  # A change that touches only specs/ runs the lighter specs.yml instead (one Linux job). A change that also touches
+  # anything else still runs this full matrix: GitHub skips a workflow only when every changed file is ignored.
   push:
     branches: [main]
+    paths-ignore:
+      - "specs/**"
   pull_request:
+    paths-ignore:
+      - "specs/**"
 
 jobs:
   build:
