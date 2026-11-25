@@ -31,7 +31,7 @@ export function startJob(s: Session, rt: LaneRuntime, job: JobKind, opts: { find
   }
   const prompt =
     job === "worker"
-      ? lanePromptText(rt.ref, s.run, laneOpenTasks(rt.ref), opts.findings, runDirRel(s.root, s.run))
+      ? lanePromptText(rt.ref, s.run, laneOpenTasks(rt.ref), opts.findings, runDirRel(s.root, s.run), rt.assistant)
       : rolePromptText(s, rt, job);
   const file = writePromptFile(s.root, s.run, job === "worker" ? rt.file.lane : `${rt.file.lane}.${job}.${rt.round}`, prompt);
   const command = can.runner.invoke({ prompt, promptFile: file, ...(s.settings.workerModel ? { model: s.settings.workerModel } : {}) });

@@ -22,6 +22,15 @@ describe("lane prompt (feature 028)", () => {
     expect(p).not.toMatch(/^#/m);
   });
 
+  it("028:FR-004: the report line names the lane's assistant as --agent, which ambykit activity requires (live check, Windows)", () => {
+    const p = buildLanePrompt(lane, { run: "r.1", artifacts, assistant: "claude" });
+    const report = p.split("\n").find((l) => l.startsWith("Report: "))!;
+    expect(report).toContain("ambykit activity 028-ambykit-run --agent=claude --phase=implement");
+    // every flag `ambykit activity` requires is present: <feature> --agent --phase
+    expect(report).toMatch(/ambykit activity \S+ --agent=\S+ --phase=\S+/);
+    expect(buildLanePrompt(lane, { run: "r.1", artifacts, assistant: "codex" })).toContain("--agent=codex");
+  });
+
   it("028:FR-004: stays small: a lane prompt is a few hundred characters, not the spec", () => {
     expect(buildLanePrompt(lane, { run: "r.1", artifacts }).length).toBeLessThan(1200);
   });

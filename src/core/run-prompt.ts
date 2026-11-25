@@ -25,6 +25,8 @@ export interface LanePromptOptions {
   protocol?: string;
   /** The run directory relative to the project root; `.amby/fleet/<run>` for a single run, nested in a fleet's directory for a fleet's (feature 031). */
   runDir?: string;
+  /** The assistant id the lane runs on (`config.tools` id, e.g. `claude`); `ambykit activity` requires it as `--agent`. */
+  assistant?: string;
 }
 
 export const shortName = (lane: string): string => lane.slice(lane.lastIndexOf(".lane-") + 1);
@@ -46,7 +48,7 @@ export function buildLanePrompt(lane: PromptLane, opts: LanePromptOptions): stri
   }
   if (own.length > 0) lines.push(`Edit only the files you own: ${own.join(", ")}.`);
   lines.push(
-    `Report: ambykit activity ${lane.feature} --phase=implement --task=T### --lane=${name} --state=<working|waiting|blocked|done> --run=${opts.run}; then read your directive with: ambykit fleet directive ${lane.feature} ${name} --run=${opts.run}.`,
+    `Report: ambykit activity ${lane.feature} --agent=${opts.assistant ?? "<your tool id>"} --phase=implement --task=T### --lane=${name} --state=<working|waiting|blocked|done> --run=${opts.run}; then read your directive with: ambykit fleet directive ${lane.feature} ${name} --run=${opts.run}.`,
   );
   if (opts.protocol) lines.push(opts.protocol);
   return lines.join("\n");
