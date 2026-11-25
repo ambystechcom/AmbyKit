@@ -39,7 +39,7 @@ created: 2026-11-24
 
 ## Phase 4 — User story US-3  (priority: P1)  — and FR-005, FR-006
 
-- [ ] [T030] [P] [US3] Legacy fixture test: 1.x fixtures exist under `test/fixtures/` (spec, tasks, a mixed repo) and read through the 1.x reader to the same model as their v2 twins — 034:FR-006 (test/release/legacy-fixtures.test.ts)
+- [x] [T030] [P] [US3] Legacy fixture test: 1.x fixtures exist under `test/fixtures/` (spec, tasks, a mixed repo) and read through the 1.x reader to the same model as their v2 twins — 034:FR-006 (test/release/legacy-fixtures.test.ts) ↪ DEVIATION: the mixed repository is built in the test from the twin pair (the v1 twin as 001, the v2 twin renamed 002) instead of a third committed fixture; analyze reports no format issue on it
 - [ ] [T031] [US3] Record the C1 evidence once 030 T095 is committed and every 2.0 feature is merged: `migrate --dry-run` reports nothing to do, a second `migrate` changes nothing, `analyze`, `trace` and the full suite pass on the migrated tree with the same coverage as before; fill C1 and C2 in `gate.md` with dates and the command output — 034:FR-005, FR-006 (specs/034-release-2-0/gate.md)
 - **Checkpoint:** US-3 is demoable: C1 and C2 are `met` with evidence.
 - **Verify:** `node dist/cli/index.js migrate --dry-run` reports 0 to convert and `npx vitest run test/release/legacy-fixtures.test.ts` passes. ? unverified: T031 waits for 030 T095.
