@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 // @ts-expect-error plain ESM scripts without type declarations
 import { listPlugins } from "../../scripts/build-plugins.mjs";
 // @ts-expect-error plain ESM scripts without type declarations
-import { parsePluginName, parseTag, pluginDir, verifyPackage } from "../../scripts/plugin-release.mjs";
+import { parsePluginName, parseTag, pendingPlugins, pluginDir, verifyPackage } from "../../scripts/plugin-release.mjs";
 import { PLUGIN_API_VERSION } from "../../src/plugins/api.js";
 import { satisfies } from "../../src/plugins/semver.js";
 
@@ -159,13 +159,47 @@ describe("release scripts on the command line", () => {
   });
 });
 
+describe("which plugins a push publishes (036:FR-008)", () => {
+  function tree(pkgs: Record<string, unknown>): string {
+    const base = mkdtempSync(join(tmpdir(), "ambykit-pending-"));
+    for (const [n, pkg] of Object.entries(pkgs)) {
+      mkdirSync(join(base, "plugins", n), { recursive: true });
+      writeFileSync(join(base, "plugins", n, "tsconfig.json"), "{}");
+      writeFileSync(join(base, "plugins", n, "package.json"), typeof pkg === "string" ? pkg : JSON.stringify(pkg));
+    }
+    return base;
+  }
+
+  it("036:FR-008: only plugins whose version is not on npm yet, in name order; a change without a bump publishes nothing", () => {
+    const base = tree({
+      zeta: { name: "@ambystech/ambykit-emitter-zeta", version: "1.0.1" },
+      alpha: { name: "@ambystech/ambykit-emitter-alpha", version: "2.0.0" },
+      beta: { name: "@ambystech/ambykit-emitter-beta", version: "1.0.0" },
+    });
+    const onNpm = new Set(["@ambystech/ambykit-emitter-beta@1.0.0", "@ambystech/ambykit-emitter-zeta@1.0.0"]);
+    const asked: string[] = [];
+    const isPublished = (pkg: string, v: string): boolean => (asked.push(`${pkg}@${v}`), onNpm.has(`${pkg}@${v}`));
+    expect(pendingPlugins(base, isPublished)).toEqual(["alpha", "zeta"]);
+    expect(asked).toHaveLength(3);
+    expect(pendingPlugins(tree({ beta: { name: "@ambystech/ambykit-emitter-beta", version: "1.0.0" } }), isPublished)).toEqual([]);
+  });
+
+  it("036:FR-008: a package.json it cannot read is listed, so verify reports it instead of the plugin being skipped", () => {
+    const base = tree({ broken: "{ not json", noversion: { name: "@ambystech/ambykit-emitter-noversion" } });
+    expect(pendingPlugins(base, () => true)).toEqual(["broken", "noversion"]);
+  });
+});
+
 describe("workflow wiring (036:FR-008)", () => {
   const read = (f: string): string => readFileSync(join(root, ".github", "workflows", f), "utf8").replace(/\r\n/g, "\n");
 
-  it("036:FR-008: the plugin workflow runs for plugin/ tags or by hand, in the Prod environment, with OIDC and no token", () => {
+  it("036:FR-008: the plugin workflow runs only for changes under plugins/ on main or by hand, in the Prod environment, with OIDC and no token", () => {
     const w = read("publish-plugins.yml");
-    expect(w).toContain("startsWith(github.event.release.tag_name, 'plugin/')");
-    expect(w).toContain("workflow_dispatch:");
+    const on = w.slice(w.indexOf("\non:"), w.indexOf("\npermissions:"));
+    expect(on).toMatch(/push:\n\s+branches: \[main\]\n\s+paths:\n\s+- "plugins\/\*\*"/);
+    expect(on).toContain("workflow_dispatch:");
+    expect(on).not.toContain("release:"); // a core release must not start (and skip) this workflow
+    expect(w).toContain("scripts/plugin-release.mjs pending");
     expect(w).toContain("environment: Prod");
     expect(w).toContain("id-token: write");
     expect(w).toContain("npm publish --access public");
@@ -176,7 +210,11 @@ describe("workflow wiring (036:FR-008)", () => {
     expect(code).not.toMatch(/NODE_AUTH_TOKEN|NPM_TOKEN/);
     // the verify step comes before anything is published
     expect(w.indexOf("scripts/plugin-release.mjs verify")).toBeGreaterThan(0);
-    expect(w.indexOf("scripts/plugin-release.mjs verify")).toBeLessThan(w.indexOf("npm publish"));
+    expect(w.indexOf("scripts/plugin-release.mjs verify")).toBeLessThan(w.indexOf("run: npm publish"));
+    // the tag and release come after the publish, from GITHUB_TOKEN (which starts no other workflow run)
+    expect(w.indexOf("gh release create")).toBeGreaterThan(w.indexOf("run: npm publish"));
+    expect(w).toContain("GH_TOKEN: ${{ github.token }}");
+    expect(w).toContain("contents: write");
   });
 
   it("036:FR-008: the core workflow ignores plugin tags, and CI builds the plugins", () => {

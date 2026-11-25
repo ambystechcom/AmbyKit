@@ -170,13 +170,14 @@ both Antigravity harnesses move to a plugin. The rest are **assumed defaults, co
   `ambykit-emitter-<target>` (one package covers both Antigravity harnesses). The official plugins live **in this repository**, each in
   `plugins/<name>/` (`package.json`, `tsconfig.json`, `src/index.ts`, `test/`, `CHANGELOG.md`), with **no npm workspaces**: a plugin gets
   everything through the `api` its factory receives, so it has no runtime dependency, and the root `files` allowlist already keeps
-  `plugins/` out of the core package. Versions are independent (FR-008). **One** extra deploy workflow, `publish-plugins.yml`, publishes
-  any plugin from a GitHub Release whose tag is `plugin/<name>/v<x.y.z>`; `publish.yml` ignores those tags. Trade-off against a sibling
+  `plugins/` out of the core package. Versions are independent (FR-008). **One** extra deploy workflow, `publish-plugins.yml`, runs only
+  when a push to `main` changes `plugins/**` and publishes each plugin whose version is not on npm yet, then tags it `plugin/<name>/v<x.y.z>`
+  with a GitHub Release created by `GITHUB_TOKEN` (which starts no other workflow); `publish.yml` also ignores those tags. Trade-off against a sibling
   repository: core and plugin changes ship in one pull request and share CI, at the price of plugin releases using this repository's
   tooling.
 - **C-3a First publish.** npm only lets a trusted publisher be configured for a package that already exists (there is no pending
   publisher), so the **first** version of each new package is published by hand from the owner's machine; the owner then adds the trusted
-  publisher on npmjs.com (this repository, workflow filename `publish-plugins.yml`, case-sensitive, environment `Prod`). npm does not
+  publisher on npmjs.com (this repository, workflow filename `publish-plugins.yml`, case-sensitive, environment `Prod`, allowed action `npm publish`). npm does not
   validate that entry when it is saved, and the first publish through it must happen within 2 days. Person tasks T034 and T037.
 - **C-4 The 2.0 gate.** The Antigravity plugin must be **published and install-tested** before the built-in Antigravity emitters are
   removed in 2.0. The long-tail targets (`gemini`, `llxprt`, `qwen`, `kilo`, `augment`, `windsurf`, `kiro`) follow the same rule but do
