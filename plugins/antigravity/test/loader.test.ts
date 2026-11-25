@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,6 +16,8 @@ import { buildRegistry } from "../../../src/plugins/registry.js";
 
 const dir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const NAME = "@ambystech/ambykit-emitter-antigravity";
+/** The version in the package itself, so a release bump needs no test edit. */
+const VERSION = (JSON.parse(readFileSync(join(dir, "package.json"), "utf8")) as { version: string }).version;
 const importSource = (): Promise<unknown> => import("../src/index.js");
 
 function installed(): string {
@@ -29,17 +31,17 @@ function installed(): string {
 
 describe("the package loads through the real loader (036:FR-003, FR-007)", () => {
   it("036:FR-007: it is accepted at the stable API with no notes, and provides both targets", async () => {
-    const { loaded, failures } = await loadPlugins(installed(), { [NAME]: "1.0.0" }, { importModule: importSource });
+    const { loaded, failures } = await loadPlugins(installed(), { [NAME]: VERSION }, { importModule: importSource });
     expect(failures).toEqual([]);
     expect(loaded).toHaveLength(1);
     expect(loaded[0]!.name).toBe(NAME);
-    expect(loaded[0]!.version).toBe("1.0.0");
+    expect(loaded[0]!.version).toBe(VERSION);
     expect(loaded[0]!.notes).toBeUndefined();
     expect(loaded[0]!.targets.map((t) => t.id)).toEqual(["antigravity", "antigravity-cli"]);
   });
 
   it("036:FR-003: while core still bundles Antigravity (before the removal task T050) both ids are reported as collisions and the built-ins win", async () => {
-    const { loaded } = await loadPlugins(installed(), { [NAME]: "1.0.0" }, { importModule: importSource });
+    const { loaded } = await loadPlugins(installed(), { [NAME]: VERSION }, { importModule: importSource });
     const registry = buildRegistry(TARGETS, loaded);
     expect(registry.collisions.map((c) => [c.id, c.with]).sort()).toEqual([
       ["antigravity", "built-in"],
@@ -49,8 +51,8 @@ describe("the package loads through the real loader (036:FR-003, FR-007)", () =>
   });
 
   it("036:FR-007: a pin that does not match the installed version is refused with the reason", async () => {
-    const { loaded, failures } = await loadPlugins(installed(), { [NAME]: "1.0.1" }, { importModule: importSource });
+    const { loaded, failures } = await loadPlugins(installed(), { [NAME]: "0.0.1" }, { importModule: importSource });
     expect(loaded).toEqual([]);
-    expect(failures.map((f) => f.reason).join("\n")).toMatch(/installed version 1\.0\.0 does not match the pin 1\.0\.1/);
+    expect(failures.map((f) => f.reason).join("\n")).toContain(`installed version ${VERSION} does not match the pin 0.0.1`);
   });
 });
