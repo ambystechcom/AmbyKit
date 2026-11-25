@@ -184,3 +184,4 @@ No `[NEEDS CLARIFICATION]` marker was open. Found while reading the code; each i
 - **C-2 Which runners.** `RUNNERS` in `src/core/runners.ts` holds two entries, `claude` and `codex`, both `verified: false`. "Every runner" in US-2 and FR-004 means those two; Copilot, Cursor and OpenCode have no headless runner and stay "no runner recorded" (not a gap, and not a 2.0 blocker).
 - **C-3 Per-OS verification.** A record names the operating systems it was checked on; a runner is runnable only there (edge case 1). A runner may be stable on one OS and refused on another, so `verified` alone is not enough: the record also carries the OS list and the version range.
 - **C-4 Plugins written for 1.x.** API 2.0.0 is a superset of 1.0.0, so a plugin declaring `^1` is accepted with a one-line note that it targets 1.x; a range that excludes both 1.x and 2.x is refused with the version it needs (FR-009).
+- **Confirmed.** The owner confirmed C-1 to C-4 as written, 2026-11-25 (T084).
