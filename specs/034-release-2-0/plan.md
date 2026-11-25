@@ -106,6 +106,8 @@ Three artifacts, two scripts, one checklist, plus documents. Nothing here runs a
 
 ## Risks & decisions
 
+**D-1..D-5 are answered; see `spec.md` Clarifications.** D-1: keep the Node 20 negative step, FR-007 reworded. D-2: precondition (default). D-3: `next`. D-4: 1.6.0, no 1.x before 2.0. D-5: as written.
+
 - **D-1 (owner): the Node 20 step in `ci.yml`.** FR-007 says CI does not run on Node 20. The current job installs Node 20 only to prove the required-version message (030:FR-015),
   which is the behaviour users on Node 20 will hit. Recommended: **keep it** as a negative check and amend FR-007 to "no build, test or publish job runs on Node 20". 030 T090 asked
   the same question and is still open. Alternative: delete the step and cover the message with a unit test of the bin entry (loses the real-Node-20 proof).

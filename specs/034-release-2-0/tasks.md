@@ -16,8 +16,8 @@ created: 2026-11-24
 ## Phase 1 — Setup
 
 - [ ] [T001] Research: confirm each fact in the plan against the repository (`publish.yml`, `ci.yml` Node 20 step, contributing checklist, migration guide sections, 1.x fixtures, `RUN_STABILITY`) and inventory every "experimental" label and 1.x-only statement in README, docs and site (specs/034-release-2-0/research.md)
-- [ ] [T002] PERSON: answer the owner decisions D-1 (Node 20 step in CI vs FR-007), D-2 (plugin as precondition, not a sixth gate condition), D-3 (candidate dist-tag name), D-4 (last 1.x version for rollback), D-5 (`RUN_STABILITY` outcome); record the answers as clarifications in `spec.md`, and amend FR-007/US-2 if D-1/D-2 change them (specs/034-release-2-0/spec.md)
-- **Verify:** `research.md` lists every coupling and every label hit, and `spec.md` records D-1 to D-5. ? unverified: T002 is a person task.
+- [x] [T002] PERSON: answer the owner decisions D-1 (Node 20 step in CI vs FR-007), D-2 (plugin as precondition, not a sixth gate condition), D-3 (candidate dist-tag name), D-4 (last 1.x version for rollback), D-5 (`RUN_STABILITY` outcome); record the answers as clarifications in `spec.md`, and amend FR-007/US-2 if D-1/D-2 change them (specs/034-release-2-0/spec.md)
+- **Verify:** `research.md` lists every coupling and every label hit, and `spec.md` records D-1 to D-5. T002 answered (spec.md Clarifications).
 
 ## Phase 2 — Foundational  (blocks all feature work)
 

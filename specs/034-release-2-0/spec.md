@@ -90,7 +90,7 @@ out half done.
 **Acceptance criteria**
 - Given the release branch, When the checklist is followed, Then it bumps `package.json` and the lockfile to 2.0.0, adds the
   changelog heading and plugin line, re-records the golden files, runs `sync` twice and runs the full tests.
-- Given CI, When it runs, Then it runs on Node 22 on Linux, macOS and Windows, and Node 20 is no longer in the matrix.
+- Given CI, When it runs, Then its build and test matrix is Node 22 on Linux, macOS and Windows, with no Node 20 in it; one separate negative step may run Node 20 only to prove the "Node.js 22 or newer" message.
 - Given the tag, When the release is published, Then the existing workflow verifies the tag equals the package version and
   publishes with provenance through trusted publishing, with no stored token.
 - Given the published package, When it is installed fresh, Then `ambykit --version` prints 2.0.0 and the migrate command exists.
@@ -154,7 +154,7 @@ As a reader, I want every page to describe 2.0, so that nothing contradicts the 
 - FR-005  WHEN the release branch is prepared, THE SYSTEM SHALL have migrated this repository's own specs with no file skipped
   and a second run changing nothing.
 - FR-006  THE SYSTEM SHALL keep fixtures of the 1.x format so that reading 1.x remains tested in 2.0.
-- FR-007  THE SYSTEM SHALL run CI on Node 22 on Linux, macOS and Windows and SHALL NOT run it on Node 20.
+- FR-007  THE SYSTEM SHALL run CI on Node 22 on Linux, macOS and Windows, and SHALL NOT run any build, test or publish job on Node 20 (one negative step that proves the required-version message is allowed).
 - FR-008  THE SYSTEM SHALL verify that the tag equals the package version and publish with provenance and no stored token.
 - FR-009  THE SYSTEM SHALL publish a release candidate on a non-`latest` tag first, and SHALL record the result of at least
   one project other than this repository before the final release.
@@ -185,3 +185,11 @@ As a reader, I want every page to describe 2.0, so that nothing contradicts the 
 - The release maintainer runs the person steps (the gate evidence and the publish); an assistant prepares the branch.
 - npm Trusted Publishing and the existing release workflow from 1.x are unchanged except for the Node version and a guard that ignores
   `plugin/*` tags; plugins publish through the one extra workflow `publish-plugins.yml` (036), whose first publish per package is manual.
+
+## Clarifications
+
+- D-1 (owner, answered): CI is Node 22 only; the Node 20 step stays as a negative check of the required-version message, and FR-007 is reworded above.
+- D-2 (owner, no preference; plan default applied): the Antigravity plugin is a precondition enforced by the release gate script, not a sixth gate condition; US-2's "exactly five" stands.
+- D-3 (owner, answered): the release candidate publishes under the dist-tag `next`.
+- D-4 (owner, answered): no 1.x release ships before 2.0; the last 1.x version for the rollback plan is 1.6.0.
+- D-5 (owner, answered): `run` stays experimental unless 033 T072 flips `RUN_STABILITY`; the label test reads the constant.
