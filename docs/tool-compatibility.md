@@ -204,7 +204,7 @@ install (the manual tasks T044 and T045 of spec 028), with the CLI version recor
 
 | Runner | Command (prompt on stdin) | Exit behaviour | Reports usage | Status | Version |
 | --- | --- | --- | --- | --- | --- |
-| `claude` | `claude -p` | 0 = finished its turn; non-zero = failed | no | unverified | — |
+| `claude` | `claude -p --permission-mode acceptEdits --allowedTools Bash(ambykit:*),PowerShell(ambykit:*) --output-format json` | 0 = finished its turn; non-zero = failed | no | unverified | — |
 | `codex` | `codex exec -` | 0 = finished; non-zero = failed | no | unverified | — |
 
 To confirm on a live install, per runner: the non-interactive flag, how the prompt is delivered (stdin, an

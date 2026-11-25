@@ -55,6 +55,8 @@ describe("process edge (feature 028)", () => {
     expect(shim.exe).toBe("cmd.exe");
     expect(shim.verbatim).toBe(true);
     expect(shim.args.join(" ")).toContain('"two words"');
+    // the claude runner's allowed-tools argument carries ( ) * , and is quoted for cmd.exe
+    expect(windowsCommand("C:\\bin\\claude.CMD", ["--allowedTools", "Bash(ambykit:*),PowerShell(ambykit:*)"]).args.join(" ")).toContain('"Bash(ambykit:*),PowerShell(ambykit:*)"');
     expect(windowsCommand("C:\\bin\\codex.exe", ["exec"])).toEqual({ exe: "C:\\bin\\codex.exe", args: ["exec"], verbatim: false });
   });
 });

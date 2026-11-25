@@ -50,4 +50,15 @@ describe("headless runner registry (feature 028)", () => {
     expect(claude.invoke({ prompt: "p", promptFile: "x" }).args).not.toContain("--model");
     expect(claude.invoke({ prompt: "p", promptFile: "x", model: "m" }).args).toContain("m");
   });
+
+  it("028:FR-006: the claude command can edit and report headless, and ends with a JSON result (live check, Windows)", () => {
+    const args = runnerFor("claude")!.invoke({ prompt: "p", promptFile: "x" }).args;
+    expect(args[0]).toBe("-p");
+    expect(args.slice(args.indexOf("--permission-mode"), args.indexOf("--permission-mode") + 2)).toEqual(["--permission-mode", "acceptEdits"]);
+    // only ambykit itself is allowed as a shell command, on both shell tools (Bash, and PowerShell on Windows)
+    expect(args[args.indexOf("--allowedTools") + 1]).toBe("Bash(ambykit:*),PowerShell(ambykit:*)");
+    expect(args.slice(args.indexOf("--output-format"), args.indexOf("--output-format") + 2)).toEqual(["--output-format", "json"]);
+    expect(args).not.toContain("--dangerously-skip-permissions");
+    expect(args).not.toContain("bypassPermissions");
+  });
 });

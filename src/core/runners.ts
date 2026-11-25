@@ -47,16 +47,29 @@ export interface RunnerSpec {
   toVerify: string;
 }
 
+/**
+ * The Claude Code command (live check on Windows, claude 2.1.332): plain `claude -p` exits 0 having done nothing, because
+ * every edit and shell command needs an approval nobody can give headless. `acceptEdits` allows file edits; the allowed
+ * tools add only `ambykit` itself (the lane's status reports), on both shell tools Claude Code may pick (Bash, and
+ * PowerShell on Windows); everything else stays denied. `--output-format json` ends the run with one JSON result that
+ * carries usage, `is_error`, `subtype` and `permission_denials` (read by `src/core/run-result.ts`).
+ */
+export const CLAUDE_ALLOWED_TOOLS = "Bash(ambykit:*),PowerShell(ambykit:*)";
+
 export const RUNNERS: RunnerSpec[] = [
   {
     id: "claude",
     label: "Claude Code",
     executable: "claude",
-    invoke: (job) => ({ exe: "claude", args: ["-p", ...(job.model ? ["--model", job.model] : [])], stdin: job.prompt }),
+    invoke: (job) => ({
+      exe: "claude",
+      args: ["-p", "--permission-mode", "acceptEdits", "--allowedTools", CLAUDE_ALLOWED_TOOLS, "--output-format", "json", ...(job.model ? ["--model", job.model] : [])],
+      stdin: job.prompt,
+    }),
     exit: "0 = finished its turn; non-zero = failed",
     reportsUsage: false,
     verified: false,
-    toVerify: "non-interactive flag, prompt on stdin, permission handling for edits, exit codes, usage output",
+    toVerify: "the permission flags let a lane edit its files and run `ambykit activity` (Bash and PowerShell), the JSON result's usage and failure fields, a failed turn's exit code",
   },
   {
     id: "codex",
