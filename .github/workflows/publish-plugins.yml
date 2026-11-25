@@ -1,15 +1,21 @@
 name: Publish plugin to npm
 
-# Publishes ONE official plugin from plugins/<name>/ when a GitHub Release is published with the tag
-# plugin/<name>/v<x.y.z> (or when run by hand with the plugin name). The core package has its own workflow
-# (publish.yml), which ignores plugin/* tags. See docs/plugins-release.md.
+# Publishes the official plugins in plugins/<name>/. It runs only when something under plugins/ changes on main, and
+# publishes each plugin whose package.json version is not on npm yet; a change without a version bump publishes nothing.
+# After a publish it tags the commit plugin/<name>/v<x.y.z> and creates a GitHub Release for it. That release is
+# created with the workflow's GITHUB_TOKEN, and GitHub does not start workflows from events that token causes, so
+# neither this workflow nor the core's publish.yml runs again for it. It can also be run by hand with a plugin name.
+# The core package has its own workflow (publish.yml). See docs/plugins-release.md.
 #
 # Auth is npm Trusted Publishing (OIDC), no stored token. Each plugin package needs its trusted publisher set on
-# npmjs.com: this repository, workflow filename "publish-plugins.yml" (case-sensitive), environment "Prod". npm can
-# only trust a package that already exists, so the FIRST version of a new plugin is published by hand once.
+# npmjs.com: this repository, workflow filename "publish-plugins.yml" (case-sensitive), environment "Prod", with
+# "npm publish" ticked under allowed actions. npm can only trust a package that already exists, so the FIRST version
+# of a new plugin is published by hand once.
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
+    paths:
+      - "plugins/**"
   workflow_dispatch:
     inputs:
       plugin:
@@ -19,15 +25,50 @@ on:
 
 permissions:
   contents: read
-  id-token: write # npm provenance attestation
+
+# Two merges in a row publish one after the other, never at the same time.
+concurrency:
+  group: publish-plugins
+  cancel-in-progress: false
 
 jobs:
+  # Which plugins to publish: by hand, the one named; on a push, every plugin whose version is not on npm yet.
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      plugins: ${{ steps.pending.outputs.plugins }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Plugins to publish
+        id: pending
+        env:
+          PLUGIN: ${{ inputs.plugin }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "plugins=$(node -e 'process.stdout.write(JSON.stringify([process.argv[1]]))' "$PLUGIN")" >> "$GITHUB_OUTPUT"
+          else
+            node scripts/plugin-release.mjs pending
+          fi
+
   publish:
-    # Release events for the core (v1.2.3 tags) are not ours.
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'plugin/')
+    needs: plan
+    if: needs.plan.outputs.plugins != '[]' && needs.plan.outputs.plugins != ''
     runs-on: ubuntu-latest
     # Must match the "Environment" set on the npm trusted publisher (case-sensitive).
     environment: Prod
+    permissions:
+      contents: write # the plugin/<name>/v<x.y.z> tag and its GitHub Release
+      id-token: write # npm Trusted Publishing and provenance
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        plugin: ${{ fromJSON(needs.plan.outputs.plugins) }}
     steps:
       - uses: actions/checkout@v7
 
@@ -51,12 +92,12 @@ jobs:
       - name: Build core
         run: npm run build
 
-      # Tag -> directory, tag version == package version, package name, pluginApi range includes the current plugin API.
+      # Directory name, package name, version x.y.z, pluginApi range includes the current plugin API, repository fields.
       - name: Verify the plugin package
         id: plugin
         env:
-          REF: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.plugin }}
-        run: node scripts/plugin-release.mjs verify "$REF"
+          PLUGIN: ${{ matrix.plugin }}
+        run: node scripts/plugin-release.mjs verify "$PLUGIN"
 
       - name: Build plugins
         run: npm run build:plugins
@@ -71,8 +112,7 @@ jobs:
         working-directory: ${{ steps.plugin.outputs.dir }}
         run: npm pack --dry-run
 
-      # The same version can reach this workflow twice (a manual run, then the Release). npm rejects the second
-      # publish, so detect it and skip rather than fail.
+      # A manual run for a version that is already on npm skips the publish (and the tag, which exists already).
       - name: Check whether this version is already on npm
         id: published
         env:
@@ -91,3 +131,21 @@ jobs:
         if: steps.published.outputs.exists != 'true'
         working-directory: ${{ steps.plugin.outputs.dir }}
         run: npm publish --access public
+
+      # Record the published version: tag plugin/<name>/v<x.y.z> on this commit and a GitHub Release for it. Created with
+      # GITHUB_TOKEN, so it starts no other workflow run (no skipped publish.yml run).
+      - name: Tag and release
+        if: steps.published.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NAME: ${{ steps.plugin.outputs.name }}
+          PKG: ${{ steps.plugin.outputs.package }}
+          VER: ${{ steps.plugin.outputs.version }}
+        run: |
+          TAG="plugin/$NAME/v$VER"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::notice::release $TAG already exists"
+          else
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "$PKG $VER" \
+              --notes "Published to npm as $PKG@$VER. Changes: plugins/$NAME/CHANGELOG.md"
+          fi
