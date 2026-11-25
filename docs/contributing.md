@@ -51,6 +51,9 @@ run `ambykit sync` and include the regenerated files in your commit.
 
 ## Release checklist
 
+These apply to every core release. The 2.0 release adds a candidate, a gate and a rollback plan: follow
+[`release.md`](./release.md) for it. Official plugins are released by their own tags ([`plugins-release.md`](./plugins-release.md)).
+
 - Move the `[Unreleased]` entries in `CHANGELOG.md` under the new version and bump `package.json`.
 - **Plugins:** state in the changelog whether plugins are affected. A change to anything in
   [`plugin-api.md`](./plugin-api.md) (extension points, the `PluginApi`, the matrix-row shape, the
