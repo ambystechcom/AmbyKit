@@ -11,7 +11,9 @@ what to extract (SC-007). If a target does move, the mechanism for telling a pro
 (VS Code and CLI variants, and Pi, which reuses Codex's output). The later additions are *plugin
 candidates*: Gemini CLI, LLxprt Code, Qwen Code, Kilo Code, Augment Code, Windsurf and Kiro.
 
-## The 18 targets
+## The 18 targets (as of the 2026-11-16 measurement)
+
+**Status after 2.0 (feature 036):** both Antigravity targets moved to the official plugin `@ambystech/ambykit-emitter-antigravity` (`plugins/antigravity/`); the seven later additions stay bundled with a deprecation notice until their plugins exist; everything else is built in. The registry holds sixteen ids. The table below is the evidence the decision used, so its Antigravity rows keep their old emitter file names.
 
 Churn is measured from git history of the target's emitter source file as of 2026-11-16: commits that
 touched the file, the date it was added and the date of the last change. It counts **our own** edits too
@@ -27,8 +29,8 @@ count of it. Aliases share their parent's file.
 | `opencode` | `opencode.ts` | built in | 5 · 2026-07-07 · 2026-11-16 | not collected |
 | `cursor` | `cursor.ts` | built in | 4 · 2026-07-07 · 2026-11-16 | not collected |
 | `cursor-cli` | `cursor-cli.ts` | built in (sibling) | 1 · 2026-07-07 · 2026-07-07 | not collected |
-| `antigravity` | `antigravity.ts` | built in | 4 · 2026-07-07 · 2026-11-16 | not collected |
-| `antigravity-cli` | `antigravity-cli.ts` | built in (sibling) | 3 · 2026-07-07 · 2026-11-16 | not collected |
+| `antigravity` | `antigravity.ts` (removed in 2.0) | official plugin | 4 · 2026-07-07 · 2026-11-16 | not collected |
+| `antigravity-cli` | `antigravity-cli.ts` (removed in 2.0) | official plugin | 3 · 2026-07-07 · 2026-11-16 | not collected |
 | `codex` | `codex.ts` | built in | 2 · 2026-07-13 · 2026-11-03 | not collected |
 | `gemini` | `gemini.ts` | plugin candidate | 1 · 2026-11-03 · 2026-11-03 | not collected |
 | `llxprt` | `llxprt.ts` | plugin candidate | 1 · 2026-11-03 · 2026-11-03 | not collected |

@@ -28,9 +28,9 @@ function project(): string {
   return root;
 }
 
-describe("one prompt edit reaches all 18 targets (SC-005)", () => {
+describe("one prompt edit reaches all 16 targets (SC-005)", () => {
   it("emits for every target, then reflects a prompt edit after one sync, and `sync --check` is clean", async () => {
-    expect(ALL).toHaveLength(18);
+    expect(ALL).toHaveLength(16);
     const root = project();
     expect((await runCommand(new SyncCommand(), root, [])).code).toBe(0);
     expect((await runCommand(new SyncCommand(), root, [], { check: true })).code).toBe(0);

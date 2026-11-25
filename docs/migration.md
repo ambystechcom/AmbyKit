@@ -153,7 +153,7 @@ The phase prompts (`/amby.implement`, `/amby.run` and the others) use it. If a v
 
 ## Antigravity is a plugin in 2.0
 
-> **Takes effect when you upgrade to AmbyKit 2.0.** In 1.x Antigravity is still bundled and nothing here applies yet.
+> **Applies from AmbyKit 2.0.** In 1.x Antigravity is still bundled and nothing here applies.
 
 AmbyKit 2.0 keeps Claude Code, Codex, Copilot, Cursor and OpenCode (with their variants `claude-vscode`, `copilot-cli`,
 `cursor-cli` and the `pi` alias) built in. **Both Antigravity targets, `antigravity` and `antigravity-cli`, move to an official

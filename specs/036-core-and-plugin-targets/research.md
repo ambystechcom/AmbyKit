@@ -64,3 +64,19 @@ name `ambykit-emitter-*`, and the test helper installs a fixture by that name). 
 on `api.SkillsEmitter` writing `.agents/skills/<phase>/SKILL.md`, the CLI one adding `.agents/mcp_config.json` through
 `api.MCP_COMMAND`. `test/plugins/api-mcp.test.ts` shows its paths and MCP file are byte-identical to the built-in Antigravity
 emitters', which is what the Phase 3 tests build on.
+
+## T035 — Install test on a project synced by 1.6 (2026-11-25, accepted by the owner)
+
+- Project: a new git repository with `npm install -D @ambystech/ambykit@1.6.0` and `ambykit init . --tools=claude,antigravity,antigravity-cli`,
+  committed as the 1.6 state. Then the core from branch `036-split-core` (packed tarball, built-in Antigravity emitters removed,
+  `SPLIT_ACTIVE` true) was installed over it.
+- Without the plugin: `ambykit sync` refuses `antigravity` and `antigravity-cli` with the install line
+  (`npm install --save-exact @ambystech/ambykit-emitter-antigravity`, list it under `plugins`) and leaves their files in place.
+- With the plugin: `npm install --save-exact @ambystech/ambykit-emitter-antigravity` (1.0.1, from npm) and
+  `"plugins": { "@ambystech/ambykit-emitter-antigravity": "1.0.1" }` in `.amby/config.json`. `ambykit check` lists the plugin and
+  reports `.agents/skills/` owned by both targets; `ambykit sync` succeeds.
+- Diff against the 1.6 state: 6 skills changed (`amby-converge`, `-implement`, `-revise`, `-run`, `-specify`, `-tasks`). These are the
+  prompts that 030 rewrote for 2.0; the same six Claude commands changed too, so the difference is prompt text, not the plugin.
+- Plugin against built-in: the same 1.6 project synced with `main`'s core (built-in Antigravity emitters, same prompts) gives
+  `.agents/` and `AGENTS.md` identical to the plugin's output (compared ignoring line endings). SC-001 holds: the plugin writes
+  what the built-in emitters wrote.

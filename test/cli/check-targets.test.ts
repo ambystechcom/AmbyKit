@@ -24,7 +24,7 @@ describe("ambykit check per new target", () => {
   it("every new target is registered, and Pi is the only alias among them", () => {
     for (const id of NEW) expect(TARGETS.some((t) => t.id === id), id).toBe(true);
     expect(TARGETS.filter((t) => NEW.includes(t.id) && t.alias).map((t) => t.id)).toEqual(["pi"]);
-    expect(TARGETS).toHaveLength(18);
+    expect(TARGETS).toHaveLength(16);
   });
 
   describe.each(NEW)("%s", (id) => {

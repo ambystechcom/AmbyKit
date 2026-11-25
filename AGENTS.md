@@ -13,7 +13,7 @@ code is written.
 
 The core design is **author-once, emit-per-tool**: one neutral source of truth (templates + phase
 prompts) is translated by per-tool **emitters** into each assistant's native command/rules format
-(Claude Code, OpenCode, GitHub Copilot + CLI, Cursor + CLI, Antigravity IDE + CLI).
+(Claude Code, OpenCode, GitHub Copilot + CLI, Cursor + CLI, Codex; Antigravity IDE + CLI come from the official plugin `plugins/antigravity/`).
 
 ## Golden rules
 

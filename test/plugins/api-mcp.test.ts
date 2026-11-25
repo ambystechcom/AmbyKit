@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
 import { loadCommandSpecs } from "../../src/core/command-spec.js";
-import { AntigravityCliEmitter, AntigravityEmitter } from "../../src/emitters/index.js";
+import { CodexEmitter } from "../../src/emitters/index.js";
 import { MCP_COMMAND, MCP_SERVER_NAME } from "../../src/emitters/base-emitter.js";
 import { createPluginApi } from "../../src/plugins/api.js";
 import * as barrel from "../../src/plugins/index.js";
@@ -55,27 +55,26 @@ describe("a plugin shaped like Antigravity (feature 036, T002)", () => {
     return Object.fromEntries(mod.default(createPluginApi()).targets.map((t) => [t.id, t.emitter]));
   }
 
-  it("036:FR-003: its IDE and CLI targets write the skills layout the built-in Antigravity emitters write", async () => {
+  it("036:FR-003: its IDE and CLI targets write the skills layout of a built-in skills target (Codex)", async () => {
     const t = await fixture();
     const own = (id: string) => t[id]!.emit(specs, ctx).map((f) => f.path);
-    expect(own("skills-target")).toEqual(new AntigravityEmitter().emit(specs, ctx).map((f) => f.path));
-    expect(own("skills-target-cli")).toEqual(new AntigravityCliEmitter().emit(specs, ctx).map((f) => f.path));
+    const codex = new CodexEmitter().emit(specs, ctx).map((f) => f.path);
+    expect(own("skills-target")).toEqual(codex);
+    expect(own("skills-target-cli")).toEqual(codex);
     expect(own("skills-target")).toContain(".agents/skills/amby-constitution/SKILL.md");
   });
 
-  it("036:FR-003: the CLI target's MCP file, built with api.MCP_COMMAND, is byte-identical to the built-in CLI emitter's", async () => {
+  it("036:FR-003: the CLI target's MCP file, built with api.MCP_COMMAND, is the project file Antigravity's CLI documents", async () => {
     const t = await fixture();
     const mine = t["skills-target-cli"]!.mcpFiles(ctx);
-    const builtIn = new AntigravityCliEmitter().mcpFiles(ctx);
-    expect(mine).toEqual(builtIn);
+    expect(mine).toEqual([{ path: ".agents/mcp_config.json", scope: "project", merge: "json", contents: JSON.stringify({ mcpServers: { ambykit: { command: "ambykit", args: ["mcp"] } } }, null, 2) + "\n" }]);
     expect(mine[0]!.path).toBe(".agents/mcp_config.json");
     expect(JSON.parse(mine[0]!.contents).mcpServers[MCP_SERVER_NAME]).toEqual(MCP_COMMAND);
   });
 
-  it("036:FR-003: the IDE target writes no MCP file and gives a reason, as the built-in IDE emitter does", async () => {
+  it("036:FR-003: the IDE target writes no MCP file and gives a reason, like Antigravity's IDE", async () => {
     const t = await fixture();
     expect(t["skills-target"]!.mcpFiles(ctx)).toEqual([]);
-    expect(t["skills-target"]!.mcpFiles(ctx)).toEqual(new AntigravityEmitter().mcpFiles(ctx));
     expect(typeof t["skills-target"]!.mcpSkipReason()).toBe("string");
   });
 });

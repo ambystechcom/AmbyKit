@@ -31,9 +31,10 @@ describe("moved targets (feature 027, US-5)", () => {
     expect(movedTarget("toString", MAP)).toBeUndefined();
   });
 
-  it("027:FR-013: nothing moved in 1.6: the map is empty and every built-in target is still bundled", () => {
-    expect(Object.keys(MOVED_TARGETS)).toEqual([]);
-    expect(TARGETS).toHaveLength(18);
+  it("027:FR-013, 036:FR-001: in 2.0 only the two Antigravity ids have moved, and the registry holds the 16 bundled ids", () => {
+    expect(Object.keys(MOVED_TARGETS).sort()).toEqual(["antigravity", "antigravity-cli"]);
+    expect(TARGETS).toHaveLength(16);
+    for (const id of Object.keys(MOVED_TARGETS)) expect(TARGETS.some((t) => t.id === id), id).toBe(false);
   });
 
   it("027:FR-014, 036:FR-004: sync prints the notice for a moved target as an error, exits 1 and removes none of its files", async () => {
@@ -55,7 +56,7 @@ describe("moved targets (feature 027, US-5)", () => {
     for (const t of TARGETS) expect(doc, t.id).toMatch(new RegExp(`\\| \`${t.id}\` \\|`));
     const rows = doc.split("\n").filter((l) => /^\| `[a-z-]+` \|/.test(l));
     expect(rows).toHaveLength(18);
-    for (const row of rows) expect(row, row).toMatch(/built in|plugin candidate/);
+    for (const row of rows) expect(row, row).toMatch(/built in|plugin candidate|official plugin/);
     expect(doc).toMatch(/2\.0 gate/);
   });
 });
@@ -88,9 +89,9 @@ describe("targetStatus (feature 036, FR-001, FR-002)", () => {
     expect(targetStatus("constructor", sources)).toEqual({ state: "unknown" });
   });
 
-  it("036:FR-001: with the real registry every registered target is still built in (nothing has moved yet)", () => {
-    expect(Object.keys(MOVED_TARGETS)).toEqual([]);
-    expect(Object.keys(DEPRECATED_TARGETS)).toEqual([]);
-    for (const t of TARGETS) expect(targetStatus(t.id), t.id).toEqual({ state: "built-in" });
+  it("036:FR-001: with the real registry the bundled targets are built in or deprecated, and the two Antigravity ids are moved", () => {
+    expect(Object.keys(DEPRECATED_TARGETS).sort()).toEqual(["augment", "gemini", "kilo", "kiro", "llxprt", "qwen", "windsurf"]);
+    for (const t of TARGETS) expect(targetStatus(t.id).state, t.id).toBe(t.id in DEPRECATED_TARGETS ? "deprecated" : "built-in");
+    for (const id of ["antigravity", "antigravity-cli"]) expect(targetStatus(id), id).toMatchObject({ state: "moved", package: "@ambystech/ambykit-emitter-antigravity" });
   });
 });

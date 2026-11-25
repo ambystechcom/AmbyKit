@@ -5,8 +5,6 @@ import { wordCount } from "../src/core/roles.js";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
-  AntigravityCliEmitter,
-  AntigravityEmitter,
   ClaudeEmitter,
   CodexEmitter,
   CopilotCliEmitter,
@@ -64,8 +62,6 @@ describe("decide command (feature 022)", () => {
       new OpenCodeEmitter(),
       new CursorEmitter(),
       new CursorCliEmitter(),
-      new AntigravityEmitter(),
-      new AntigravityCliEmitter(),
       new CodexEmitter(),
     ]) {
       const has = emitter.emit(specs, ctx).some((f) => /decide/.test(f.path));

@@ -26,7 +26,7 @@ describe("the migration guide lists the moved targets (036:FR-009)", () => {
   });
 
   it("036:FR-009: it says when it takes effect, what is never deleted, and that AmbyKit does not install the package for you", () => {
-    expect(migration).toContain("Takes effect when you upgrade to AmbyKit 2.0");
+    expect(migration).toContain("Applies from AmbyKit 2.0");
     expect(migration).toMatch(/never delete or rewrite/);
     expect(migration).toMatch(/does not install the package or edit your\s+config/);
   });
@@ -39,10 +39,10 @@ describe("the migration guide lists the moved targets (036:FR-009)", () => {
 });
 
 describe("the changelog lists the moved targets (036:FR-009)", () => {
-  it("036:FR-009: [Unreleased] names the package and both Antigravity targets, and says they are still bundled until 2.0", () => {
+  it("036:FR-009: [Unreleased] names the package and both Antigravity targets, and says they are moved (no longer bundled) in 2.0", () => {
     expect(unreleased).toContain("@ambystech/ambykit-emitter-antigravity");
     expect(unreleased).toContain("`antigravity`");
     expect(unreleased).toContain("`antigravity-cli`");
-    expect(unreleased).toMatch(/still bundled and nothing changes for you/);
+    expect(unreleased).toMatch(/Antigravity is moved: it is no longer bundled/);
   });
 });

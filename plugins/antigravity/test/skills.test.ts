@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { loadCommandSpecs } from "../src/core/command-spec.js";
-import { emitTarget } from "./helpers/emit-target.js";
+import { loadCommandSpecs } from "../../../src/core/command-spec.js";
+import { emitTargetWithPlugin as emitTarget } from "./helpers.js";
 
-/** Antigravity targets emit skills, not the retired workflows (feature 018, FR-001..003, FR-014). */
+/** Moved here from core in feature 036 (T053). Antigravity targets emit skills, not the retired workflows (feature 018, FR-001..003, FR-014). */
 describe.each([
   ["antigravity", "antigravity"],
   ["antigravity-cli", "antigravity-cli"],
@@ -39,5 +39,14 @@ describe.each([
 
   it("is a pure function of the neutral prompts (re-emit is identical)", () => {
     expect(emitTarget(target, { manageRules: false })).toEqual(out);
+  });
+});
+
+describe("the IDE and CLI targets share one skill output (moved from core's emitter tests)", () => {
+  it("the CLI writes the IDE's skill files byte for byte, apart from the self-report id", () => {
+    const ide = emitTarget("antigravity", { manageRules: false });
+    const cli = emitTarget("antigravity-cli", { manageRules: false });
+    expect(Object.keys(cli)).toEqual(Object.keys(ide));
+    for (const [path, text] of Object.entries(cli)) expect(text.replaceAll("--agent=antigravity-cli", "--agent=antigravity")).toBe(ide[path]);
   });
 });

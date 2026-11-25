@@ -17,8 +17,8 @@ Several targets share one emitter's output (why `BaseEmitter` + thin subclasses 
 | OpenCode | `OpenCodeEmitter` | `commands` |
 | Cursor | `CursorEmitter` | `commands` |
 | Cursor CLI (`cursor-agent`) | `CursorCliEmitter` | `none` (rules-only) |
-| Antigravity (IDE) | `AntigravityEmitter` | `skills` (workflows retired 2026-10-19) |
-| Antigravity CLI (`agy`) | `AntigravityCliEmitter` | `skills` (reuses Antigravity) |
+| Antigravity (IDE) | official plugin `@ambystech/ambykit-emitter-antigravity` | `skills` (workflows retired 2026-10-19) |
+| Antigravity CLI (`agy`) | official plugin `@ambystech/ambykit-emitter-antigravity` | `skills` (reuses Antigravity) |
 | Codex CLI (`codex`) | `CodexEmitter` | `skills` |
 | Gemini CLI (`gemini`) | `GeminiEmitter` | `commands` (TOML) |
 | LLxprt Code (`llxprt`) | `LlxprtEmitter` | `commands` (TOML) |

@@ -33,8 +33,6 @@ export const SUBAGENT_SUPPORT: Record<string, SubagentSupport> = {
   "copilot-cli": { status: "unconfirmed", agentFile: true, source: "shares the Copilot agent files; not run live" },
   cursor: { status: "unconfirmed", agentFile: false, source: "modes are UI only (no file); " + NONE },
   "cursor-cli": { status: "unconfirmed", agentFile: false, source: NONE },
-  antigravity: { status: "unconfirmed", agentFile: false, source: "agents are SDK only; " + NONE },
-  "antigravity-cli": { status: "unconfirmed", agentFile: false, source: NONE },
   codex: { status: "unconfirmed", agentFile: false, source: "skills only; " + NONE },
   gemini: { status: "unconfirmed", agentFile: false, source: NONE },
   llxprt: { status: "unconfirmed", agentFile: false, source: "`/subagent save` only, no file format; " + NONE },

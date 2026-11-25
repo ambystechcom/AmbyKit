@@ -40,14 +40,12 @@ describe("the package loads through the real loader (036:FR-003, FR-007)", () =>
     expect(loaded[0]!.targets.map((t) => t.id)).toEqual(["antigravity", "antigravity-cli"]);
   });
 
-  it("036:FR-003: while core still bundles Antigravity (before the removal task T050) both ids are reported as collisions and the built-ins win", async () => {
+  it("036:FR-003: with the built-ins removed from core the two ids are provided by the plugin alone, with no collision", async () => {
     const { loaded } = await loadPlugins(installed(), { [NAME]: VERSION }, { importModule: importSource });
     const registry = buildRegistry(TARGETS, loaded);
-    expect(registry.collisions.map((c) => [c.id, c.with]).sort()).toEqual([
-      ["antigravity", "built-in"],
-      ["antigravity-cli", "built-in"],
-    ]);
-    expect(registry.targets.find((t) => t.id === "antigravity")).toBe(TARGETS.find((t) => t.id === "antigravity"));
+    expect(registry.collisions).toEqual([]);
+    expect(registry.owners.get("antigravity")).toBe(NAME);
+    expect(registry.owners.get("antigravity-cli")).toBe(NAME);
   });
 
   it("036:FR-007: a pin that does not match the installed version is refused with the reason", async () => {

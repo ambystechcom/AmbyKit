@@ -7,7 +7,6 @@ import { buildEmittedFiles } from "../src/core/emit.js";
 import { installArtifactTemplates } from "../src/core/scaffold.js";
 import { loadRoles } from "../src/core/roles.js";
 import {
-  AntigravityEmitter,
   ClaudeEmitter,
   CodexEmitter,
   CopilotCliEmitter,
@@ -61,7 +60,6 @@ describe("role binding on emitted commands (feature 013, US-1)", () => {
       new CopilotCliEmitter(),
       new OpenCodeEmitter(),
       new CursorEmitter(),
-      new AntigravityEmitter(),
       new CodexEmitter(),
     ];
     for (const emitter of emitters) {
@@ -112,7 +110,7 @@ describe("native persona files (feature 013, US-5, FR-009)", () => {
     expectPersonas(new OpenCodeEmitter().emit(specs, ctx), ".opencode/agents/", ".md");
     expectPersonas(new CopilotEmitter().emit(specs, ctx), ".github/agents/", ".agent.md");
     expectPersonas(new CopilotCliEmitter().emit(specs, ctx), ".github/agents/", ".agent.md");
-    for (const emitter of [new CursorEmitter(), new AntigravityEmitter(), new CodexEmitter()]) {
+    for (const emitter of [new CursorEmitter(), new CodexEmitter()]) {
       expect(emitter.emit(specs, ctx).some((f) => /agents\/amby-/.test(f.path)), emitter.constructor.name).toBe(false);
     }
   });
