@@ -204,14 +204,18 @@ install (the manual tasks T044 and T045 of spec 028), with the CLI version recor
 
 | Runner | Command (prompt on stdin) | Exit behaviour | Reports usage | Status | Version |
 | --- | --- | --- | --- | --- | --- |
-| `claude` | `claude -p --permission-mode acceptEdits --allowedTools Bash(ambykit:*),PowerShell(ambykit:*) --output-format json` | 0 = finished its turn; non-zero, an error result or refused tools with tasks left open = failed | yes | verified | 2.1.332 |
+| `claude` | `claude -p --permission-mode acceptEdits --allowedTools Bash(ambykit:*),PowerShell(ambykit:*),Bash(npm test:*),PowerShell(npm test:*),Bash(npx vitest:*),PowerShell(npx vitest:*),Bash(npm run typecheck:*),PowerShell(npm run typecheck:*) --output-format json` | 0 = finished its turn; non-zero, an error result or refused tools with tasks left open = failed | yes | verified | 2.1.332 |
 | `codex` | `codex exec -` | 0 = finished; non-zero = failed | no | unverified | — |
 
 The `claude` command was changed after a live check on Windows (claude 2.1.332): plain `claude -p` exited 0 having
 done nothing, because every edit and shell command needs an approval nobody gives headless. `acceptEdits` allows the
-lane's file edits, the allowed tools add only `ambykit` itself (Bash, and PowerShell on Windows), and
-`--output-format json` ends the run with one result object. `ambykit run` reads it: its usage is counted against the
-token ceiling, and an error result, or refused tools with tasks left open, fails the lane even on exit 0.
+lane's file edits, the allowed tools add `ambykit` itself and the check commands in `fleet.allowedCommands`
+(default `npm test`, `npx vitest`, `npm run typecheck`, so a worker runs the tests before it ticks a task and QA runs the
+phase's Verify check), each as a prefix rule on Bash and on PowerShell (Windows); every other shell command stays
+denied. `--output-format json` ends the run with one result object. `ambykit run` reads it: its usage is counted against
+the token ceiling, and an error result, or refused tools with tasks left open, fails the lane even on exit 0. A QA or
+architect job also gets `--add-dir <run directory>`, because it writes its verdict there, outside the lane checkout it
+runs in.
 
 To confirm on a live install, per runner: the non-interactive flag, how the prompt is delivered (stdin, an
 argument or a file), the permission or sandbox flags a headless edit needs, the exit codes, and whether usage

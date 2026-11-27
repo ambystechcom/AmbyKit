@@ -51,9 +51,9 @@ describe("a single feature runs as before (feature 031, US-9)", () => {
       expect(kinds).toContain("merged");
       expect(kinds.at(-1)).toBe("done");
       expect(kinds).not.toContain("budget-exceeded");
-      // the prompts name the flat run directory, exactly as before
+      // the prompts name the flat run directory (by its absolute path since the 2.0 dogfood: the reviewer runs in the lane)
       const qa = readFileSync(join(fleetRoot(p.root), `${F}.1`, "prompts", "lane-1-1.qa.1.md"), "utf8");
-      expect(qa).toContain(`Write your verdict to .amby/fleet/${F}.1/verdicts/lane-1-1.qa.1.json as JSON`);
+      expect(qa).toContain(`/.amby/fleet/${F}.1/verdicts/lane-1-1.qa.1.json as JSON`);
       expect(runDirRel(p.root, `${F}.1`)).toBe(`.amby/fleet/${F}.1`);
       const lane = laneRefs(p.root, F)[0]!;
       expect(lanePromptText(lane, `${F}.1`)).toContain(`--run=${F}.1`);

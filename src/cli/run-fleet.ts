@@ -16,10 +16,11 @@ import { reviveForContinue } from "./run-control.js";
 import { acquireRunLock, guardNewRun, readBudget, readLaneFile, releaseRunLock, writeLaneFile, type LaneFile } from "./run-files.js";
 import { FleetSupervisor, superviseFleet, type BeginResult, type FeatureRun, type FleetOutcome } from "./run-fleet-loop.js";
 import { mergeDependencies, syncLanesWithFeature } from "./run-fleet-merge.js";
-import { prepareLanes } from "./run-fleet-prepare.js";
+import { ensureFeatureWorktree, prepareLanes } from "./run-fleet-prepare.js";
 import { running as runningLanes } from "./run-launch.js";
 import { Supervisor } from "./run-loop.js";
 import type { LaneRuntime, Session } from "./run-session.js";
+import { stagePreparer } from "./run-stages.js";
 import type { RunDeps } from "./run.js";
 
 /**
@@ -169,6 +170,17 @@ export async function runFleet(root: string, args: string[], opts: CliOptions, d
     }
   }
 
+  // a resumed fleet launches nothing without --yes either (028 FR-001; the 2.0 dogfood's --continue-fleet launched at once)
+  if (cont && !(flag(opts, "yes") || flag(opts, "y"))) {
+    if (json) console.log(JSON.stringify({ ...(planJson(plan) as object), fleet: cont, launched: false, launching: false }));
+    else {
+      io.info(`Fleet ${cont} would continue with: ${names.join(", ")}.`);
+      for (const line of planLines(plan)) io.info(line);
+      io.info(`Nothing launched. Re-run with --yes to continue this fleet.`);
+    }
+    return 0;
+  }
+
   // --- refuse unverified runners before anything starts (028 FR-006) ---------------------
   if (assistants.length === 0) {
     io.error("No assistants to run lanes on.", "Set `tools` in .amby/config.json or pass --assistant=<id>.");
@@ -235,6 +247,8 @@ export async function runFleet(root: string, args: string[], opts: CliOptions, d
       reportsUsage,
       slots: () => sup.slotsFor(feature),
       ...(deps.ask ? { ask: deps.ask } : {}),
+      // after each stage merges, the next one (sequential tasks included) is prepared from the merged code
+      prepareNext: stagePreparer(root, feature, { lanes: prepareFor.get(feature) ?? 2, assistants }),
     };
   };
   const adopt = (f: FleetFeature): SessionRun | null => {
@@ -252,6 +266,9 @@ export async function runFleet(root: string, args: string[], opts: CliOptions, d
     return run;
   };
   const begin = async (f: FleetFeature): Promise<BeginResult> => {
+    const home = await ensureFeatureWorktree(root, f.feature);
+    if (!home.ok) return { ok: false, reason: home.reason };
+    if (home.created && !json) io.info(`[${f.feature}] created its worktree`);
     const merged = mergeDependencies(root, f.feature, f.waitsFor.map((w) => w.feature));
     if (!merged.ok) return { ok: false, reason: merged.reason };
     let lanes = laneRefs(primaryRoot(root), f.feature);
@@ -259,7 +276,7 @@ export async function runFleet(root: string, args: string[], opts: CliOptions, d
       const prep = await prepareLanes(root, [{ feature: f.feature, lanes: prepareFor.get(f.feature) ?? 2 }], deps.laneRunner);
       if (!prep[0]!.ok) return { ok: false, reason: prep[0]!.reason ?? "its lanes could not be prepared" };
       lanes = laneRefs(primaryRoot(root), f.feature);
-      if (lanes.length === 0) return { ok: false, reason: `it has no parallel tasks to lane; run it alone with: ambykit run ${f.feature}` };
+      if (lanes.length === 0) return { ok: false, reason: `it has no open tasks to lane (every task is checked off)` };
     } else {
       const synced = syncLanesWithFeature(root, f.feature);
       if (!synced.ok) return { ok: false, reason: synced.reason };

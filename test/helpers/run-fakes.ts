@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { isAbsolute, join, resolve } from "node:path";
 import { RUNNERS, type RunnerSpec } from "../../src/core/runners.js";
 import type { ExitInfo, ProcessHandle, ProcessPort, SpawnSpec } from "../../src/cli/run-process.js";
 import { LaneCommand } from "../../src/cli/lane.js";
@@ -111,6 +111,7 @@ import { mkdirSync } from "node:fs";
 import { bootstrapRun, readLaneFile, writeLaneFile, type LaneFile } from "../../src/cli/run-files.js";
 import { Supervisor } from "../../src/cli/run-loop.js";
 import { preparedLanes } from "../../src/cli/run.js";
+import { stagePreparer } from "../../src/cli/run-stages.js";
 import type { LaneRuntime, Session } from "../../src/cli/run-session.js";
 import { fleetSettings, loadConfig, type FleetSettings } from "../../src/core/config.js";
 import { resolveBudgets, type Budgets } from "../../src/core/run-supervise.js";
@@ -136,6 +137,8 @@ export interface HarnessOptions {
   budgets?: Partial<Budgets>;
   usage?: boolean;
   unattended?: boolean;
+  /** Prepare each next stage after a merge, as `ambykit run` does (sequential tasks included). */
+  stages?: boolean;
 }
 
 export const flush = (): Promise<void> => new Promise((r) => setImmediate(r));
@@ -179,6 +182,7 @@ export function harness(p: LaneProject, opts: HarnessOptions = {}): Harness {
     lanes: runtimes,
     unattended: opts.unattended ?? false,
     reportsUsage: opts.usage ?? false,
+    ...(opts.stages ? { prepareNext: stagePreparer(root, feature, { lanes: 2, assistants }) } : {}),
   };
   const sup = new Supervisor(s, opts.review ?? false);
   return {
@@ -206,6 +210,8 @@ export interface Script {
   hang?: boolean;
   /** Reviewer verdict: pass, fail with these finding ids, or write nothing. */
   verdict?: "pass" | "none" | string[];
+  /** Leave the work uncommitted, as a real worker does (it may not run git); default false: the fake commits it. */
+  uncommitted?: boolean;
 }
 
 const IDS = /check each off in tasks\.md: ([T0-9, ]+)\./;
@@ -220,7 +226,8 @@ export function script(h: Pick<Harness, "port">, p: LaneProject, how: Script | (
     if (review) {
       const v = plan.verdict ?? "pass";
       if (v !== "none") {
-        const file = join(primaryRoot(p.root), review[1]!);
+        // the prompt names the run directory by its absolute path (the reviewer runs in the lane's checkout)
+        const file = isAbsolute(review[1]!) ? review[1]! : join(primaryRoot(p.root), review[1]!);
         mkdirSync(join(file, ".."), { recursive: true });
         writeFileSync(
           file,
@@ -233,7 +240,11 @@ export function script(h: Pick<Harness, "port">, p: LaneProject, how: Script | (
     const m = IDS.exec(prompt);
     if (plan.work !== false && m) {
       tickIn(proc.spec.cwd, p.feature, m[1]!.split(",").map((x) => x.trim()));
-      commitFile(proc.spec.cwd, `src/${proc.spec.cwd.split(/[\\/]/).pop()}.ts`, "work\n", "worker commit");
+      const rel = `src/${proc.spec.cwd.split(/[\\/]/).pop()}.ts`;
+      if (plan.uncommitted) {
+        mkdirSync(join(proc.spec.cwd, "src"), { recursive: true });
+        writeFileSync(join(proc.spec.cwd, rel), "work\n");
+      } else commitFile(proc.spec.cwd, rel, "work\n", "worker commit");
     }
     if (!plan.hang) proc.finish(plan.exit ?? 0);
   };

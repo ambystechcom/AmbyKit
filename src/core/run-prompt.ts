@@ -27,6 +27,8 @@ export interface LanePromptOptions {
   runDir?: string;
   /** The assistant id the lane runs on (`config.tools` id, e.g. `claude`); `ambykit activity` requires it as `--agent`. */
   assistant?: string;
+  /** Shell commands the worker may run besides `ambykit` (`fleet.allowedCommands`), to check its work before ticking. */
+  commands?: readonly string[];
 }
 
 export const shortName = (lane: string): string => lane.slice(lane.lastIndexOf(".lane-") + 1);
@@ -47,6 +49,9 @@ export function buildLanePrompt(lane: PromptLane, opts: LanePromptOptions): stri
     lines.push(`Read: ${refs}.`);
   }
   if (own.length > 0) lines.push(`Edit only the files you own: ${own.join(", ")}.`);
+  if (opts.commands && opts.commands.length > 0) {
+    lines.push(`Check your work before you tick a task: you may run ${opts.commands.map((c) => `\`${c}\``).join(", ")} (no other shell command besides ambykit).`);
+  }
   lines.push(
     `Report: ambykit activity ${lane.feature} --agent=${opts.assistant ?? "<your tool id>"} --phase=implement --task=T### --lane=${name} --state=<working|waiting|blocked|done> --run=${opts.run}; then read your directive with: ambykit fleet directive ${lane.feature} ${name} --run=${opts.run}.`,
   );

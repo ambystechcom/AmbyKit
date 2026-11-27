@@ -39,6 +39,8 @@ export interface LaunchPlanOptions {
   promptFileFor(lane: string): string;
   registry?: RunnerSpec[];
   model?: string;
+  /** Shell commands a job may run besides `ambykit` (`fleet.allowedCommands`). */
+  allowedCommands?: readonly string[];
 }
 
 const quote = (a: string): string => (/^[A-Za-z0-9_@%+=:,./\\-]+$/.test(a) ? a : `"${a.replace(/"/g, '\\"')}"`);
@@ -50,7 +52,12 @@ export function launchPlan(lanes: LaunchLane[], opts: LaunchPlanOptions): Launch
     const base = { lane: l.lane, full: l.full, assistant: l.assistant, cwd: l.cwd, promptFile, prompt: l.prompt };
     const can = runnable(l.assistant, registry);
     if (!can.ok) return { ...base, display: `# ${l.lane} (${l.assistant}): REFUSED — ${can.reason}`, refused: can.reason };
-    const command = can.runner.invoke({ prompt: l.prompt, promptFile, ...(opts.model ? { model: opts.model } : {}) });
+    const command = can.runner.invoke({
+      prompt: l.prompt,
+      promptFile,
+      ...(opts.model ? { model: opts.model } : {}),
+      ...(opts.allowedCommands ? { allowedCommands: opts.allowedCommands } : {}),
+    });
     const text = [command.exe, ...command.args].map(quote).join(" ");
     const display = `cd ${quote(l.cwd)} && ${text}${command.stdin !== undefined ? ` < ${quote(promptFile)}` : ""}`;
     return { ...base, command, display };

@@ -60,7 +60,18 @@ export interface Session {
    * per-type caps, so the caps hold across the fleet. Absent (a single run) means today's behavior exactly.
    */
   slots?: () => { lane: string; assistant: string }[];
+  /**
+   * Prepare the feature's next stage once every lane has merged (the 2.0 dogfood: sequential tasks must run too). The
+   * supervisor adds the returned lanes and keeps going; `none` = every task is done. Absent = the 1.6 behaviour: the run
+   * ends when its prepared lanes have merged.
+   */
+  prepareNext?: (merged: ReadonlySet<string>) => NextStage;
 }
+
+export type NextStage =
+  | { kind: "none" }
+  | { kind: "planned"; phase: number; stage: "serial" | "parallel"; lanes: { ref: LaneRef; assistant: string }[] }
+  | { kind: "failed"; reason: string };
 
 /** Persist a lane's file after changing it. */
 export function save(s: Session, rt: LaneRuntime): void {

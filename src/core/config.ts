@@ -31,6 +31,7 @@ const configSchema = z.object({
       workerModel: z.string().optional(),
       stopGraceMinutes: z.number().positive().optional(),
       runners: z.array(z.string()).optional(),
+      allowedCommands: z.array(z.string().min(1)).optional(),
     })
     .optional(),
   plugins: z.record(z.string(), z.string()).optional(),
@@ -53,6 +54,8 @@ export interface FleetSettings {
   workerModel?: string;
   stopGraceMinutes: number;
   runners: string[];
+  /** Shell commands a headless job may run besides `ambykit` (`fleet.allowedCommands`). */
+  allowedCommands: string[];
 }
 
 export const FLEET_DEFAULTS = {
@@ -62,6 +65,7 @@ export const FLEET_DEFAULTS = {
   roundLimit: 3,
   tickSeconds: 30,
   stopGraceMinutes: 10,
+  allowedCommands: ["npm test", "npx vitest", "npm run typecheck"],
 } as const;
 
 /** Resolve `config.fleet` against the defaults; the single place those numbers live. */
@@ -80,6 +84,7 @@ export function fleetSettings(config: { fleet?: FleetConfig } | null | undefined
     ...(f.workerModel ? { workerModel: f.workerModel } : {}),
     stopGraceMinutes: f.stopGraceMinutes ?? FLEET_DEFAULTS.stopGraceMinutes,
     runners: f.runners ?? [],
+    allowedCommands: f.allowedCommands ?? [...FLEET_DEFAULTS.allowedCommands],
   };
 }
 

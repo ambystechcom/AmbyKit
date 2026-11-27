@@ -1,9 +1,9 @@
-import { runDirRel } from "../core/fleet/index.js";
+import { runDir } from "../core/fleet/index.js";
 import { runnable } from "../core/runners.js";
 import { nextToStart } from "../core/run-schedule.js";
 import { lanePromptText, laneOpenTasks } from "./run-plan.js";
 import { writePromptFile } from "./run-files.js";
-import { rolePromptText } from "./run-protocol-prompts.js";
+import { absoluteRunDir, rolePromptText } from "./run-protocol-prompts.js";
 import { event, isRunning, save, type JobKind, type LaneRuntime, type Session } from "./run-session.js";
 
 /**
@@ -31,10 +31,17 @@ export function startJob(s: Session, rt: LaneRuntime, job: JobKind, opts: { find
   }
   const prompt =
     job === "worker"
-      ? lanePromptText(rt.ref, s.run, laneOpenTasks(rt.ref), opts.findings, runDirRel(s.root, s.run), rt.assistant)
+      ? lanePromptText(rt.ref, s.run, laneOpenTasks(rt.ref), opts.findings, absoluteRunDir(s), rt.assistant, s.settings.allowedCommands)
       : rolePromptText(s, rt, job);
   const file = writePromptFile(s.root, s.run, job === "worker" ? rt.file.lane : `${rt.file.lane}.${job}.${rt.round}`, prompt);
-  const command = can.runner.invoke({ prompt, promptFile: file, ...(s.settings.workerModel ? { model: s.settings.workerModel } : {}) });
+  const command = can.runner.invoke({
+    prompt,
+    promptFile: file,
+    ...(s.settings.workerModel ? { model: s.settings.workerModel } : {}),
+    allowedCommands: s.settings.allowedCommands,
+    // a reviewer writes its verdict into the run directory, outside the lane checkout it runs in
+    ...(job === "worker" ? {} : { addDirs: [runDir(s.root, s.run)] }),
+  });
   try {
     rt.handle = s.port.spawn({
       exe: command.exe,

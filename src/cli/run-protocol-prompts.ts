@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { readPhases } from "../core/spec-format/dispatch.js";
-import { runDirRel, verdictPath } from "../core/fleet/index.js";
+import { runDir, verdictPath } from "../core/fleet/index.js";
 import { buildRolePrompt } from "../core/run-prompt.js";
 import { laneArtifacts } from "./run-plan.js";
 import type { JobKind, LaneRuntime, Session } from "./run-session.js";
@@ -19,6 +19,11 @@ export function verdictFile(rt: LaneRuntime, role: "qa" | "architect", round: nu
   return verdictPath(rt.file.lane, role, round);
 }
 
+/** The run directory as an absolute path with forward slashes, for prompts that run in a lane's checkout. */
+export function absoluteRunDir(s: Session): string {
+  return runDir(s.root, s.run).replace(/\\/g, "/");
+}
+
 /** The QA or architect job's prompt: the role by `@` reference, the phase's Verify line, the verdict file. */
 export function rolePromptText(s: Session, rt: LaneRuntime, job: JobKind): string {
   const role = job === "architect" ? "architect" : "qa";
@@ -34,6 +39,7 @@ export function rolePromptText(s: Session, rt: LaneRuntime, job: JobKind): strin
     ...(verify ? { verify } : {}),
     artifacts: laneArtifacts(rt.ref),
     verdictFile: verdictFile(rt, role, rt.round),
-    runDir: runDirRel(s.root, s.run),
+    // absolute: the reviewer runs in the lane's checkout, but the supervisor reads the run directory of the project root
+    runDir: absoluteRunDir(s),
   });
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { RUNNERS, listRunners, runnable, runnerFor, type RunnerSpec } from "../../src/core/runners.js";
+import { CLAUDE_ALLOWED_TOOLS, RUNNERS, claudeAllowedTools, listRunners, runnable, runnerFor, type RunnerSpec } from "../../src/core/runners.js";
 
 // A verified test runner with no platform or version restriction, so it is runnable on every OS the suite runs on.
 const { verifiedOn: _on, verifiedRange: _range, ...base } = RUNNERS[0]!;
@@ -70,10 +70,29 @@ describe("headless runner registry (feature 028)", () => {
     const args = runnerFor("claude")!.invoke({ prompt: "p", promptFile: "x" }).args;
     expect(args[0]).toBe("-p");
     expect(args.slice(args.indexOf("--permission-mode"), args.indexOf("--permission-mode") + 2)).toEqual(["--permission-mode", "acceptEdits"]);
-    // only ambykit itself is allowed as a shell command, on both shell tools (Bash, and PowerShell on Windows)
-    expect(args[args.indexOf("--allowedTools") + 1]).toBe("Bash(ambykit:*),PowerShell(ambykit:*)");
+    // ambykit and the default check commands are the only shell commands, on both shell tools (Bash, and PowerShell on Windows)
+    expect(args[args.indexOf("--allowedTools") + 1]).toBe(
+      "Bash(ambykit:*),PowerShell(ambykit:*),Bash(npm test:*),PowerShell(npm test:*),Bash(npx vitest:*),PowerShell(npx vitest:*),Bash(npm run typecheck:*),PowerShell(npm run typecheck:*)",
+    );
     expect(args.slice(args.indexOf("--output-format"), args.indexOf("--output-format") + 2)).toEqual(["--output-format", "json"]);
     expect(args).not.toContain("--dangerously-skip-permissions");
     expect(args).not.toContain("bypassPermissions");
+  });
+
+  it("fleet.allowedCommands: the allowed shell commands are ambykit plus the configured ones, as one argument", () => {
+    const allowed = (cmds?: string[]): string => {
+      const args = runnerFor("claude")!.invoke({ prompt: "p", promptFile: "x", ...(cmds ? { allowedCommands: cmds } : {}) }).args;
+      return args[args.indexOf("--allowedTools") + 1]!;
+    };
+    expect(allowed(["pnpm test"])).toBe("Bash(ambykit:*),PowerShell(ambykit:*),Bash(pnpm test:*),PowerShell(pnpm test:*)");
+    expect(allowed([])).toBe(CLAUDE_ALLOWED_TOOLS);
+    expect(allowed(["ambykit", " "])).toBe("Bash(ambykit:*),PowerShell(ambykit:*)"); // no duplicate, no empty rule
+    expect(claudeAllowedTools()).toBe(allowed());
+  });
+
+  it("a review job may write its verdict outside the lane checkout: --add-dir names the run directory", () => {
+    const args = runnerFor("claude")!.invoke({ prompt: "p", promptFile: "x", addDirs: ["/repo/.amby/fleet/r.1"] }).args;
+    expect(args.slice(args.indexOf("--add-dir"), args.indexOf("--add-dir") + 2)).toEqual(["--add-dir", "/repo/.amby/fleet/r.1"]);
+    expect(runnerFor("claude")!.invoke({ prompt: "p", promptFile: "x" }).args).not.toContain("--add-dir");
   });
 });

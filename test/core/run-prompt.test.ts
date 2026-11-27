@@ -80,3 +80,22 @@ describe("lane prompt (feature 028)", () => {
     expect(p).toContain("no Verify line");
   });
 });
+
+describe("allowed check commands (fleet.allowedCommands, the 2.0 dogfood)", () => {
+  const lane: PromptLane = { feature: "037-x", lane: "037-x.lane-1-1", phase: 1, tasks: [{ id: "T001", paths: ["src/a.ts"] }] };
+
+  it("the worker prompt names the commands it may run to check its work before ticking", () => {
+    const p = buildLanePrompt(lane, { run: "r.1", artifacts: [], commands: ["npm test", "npx vitest"] });
+    expect(p).toContain("Check your work before you tick a task: you may run `npm test`, `npx vitest`");
+  });
+
+  it("without commands the prompt says nothing about them", () => {
+    expect(buildLanePrompt(lane, { run: "r.1", artifacts: [] })).not.toContain("Check your work");
+  });
+
+  it("the defaults are the test and typecheck commands, and config replaces them", async () => {
+    const { fleetSettings } = await import("../../src/core/config.js");
+    expect(fleetSettings({}).allowedCommands).toEqual(["npm test", "npx vitest", "npm run typecheck"]);
+    expect(fleetSettings({ fleet: { allowedCommands: ["pnpm test"] } }).allowedCommands).toEqual(["pnpm test"]);
+  });
+});

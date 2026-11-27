@@ -171,6 +171,12 @@ export interface FleetConfig {
   stopGraceMinutes?: number;
   /** Assistants `ambykit run` may assign lanes to, in order (028). Default: the configured tools that have a runner. */
   runners?: string[];
+  /**
+   * Shell commands a headless worker or reviewer may run besides `ambykit`, matched as a prefix (the 2.0 dogfood: a worker
+   * must run the tests before it ticks a task, and QA must run the phase's Verify check). Default `npm test`, `npx vitest`,
+   * `npm run typecheck`.
+   */
+  allowedCommands?: string[];
 }
 
 /** How a tool materializes phase prompts. */
