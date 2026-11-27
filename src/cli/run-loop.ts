@@ -1,7 +1,7 @@
 import { readRun, updateRun } from "../core/fleet/index.js";
 import { writeLaneFile } from "./run-files.js";
 import { enforceBudgets, meter, stopAll } from "./run-budget.js";
-import { applyDirectives, applyReassignments, heldByDirective } from "./run-control.js";
+import { applyDirectives, applyReassignments, heldByDirective, runHeld } from "./run-control.js";
 import { afterPhase } from "./run-gates.js";
 import { launchQueued, running } from "./run-launch.js";
 import { mergeReady } from "./run-merger.js";
@@ -68,6 +68,8 @@ export class Supervisor {
 
     const phase = this.currentPhase();
     if (phase === null) {
+      // a paused or stopped run prepares nothing new: it waits, polling, until it is resumed
+      if (runHeld(s)) return null;
       // every prepared lane merged: the next stage (sequential tasks included) is prepared from the merged code
       const next = this.prepareNext();
       return next === "continue" ? null : (next ?? this.finish());

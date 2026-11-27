@@ -5,6 +5,7 @@ import { lanePromptText, laneOpenTasks } from "./run-plan.js";
 import { writePromptFile } from "./run-files.js";
 import { absoluteRunDir, rolePromptText } from "./run-protocol-prompts.js";
 import { event, isRunning, save, type JobKind, type LaneRuntime, type Session } from "./run-session.js";
+import { jobHeld } from "./run-control.js";
 
 /**
  * The launch queue (feature 028, FR-004, FR-005): one process per lane, in the lane's own worktree, started
@@ -20,6 +21,7 @@ export function running(s: Session): LaneRuntime[] {
 /** Start one process for a lane: its worker, or a review job. Returns false when it could not start. */
 export function startJob(s: Session, rt: LaneRuntime, job: JobKind, opts: { findings?: string[]; restart?: boolean } = {}): boolean {
   if (s.stopReason) return false; // a budget stop is in force: nothing new starts (FR-014)
+  if (jobHeld(s, rt)) return false; // paused or stopped by a person: nothing new starts until resumed; the lane is unchanged
   const can = runnable(rt.assistant, s.registry);
   if (!can.ok) {
     rt.file.status = "failed";

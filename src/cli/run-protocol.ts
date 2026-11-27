@@ -7,6 +7,7 @@ import { addTaskEvents } from "./run-budget.js";
 import { startJob } from "./run-launch.js";
 import { verdictFile } from "./run-protocol-prompts.js";
 import { event, isRunning, save, type LaneRuntime, type Session } from "./run-session.js";
+import { jobHeld } from "./run-control.js";
 
 /**
  * The team protocol as processes (feature 028, FR-018): the same QA, architect and review loop `/amby.run`
@@ -25,7 +26,9 @@ export function advanceReviews(s: Session, review: boolean): void {
         save(s, rt);
         continue;
       }
-      rt.stage = "qa";
+      if (jobHeld(s, rt)) continue; // paused or stopped: no review starts until the lane is resumed
+      rt.stage = rt.resumeStage ?? "qa";
+      delete rt.resumeStage;
       rt.round = rt.round || 1;
       begin(s, rt);
     } else if (rt.file.status === "reviewing" && rt.job !== "worker" && !isRunning(s, rt) && rt.exit) {
@@ -83,6 +86,13 @@ function judge(s: Session, rt: LaneRuntime): void {
   if (step.kind === "advance") {
     rt.stage = "architect";
     event(s, "review-passed", rt, `${role} round ${rt.round}`);
+    if (jobHeld(s, rt)) {
+      // paused: the architect review starts when the lane is resumed (the lane waits as finished, at this stage)
+      rt.resumeStage = "architect";
+      rt.file.status = "finished";
+      save(s, rt);
+      return;
+    }
     begin(s, rt);
   } else if (step.kind === "pass") {
     rt.file.status = "ready";

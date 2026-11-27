@@ -4,6 +4,7 @@ import { createFleet, createRun, readDirective } from "../../src/core/fleet/inde
 import { listFleets } from "../../src/core/fleet/index.js";
 import type { FleetFeature } from "../../src/core/fleet-plan/types.js";
 import { FakePort } from "../helpers/run-fakes.js";
+import { writeLaneFile } from "../../src/cli/run-files.js";
 import { fleetRun, gitFleetProject, scriptWorkers } from "../helpers/fleet-run-fixture.js";
 import { tempProject } from "../helpers/spec-project.js";
 
@@ -31,6 +32,15 @@ describe("pause, stop and resume a whole fleet (feature 031, US-6)", () => {
     const root = recorded();
     controlFleet(root, "fleet-1", "stop");
     expect(readDirective(root, "032-b.1", "lane-1-1")?.action).toBe("stop");
+    controlFleet(root, "fleet-1", "resume");
+    expect(readDirective(root, "032-b.1", "lane-1-1")?.action).toBe("continue");
+  });
+
+  it("031:FR-015: a merged lane gets the directive too, so a run between two stages (every lane merged) is held and resumed", () => {
+    const root = recorded();
+    writeLaneFile(root, "032-b.1", { lane: "lane-1-1", full: "032-b.lane-1-1", assistant: "claude", status: "merged", restarts: 0 });
+    expect(controlFleet(root, "fleet-1", "pause").written).toContain("032-b:lane-1-1");
+    expect(readDirective(root, "032-b.1", "lane-1-1")?.action).toBe("pause");
     controlFleet(root, "fleet-1", "resume");
     expect(readDirective(root, "032-b.1", "lane-1-1")?.action).toBe("continue");
   });

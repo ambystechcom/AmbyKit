@@ -125,6 +125,26 @@ export function applyReassignments(s: Session): void {
   }
 }
 
+/**
+ * The whole run is held: every one of its lanes, merged ones included, has a pause or stop directive (a fleet pause
+ * writes one to each). Nothing new starts while it holds: no worker, no review, no next stage (the 2.0 dogfood: a
+ * paused fleet still started a QA review). A pause of a single lane holds only that lane (see `jobHeld`).
+ */
+export function runHeld(s: Session): boolean {
+  if (s.lanes.length === 0) return false;
+  return s.lanes.every((rt) => {
+    const d = readDirective(s.root, s.run, rt.file.lane);
+    return d !== null && (d.action === "pause" || d.action === "stop");
+  });
+}
+
+/** May no new job (worker or review) start for this lane? Its own pause or stop directive, or the whole run held. */
+export function jobHeld(s: Session, rt: { file: { lane: string } }): boolean {
+  const d = readDirective(s.root, s.run, rt.file.lane);
+  if (d && (d.action === "pause" || d.action === "stop")) return true;
+  return runHeld(s);
+}
+
 /** Lanes a person has paused or stopped that have not started: they must not launch. */
 export function heldByDirective(s: Session): Set<string> {
   const held = new Set<string>();

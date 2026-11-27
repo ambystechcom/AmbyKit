@@ -32,6 +32,8 @@ export interface LaneRuntime {
   stopAskedMs?: number;
   /** Review finding IDs to send back to the worker at its next start. */
   pendingFindings?: string[];
+  /** A review step that came due while the lane was paused (the architect after a passed QA): it starts on resume. */
+  resumeStage?: "qa" | "architect";
   /** The directive `at` last recorded as obeyed, so it is recorded once. */
   obeyedAt?: string;
 }
