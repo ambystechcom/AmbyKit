@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { planNextStage } from "../../src/core/lanes.js";
+import { isLastStageOfPhase, planNextStage } from "../../src/core/lanes.js";
 import { readTasks } from "../../src/core/spec-format/dispatch.js";
 
 /**
@@ -91,5 +91,35 @@ describe("planNextStage: every open task runs, in order", () => {
     const shared = tasks(`## Phase 1\n\n- [ ] [T001] a (src/a.ts)\n- [ ] [T002] [P] b (src/a.ts)\n- [ ] [T003] [P] c (src/a.ts)\n`);
     expect(planNextStage("001-x", shared)).toMatchObject({ kind: "serial", status: "planned" });
     expect(planNextStage("001-x", tick(shared, ["T001"]))).toMatchObject({ kind: "parallel", status: "conflict" });
+  });
+});
+
+describe("isLastStageOfPhase: the phase's Verify line judges only its last stage (the 2.0 dogfood: T010's stage failed QA on T011/T012's tests)", () => {
+  const afterPhase1 = tick(F037, ["T001", "T002"]);
+
+  it("037 phase 2's serial stage (T010) is not the last: T011 and T012 run after it", () => {
+    expect(isLastStageOfPhase(afterPhase1, ["T010"], 2)).toBe(false);
+    // its worker ticked T010: still the same stage
+    expect(isLastStageOfPhase(tick(afterPhase1, ["T010"]), ["T010"], 2)).toBe(false);
+  });
+
+  it("phase 2's parallel stage (T011 | T012) is the last, for each of its lanes, whatever the sibling has ticked", () => {
+    const afterT010 = tick(afterPhase1, ["T010"]);
+    expect(isLastStageOfPhase(afterT010, ["T011"], 2)).toBe(true);
+    expect(isLastStageOfPhase(tick(afterT010, ["T011"]), ["T012"], 2)).toBe(true);
+  });
+
+  it("phase 4 = a parallel stage then a serial one: the parallel stage is not last, the serial one is", () => {
+    const toPhase4 = tick(F037, ["T001", "T002", "T010", "T011", "T012"]);
+    expect(isLastStageOfPhase(toPhase4, ["T030"], 4)).toBe(false);
+    expect(isLastStageOfPhase(tick(toPhase4, ["T030", "T031"]), ["T032", "T033"], 4)).toBe(true);
+  });
+
+  it("a single-stage phase is its own last stage (unchanged behaviour)", () => {
+    expect(isLastStageOfPhase(F037, ["T001", "T002"], 1)).toBe(true);
+  });
+
+  it("a lane that is not a stage of the plan (a 1.6 lane of [P] tasks only, sequential ones still open) keeps the old rule", () => {
+    expect(isLastStageOfPhase(afterPhase1, ["T011"], 2)).toBe(true);
   });
 });

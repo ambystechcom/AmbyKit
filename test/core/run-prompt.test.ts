@@ -99,3 +99,14 @@ describe("allowed check commands (fleet.allowedCommands, the 2.0 dogfood)", () =
     expect(fleetSettings({ fleet: { allowedCommands: ["pnpm test"] } }).allowedCommands).toEqual(["pnpm test"]);
   });
 });
+
+describe("role prompt of an earlier stage (the 2.0 dogfood)", () => {
+  it("judges the lane's own tasks and does not ask for the phase's Verify line", () => {
+    const p = buildRolePrompt({ role: "qa", feature: "037-x", lane: "037-x.lane-2-1", phase: 2, round: 1, run: "r.1", roleFile: ".amby/roles/qa.md", stageTasks: ["T010"], artifacts, verdictFile: "v.json" });
+    expect(p).toContain("earlier stage of phase 2");
+    expect(p).toContain("(T010)");
+    expect(p).toContain("do not run the phase's Verify line");
+    expect(p).not.toContain("Run this check");
+    expect(p).not.toContain("no Verify line:");
+  });
+});
