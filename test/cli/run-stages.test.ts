@@ -87,4 +87,40 @@ describe.skipIf(!HAS_GIT)("run executes sequential tasks, in order (the 2.0 dogf
     const r = await runCommand(new RunCommand({ registry: fakeRegistry(), port: new FakePort() }), p.root, [F], {});
     expect(r.out).toContain("10 task events"); // twice the feature's 5 open tasks
   });
+  it("the phase's Verify line goes only to the reviewers of its last stage; an earlier stage is judged on its own tasks (the 2.0 dogfood)", async () => {
+    const md = [
+      "---", `feature: ${F}`, "---", "", "# Tasks", "",
+      "## Phase 1", "", "- [ ] [T001] task T001 (src/config.ts)", "",
+      "## Phase 2", "",
+      "- [ ] [T010] [US1] task T010 (src/analyze.ts)",
+      "- [ ] [T011] [P] [US1] task T011 (test/unit.test.ts)",
+      "- [ ] [T012] [P] [US1] task T012 (test/cli.test.ts)",
+      "- **Verify:** `npx vitest run test/unit.test.ts test/cli.test.ts` passes", "",
+    ].join("\n");
+    const p = laneProject(F, md);
+    await runCommand(new LaneCommand(), p.root, [F], { next: true });
+    const h = harness(p, { assistants: ["claude"], stages: true, unattended: true, review: true });
+    const reviews: string[] = [];
+    script(h, p, (_cwd, prompt) => {
+      if (/Write your verdict to/.test(prompt)) reviews.push(prompt);
+      return { work: true };
+    });
+    expect(await runToEnd(h)).toMatchObject({ kind: "done" });
+    const of = (lane: string): string[] => reviews.filter((r) => r.includes(`Review lane ${lane} of`));
+    // phase 2's serial stage (T010): judged on T010, never on the phase's Verify line
+    expect(of("lane-2-1").length).toBeGreaterThan(0);
+    for (const r of of("lane-2-1")) {
+      expect(r).toContain("earlier stage of phase 2");
+      expect(r).toContain("(T010)");
+      expect(r).not.toContain("Run this check");
+    }
+    // phase 2's last stage (T011 | T012): the phase's Verify line
+    for (const lane of ["lane-2-2", "lane-2-3"]) {
+      expect(of(lane).length).toBeGreaterThan(0);
+      for (const r of of(lane)) expect(r).toContain("Run this check and judge its result: **Verify:** `npx vitest run test/unit.test.ts test/cli.test.ts` passes");
+    }
+    // a single-stage phase without a Verify line: unchanged
+    for (const r of of("lane-1-1")) expect(r).toContain("The phase has no Verify line");
+  });
+
 });

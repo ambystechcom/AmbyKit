@@ -70,8 +70,13 @@ export interface RolePromptInput {
   run: string;
   /** The role file by reference, e.g. `.amby/roles/qa.md`. */
   roleFile: string;
-  /** The phase's `**Verify:**` line, verbatim; absent when the phase has none. */
+  /** The phase's `**Verify:**` line, verbatim; absent when the phase has none or this lane is not its last stage. */
   verify?: string;
+  /**
+   * Set when the lane is an earlier stage of its phase (more of the phase's tasks run after it): the lane's own task ids.
+   * The reviewer then judges those tasks only and is not given the phase's Verify line (later stages complete it).
+   */
+  stageTasks?: string[];
   artifacts: string[];
   /** The verdict file the role writes, relative to the run directory. */
   verdictFile: string;
@@ -84,7 +89,11 @@ export function buildRolePrompt(input: RolePromptInput): string {
   const refs = input.artifacts.map((a) => `@${a}`).join(" ");
   return [
     `Act as the ${input.role} reviewer: follow @${input.roleFile}. Review lane ${shortName(input.lane)} of ${input.feature}, phase ${input.phase}, round ${input.round}. Read: ${refs}.`,
-    input.verify ? `Run this check and judge its result: ${input.verify}` : "The phase has no Verify line: review the lane's diff against the plan.",
+    input.stageTasks
+      ? `This lane is an earlier stage of phase ${input.phase}: later stages build the phase's other tasks, so do not run the phase's Verify line. Judge only this lane's tasks (${input.stageTasks.join(", ")}) against the spec and plan; you may run the project's test and typecheck commands on them.`
+      : input.verify
+        ? `Run this check and judge its result: ${input.verify}`
+        : "The phase has no Verify line: review the lane's diff against the plan.",
     `Write your verdict to ${input.runDir ?? `.amby/fleet/${input.run}`}/${input.verdictFile} as JSON: {"verdict":"pass"|"fail","findings":[{"id","severity","finding","fix"}]}. A fail needs at least one finding with an id. Edit no other file.`,
   ].join("\n");
 }

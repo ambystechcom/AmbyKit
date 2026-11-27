@@ -196,15 +196,13 @@ export interface StagePlan {
   conflicts: LaneConflict[];
 }
 
-export function planNextStage(
-  feature: string,
+/** The tasks of the next stage (see `StagePlan`), before any lane or conflict check; null when no open task is left. */
+export function nextStageTasks(
   tasks: TaskLine[],
-  opts: { lanes?: number; firstIndex?: number; done?: ReadonlySet<string> } = {},
-): StagePlan {
-  // `done`: tasks already merged by this run's lanes, counted done even if a hand-resolved merge lost their tick
-  const open = tasks.filter((t) => !t.done && !opts.done?.has(t.id));
-  const none: StagePlan = { feature, status: "done", phase: 0, kind: "serial", lanes: [], conflicts: [] };
-  if (open.length === 0) return none;
+  done?: ReadonlySet<string>,
+): { phase: number; kind: StagePlan["kind"]; stage: TaskLine[]; rest: TaskLine[] } | null {
+  const open = tasks.filter((t) => !t.done && !done?.has(t.id));
+  if (open.length === 0) return null;
   const phase = Math.min(...open.map((t) => t.phase));
   const inPhase = open.filter((t) => t.phase === phase); // tasks.md order
   const kind: StagePlan["kind"] = inPhase[0]!.parallel ? "parallel" : "serial";
@@ -213,6 +211,37 @@ export function planNextStage(
     if (t.parallel !== (kind === "parallel")) break;
     stage.push(t);
   }
+  return { phase, kind, stage, rest: inPhase.slice(stage.length) };
+}
+
+/**
+ * Is a lane part of its phase's LAST stage (no open task of the phase remains after it)? Read from the lane's own
+ * `tasks.md`: earlier stages are merged (ticked) there, the lane's own tasks are counted open again (its worker may have
+ * ticked them), and the sibling lanes of a parallel stage are open there too (they tick in their own checkouts). Only
+ * the last stage is judged against the phase's Verify line: an earlier one cannot pass a check that runs files a later
+ * stage writes (the 2.0 dogfood: 037's T010 stage failed QA three rounds on T011/T012's missing tests). A lane that is
+ * not a stage of the plan (a 1.6 lane of `[P]` tasks only) keeps the old rule: true.
+ */
+export function isLastStageOfPhase(tasks: TaskLine[], laneTaskIds: readonly string[], phase: number, done?: ReadonlySet<string>): boolean {
+  const own = new Set(laneTaskIds);
+  const reopened = tasks.map((t) => (own.has(t.id) ? { ...t, done: false } : t));
+  const next = nextStageTasks(reopened, done ? new Set([...done].filter((id) => !own.has(id))) : undefined);
+  if (!next || next.phase !== phase) return true;
+  const stageIds = new Set(next.stage.map((t) => t.id));
+  if (!laneTaskIds.every((id) => stageIds.has(id))) return true;
+  return next.rest.length === 0;
+}
+
+export function planNextStage(
+  feature: string,
+  tasks: TaskLine[],
+  opts: { lanes?: number; firstIndex?: number; done?: ReadonlySet<string> } = {},
+): StagePlan {
+  // `done`: tasks already merged by this run's lanes, counted done even if a hand-resolved merge lost their tick
+  const none: StagePlan = { feature, status: "done", phase: 0, kind: "serial", lanes: [], conflicts: [] };
+  const next = nextStageTasks(tasks, opts.done);
+  if (!next) return none;
+  const { phase, kind, stage } = next;
   const first = Math.max(1, Math.floor(opts.firstIndex ?? 1));
   const base = { feature, phase, kind, lanes: [] as PlannedLane[], conflicts: [] as LaneConflict[] };
   if (kind === "serial") {
